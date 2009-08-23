@@ -1,0 +1,16 @@
+Congratulations!
+
+You have been requested to be a referrer of %member_name% (e-mail: %member_email_addr%) 
+to the position %position%.
+
+However, our system indicates that you have yet to become a member of YellowElevator.com. In order to accept this job referral, please sign up as a member by clicking on the following link, and then sign in to review the requester's resume:  
+
+%protocol%://%root%/members/sign_up.php?member=%member_email_addr%&referee=%referrer_email_addr%
+
+Yellow Elevator allows you to (1) refer jobs to your contacts and earn rewards for every successful job referral,
+and (2) get referred to better job opportunities. 
+
+We look forward to having you on board!
+
+Yellow Elevator
+Refer a Job

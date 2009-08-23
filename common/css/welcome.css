@@ -1,0 +1,188 @@
+#splash_floater, div.button_floater {
+    position: absolute;
+    z-index: 1;
+}
+
+#splash_floater {
+    width: 800px;
+    height: 280px;
+}
+
+div.button_floater {
+    width: 398px;
+    height: 80px;
+}
+
+a {
+    color: #333333;
+}
+
+a:hover {
+    color: #333333;
+}
+
+div.splash_banner {
+    /*border: 1px solid #CCCCCC;*/
+    width: 800px;
+    height: 300px;
+    margin: auto;
+    text-align: center;
+}
+
+object.splash_banner, embed.splash_banner, 
+object.action_button, embed.action_button, 
+object.promotion_banner, embed.promotion_banner {
+    width: 100%;
+    height: 95%;
+}
+
+table.action_buttons {
+    border: none;
+    margin: auto;
+    width: 800px;
+}
+
+table.action_buttons td.action_button {
+    /*border: 1px solid #CCCCCC;*/
+    text-align: center;
+    width: 50%;
+    height: 100px;
+}
+
+div.promotion_banner {
+    /*border: 1px solid #CCCCCC;*/
+    width: 800px;
+    height: 150px;
+    margin: auto;
+    text-align:center;
+}
+
+div.top_employers {
+    width: 885px;
+    height: 95px;
+    padding-bottom: 30px;
+    text-align: center;
+    margin: auto;
+}
+
+div.top_employers table.top_employers {
+    border: none;
+    width: 100%;
+    border-spacing: 0px;
+    margin: auto;
+}
+
+div.top_employers table.top_employers td {
+    text-align: center;
+}
+
+div.top_employers table.top_employers td.arrow {
+    border: 1px solid #CCCCCC;
+    width: 30px;
+}
+
+div.top_employers table.top_employers td div.employer_logos {
+    text-align: center;
+}
+
+div.top_jobs {
+    width: 800px;
+    margin: auto;
+    padding-top: 10px;
+}
+
+table.top_jobs {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.top_jobs td.top_jobs_header {
+    font-weight: bold;
+    color: #666666;
+    text-align: left;
+    width: 25%;
+}
+
+table.top_jobs td.top_jobs_item {
+    color: #666666;
+    text-align: left;
+    vertical-align: top;
+    padding: 5px 5px 5px 5px;
+}
+
+table.drop_contact {
+    /*border: 1px solid #6699FF;*/
+    /*border: 1px solid #C3E0FA;*/
+    border: none;
+    width: 100%;
+    margin: auto;
+}
+
+input.drop {
+    font-size: 10pt;
+    /*height: 23px;*/
+}
+
+td.title {
+    text-align: center;
+    /*background-color: #6699FF;*/
+    background-color: #CCCCCC;
+    font-size: 10pt;
+    font-weight: bold;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+td.label {
+    text-align: right;
+    padding: 10px;
+    width: 28%;
+}
+
+td.buttons {
+    text-align: center;
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#company, #email, #phone, #contact {
+    font-family: verdana, tahoma, arial;
+    font-size: 10pt;
+    width: 99%;
+    height: 23px;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+}
+
+#div_contact_drop_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 235px;
+    overflow: auto;
+    text-align: center;
+    z-index: 101;
+}
+
+#main_logo {
+    width: 196px;
+    height: 105px;
+}

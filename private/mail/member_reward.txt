@@ -1,0 +1,22 @@
+Hi %member_name%,
+
+Congratulations! %referee_name% was successfully employed by %employer% for the 
+%job_title% position. 
+
+To check your reward, please sign in at: 
+
+%protocol%://%root%/members/
+
+Just a friendly reminder that our system indicates that you have not provided 
+your bank account details to us.
+
+If you like us to transfer your rewards directly into your bank account, 
+please submit your details at the "Bank Account" section you signed in. Just 
+click on the "Bank Accounts" on the menu. 
+
+However, if you wish to receive your rewards by cheque instead, please ensure 
+that your full name and mailing address in your "Profile" section is valid. 
+Also, please leave the "Bank Account" section empty. Thank you!
+
+Yellow Elevator
+Refer a job

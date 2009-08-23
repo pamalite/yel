@@ -1,0 +1,32 @@
+div.description {
+    display: none;
+    font-size: 10pt;
+    padding: 10px 10px 10px 10px;
+}
+
+td.id {
+    width: 35px;
+}
+
+td.industry {
+    width: 150px;
+}
+
+td.title {
+    width: 150px;
+}
+
+td.date {
+    width: 150px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+

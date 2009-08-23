@@ -1,0 +1,15 @@
+Congratulations!
+
+You have been referred by %member_name% (e-mail: %member_email_addr%) 
+to the following positions:
+
+%positions%
+
+Please sign into your account to submit your application at "Jobs Referred To Me".
+
+To sign in, go to:
+
+%protocol%://%root%/members/
+
+Yellow Elevator
+Refer a job

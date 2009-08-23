@@ -1,0 +1,14 @@
+Congratulations!
+
+You have been referred by %member_name% (e-mail: %member_email_addr%) to 
+the %positions%.
+
+Your resume has been submitted to the employer. Please keep track of your 
+job application at 'Jobs Applied' after you sign into your account.
+
+To sign into your account, go to: %protocol%://%root%/members/
+
+We wish you good luck in your new job application!
+
+Yellow Elevator
+Refer a job

@@ -1,0 +1,363 @@
+body, div, p, td, input, textarea, select {
+    font-family: Verdana, Arial, Helvetica;
+}
+
+body {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+body, div, p, td {
+    font-size: 10pt;
+    text-align: left;
+}
+
+table.welcome_top {
+    margin: auto;
+    border-spacing: 0px;
+    width: 800px;
+}
+
+table.welcome_top td.welcome_logo {
+    text-align: left;
+    vertical-align: center;
+    width: 25%;
+}
+
+div.job_search {
+    width: 100%;
+    margin: auto;
+    border-bottom: 1px solid #;
+}
+
+div.search_form {
+    white-space: nowrap;
+}
+
+div.search_form #keywords {
+    width: 85%;
+    font-size: 10pt;
+    vertical-align: middle;
+}
+
+div.search_form #employer, div.search_form #industry {
+    width: 47%;
+    font-size: 10pt;
+    vertical-align: middle;
+}
+
+div.welcome_login {
+    font-size: 11pt;
+    color: #666666;
+    padding-bottom: 5px;
+}
+
+a.industry_item:link, a.industry_item:visited {
+    color: #666666;
+    text-decoration: none;
+}
+
+a.industry_item:active, a.industry_item:hover {
+    color: #0000FF;
+    text-decoration: underline;
+}
+
+a.no_link {
+    cursor: pointer;
+    color: #0000FF;
+}
+
+a {
+    color: #0000FF;
+    text-decoration: none;
+}
+
+a:link, a:visited {
+    color:#0000FF;
+}
+
+a:active, a:hover {
+    color: #FF0000;
+    text-decoration: underline;
+}
+
+img {
+    border: none;
+}
+
+div.status {
+    text-align: center;
+}
+
+span.status {
+    padding: 3px 5px 3px 5px;
+    background-color: #FFCC00;
+    visibility: hidden;
+    font-size: 10pt;
+}
+
+table.header {
+    width: 100%;
+    margin: auto;
+    font-weight: bold;
+    border-collapse: collapse;
+    /*border-top: 1px solid #0000FF;
+    border-bottom: 1px solid #0000FF;*/
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+table.header td {
+    font-size: 10pt;
+    /*background-color: #66CCFF;*/
+    background-color: #EEEEEE;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+table.list {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.list td {
+    font-size: 10pt;
+    border-bottom: 1px solid #CCCCCC;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+table.list tr:hover {
+    background-color: #FFFF00;
+}
+
+table.list td:hover {
+    background-color: #BBFCA1;
+}
+
+table.top {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+div.top {
+    text-align: center;
+}
+
+td.logo {
+    text-align: center;
+    width: 15%;
+}
+
+td.logo img {
+    vertical-align: middle;
+    border: none;
+}
+
+div.page_title {
+    text-align: left;
+    vertical-align: middle;
+    /*background-color: #FFCC00;*/
+    background-color: #FFCC00;
+    /*border-bottom: 1px solid #CCCCCC;*/
+    font-weight: bold;
+    margin-top: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 10px;
+}
+
+span.slogan {
+    font-style: italic;
+}
+
+div.footer p {
+    font-size: 9pt;
+    text-align: center;
+    /*background-color: #FFCC00;*/
+    /*background-color: #97DFFC;*/
+    padding-top: 25px;
+    padding-bottom: 3px;
+}
+
+div.menu {
+    margin-top: 20px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+div.menu ul.menu {
+    list-style-type: none;
+    white-space: nowrap;
+    padding: 0;
+    margin: 0;
+}
+
+ul.menu li {
+    padding: 5px 10px 5px 10px;
+    font-size: 10pt;
+    display: inline;
+    border: 1px solid white;
+}
+
+ul.menu li:hover {
+    border: 1px solid blue;
+}
+
+div.support {
+    font-size: 9pt;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+div.support span.phone, div.support span.email {
+    font-weight: bold;
+}
+
+div.rewards {
+	text-align: center;
+    font-size: 10pt;
+    padding-top: 45px;
+    padding-bottom: 15px;
+    color: #666666;
+}
+
+div.rewards div.rewards_title {
+    text-align: center;
+    font-size: 10pt;
+    padding-bottom: 10px;
+    font-weight: bold;
+}
+
+img.flag {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    border: none;
+}
+
+div.job_count {
+    font-size: 10pt;
+    padding-top: 15px;
+    padding-bottom: 3px;
+    color: #666666;
+}
+
+span.job_count {
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+div.mini_search {
+    /*border: 1px solid #FFCC00;*/
+}
+
+#mini_industry_drop_down {
+    font-size: 10pt;
+}
+
+#mini_employer_drop_down {
+    font-size: 10pt;
+}
+
+#mini_industry {
+    font-size: 10pt;
+}
+
+#mini_employer {
+    font-size: 10pt;
+}
+
+#mini_keywords {
+    width: 35%;
+    font-size: 10pt;
+    vertical-align: middle;
+}
+
+#mini_search_button {
+    font-size: 10pt;
+    vertical-align: middle;
+}
+
+table.search td.title {
+    text-align: center;
+    vertical-align: middle;
+    /*background-color: #99CCFF;
+    border: 1px solid #99CCFF;*/
+    font-weight: bold;
+}
+
+table.search td.search {
+    text-align: center;
+    vertical-align: middle;
+    /*border: 1px solid #99CCFF;*/
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+option.main_industry {
+    font-weight: bold;
+}
+
+#industry_drop_down {
+    /*font-size: 12pt;*/
+	font-size: 10pt;
+	vertical-align: middle;
+}
+
+#employer_drop_down {
+    font-size: 10pt;
+    vertical-align: middle;
+
+#mini_industry {
+    /*width: 15%;
+    font-size: 12pt;
+    width: 28%;*/
+    font-size: 10pt;
+	vertical-align: middle;
+}
+
+#mini_keywords {
+    width: 25%;
+    font-size: 10pt;
+}
+
+#industry {
+    width: 30%;
+    font-size: 10pt;
+    vertical-align: middle;
+}
+
+#employer {
+    width: 30%;
+    font-size: 10pt;
+    vertical-align: middle;
+}
+
+div.debug {
+    font-size: 8pt;
+}
+
+div.companies {
+    text-align: center;
+    padding-top: 75px;
+    padding-bottom: 20px;
+}
+
+img.companies {
+    border: none;
+    vertical-align: middle;
+}
+
+p.small_notes {
+    font-size: 9pt;
+    font-style: italic;
+    color: #666666;
+}
+
+div.reminder {
+    font-size: 9pt;
+    color: #666666;
+    font-style: italic;
+}

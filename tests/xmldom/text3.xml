@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+    <property>
+        <key>system.config.path</key>
+        <default>/Library/WebServer/Documents/yel2</default>
+        <value>somepath/to/file</value>
+    </property>
+    <property>
+        <key>database.name</key>
+        <value>yel2</value>
+        <default>yel2</default>
+    </property>
+    <property>
+        <key>database.host</key>
+        <value>yellowelevator.com</value>
+        <default>localhost</default>
+    </property>
+    <property>
+        <key>database.username</key>
+        <value>admin</value>
+        <default>root</default>
+    </property>
+    <property>
+        <key>database.password</key>
+        <value>mypassword</value>
+        <default></default>
+    </property>
+    <property>
+        <key>system.companyname</key>
+        <value>Yellow Elevator</value>
+        <default>My Company</default>
+    </property>
+</properties>

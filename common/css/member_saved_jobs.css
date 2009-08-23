@@ -1,0 +1,57 @@
+div.banner {
+    border: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 9pt;
+    margin-left: 250px;
+    margin-right: 250px;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+td.checkbox {
+    width: 10px;
+}
+
+td.industry, td.employer, td.title {
+   width: 150px;
+}
+
+td.date {
+    width: 150px;
+}
+
+table.list div.description {
+    display: none;
+    width: 99%;
+    font-size: 10pt;
+    padding: 10px 10px 10px 10px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+

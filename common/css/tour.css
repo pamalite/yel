@@ -1,0 +1,12 @@
+div.content {
+    width: 100%;
+    height: 650px;
+    border: 1px solid #EEEEEE;
+    text-align: center;
+    margin: auto;
+}
+
+object, embed {
+    width: 100%;
+    height: 100%;
+}

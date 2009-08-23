@@ -1,0 +1,381 @@
+table.upload_form, table.cover_note_form, table.experiences_form, 
+table.educations_form, table.skills_form, table.technical_skills_form {
+    width: 65%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+div.banner {
+    text-align: center;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_candidates {
+    border: 1px solid #CCCCCC;
+}
+
+#li_networks, #li_invite {
+    border: 1px solid #0000FF;
+}
+
+span.network {
+    font-size: 7pt;
+    color: #0000FF;
+    background-color: #FFFF99;
+    border: none;
+}
+
+td.testimony_title {
+    width: 50px;
+}
+
+td.testimony {
+    width: 83px;
+    text-align: center;
+}
+
+td.checkbox {
+    width: 10px;
+}
+
+td.id {
+    width: 35px;
+}
+
+td.date {
+    width: 150px;
+}
+
+td.email {
+    width: 400px;
+}
+
+td.add {
+    width: 100px;
+    text-align: center;
+}
+
+td.employer, td.job {
+    width: 100px;
+}
+
+td.reward {
+    width: 100px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+option.main_industry {
+    font-weight: bold;
+}
+
+textarea {
+    font-size: 10pt;
+    width: 99%;
+    height: 150px;
+}
+
+input.year {
+    width: 40px;
+    font-size: 10pt;
+}
+
+#div_candidate, #div_search_candidate, #div_networks,
+#div_network_form, #div_invite_contacts, #div_total_rewards {
+    display: none;
+}
+
+#div_total_rewards {
+    padding-top: 10px; 
+    padding-bottom: 10px;
+    text-align: center;
+    color: #666666; 
+}
+
+table.upload_form td.label, table.cover_note_form td.label, table.experiences_form td.label,
+table.educations_form td.label, table.skills_form td.label, table.technical_skills_form td.label {
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.educations_form td.label {
+    width: 35%;
+}
+
+table.upload_form td.title, table.cover_note_form td.title, table.experiences_form td.title,
+table.educations_form td.title, table.skills_form td.title, table.technical_skills_form td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+
+table.upload_form input.field, #div_resume_form input.field, #div_resume_form select.field,
+table.educations_form td.field, table.skills_form td.field, table.technical_skills_form td.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+#upload_progress {
+    display: none;
+}
+
+td.buttons_left, td.buttons_right {
+    background-color: #CCCCCC;
+}
+
+td.buttons_right {
+    text-align: right;
+}
+
+span.upload_note {
+    font-style: italic;
+    font-size: 9pt;
+}
+
+#experience_forms, #education_forms, #technical_skill_forms {
+    padding-bottom: 5px;
+}
+
+#div_resume_title {
+    text-align: center;
+    font-weight: bolder;
+    text-decoration: underline;
+    padding-top: 5px;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_network_form {
+    background-color: #FFFFFF;
+    position: absolute;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 450px;
+    height: 99px;
+}
+
+#div_network_form div.buttons {
+    background-color: #CCCCCC;
+    text-align: center;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#div_network_form p {
+    text-align: center;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#div_testimony {
+    background-color: #FFFFFF;
+    display: none;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 640px;
+    height: 480px;
+}
+
+#div_testimony div.buttons {
+    background-color: #CCCCCC;
+    text-align: center;
+}
+
+#div_testimony div.testimony {
+    height: 445px;
+    margin: 5px 5px 5px 5px;
+    text-align: left;
+    font-size: 10pt;
+    overflow: auto;
+}
+
+#div_candidate_details {
+    padding-top: 10px;
+    padding-bottom: 15px;
+}
+
+#div_candidate_details #div_candidate_name, 
+#div_candidate_details #div_candidate_networks, 
+#div_candidate_details #div_candidate_contacts {
+    text-align: center;
+}
+
+#div_candidate_details #div_candidate_name {
+    font-weight: bolder;
+    text-decoration: underline;
+}
+
+table.history {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.history td.left {
+    text-align: left;
+    vertical-align: middle;
+    background-color: #CCCCCC;
+    font-weight: bolder;
+}
+
+table.history td.right {
+    text-align: right;
+    font-style: italic;
+    vertical-align: middle;
+    font-size: 22pt;
+    font-weight: bolder;
+    background-color: #CCCCCC;
+}
+
+/* invite section */
+#li_smart_invite {
+    border: 1px solid #CCCCCC;
+}
+
+#li_manual_invite, #li_vcard_invite {
+    border: 1px solid #0000FF;
+}
+
+#div_manual_invite, #div_vcard_invite {
+    display: none;
+}
+
+table.invite_form, 
+table.get_contacts_form, 
+table.send_vcard_invites_form {
+    width: 65%;
+    margin: auto;
+}
+
+table.invite_form td.label, 
+table.get_contacts_form td.label, 
+table.send_vcard_invites_form td.label {
+    width: 35%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.invite_form td.title,
+table.get_contacts_form td.title, 
+table.send_vcard_invites_form td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+table.invite_form td.buttons_bar, 
+table.get_contacts_form td.buttons_bar,
+table.send_vcard_invites_form td.buttons_bar {
+    text-align: right;
+    background-color: #CCCCCC;
+}
+
+input, table.invite_form td.field, 
+table.get_contacts_form td.field, 
+table.send_vcard_invites_form td.field {
+    font-size: 10pt;
+}
+
+input.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+#oi_service {
+    width: 98%;
+    font-size: 10pt;
+}
+
+td.instruction {
+    text-align: center;
+    font-style: italic;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+textarea {
+    font-size: 10pt;
+    width: 99%;
+    height: 90px;
+}
+
+#send_invite_form, #send_vcard_invites_form {
+    display: none;
+}
+
+div.contacts {
+    width: 100%;
+    height: 295px;
+    overflow: auto;
+    border: 1px solid #CCCCCC;
+}
+
+#upload_progress {
+    display: none;
+}
+
+#vcard_contacts {
+    overflow: auto;
+    height: 300px;
+}
+
+td.vcard_contact {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}

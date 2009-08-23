@@ -1,0 +1,64 @@
+#div_new_invoices, #div_paid_invoices {
+    padding-top: 10px;
+}
+
+#div_paid_invoices {
+    display: none;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_new {
+    border: 1px solid #CCCCCC;
+}
+
+#li_paid {
+    border: 1px solid #0000FF;
+}
+
+td.expired {
+    text-align: center;
+    width: 20px;
+}
+
+td.type {
+    width: 150px;
+}
+
+td.invoice {
+    width: 150px;
+}
+
+td.date {
+    width: 150px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+img.warning {
+    vertical-align: middle;    
+}
+

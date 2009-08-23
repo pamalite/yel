@@ -1,0 +1,113 @@
+div.banner {
+    border: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 9pt;
+    margin-left: 250px;
+    margin-right: 250px;
+}
+
+table.bank_form {
+    width: 65%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+td.checkbox {
+    width: 10px;
+}
+
+td.edit {
+    text-align: center;
+    width: 100px;
+}
+
+td.bank, td.account {
+   width: 150px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+table.bank_form td.label {
+    width: 35%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.bank_form input.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+td.buttons_left, td.buttons_right {
+    background-color: #CCCCCC;
+}
+
+td.buttons_right {
+    text-align: right;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_bank_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 145px;
+    overflow: auto;
+}
+
+#div_bank_form p.instructions {
+    text-align: center;
+    font-style: italic;
+}
+
+#div_bank_form p.button {
+    text-align: center;
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}

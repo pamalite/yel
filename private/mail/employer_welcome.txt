@@ -1,0 +1,29 @@
+Hi %company%,
+
+Welcome to Yellow Elevator, the world of revolutionary web-based job referrals! 
+
+We are now in the process of setting up an account for you with the following 
+User ID and temporary password:
+
+User ID: %user_id%
+Temporary Password: %temporary_password%
+
+Please allow up to the next 24 hours for your account to be active. Also, please be 
+reminded that you need to update your account password in the Profile section once 
+you are signed in. 
+
+Please follow this link to sign in as an employer:
+
+%protocol%://%root%/employers
+
+As a security note, Yellow Elevator DOES NOT have access to your password. 
+All passwords are encrypted and destroyed after creation. If you are receiving 
+this e-mail but did not request for an account creation through our administrators 
+or systems, please alert us as soon as possible to prevent fraudulent access 
+requests.
+
+Thank you for choosing Yellow Elevator as your hiring partner, and we look forward to a 
+long-term business relationship with you. 
+
+Yellow Elevator
+Refer a job

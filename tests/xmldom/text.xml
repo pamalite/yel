@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+    <property key="system.config.path" default="/Library/WebServer/Documents/yel2" value="somepath/to/file" />
+    <property key="database.name" default="yel2" />
+    <property key="database.host" default="locahost" value="yellowelevator.com" />
+    <property key="database.username" default="root" value="sysyellowel" />
+    <property key="database.password" default="" value="mypassword" encryption="SHA1" />
+    <property key="system.companyname" default="My Company" value="Yellow Elevator" field="DROPDOWN" />
+</properties>

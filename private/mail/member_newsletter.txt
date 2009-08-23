@@ -1,0 +1,27 @@
+<p>Hello %member%,<p> 
+
+<p>Here are highlights of this week's jobs for you to refer to your contacts. To get the full details, sign in at yellowelevator.com/members:</p>
+
+<p>
+    <table cellspacing="3" cellpadding="3">
+        <tr>
+            <td>Employer</td>
+            <td>Job Title</td>
+            <td>Industry</td>
+            <td>Country</td>
+            <td>Reward</td>
+        </tr>
+        %job_list%
+    </table>
+</p>
+
+<p>We hope you will find them suitable for your contacts.</p>
+
+<p>Please use the following URL link to sign in and view the job ads: </p>
+
+<p>%protocol%://%root%/members</p>
+
+<p>Thank you for choosing Yellow Elevator.</p>
+
+<p>Yellow Elevator<br/>
+Refer a job</p>

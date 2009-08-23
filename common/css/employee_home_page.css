@@ -1,0 +1,6 @@
+div.deco {
+    background-image: url('../images/employee_home_bg.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 300px;
+}

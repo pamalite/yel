@@ -1,0 +1,87 @@
+#div_rewardeds {
+    display: none;
+}
+
+#div_total_rewards {
+    padding-top: 10px; 
+    padding-bottom: 10px;
+    text-align: center;
+    color: #666666; 
+    display: none;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_pendings {
+    border: 1px solid #CCCCCC;
+}
+
+#li_rewardeds {
+    border: 1px solid #0000FF;
+}
+
+div.description {
+    display: none;
+    font-size: 10pt;
+    padding: 10px 10px 10px 10px;
+}
+
+td.id {
+    width: 35px;
+}
+
+td.confirm {
+    width: 120px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+td.employer {
+    width: 150px;
+}
+
+td.title {
+    width: 150px;
+}
+
+td.date {
+    width: 150px;
+}
+
+td.reward_title, td.potential_title {
+    width: 100px;
+}
+
+td.reward {
+    width: 100px;
+    text-align: right;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+input.button {
+    font-size: 10pt;
+}

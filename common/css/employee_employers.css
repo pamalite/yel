@@ -1,0 +1,250 @@
+#div_employers, #div_employer {
+    padding-top: 10px;
+}
+
+#div_employer {
+    display: none;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_profile {
+    border: 1px solid #CCCCCC;
+}
+
+#li_employers, #li_service_fees, #li_extra_fees {
+    border: 1px solid #0000FF;
+}
+
+#div_service_fees, #div_extra_fees {
+    display: none;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+td.user_id, td.employer, 
+td.salary_start_title, td.salary_end_title, 
+td.guaranteed_months_title, td.service_fee_title, 
+td.discount_title, td.reward_percentage_title, 
+td.charge_label, td.amount_title {
+    width: 150px;
+}
+
+td.guaranteed_months {
+    width: 150px;
+    text-align: center;
+}
+
+td.salary_start, td.salary_end, td.service_fee, 
+td.discount, td.reward_percentage, td.amount {
+    width: 150px;
+    text-align: right;
+}
+
+td.checkbox {
+    width: 10px;
+    text-align: center;
+}
+
+td.date {
+    width: 100px;
+}
+
+td.actions {
+    width: 150px;
+    text-align: center;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+table.profile_form {
+    width: 80%;
+    margin: auto;
+}
+
+table.profile_form td.label {
+    width: 35%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.profile_form td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+table.profile_form td.buttons_bar {
+    text-align: right;
+    background-color: #CCCCCC;
+}
+
+input, table.profile_form td.field {
+    font-size: 10pt;
+}
+
+input.field, select.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+input.field_number {
+    width: 25px;
+    font-size: 10pt;
+}
+
+textarea {
+    font-size: 10pt;
+    width: 99%;
+    height: 90px;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_service_fee_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 300px;
+    overflow: auto;
+}
+
+#div_service_fee_form table.service_fee_form {
+    width: 95%;
+    margin: auto;
+}
+
+#div_service_fee_form table.service_fee_form td.label {
+    width: 35%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+#div_service_fee_form input, 
+#div_service_fee_form table.service_fee_form td.field {
+    font-size: 10pt;
+}
+
+#div_service_fee_form p.instructions {
+    text-align: center;
+    font-style: italic;
+}
+
+#div_service_fee_form p.tiny_note {
+    text-align: center;
+    font-style: italic;
+    font-size: 9pt;
+    color: #666666;
+}
+
+#div_service_fee_form p.button {
+    text-align: center;
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#div_extra_fee_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 150px;
+    overflow: auto;
+}
+
+#div_extra_fee_form table.extra_fee_form {
+    width: 95%;
+    margin: auto;
+}
+
+#div_extra_fee_form table.extra_fee_form td.label {
+    width: 35%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+#div_extra_fee_form input, 
+#div_extra_fee_form table.extra_fee_form td.field {
+    font-size: 10pt;
+}
+
+#div_extra_fee_form p.instructions {
+    text-align: center;
+    font-style: italic;
+}
+
+#div_extra_fee_form p.button {
+    text-align: center;
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#user_id_warning {
+    font-size: 9pt;
+    font-weight: bold;
+    color: #ff0000;
+}
+

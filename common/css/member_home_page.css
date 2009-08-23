@@ -1,0 +1,176 @@
+div.banner, div.rewards, div.job_count {
+    text-align: center;
+}
+
+#div_banner {
+    overflow: hidden;
+    height: 315px;
+}
+
+#div_approvals, #div_rewards, #div_jobs, 
+#div_acknowledgements {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#div_approvals, #div_rewards, 
+#div_acknowledgements {
+    display: none;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_jobs {
+    border: 1px solid #CCCCCC;
+}
+
+#li_rewards, #li_approvals, 
+#li_acknowledgements {
+    border: 1px solid #0000FF;
+}
+
+td.id {
+    width: 35px;
+}
+
+td.industry, td.employer {
+    width: 150px;
+}
+
+td.title, td.referrer {
+    width: 150px;
+}
+
+td.date {
+    width: 150px;
+}
+
+td.buttons {
+    text-align: center;
+    background-color: #CCCCCC;
+}
+
+td.acknowledge, td.approve {
+    width: 150px;
+    text-align: center;
+}
+
+td.reward_title, td.potential_title {
+    width: 100px;
+}
+
+td.reward {
+    width: 100px;
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+table.job_info {
+    width: 100%;
+    margin: auto;
+}
+
+table.job_info td.label {
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+    font-weight: bold;
+}
+
+table.job_info td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+table.job_info td.title_reward {
+    text-align: center;
+    font-weight: bold;
+    font-style: italic;
+}
+
+table.job_info div.job_description {
+    width: 100%;
+    height: 340px;
+    overflow: auto;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_job_info {
+    background-color: #FFFFFF;
+    display: none;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 800px;
+    height: 600px;
+}
+
+#div_acknowledge_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 120px;
+    overflow: auto;
+}
+
+#div_acknowledge_form p {
+    text-align: center;
+}
+
+#div_acknowledge_form p.button {
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#div_acknowledge_form select.field {
+    font-size: 12pt;
+}
+
+    

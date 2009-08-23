@@ -1,0 +1,183 @@
+div.description {
+    display: none;
+    font-size: 10pt;
+    padding: 10px 10px 10px 10px;
+}
+
+div.back {
+    padding-top: 5px;
+    padding-bottom: 15px;
+    text-align: center;
+    font-size: 10pt;
+}
+
+span.back {
+    border: 1px solid #0000FF;
+    padding: 5px 5px 5px 5px;
+}
+
+#div_job_info {
+    text-align: center;
+    padding-top: 10px;
+}
+
+table.job_info {
+    width: 85%;
+    margin: auto;
+}
+
+table.job_info td.label {
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+    font-weight: bold;
+}
+
+table.job_info td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+table.job_info td.title_reward {
+    text-align: center;
+    font-weight: bold;
+    font-style: italic;
+}
+
+table.job_info td.buttons {
+    background-color: #CCCCCC;
+    text-align: center;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+table.job_info div.job_description {
+    width: 100%;
+    /*height: 300px;*/
+    /*overflow: auto;*/
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_refer_form {
+    display: none;
+    background-color: #FFFFFF;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 675px;
+    height: 480px;
+    overflow: auto;
+}
+
+#div_refer_form table.refer_form, 
+#div_acknowledge_form table.request_form {
+    width: 95%;
+    margin: auto;
+}
+
+#div_refer_form table.refer_form td.separator, 
+#div_acknowledge_form table.request_form td.separator {
+    width: 1px;
+    border-left: 1px solid #CCCCCC;
+    /*background-color: #CCCCCC;*/
+}
+
+#div_refer_form table.refer_form td,
+#div_acknowledge_form table.request_form td {
+    vertical-align: top;
+    font-size: 10pt;
+}
+
+#div_refer_form table.refer_form td.right {
+    width: 50%;
+}
+
+#div_refer_form textarea.mini_field {
+    width: 99%;
+    height: 100px;
+}
+
+#div_refer_form input.mini_field {
+    width: 99%;
+}
+
+#div_refer_form div.candidates, 
+#div_acknowledge_form div.referrers {
+    width: 100%;
+    height: 295px;
+    overflow: auto;
+    border: 1px solid #CCCCCC;
+}
+
+#div_refer_form p {
+    font-size: 10pt;
+    margin: 3px 3px 3px 3px;
+}
+
+#div_refer_form p.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+    background-color: #CCCCCC;
+}
+
+#div_refer_form span.filter,
+#div_acknowledge_form span.filter {
+    font-size: 7pt;
+    font-weight: bold;
+}
+
+#div_acknowledge_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 950px;
+    height: 450px;
+    overflow: auto;
+}
+
+#div_acknowledge_form p {
+    text-align: center;
+}
+
+#div_acknowledge_form p.button {
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#div_acknowledge_form select.field {
+    font-size: 12pt;
+}
+
+#div_acknowledge_form table.request_form td.radio {
+    width: 5px;
+}
+
+#div_acknowledge_form table.request_form td.option {
+    width: 30%;
+}
+
+#div_acknowledge_form table.request_form textarea {
+    width: 98%;
+    height: 290px;
+}

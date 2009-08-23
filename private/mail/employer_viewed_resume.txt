@@ -1,0 +1,19 @@
+Hi %referee%,
+
+Our systems indicated that your resume submitted for the %job% position at 
+%employer% has been viewed.
+
+Please keep track of this job application at the "Jobs Applied" section 
+after you sign into your account at: 
+
+%protocol%://%root%/members/
+
+ALWAYS REMEMBER to click on "I'm Employed" in the Jobs Applied section if 
+you are hired by %employer%. 
+
+You MUST click on "I'm Employed" as long as you are hired by %employer% 
+regardless of the final position %employer% hires you for. Failure to do so 
+will result in your referrer not receiving the reward.
+
+Yellow Elevator
+Refer a job

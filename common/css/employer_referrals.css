@@ -1,0 +1,307 @@
+#div_referred_jobs, #div_referrals {
+    padding-top: 10px;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_referred {
+    border: 1px solid #CCCCCC;
+}
+
+#li_suggested, #li_referred_jobs, #li_shortlisted {
+    border: 1px solid #0000FF;
+}
+
+
+#div_referred, #div_suggested, #div_shortlisted{
+    padding-top: none;
+}
+
+#div_suggested, #div_shortlisted {
+    display: none;
+}
+
+#div_buttons {
+    text-align: right;
+    background-color: #CCCCCC;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+input.mini_button {
+    font-size: 9pt;
+}
+
+td.score {
+    width: 50px;
+}
+
+td.checkbox {
+    width: 10px;
+}
+
+td.id {
+    width: 35px;
+}
+
+td.indicator {
+    text-align: center;
+    width: 16px;
+}
+
+td.referrals {
+    width: 65px;
+    text-align: center;
+}
+
+td.industry {
+    width: 150px;
+}
+
+td.title, td.member, td.referee {
+    width: 150px;
+}
+
+td.date {
+    width: 150px;
+}
+
+td.view {
+    width: 150px;
+    text-align: center;
+}
+
+td.employ {
+    width: 180px;
+    text-align: center;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+div.description {
+    display: none;
+    font-size: 10pt;
+    padding: 10px 10px 10px 10px;
+}
+
+#div_referrals, #div_suggested {
+    display: none;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_description {
+    display: none;
+    background-color: #FFFFFF;
+    position: absolute;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 540px;
+    height: 400px;
+}
+
+#div_description #job_title {
+    font-size: 10pt;
+    font-weight: bold;
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+#div_description #description {
+    font-size: 10pt;
+    height: 83%;
+    overflow: auto;
+}
+
+#div_description p.button, #div_resume_viewing_terms p.button, 
+#div_employ_form p.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+}
+
+div.title {
+    text-align: center;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+div.industry {
+    text-align: center;
+    font-size: 9pt;
+}
+
+div.description_link {
+    text-align: center;
+    font-size: 9pt;
+    padding-bottom: 20px;
+}
+
+div.salary {
+    text-align: center;
+    font-weight: bold;
+}
+
+p.disclaimer {
+    text-align: center;
+    font-size: 7pt;
+}
+
+div.section {
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+table.section {
+    width: 65%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.section td {
+    padding-bottom: 5px;
+}
+
+table.section td.label, table.section td.field, 
+table.employ td.field {
+    font-size: 10pt;
+}
+
+table.section td.field, 
+table.employ_form td.field {
+    width: 98%;
+}
+
+table.section td.label,
+table.employ_form td.label {
+    font-weight: bold;
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.employ_form td.label {
+    width: 50%;
+    font-size: 10pt;
+}
+
+table.section td.separator {
+    height: 10px;
+}
+
+table.section td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+#div_resume_viewing_terms {
+    display: none;
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 480px;
+    overflow: auto;
+}
+
+#div_resume_viewing_terms p {
+    font-size: 9pt;
+    margin: 15px 15px 15px 15px;
+}
+
+#div_employ_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 150px;
+    overflow: auto;
+}
+
+#div_employ_form p {
+    text-align: center;
+}
+
+#div_employ_form p.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background-color: #CCCCCC;
+}
+
+table.employ_form {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+#div_employ_form div.note {
+    padding: 5px 5px 5px 5px;
+}
+
+#div_employ_form p.note {
+    text-align: center;
+    font-size: 9pt;
+    font-style: italic;
+    border: 1px dashed #FF0000;
+    padding: 10px 10px 10px 10px;
+}
+

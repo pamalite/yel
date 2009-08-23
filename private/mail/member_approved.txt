@@ -1,0 +1,10 @@
+Hi %referee_name%,
+
+%member_name% has approved your request and has been added into your Contacts. 
+
+Please go to to the following URL to check it out. 
+
+%protocol%://%root%/members/
+
+Yellow Elevator
+Refer a job

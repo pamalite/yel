@@ -1,0 +1,21 @@
+Hi %member%,
+
+We regret to inform that your referred contact has been removed from  
+employment within the guarantee period. As such, you are not eligible
+for the reward. 
+
+The details of the employment from which the referred contact has been removed are as follows:
+
+Job Title: %job_title%
+Employer: %employer%
+Industry: %industry%
+Contact: %candidate% (e-mail: %referee_email_addr%)
+Referred On: %referred_on%
+Employed On: %employed_on%
+Removed On: %authorized_on%
+
+All removals are solely at the discretion of the employer. 
+Yellow Elevator is not liable for any loss of rewards.
+
+Yellow Elevator
+Refer a job

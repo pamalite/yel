@@ -1,0 +1,195 @@
+div.banner {
+    border: 1px dashed #ff0000;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 9pt;
+    margin-left: 250px;
+    margin-right: 250px;
+}
+
+#div_new_rewards, #div_partially_paid_rewards, 
+#div_fully_paid_rewards, #div_payments {
+    padding-top: 10px;
+}
+
+#div_partially_paid_rewards, #div_fully_paid_rewards, #div_payments {
+    display: none;
+}
+
+#div_payments div.payment_info {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+#div_payments div.button {
+    text-align: right;
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#div_payments table.total_amount {
+    width: 100%;
+    margin: auto;
+    font-weight: bold;
+    border-collapse: collapse;
+}
+
+#div_payments table.total_amount td.label {
+    text-align: right;
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_new {
+    border: 1px solid #CCCCCC;
+}
+
+#li_partially_paid, #li_fully_paid {
+    border: 1px solid #0000FF;
+}
+
+td.id, td.days {
+    width: 50px;
+}
+
+td.days {
+    text-align: center;
+}
+
+td.action {
+    text-align: center;
+    width: 100px;
+}
+
+td.reward, td.reward_title, td.amount, td.amount_title {
+    width: 150px;
+    padding-right: 15px;
+    text-align: right;
+}
+
+td.reward, td.amount {
+    text-align: right;
+}
+
+td.title, td.employer, td.member, td.mode, td.bank, td.receipt, td.cheque {
+    width: 150px;
+}
+
+td.invoice {
+    width: 100px;
+}
+
+td.date {
+    width: 90px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+table.payment_form {
+    width: 98%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.payment_form td.label {
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.payment_form input.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+#div_payment_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 240px;
+    overflow: auto;
+}
+
+#div_payment_form p.instructions {
+    text-align: center;
+    font-style: italic;
+}
+
+#div_payment_form p.button {
+    text-align: center;
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#div_payment_plan {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 243px;
+    overflow: auto;
+}
+
+#div_payment_plan p.instructions {
+    text-align: center;
+    font-style: italic;
+}
+
+#div_payment_plan p.button {
+    text-align: center;
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+

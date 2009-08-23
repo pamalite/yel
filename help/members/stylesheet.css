@@ -1,0 +1,83 @@
+@charset "utf-8";
+div.top {
+    text-align: center;
+}
+table.top {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+td.logo {
+    text-align: center;
+    width: 15%;
+}
+
+img {
+    border: none;
+}
+body, div, p, td, input, textarea, select {
+    font-family: Verdana, Arial, Helvetica;
+}
+
+body {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+body, div, p, td {
+    font-size: 10pt;
+    text-align: left;
+}
+div.page_title {
+    text-align: left;
+    vertical-align: middle;
+    /*background-color: #FFCC00;*/
+    background-color: #FFCC00;
+    /*border-bottom: 1px solid #CCCCCC;*/
+    font-weight: bold;
+    margin-top: 10px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 10px;
+}
+.myp {
+	line-height:150%;
+	color: #333333;
+	font: 100% Verdana, Arial, Helvetica, sans-serif;
+	font-size:12px;
+}
+.con_container{
+	margin-left:15%;
+}
+.myul {
+	color: #333333;
+	font: 100% Verdana, Arial, Helvetica, sans-serif;
+	font-size:12px;
+	list-style-position: outside;
+}
+.myulli{
+	line-height:150%;
+}
+.myol {
+	color: #333333;
+	font-size:12px;
+	counter-reset: item;
+	list-style-position:outside;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+.myemptyli{
+	list-style-type:none;
+}
+.myolli {
+	line-height:150%;
+	display: block
+}
+.myolli:before { 
+	content: counters(item, ".") ". ";
+	counter-increment: item;
+}
+.section_link{
+	color: #0000FF;
+	text-decoration:none;
+	font-weight:bold;
+}

@@ -1,0 +1,152 @@
+table.content {
+    border: none;
+    width: 98%;
+    margin: auto;
+    padding-top: 25px;
+    padding-bottom: 5px;
+}
+
+table.content td {
+    vertical-align: top;
+}
+
+table.content td.content {
+    width: 70%;
+}
+
+div.content {
+    font-size: 10pt;
+    text-align: center;
+}
+
+div.content p {
+    margin-left: 25px;
+    margin-right: 15px;
+    font-size: 10pt;
+}
+
+table.description {
+    border: none;
+    margin: auto;
+    width: 75%;
+}
+
+table.description td {
+    vertical-align: middle;
+    color: #666666;
+    font-size: 10pt;
+}
+
+table.description td.icons {
+    text-align: center;
+    padding-right: 25px;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_contact_drop_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 235px;
+    overflow: auto;
+    text-align: center;
+}
+
+div.login {
+    text-align: center;
+    padding-top: 5px;
+}
+
+table.login {
+    /*border: 1px solid #6699FF;*/
+    border: 1px solid #CCCCCC;
+    width: 95%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.login td {
+    padding: 5px 5px 5px 5px;
+    vertical-align: middle;
+}
+
+table.drop_contact {
+    /*border: 1px solid #6699FF;*/
+    /*border: 1px solid #C3E0FA;*/
+    border: none;
+    width: 100%;
+    margin: auto;
+}
+
+input.login, input.drop {
+    font-size: 10pt;
+    /*height: 23px;*/
+}
+
+td.id, td.password {
+    text-align: right;
+    width: 15%;
+}
+
+td.title {
+    text-align: center;
+    /*background-color: #6699FF;*/
+    background-color: #CCCCCC;
+    font-size: 10pt;
+    font-weight: bold;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#id, #password {
+    font-family: verdana, tahoma, arial;
+    font-size: 10pt;
+    width: 97%;
+    /*height: 23px;*/
+}
+
+td.login_status {
+    text-align: center;
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+span.forgot_password {
+    font-size: 10pt;
+}
+
+td.label {
+    text-align: right;
+    padding: 10px;
+    width: 28%;
+}
+
+td.buttons {
+    text-align: center;
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#company, #email, #phone, #contact {
+    font-family: verdana, tahoma, arial;
+    font-size: 10pt;
+    width: 99%;
+    height: 23px;
+}

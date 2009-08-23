@@ -1,0 +1,10 @@
+Hi %referee_name%,
+
+%member_name% has requested to add you as a contact. 
+
+To approve %member_name%'s request, please go to 
+
+%protocol%://%root%/members/
+
+Yellow Elevator
+Refer a job

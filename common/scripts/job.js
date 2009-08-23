@@ -1,0 +1,516 @@
+var order_by = 'relevance';
+var order = 'desc';
+var filter_by = '0';
+var candidates_list = new ListBox('candidates', 'candidates_list');
+var referrers_list = new ListBox('referrers', 'referrers_list', true);
+
+function ascending_or_descending() {
+    if (order == 'desc') {
+        order = 'asc';
+    } else {
+        order = 'desc';
+    }
+}
+
+function duplicated(emails, email) {
+    if (isEmpty(emails)) {
+        return false;
+    }
+    
+    var temp = emails.split(',');
+    for (var i=0; i < temp.length; i++) {
+        if (email == temp[i]) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+function show_candidates() {
+    $('candidates').set('html', '');
+    
+    var params = 'id=' + id + '&action=get_candidates';
+    params = params + '&filter_by=' + filter_by;
+    
+    var uri = root + "/search_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error occured while loading candidates.');
+                return false;
+            }
+            
+            candidates_list.clear();
+            
+            var ids = xml.getElementsByTagName('id');
+            var referee_names = xml.getElementsByTagName('referee_name');
+            var referee_emails = xml.getElementsByTagName('referee');
+            
+            for (var i=0; i < ids.length; i++) {
+                candidates_list.add_item(referee_names[i].childNodes[0].nodeValue, referee_emails[i].childNodes[0].nodeValue);
+            }
+            
+            candidates_list.show();
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading referees...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function show_referrers() {
+    $('candidates').set('html', '');
+    
+    var params = 'id=' + id + '&action=get_candidates';
+    params = params + '&filter_by=' + filter_by;
+    
+    var uri = root + "/search_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error occured while loading referrers.');
+                return false;
+            }
+            
+            referrers_list.clear();
+            
+            var ids = xml.getElementsByTagName('id');
+            var contact_names = xml.getElementsByTagName('referee_name');
+            var contact_emails = xml.getElementsByTagName('referee');
+            
+            for (var i=0; i < ids.length; i++) {
+                referrers_list.add_item(contact_names[i].childNodes[0].nodeValue, contact_emails[i].childNodes[0].nodeValue);
+            }
+            
+            referrers_list.show();
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading referrers...');
+        }
+    });
+    
+    request.send(params);
+}
+
+
+function save_job() {
+    if (id <= 0) {
+        window.location = root + '/members?job=' + $('job_id').value;
+        navigator.reload();
+    }
+    
+    var params = 'id=' + $('job_id').value;
+    params = params + '&member=' + id;
+    params = params + '&action=save_job_to_bin';
+    
+    var uri = root + "/search_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                set_status('An error occured while saving job.');
+                return false;
+            } 
+            
+            if (txt == '-1') {
+                alert('This job was previously saved.');
+                set_status('');
+                return true;
+            }
+            
+            alert('Job was successfully saved.');
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Saving job...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_refer_form() {
+    $('div_refer_form').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+}
+
+function show_refer_job() {
+    if (id <= 0) {
+        window.location = root + '/members?job=' + $('job_id').value;
+        navigator.reload();
+    }
+    
+    $('div_blanket').setStyle('display', 'block');
+    
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_refer_form').getStyle('height'));
+    var div_width = parseInt($('div_refer_form').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_refer_form').setStyle('top', ((window_height - div_height) / 2));
+    $('div_refer_form').setStyle('left', ((window_width - div_width) / 2));
+    
+    $('job_title').set('html', $('job.title').get('html'));
+    
+    $('div_refer_form').setStyle('display', 'block');
+    show_candidates();
+}
+
+function set_filter(_is_from_request_form) {
+    if (!_is_from_request_form) {
+        filter_by = $('network_filter').options[$('network_filter').selectedIndex].value;
+        show_candidates();
+    } else {
+        filter_by = $('network_filter_request').options[$('network_filter_request').selectedIndex].value;
+        show_referrers();
+    }
+    
+}
+
+function check_has_banks(_member) {
+    var params = 'id=' + _member + '&action=has_banks';
+    var uri = root + "/search_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == '0') {
+                alert('Our system indicates that you have not provided us your bank account details. \n\nIf you like us to transfer your rewards directly into your bank account, please go to the "Bank Accounts" page to submit your bank account details. \n\nHowever, if you wish to receive your rewards by cheque instead, please ensure that your full name and mailing address in the "Profile" page is valid.');
+            } 
+        },
+        onRequest: function(instance) {
+            set_status('Checking reward matters...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function check_referred_already() {
+    if (!isEmpty(candidates_list.selected_value)) {
+        var params = 'job=' + $('job_id').value + 
+                      '&id=' + id + 
+                      '&candidate=' + candidates_list.selected_value + 
+                      '&action=referred_already';
+
+        var uri = root + "/search_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == '1') {
+                    alert("You have already referred " + candidates_list.selected_item + " to this job. \n\nPlease unselect " + candidates_list.selected_item + " from the Contacts list.");
+                } 
+                
+                set_status('');
+            },
+            onRequest: function(instance) {
+                set_status('Checking referral existence...');
+            }
+        });
+
+        request.send(params);
+    }
+}
+
+function refer() {
+    var referee = '';
+    var from = 'list'; // list or email
+    if ($('from_list').checked) {
+        if (isEmpty(candidates_list.selected_value)) {
+            alert('Please select a candidate.');
+            return false;
+        }
+        
+        referee = candidates_list.selected_value;
+    } else {
+        if (isEmpty($('email_addr').value) || !isEmail($('email_addr').value)) {
+            alert('Please provide a valid email address of the candidate.');
+            return false;
+        }
+        
+        referee = $('email_addr').value;
+        from = 'email';
+    }
+    
+    var answer_1 = $('testimony_answer_1').value;
+    var answer_2 = $('testimony_answer_2').value;
+    var answer_3 = $('testimony_answer_3').value;
+    
+    if (isEmpty(answer_1) || isEmpty(answer_2) || isEmpty(answer_3)) {
+        alert('Please briefly answer all questions.');
+        return false;
+    } else if (answer_1.split(' ').length > 50 || answer_3.split(' ').length > 50 || answer_3.split(' ').length > 50) {
+        if (answer_1.split(' ').length > 50) {
+            alert('Please keep your 1st answer below 50 words.');
+        } else if (answer_2.split(' ').length > 50) {
+            alert('Please keep your 2nd answer below 50 words.');
+        } else if (answer_3.split(' ').length > 50) {
+            alert('Please keep your 3rd and final answer below 50 words.');
+        }
+        return false;
+    }
+    
+    var testimony = answer_1 + '<br/>' + answer_2 + '<br/>' + answer_3;
+    
+    check_has_banks(id);
+    
+    var params = 'id=' + id + '&action=make_referral';
+    params = params + '&from=' + from;
+    params = params + '&referee=' + referee;
+    params = params + '&job=' + $('job_id').value;
+    params = params + '&testimony=' + testimony;
+    
+    var uri = root + "/search_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error occured while referring the candidate to the job. \n\nIt might because of this referral had been made before. Please try again.');
+                close_refer_form();
+                set_status('');
+                return false;
+            } else if (txt == '-900') {
+                alert('An error occured while adding the potential candidate into your contacts list. Please try again.');
+                close_refer_form();
+                set_status('');
+                return false;
+            } else if (txt == '-901') {
+                alert('An error occured while inviting the potential candidate to become a member. Please try again.');
+                close_refer_form();
+                set_status('');
+                return false;
+            } else if (txt == '-902') {
+                alert('An error occured while reserving a member place for the potential candidate. Please try again.');
+                close_refer_form();
+                set_status('');
+                return false;
+            } else if (txt == '-903') {
+                alert('Hmm... an error occured while adding the potential candidate into your contacts list after inviting and reserving a place. Please try again.');
+                close_refer_form();
+                set_status('');
+                return false;
+            } else if (txt == '-2') {
+                alert('It appears that this candidate is not in your candidates list. The candidate will be notified before the referral can be made. \n\nYellow Elevator will automatically complete the referral process once the candidate approved the request of being added to your list.');
+            } else if (txt == '-3') {
+                alert('It appears that this candidate is not in a member of Yellow Elevator. The candidate will be notified before the referral can be made. \n\nYellowElevator.com will automatically complete the referral process once the candidate had signed up as a member. The candidate will be added into your contacts list automatically.');
+            }
+            
+            close_refer_form();
+            set_status('Your contact was successfully referred. A notification email has been sent to the referred contact. You may make another referrals.');
+        },
+        onRequest: function(instance) {
+            set_status('Making referral...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_refer_me() {
+    $('div_acknowledge_form').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+}
+
+function show_refer_me() {
+    if (id <= 0) {
+        window.location = root + '/members?job=' + $('job_id').value;
+        navigator.reload();
+    }
+    
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_acknowledge_form').getStyle('height'));
+    var div_width = parseInt($('div_acknowledge_form').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_acknowledge_form').setStyle('top', ((window_height - div_height) / 2));
+    $('div_acknowledge_form').setStyle('left', ((window_width - div_width) / 2));
+    
+    var params = 'id=' + id;
+    params = params + '&action=has_resumes';
+    
+    var uri = root + "/members/home_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            set_status('');
+            if (txt == '0') {
+                alert('You have not created or uploaded your resume yet. In order to request for a referral, you need to either create or upload a resume at the "Resumes" section. \n\nIf you have already created one, please ensure that the \'Private\' check box is unchecked.');
+                referral = 0;
+                return false;
+            }
+            
+            //$('ack.job_title').set('html', $('job.title').get('html'));
+            $('div_blanket').setStyle('display', 'block');
+            $('div_acknowledge_form').setStyle('display', 'block');
+        },
+        onRequest: function(instance) {
+            set_status('Checking resumes...');
+        }
+    });
+    
+    request.send(params);
+    show_referrers();
+}
+
+function refer_me() {
+    if ($('resume').options[$('resume').selectedIndex].value == '0') {
+        alert('Please choose a resume to proceed.');
+        return false;
+    }
+    
+    var referrer = '';
+    var from = 'contacts';
+    if ($('referrer_contacts').checked) {
+        var referrers = referrers_list.get_selected_values();
+        number_of_referrers = referrers.length;
+        for (var i=0; i < number_of_referrers; i++) {
+            var referrer_details = referrers[i].split('|');
+            referrer = referrer + referrer_details[1];
+
+            if (i < number_of_referrers-1) {
+                referrer = referrer + '|';
+            }
+        }
+    } else if ($('referrer_others').checked) {
+        from = 'others';
+        if (isEmpty($('referrer_emails').value)) {
+            salert('You need to enter at least an e-mail address.');
+            return false;
+        }
+        
+        var temp = $('referrer_emails').value;
+        temp = temp.replace(/\n/g, ' ');
+        var emails = temp.split(' ');
+        for (var i=0; i < emails.length; i++) {
+            if (!isEmail(emails[i])) {
+                if (!isEmpty(emails[i])) {
+                    alert('One of your e-mail addresses is invalid- <strong>' + emails[i] + '</strong>');
+                    return false;
+                }
+            }
+
+            if (!isEmpty(emails[i]) && !duplicated(referrer, emails[i])) {
+                if (isEmpty(referrer)) {
+                    referrer = emails[i];
+                } else {
+                    referrer = referrer + '|' + emails[i];
+                }
+            }
+        }
+    } else {
+        from = 'yel';
+        referrer = 'initial@yellowelevator.com';
+    }
+    
+    var params = 'id=' + id; 
+    params = params + '&job=' + $('job_id').value;
+    params = params + '&resume=' + $('resume').options[$('resume').selectedIndex].value;
+    params = params + '&referrer=' + referrer;
+    params = params + '&from=' + from;
+    params = params + '&action=refer_me';
+    
+    var uri = root + "/search_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('Some of your requests were not send due to duplications.');
+                return false;
+            }
+            
+            set_status('');
+            if (txt == '-1') {
+                alert('Sorry, this job only accepts resumes created online.');
+                return false;
+            } else if (txt == '-2') {
+                alert('Sorry, this job only accepts uploaded file resumes.');
+                return false;
+            }
+            
+            set_status('Your resume has been received, and you will be referred shortly.');
+            close_refer_me();
+        },
+        onRequest: function(instance) {
+            set_status('Referring you to job...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function onDomReady() {
+    set_root();
+    get_employers_for_mini();
+    get_industries_for_mini();
+    set_mini_keywords();
+    
+    $('candidates').addEvent('click', function() {
+        check_referred_already();
+    });
+    
+    if (isEmpty(keywords)) {
+        $('mini_keywords').value = 'Job title or keywords';
+    } else {
+        $('mini_keywords').value = keywords;
+    }
+    
+    $('testimony_answer_1').addEvent('keypress', function() {
+       update_word_count_of('word_count_q1', 'testimony_answer_1') 
+    });
+
+    $('testimony_answer_2').addEvent('keypress', function() {
+       update_word_count_of('word_count_q2', 'testimony_answer_2') 
+    });
+    
+    $('testimony_answer_3').addEvent('keypress', function() {
+       update_word_count_of('word_count_q3', 'testimony_answer_3') 
+    });
+    
+    var suggest_url = root + '/common/php/search_suggest.php';
+    new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
+        'postVar': 'keywords',
+        'minLength' : 1,
+        'overflow' : true,
+        'delay' : 50
+    });
+}
+
+window.addEvent('domready', onDomReady);

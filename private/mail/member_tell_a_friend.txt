@@ -1,0 +1,19 @@
+Hi, 
+
+Your friend, %member_name% (e-mail: %member_email_addr%) has 
+signed up with Yellow Elevator and would like to invite you to join him.
+
+Here's the message from your friend: 
+
+
+%message%
+
+
+Sign up now at %protocol%://%root%/members/ so that you can (1) refer jobs to
+your contacts and earn rewards for every successful job referral, and (2) get referred 
+to better job opportunities. 
+
+We look forward to having you on board!
+
+Yellow Elevator
+Refer a job

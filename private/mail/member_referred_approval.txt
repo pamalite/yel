@@ -1,0 +1,17 @@
+Congratulations!
+
+You have been referred by %member_name% (e-mail: %member_email_addr%) to the following
+positions:
+
+%positions%
+
+In order to accept this job referral, %member_name% has to be in your Contacts.
+Please sign in and approve adding %member_name% into your Contacts, and then submit
+your resume if you are interested in the job referral.
+
+Please click on the following link to go to:
+
+%protocol%://%root%/members/
+
+Yellow Elevator
+Refer a job

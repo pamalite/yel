@@ -1,0 +1,147 @@
+#div_new_invoices, #div_paid_invoices {
+    padding-top: 10px;
+}
+
+#div_paid_invoices {
+    display: none;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_new {
+    border: 1px solid #CCCCCC;
+}
+
+#li_paid {
+    border: 1px solid #0000FF;
+}
+
+
+
+td.pdf {
+    text-align: center;
+    width: 50px;
+}
+
+td.expired {
+    text-align: center;
+    width: 20px;
+}
+
+td.payment_received {
+    text-align: center;
+    width: 100px;
+}
+
+td.type {
+    width: 90px;
+}
+
+td.amount, td.amount_title {
+    width: 90px;
+    padding-right: 15px;
+}
+
+td.amount {
+    text-align: right;
+}
+
+td.invoice, td.employer {
+    width: 150px;
+}
+
+td.date {
+    width: 90px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+img.warning {
+    vertical-align: middle;    
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_confirm_payment_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 215px;
+    overflow: auto;
+}
+
+#div_confirm_payment_form p {
+    text-align: center;
+}
+
+#div_confirm_payment_form p.button {
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+table.confirm_payment_form {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.confirm_payment_form td {
+    padding-top: 3px;
+}
+
+table.confirm_payment_form td.field {
+    width: 98%;
+}
+
+table.confirm_payment_form td.label {
+    font-weight: bold;
+    width: 35%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+    font-size: 10pt;
+}
+
+input.field {
+    width: 90%;
+}
+

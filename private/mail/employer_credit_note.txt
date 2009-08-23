@@ -1,0 +1,18 @@
+Hi %company%,
+
+With reference to the free replacement for the %job_title% position, 
+our system has indicated a remaining balance due to you.
+
+The service fee for the replacement candidate is lower than the original 
+service fee, so we will be crediting the difference to you as a refund.
+
+Original Invoice Number: %previous_invoice%
+Credit Note Number: %new_invoice%
+
+Please find the Credit Note attached in this email.
+
+The refund will be credited to you shortly. Please inform us should there 
+be any discrepancies.
+
+Yellow Elevator
+Refer a job

@@ -1,0 +1,19 @@
+Hi %member_name%,
+
+Welcome on board!
+
+You are receiving this e-mail because you have signed up as a member with 
+YellowElevator.com. However, you may disregard if you have received this by mistake. 
+
+To sign in using your email (%email_addr%), click on the following link:
+
+%protocol%://%root%/members
+
+Yellow Elevator enables you to (1) refer jobs to your contacts and earn rewards 
+for every successful job referral, and (2) get referred to better job 
+opportunities. 
+
+Thank you for choosing Yellow Elevator!
+
+Yellow Elevator
+Refer a job

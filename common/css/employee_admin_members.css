@@ -1,0 +1,44 @@
+#div_members {
+    padding-top: 10px;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+td.email_addr, td.member{
+    width: 250px;
+}
+
+td.date {
+    width: 150px;
+}
+
+td.actions {
+    width: 150px;
+    text-align: center;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}

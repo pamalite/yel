@@ -1,0 +1,23 @@
+<p>Dear %contact_person% of %employer%,</p>
+
+<p>The following are the number of referrals that have not been read:</p>
+
+<p>
+    <table cellspacing="3" cellpadding="3">
+        <tr>
+            <td>Job Title</td>
+            <td>Industry</td>
+            <td width="100px" align="right">Referrals</td>
+        </tr>
+        %referrals%
+    </table>
+</p>
+
+<p>Please sign in to view the referrals at:</p>
+
+<p>%protocol%://%root%/employers</p>
+
+<p>Thank you for choosing Yellow Elevator.</p>
+
+<p>Yellow Elevator<br/>
+Refer a job</p>

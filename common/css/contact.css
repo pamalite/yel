@@ -1,0 +1,25 @@
+div.content table td {
+    font-size: 10pt;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+table.contact {
+    margin: auto;
+}
+
+table.contact td {
+    padding: 5px 5px 5px 5px;
+}
+
+table.contact td.title {
+    background-color: #CCCCCC;
+    text-align: center;
+    font-weight: bold;
+}
+
+table.contact td.label {
+    width: 35%;
+    text-align: right;
+    font-weight: bold;
+}

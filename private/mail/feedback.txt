@@ -1,0 +1,11 @@
+From: %name%
+
+Country: %country%
+
+Feedback: 
+
+====
+
+%feedback%
+
+====

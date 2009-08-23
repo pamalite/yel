@@ -1,0 +1,122 @@
+body {
+    margin: 15px 10px 15px 10px;
+}
+
+table.header_invoice {
+    border-collapse: separate;
+    margin: auto;
+}
+
+table.header_invoice td.logo {
+    width: 20%;
+}
+
+table.header_invoice td.type {
+    width: 60%;
+    vertical-align: middle;
+    text-align: center;
+    font-style: italic;
+    font-weight: bolder;
+    font-size: 16pt;
+}
+
+table.header_invoice td.contacts {
+    vertical-align: top;
+    text-align: left;
+}
+
+table.header_invoice div.contacts {
+    padding-left: 5px;
+}
+
+table.header_invoice table.contacts {
+    padding-left: 10px;
+    border-collapse: collapse;
+    width: 95%;
+}
+
+table.header_invoice td.field, table.header_invoice td.value {
+    font-size: 7pt;
+    color: #666666;
+    vertical-align: top;
+}
+
+table.invoiceinfo {
+    width: 100%;
+    margin: auto;
+}
+
+table.invoiceinfo td.field {
+    border: 1px solid #666666;
+    background-color: #666666;
+    text-align: center;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
+table.invoiceinfo td.value {
+    border: 1px solid #666666;
+    text-align: center;
+}
+
+table.items {
+    width: 100%;
+}
+
+table.items tr.header td {
+    background-color: #666666;
+    color: #FFFFFF;
+    font-weight: bold;
+    text-align: center;
+}
+
+table.items tr.odd {
+    background-color: #E0E0E0;
+}
+
+table.items tr.even {
+    background-color: #FFFFFF;
+}
+
+table.items td.item {
+    width: 75%;
+}
+
+table.items td.amount {
+    width: 20%;
+    text-align: right;
+}
+
+table.items td.total {
+    background-color: #666666;
+    color: #FFFFFF;
+    font-weight: bold;
+    text-align: right;
+}
+
+table.items td.total_amount {
+    font-weight: bolder;
+    text-align: right;
+    border: 2px solid black;
+}
+
+div.footer {
+    padding-top: 10px;
+    text-align: center;
+    font-style: italic;
+}
+
+
+
+div.payment_note {
+    padding-top: 5px;
+    border: 1px solid #666666;
+    text-align: center;
+}
+
+#div_buttons {
+    text-align: right;
+    background-color: #CCCCCC;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
