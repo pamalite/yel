@@ -1,7 +1,7 @@
 var root = "";
 
 function set_root() {
-    root = location.protocol + "//" + location.hostname + "/yel2";
+    root = location.protocol + "//" + location.hostname + "/yel";
 }
 
 function set_status(msg) {
