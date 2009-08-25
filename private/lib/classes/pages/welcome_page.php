@@ -31,8 +31,8 @@ class WelcomePage extends Page {
                   LEFT JOIN job_index ON job_index.job = jobs.id 
                   LEFT JOIN employers ON employers.id = jobs.employer 
                   LEFT JOIN currencies ON currencies.country_code = employers.country 
-                  WHERE jobs.closed = 'N' 
-                  AND jobs.expire_on >= NOW() 
+                  WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() AND 
+                  jobs.id NOT IN (SELECT DISTINCT job FROM job_extensions) 
                   ORDER BY jobs.created_on DESC, jobs.potential_reward DESC LIMIT 10";
         $mysql = Database::connect();
         $result = $mysql->query($query);
@@ -68,7 +68,13 @@ class WelcomePage extends Page {
             </td>
             <td class="top_jobs_item"><?php echo $job['employer']; ?></td>
             <td class="top_jobs_item">
-                <?php echo $job['currency']. ' '. number_format($job['salary_start'], 2, '.', ', '). ' - '. number_format($job['salary_end'], 2, '.', ', '); ?>
+                <?php 
+                    if ($job['salary_end'] <= 0) {
+                        echo 'from '. $job['currency']. ' '. number_format($job['salary_start'], 2, '.', ', '); 
+                    } else {
+                        echo $job['currency']. ' '. number_format($job['salary_start'], 2, '.', ', '). ' - '. number_format($job['salary_end'], 2, '.', ', '); 
+                    }
+                ?>
                 </td>
             <td class="top_jobs_item">
                 <?php echo $job['currency']. ' '. number_format($job['potential_reward'], 2, '.', ', '); ?>
