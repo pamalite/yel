@@ -1,14 +1,4 @@
 function validate() {
-    if ($('personal_id').value == '') {
-        alert('You must have at least a passport or a National Identification Card to be a member of Yellow Elevator.');
-        $('personal_id').setStyle('border', '2px solid #FF0000');
-        return false;
-    } else {
-        var field = $('personal_id');
-        field.style.borderColor = '';
-        field.style.borderStyle = '';
-    }
-    
     if ($('firstname').value == '') {
         alert('Given Names cannot be empty.');
         $('firstname').setStyle('border', '2px solid #FF0000');

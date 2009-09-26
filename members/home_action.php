@@ -133,7 +133,7 @@ if ($_POST['action'] == 'acknowledge_job') {
         exit();
     }
     
-    $query = "SELECT employers.like_instant_notification, employers.email_addr, 
+    /*$query = "SELECT employers.like_instant_notification, employers.email_addr, 
               employers.name, jobs.title 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job 
@@ -158,16 +158,56 @@ if ($_POST['action'] == 'acknowledge_job') {
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         mail($result[0]['email_addr'], $subject, $message, $headers);
 
-        /*$handle = fopen('/tmp/email_to_'. $result[0]['email_addr']. '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $message);
-        fclose($handle);*/
-    }
+        // $handle = fopen('/tmp/email_to_'. $result[0]['email_addr']. '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
+    }*/
     
     if (!Referral::close_similar_referrals_with_id($_POST['id'])) {
         echo 'ko';
         exit();
     }
+    
+    $query = "SELECT CONCAT(members.firstname, ', ', members.lastname) AS member, 
+              CONCAT(referees.firstname, ', ', referees.lastname) AS candidate, 
+              referrals.member AS member_email, referrals.referee AS candidate_email,
+              employers.name AS employer, jobs.title AS job 
+              FROM referrals 
+              LEFT JOIN members ON members.email_addr = referrals.member 
+              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
+              LEFT JOIN jobs ON jobs.id = referrals.job 
+              LEFT JOIN employers ON employers.id = jobs.employer 
+              WHERE referrals.id = ". $_POST['id']. " LIMIT 1";
+    $result = $mysqli->query($query);
+    $member = $result[0]['member'];
+    $candidate = $result[0]['candidate'];
+    $member_email = $result[0]['member_email'];
+    $candidate_email = $result[0]['candidate_email'];
+    $employer = $result[0]['employer'];
+    $job = $result[0]['job'];
+    
+    $lines = file(dirname(__FILE__). '/../private/mail/candidate_acknowledge_job.txt');
+    $message = '';
+    foreach($lines as $line) {
+        $message .= $line;
+    }
+    
+    $message = str_replace('%referrer_name%', htmlspecialchars_decode($member), $message);
+    $message = str_replace('%candidate_name%', htmlspecialchars_decode($candidate), $message);
+    $message = str_replace('%candidate_email_addrr%', $candidate_email, $message);
+    $message = str_replace('%employer%', htmlspecialchars_decode($employer), $message);
+    $message = str_replace('%job%', htmlspecialchars_decode($job), $message);
+    $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+    $message = str_replace('%root%', $GLOBALS['root'], $message);
+    $subject = htmlspecialchars_decode($candidate). ' accepted the '. htmlspecialchars_decode($job). ' position';
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    mail($member_email, $subject, $message, $headers);
+
+    /*$handle = fopen('/tmp/email_to_'. $member_email. '.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);*/
     
     echo 'ok';
     exit();

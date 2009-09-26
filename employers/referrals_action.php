@@ -30,9 +30,11 @@ function get_suggested_candidates($_job_id, $_referral_id_only = false) {
               FROM referrals 
               LEFT JOIN resumes ON resumes.id = referrals.resume 
               WHERE referrals.job = ". $_job_id. " AND 
+              resumes.deleted = 'N' AND 
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
               -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-              referrals.employer_rejected_on IS NULL AND 
+              referrals.employer_removed_on IS NULL AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')";
     $result = $mysqli->query($query);
     if (count($result) <= 0 || is_null($result)) {
@@ -80,41 +82,54 @@ function get_suggested_candidates($_job_id, $_referral_id_only = false) {
         return array();
     }
     
+    // $match_against = "MATCH (resume_index.cover_note, 
+    //                          resume_index.skill, 
+    //                          resume_index.technical_skill, 
+    //                          resume_index.qualification, 
+    //                          resume_index.work_summary) 
+    //                   AGAINST ('". $job_description. "')";
     $match_against = "MATCH (resume_index.cover_note, 
                              resume_index.skill, 
                              resume_index.technical_skill, 
                              resume_index.qualification, 
-                             resume_index.work_summary) 
+                             resume_index.work_summary, 
+                             resume_index.file_text) 
                       AGAINST ('". $job_description. "')";
+    // $max_score_temp_table = "(SELECT MAX(". $match_against. ") AS max_score 
+    //                           FROM resume_index 
+    //                           WHERE resume IN (". $non_file_resumes_list. ")
+    //                           LIMIT 1) AS scores";
     $max_score_temp_table = "(SELECT MAX(". $match_against. ") AS max_score 
-                              FROM resume_index 
-                              WHERE resume IN (". $non_file_resumes_list. ")
-                              LIMIT 1) AS scores";
+                            FROM resume_index LIMIT 1) AS scores";
     $columns = "CONCAT(members.lastname,', ', members.firstname) AS referrer, 
                 CONCAT(referees.lastname,', ', referees.firstname) AS candidate,
-                DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
+                DATE_FORMAT(referrals.member_confirmed_on, '%e %b, %Y') AS formatted_referred_on, 
                 DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y') AS formatted_acknowledged_on, 
                 DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
+                DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
                 referrals.resume, referrals.id, referrals.testimony, referrals.shortlisted_on, 
-                referrals.employer_agreed_terms_on, 
+                referrals.employer_agreed_terms_on, members.email_addr AS referrer_email_addr, 
+                referees.email_addr AS candidate_email_addr, members.phone_num AS referrer_phone_num, 
+                referees.phone_num AS candidate_phone_num, 
                 referrals.used_suggested, ". $match_against. " AS score, scores.max_score";
     if ($_referral_id_only) {
       $columns = "referrals.id";
     }
-    $query= "SELECT ". $columns. " 
-             FROM resume_index 
-             LEFT JOIN referrals ON referrals.resume = resume_index.resume 
-             LEFT JOIN members ON members.email_addr = referrals.member 
-             LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
-             , ". $max_score_temp_table. "
-             WHERE ". $match_against. " AND 
-             referrals.job = ". $_POST['id']. " AND 
-             referrals.resume IN (". $non_file_resumes_list. ") AND
-             (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
-             (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-             referrals.employer_rejected_on IS NULL AND 
-             (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')";
-    if (!$_referral_id_only) {
+    $query = "SELECT ". $columns. " 
+              FROM resume_index 
+              LEFT JOIN referrals ON referrals.resume = resume_index.resume 
+              LEFT JOIN members ON members.email_addr = referrals.member 
+              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
+              , ". $max_score_temp_table. "
+              WHERE ". $match_against. " AND 
+              referrals.job = ". $_POST['id']. " AND 
+              -- referrals.resume IN (". $non_file_resumes_list. ") AND
+              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
+              (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
+              referrals.employer_removed_on IS NULL AND 
+              (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')";
+   if (!$_referral_id_only) {
         $query .= " ORDER BY ". $order_by;
     }
     $result = $mysqli->query($query);
@@ -146,8 +161,9 @@ if (!isset($_POST['action'])) {
               LEFT JOIN industries ON industries.id = jobs.industry 
               WHERE jobs.employer = '". $_POST['id']. "' AND 
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
               -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-              referrals.employer_rejected_on IS NULL AND 
+              referrals.employer_removed_on IS NULL AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')
               GROUP BY referrals.job 
               ORDER BY ". $order_by;
@@ -175,8 +191,9 @@ if (!isset($_POST['action'])) {
               WHERE jobs.employer = '". $_POST['id']. "' AND 
               (referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00 00:00:00') AND 
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
               -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-              referrals.employer_rejected_on IS NULL AND 
+              referrals.employer_removed_on IS NULL AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')
               GROUP BY referrals.job";
     
@@ -250,19 +267,23 @@ if ($_POST['action'] == 'get_referred_candidates') {
     
     $query= "SELECT CONCAT(members.lastname,', ', members.firstname) AS referrer, 
              CONCAT(referees.lastname,', ', referees.firstname) AS candidate,
-             DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
+             DATE_FORMAT(referrals.member_confirmed_on, '%e %b, %Y') AS formatted_referred_on, 
              DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y') AS formatted_acknowledged_on, 
              DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
+             DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
              referrals.resume, referrals.id, referrals.testimony, referrals.shortlisted_on, referrals.used_suggested,
-             referrals.employer_agreed_terms_on 
+             referrals.employer_agreed_terms_on, members.email_addr AS referrer_email_addr, 
+             referees.email_addr AS candidate_email_addr, members.phone_num AS referrer_phone_num, 
+             referees.phone_num AS candidate_phone_num 
              FROM referrals 
              LEFT JOIN members ON members.email_addr = referrals.member 
              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
              LEFT JOIN resumes ON resumes.id = referrals.resume 
              WHERE referrals.job = ". $_POST['id']. " AND ". $filter_by. "
              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+             (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
              -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-             referrals.employer_rejected_on IS NULL AND 
+             referrals.employer_removed_on IS NULL AND 
              (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') ". $recommended_query. " 
              ORDER BY ". $order_by;
     $mysqli = Database::connect();
@@ -324,20 +345,23 @@ if ($_POST['action'] == 'get_shortlisted_candidates') {
     
     $query= "SELECT CONCAT(members.lastname,', ', members.firstname) AS referrer, 
              CONCAT(referees.lastname,', ', referees.firstname) AS candidate,
-             DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
+             DATE_FORMAT(referrals.member_confirmed_on, '%e %b, %Y') AS formatted_referred_on, 
              DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y') AS formatted_acknowledged_on, 
              DATE_FORMAT(referrals.shortlisted_on, '%e %b, %Y') AS formatted_shortlisted_on, 
              DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
              referrals.resume, referrals.id, referrals.testimony, referrals.shortlisted_on, referrals.used_suggested, 
-             referrals.employer_agreed_terms_on 
+             referrals.employer_agreed_terms_on, members.email_addr AS referrer_email_addr, 
+             referees.email_addr AS candidate_email_addr, members.phone_num AS referrer_phone_num, 
+             referees.phone_num AS candidate_phone_num 
              FROM referrals 
              LEFT JOIN members ON members.email_addr = referrals.member 
              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
              WHERE referrals.job = ". $_POST['id']. " AND 
              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+             (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
              -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
              (referrals.shortlisted_on IS NOT NULL AND referrals.shortlisted_on <> '0000-00-00 00:00:00') AND
-             referrals.employer_rejected_on IS NULL AND 
+             referrals.employer_removed_on IS NULL AND referrals.employer_rejected_on IS NULL AND 
              (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')
              ORDER BY ". $order_by;
              
@@ -435,7 +459,7 @@ if ($_POST['action'] == 'set_verify_resume_viewing') {
     exit();
 }
 
-if ($_POST['action'] == 'reject_candidates') {
+if ($_POST['action'] == 'remove_candidates') {
     if (!isset($_POST['payload'])) {
         echo "ko";
         exit();
@@ -443,9 +467,9 @@ if ($_POST['action'] == 'reject_candidates') {
     
     $xml_dom->load_from_xml($_POST['payload']);
     $candidates = $xml_dom->get('id');
-    $query = "UPDATE referrals SET employer_rejected_on = NOW() WHERE id IN (";
+    $query = "UPDATE referrals SET employer_removed_on = NOW() WHERE id IN (";
     if ($_POST['used_suggested'] == 'Y') {
-        $query = "UPDATE referrals SET employer_rejected_on = NOW(), used_suggested = 'Y' WHERE id IN (";
+        $query = "UPDATE referrals SET employer_removed_on = NOW(), used_suggested = 'Y' WHERE id IN (";
     }
     $i = 0;
     foreach ($candidates as $candidate) {
@@ -469,6 +493,98 @@ if ($_POST['action'] == 'reject_candidates') {
     echo "ok";
     exit();
 }
+
+
+if ($_POST['action'] == 'reject_candidate') {
+    $query = "UPDATE referrals SET employer_rejected_on = NOW(), shortlisted_on = NULL ";
+    if ($_POST['used_suggested'] == 'Y') {
+        $query .= ", used_suggested = 'Y' ";
+    }
+    $query .= "WHERE id = ". $_POST['id'];
+    
+    $mysqli = Database::connect();
+    if (!$mysqli->execute($query)) {
+        echo "ko";
+        exit();
+    }
+    
+    $query = "SELECT referrals.member AS member_email_addr, referrals.referee AS candidate_email_addr, 
+              jobs.title AS job_title, employers.name AS employer, 
+              CONCAT(members.lastname,', ', members.firstname) AS referrer, 
+              CONCAT(referees.lastname,', ', referees.firstname) AS candidate 
+              FROM referrals 
+              LEFT JOIN members ON members.email_addr = referrals.member 
+              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
+              LEFT JOIN jobs ON jobs.id = referrals.job 
+              LEFT JOIN employers ON employers.id = jobs.employer 
+              WHERE referrals.id = ". $_POST['id']. " LIMIT 1";
+    $result = $mysqli->query($query);
+    $member_email_addr = $result[0]['member_email_addr'];
+    $candidate_email_addr = $result[0]['candidate_email_addr'];
+    $referrer = $result[0]['referrer'];
+    $candidate = $result[0]['candidate'];
+    $job = $result[0]['job_title'];
+    $employer = $result[0]['employer'];
+    
+    $lines = file('../private/mail/employer_rejection_to_referrer.txt');
+    $message = '';
+    foreach ($lines as $line) {
+        $message .= $line;
+    }
+
+    $message = str_replace('%employer%', htmlspecialchars_decode($employer), $message);
+    $message = str_replace('%job%', htmlspecialchars_decode($job), $message);
+    $message = str_replace('%referrer%', htmlspecialchars_decode($referrer), $message);
+    $message = str_replace('%candidate%', htmlspecialchars_decode($candidate), $message);
+    $message = str_replace('%candidate_email%', $candidate_email_addr, $message);
+    $subject = htmlspecialchars_decode($candidate). ' is not shortlisted for the job '. htmlspecialchars_decode($job);
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    mail($member_email_addr, $subject, $message, $headers);
+    
+    /*$handle = fopen('/tmp/email_to_'. $member_email_addr. '.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);*/
+    
+    $lines = file('../private/mail/employer_rejection_to_candidate.txt');
+    $message = '';
+    foreach ($lines as $line) {
+        $message .= $line;
+    }
+
+    $message = str_replace('%employer%', htmlspecialchars_decode($employer), $message);
+    $message = str_replace('%job%', htmlspecialchars_decode($job), $message);
+    $message = str_replace('%candidate%', htmlspecialchars_decode($candidate), $message);
+    $subject = 'Status for your application to the '. htmlspecialchars_decode($job). 'position';
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    mail($candidate_email_addr, $subject, $message, $headers);
+    
+    /*$handle = fopen('/tmp/email_to_'. $candidate_email_addr. '.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);*/
+    
+    echo "ok";
+    exit();
+}
+
+if ($_POST['action'] == 'unreject_candidate') {
+    $query = "UPDATE referrals SET employer_rejected_on = NULL ";
+    if ($_POST['used_suggested'] == 'Y') {
+        $query .= ", used_suggested = 'Y' ";
+    }
+    $query .= "WHERE id = ". $_POST['id'];
+    
+    $mysqli = Database::connect();
+    if (!$mysqli->execute($query)) {
+        echo "ko";
+        exit();
+    }
+    
+    echo "ok";
+    exit();
+}
+
 
 if ($_POST['action'] == 'shortlist_referral') {
     $data = array();
@@ -531,7 +647,7 @@ if ($_POST['action'] == 'get_referred_candidates_count') {
              WHERE referrals.job = ". $_POST['id']. " AND 
              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
              -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-             referrals.employer_rejected_on IS NULL AND 
+             referrals.employer_removed_on IS NULL AND 
              (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') ". $recommended_query;
              
     $mysqli = Database::connect();
@@ -549,7 +665,7 @@ if ($_POST['action'] == 'get_shortlisted_candidates_count') {
              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
              -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
              (referrals.shortlisted_on IS NOT NULL AND referrals.shortlisted_on <> '0000-00-00 00:00:00') AND
-             referrals.employer_rejected_on IS NULL AND 
+             referrals.employer_removed_on IS NULL AND 
              (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')";
              
     $mysqli = Database::connect();
@@ -583,12 +699,17 @@ if ($_POST['action'] == 'employ_candidate') {
     $referee = new Member($result[0]['referee']);
     $job_title = $result[0]['title'];
     
+    $total_reward = Referral::calculate_total_reward_from($_POST['salary'], $_POST['employer']);
+    $total_token_reward = $total_reward * 0.05;
+    $total_reward_to_referrer = $total_reward - $total_token_reward;
+    
     $data = array();
     $data['id'] = $_POST['id'];
     $data['employed_on'] = now();
     $data['work_commence_on'] = $_POST['commence'];
     $data['salary_per_annum'] = $_POST['salary'];
-    $data['total_reward'] = Referral::calculate_total_reward_from($_POST['salary'], $_POST['employer']);
+    $data['total_reward'] = $total_reward_to_referrer;
+    $data['total_token_reward'] = $total_token_reward;
     $data['used_suggested'] = $_POST['used_suggested'];
     $data['guarantee_expire_on'] = Referral::get_guarantee_expiry_date_from($_POST['salary'], $_POST['employer'], $today);
     if ($not_agreed_terms_yet) {
@@ -685,7 +806,7 @@ if ($_POST['action'] == 'employ_candidate') {
     $data['issued_on'] = today();
     $data['type'] = 'R';
     $data['employer'] = $_POST['employer'];
-    $data['payable_by'] = date_add($data['issued_on'], $payment_terms_days, 'day');
+    $data['payable_by'] = sql_date_add($data['issued_on'], $payment_terms_days, 'day');
     
     if ($is_free_replacement) {
         $data['paid_on'] = $data['issued_on'];
@@ -731,7 +852,7 @@ if ($_POST['action'] == 'employ_candidate') {
             $credit_note_desc = 'Refund of balance for Invoice: '. pad($previous_invoice, 11, '0');
             $filename = generate_random_string_of(8). '.'. generate_random_string_of(8);
             $issued_on = today();
-            $expire_on = date_add($issued_on, 30, 'day');
+            $expire_on = sql_date_add($issued_on, 30, 'day');
             
             Invoice::accompany_credit_note_with($previous_invoice, $invoice, $issued_on, $credit_amount);
             

@@ -111,7 +111,7 @@ class MemberCandidatesPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_search($this->member->get_name(). " - Contacts");
+        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Contacts</span>");
         $this->menu('member', 'candidates');
         
         ?>

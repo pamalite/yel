@@ -67,7 +67,7 @@ class MemberLoginPage extends Page {
     
     public function show($_error = "") {
         $this->begin();
-        $this->top("Yellow Elevator - Members");
+        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Members</span>");
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
@@ -105,18 +105,17 @@ class MemberLoginPage extends Page {
                         <div class="login">
                             <table class="login">
                                 <tr>
-                                    <td colspan="2" class="title">Member Sign In</td>
+                                    <td class="title">Member Sign In</td>
                                 </tr>
                                 <tr>
-                                    <td class="id"><label for="id">E-mail:</label></td>
-                                    <td><input type="text" id="id" name="id" value=""></td>
+                                    <td><label for="id">E-mail:</label><br/>
+                                    <input type="text" id="id" name="id" value=""></td>
                                 </tr>
                                 <tr>
-                                    <td class="password"><label for="password">Password:</label></td>
-                                    <td><input type="password" id="password" name="password"></td>
+                                    <td><label for="password">Password:</label><br/>
+                                    <input type="password" id="password" name="password"></td>
                                 </tr>
                                 <tr>
-                                    <td>&nbsp;</td>
                                     <td>
                                         <input type="submit" class="login" id="login" value="Sign In">
                                         &nbsp;
@@ -126,18 +125,14 @@ class MemberLoginPage extends Page {
                             </table>
                         </div>
                     </form>
-                    <div class="login">
-                        <table class="login">
-                            <tr>
-                                <td style="font-weight: bold; font-size: 12pt;">
-                                    <div style="text-align: center; padding-top: 5px; padding-bottom: 5px;"><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a></div>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
+                    
                 </td>
             </tr>
         </table>
+        
+        <div style="text-align: center;">
+            <a href="sign_up.php"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/50_bonus_banner.jpg" /></a>
+        </div>
         
         <div id="div_blanket"></div>
         <div id="div_get_password_hint_form">

@@ -607,8 +607,8 @@ class Member {
     }
     
     public function get_saved_jobs($_order_by = 'member_saved_jobs.saved_on DESC') {
-        $query = "SELECT jobs.id, jobs.title, jobs.description, 
-                  industries.industry, employers.name AS employer, 
+        $query = "SELECT jobs.id, jobs.title, jobs.description, currencies.symbol AS currency, 
+                  industries.industry, employers.name AS employer, jobs.potential_reward, 
                   DATE_FORMAT(member_saved_jobs.saved_on, '%e %b, %Y') AS formatted_saved_on, 
                   DATE_FORMAT(jobs.created_on, '%e %b, %Y') AS formatted_created_on, 
                   DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS formatted_expire_on 
@@ -616,6 +616,7 @@ class Member {
                   LEFT JOIN jobs ON jobs.id = member_saved_jobs.job 
                   LEFT JOIN industries ON industries.id = jobs.industry 
                   LEFT JOIN employers ON employers.id = jobs.employer 
+                  LEFT JOIN currencies ON currencies.country_code = employers.country 
                   WHERE member_saved_jobs.member = '". $this->id. "' AND 
                   jobs.closed = 'N' 
                   ORDER BY ". $_order_by;
@@ -623,15 +624,16 @@ class Member {
     }
     
     public function get_saved_jobs_with_filter($_filter_by = '0') {
-        $query = "SELECT jobs.id, jobs.title, jobs.description, 
-                  industries.industry, employers.name AS employer, 
+        $query = "SELECT jobs.id, jobs.title, jobs.description, currencies.symbol AS currency, 
+                  industries.industry, employers.name AS employer, jobs.potential_reward, 
                   DATE_FORMAT(member_saved_jobs.saved_on, '%e %b, %Y') AS formatted_saved_on, 
                   DATE_FORMAT(jobs.created_on, '%e %b, %Y') AS formatted_created_on, 
-                  DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS formatted_expire_on 
+                  DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS formatted_expire_on
                   FROM member_saved_jobs 
                   LEFT JOIN jobs ON jobs.id = member_saved_jobs.job 
                   LEFT JOIN industries ON industries.id = jobs.industry 
                   LEFT JOIN employers ON employers.id = jobs.employer 
+                  LEFT JOIN currencies ON currencies.country_code = employers.country 
                   WHERE member_saved_jobs.member = '". $this->id. "' AND 
                   jobs.closed = 'N' ";
         if ($_filter_by == '0') {

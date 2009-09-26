@@ -78,7 +78,7 @@ class MemberResumesPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_search($this->member->get_name(). " - Resumes");
+        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Resumes</span>");
         $this->menu('member', 'resumes');
         
         ?>
@@ -133,7 +133,7 @@ class MemberResumesPage extends Page {
                     <table class="upload_form">
                         <tr>
                             <td class="label"><label for="my_file">Resume File:</label></td>
-                            <td class="field"><input class="field" name="my_file" type="file" /><br/><span class="upload_note">1. Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed. <br />2. Only ONE resume can be uploaded to the system for every resume. <br />3. You can update your resume by clicking "<span style="font-weight: bold;">Update by re-upload</span>" button in the previous page next to the file name.</span></td>
+                            <td class="field"><input class="field" name="my_file" type="file" /><br/><span class="upload_note">1. Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed. <br />2. Only ONE resume can be uploaded to the system for every resume. <br />3. You can update your resume by clicking "<span style="font-weight: bold;">Update File</span>" button in the previous page next to the file name.</span></td>
                         </tr>
                         <tr>
                             <td class="buttons_left">&nbsp;</td>

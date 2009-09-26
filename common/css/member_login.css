@@ -96,13 +96,13 @@ td.title {
 
 #id, #password {
     font-family: verdana, tahoma, arial;
-    font-size: 10pt;
+    font-size: 12pt;
     width: 97%;
     /*height: 23px;*/
 }
 
 input.login {
-    font-size: 10pt;
+    font-size: 12pt;
     /*height: 23px;*/
 }
 

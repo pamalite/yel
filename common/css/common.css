@@ -158,9 +158,10 @@ td.logo img {
 
 div.page_title {
     text-align: left;
+    color: #FFFFFF;
     vertical-align: middle;
     /*background-color: #FFCC00;*/
-    background-color: #FFCC00;
+    background-color: #1D3E6E;
     /*border-bottom: 1px solid #CCCCCC;*/
     font-weight: bold;
     margin-top: 10px;

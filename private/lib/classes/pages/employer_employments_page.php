@@ -33,7 +33,7 @@ class EmployerEmploymentsPage extends Page {
     public function show() {
         $this->begin();
         $this->support();
-        $this->top($this->employer->get_name(). " - Employment Records");
+        $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Employment Records</span>");
         $this->menu('employer', 'employments');
         
         ?>

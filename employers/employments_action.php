@@ -28,7 +28,7 @@ if (!isset($_POST['action'])) {
               LEFT JOIN industries ON industries.id = jobs.industry 
               WHERE jobs.employer = '". $_POST['id']. "' AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
-              referrals.employer_rejected_on IS NULL AND 
+              referrals.employer_removed_on IS NULL AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')
               GROUP BY referrals.id 
               ORDER BY ". $order_by;

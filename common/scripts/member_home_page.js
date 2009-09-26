@@ -51,6 +51,16 @@ function acknowledgements_ascending_or_descending() {
     }
 }
 
+function show_guide_page(_guide_page) {
+    if (!isEmpty(_guide_page)) {
+        var popup = window.open('guides/' + _guide_page, '', 'width=800px, height=600px, scrollbars');
+
+        if (!popup) {
+            alert('Popup blocker was detected. Please allow pop-up windows for YellowElevator.com and try again.');
+        }
+    }
+}
+
 function close_job_info() {
     $('div_job_info').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');
@@ -635,13 +645,13 @@ function toggle_banner() {
     var height = $('div_banner').getStyle('height');
     var params = 'id=' + id + '&action=set_hide_banner';
     
-    if (parseInt(height) >= 300) {
+    if (parseInt(height) >= 100) {
         $('hide_show_label').set('html', 'Show');
         $('div_banner').tween('height', '15px');
         params = params + '&hide=1';
     } else {
         $('hide_show_label').set('html', 'Hide');
-        $('div_banner').tween('height', '315px');
+        $('div_banner').tween('height', '105px');
         params = params + '&hide=0';
     }
     
@@ -667,7 +677,7 @@ function hide_show_banner() {
                 $('div_banner').setStyle('height', '15px');
             } else {
                 $('hide_show_label').set('html', 'Hide');
-                $('div_banner').setStyle('height', '315px');
+                $('div_banner').setStyle('height', '105px');
             }
         }
     });

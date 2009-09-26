@@ -145,14 +145,17 @@ class MemberSignUpPage extends Page {
         
         if (!empty($this->member)) {
             $member = new Member($this->member);
-            $this->top("Yellow Elevator - Member Sign Up (Invited by ". $member->get_name(). ")");
+            $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Member Sign Up (Invited by ". $member->get_name(). ")</span>");
         } else {
-            $this->top("Yellow Elevator - Member Sign Up");
+            $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Member Sign Up</span>");
         }
         
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
+        </div>
+        <div style="text-align: center;">
+            <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/50_banner.jpg" />
         </div>
         <div class="profile">
             <form id="profile" method="post" action="sign_up_action.php">
@@ -164,10 +167,6 @@ class MemberSignUpPage extends Page {
                     </tr>
                     <tr>
                         <td class="instruction" colspan="2">Please fill up all fields, and fields marked with * are mandatory.</td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="personal_id">* NRIC / ID / Passport No.:</label></td>
-                        <td class="field"><input class="field" type="text" id="personal_id" name="personal_id" value="<?php echo $_session['personal_id'] ?>" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="firstname">* First Name / Given Names:</label></td>
@@ -184,16 +183,16 @@ class MemberSignUpPage extends Page {
                         <td class="title" colspan="2">Expertise</td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="primary_industry">* Primary/Majoring Industry:</label></td>
+                        <td class="label"><label for="primary_industry">* Primary/Majoring Specialization:</label></td>
                         <td class="field">
                             <?php $this->generate_industries('primary_industry', $_session['primary_industry']); ?>
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="secondary_industry">* Secondary/Minoring Industry:</label></td>
+                        <td class="label"><label for="secondary_industry">* Secondary/Minoring Specialization:</label></td>
                         <td class="field">
                             <?php $this->generate_industries('secondary_industry', $_session['secondary_industry']); ?>
-                            <p class="note">Please choose your primary and secondary industries. If you consider yourself to be an expert only in one industry, select the same industry as both your primary and secondary ones. The purpose of this information is for us to understand your needs better. If you are a fresh graduate, simply choose the industry that is the closest to your major.</p>
+                            <p class="note">Please choose your primary and secondary specializations. If you consider yourself to be an expert only in one specialization, select the same specialization as both your primary and secondary ones. The purpose of this information is for us to understand your needs better. If you are a fresh graduate, simply choose the specialization that is the closest to your major.</p>
                         </td>
                     </tr>
                     <tr>

@@ -56,18 +56,49 @@ class MemberHomePage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_search($this->member->get_name(). " - Home");
+        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Home</span>");
         $this->menu('member', 'home');
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
         <div class="banner" id="div_banner">
-            <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Getting Started Notice</a>
+            <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guides</a>
             <br/><br/>
-            <img id="img_banner" style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/member_banners/home.jpg" />
-            <!--&nbsp;
-            <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/members/confirm_hires.php"><img style="border: none; vertical-align: top;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/member_banners/confirm_employ_reminder.jpg" /></a-->
+            <table class="guides">
+                <tr>
+                    <td colspan="3" style="text-align: center; padding-bottom: 5px;">
+                        <a class="no_link guides" onClick="show_guide_page('setting_up_account.php');">
+                            <span style="font-weight: bold;">Setting Up My Account</span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right; padding-bottom: 5px; padding-right: 8px;">
+                        <a class="no_link guides" onClick="show_guide_page('job_referral.php');">
+                            How to <span style="font-weight: bold;">Make a Referral</span>?
+                        </a>
+                    </td>
+                    <td rowspan="2" class="spacer"></td>
+                    <td style="padding-bottom: 5px; padding-left: 5px;">
+                        <a class="guides" href="my_referrals.php">
+                            How to <span style="font-weight: bold;">Track My Referrals</span>?
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right; padding-bottom: 5px; padding-right: 8px;">
+                        <a class="no_link guides" onClick="show_guide_page('apply_job.php');">
+                            How to <span style="font-weight: bold;">Apply for a Job Position</span>?
+                        </a>
+                    </td>
+                    <td style="padding-bottom: 5px; padding-left: 5px;">
+                        <a class="guides" href="confirm_hires.php">
+                            How to <span style="font-weight: bold;">Track My Job Application</span>?
+                        </a>
+                    </td>
+                </tr>
+            </table>
         </div>
         <div id="div_tabs">
             <ul>

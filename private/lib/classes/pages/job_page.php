@@ -57,7 +57,7 @@ class JobPage extends Page {
         }
         
         echo '</script>'. "\n";
-        echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;embeds=true&amp;style=rotate"></script>';
+        echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
     }
     
     private function generate_networks_list($_for_request_form = false) {
@@ -104,11 +104,16 @@ class JobPage extends Page {
         foreach ($jobs[0] as $key => $value) {
             $job[$key] = $value;
         }
-
+        
+        $total_potential_reward = $job['potential_reward'];
+        $potential_token_reward = $total_potential_reward * 0.05;
+        $potential_reward = $total_potential_reward - $potential_token_reward;
+        
         $job['description'] = htmlspecialchars_decode($job['description']);
-        $job['potential_reward'] = number_format($job['potential_reward'], 2, '. ', ', ');
-        $job['salary'] = number_format($job['salary'], 2, '. ', ', ');
-        $job['salary_end'] = number_format($job['salary_end'], 2, '. ', ', ');
+        $job['potential_reward'] = number_format($potential_reward, 0, '.', ', ');
+        $job['potential_token_reward'] = number_format($potential_token_reward, 0, '. ', ', ');;
+        $job['salary'] = number_format($job['salary'], 0, '. ', ', ');
+        $job['salary_end'] = number_format($job['salary_end'], 0, '. ', ', ');
         $job['state'] = ucwords($job['state']);
         
         return $job;
@@ -148,7 +153,7 @@ class JobPage extends Page {
     public function show($_from_search = false) {
         $this->begin();
         if (is_null($this->member)) {
-            $this->top_search("Yellow Elevator - Job Details");
+            $this->top_search("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Job Details</span>");
         } else {
             $this->top_search($this->member->get_name(). " - Job Details");
             $this->menu('member');
@@ -162,7 +167,7 @@ class JobPage extends Page {
             $error_message = 'An error occured while loading the job details.';
         } 
         
-        if ($job['expired'] >= 0 || $job['closed'] == 'Y') {
+        if ($job['expired'] > 0 || $job['closed'] == 'Y') {
             $error_message = 'The job that you are looking for is no longer available.';
         }
         
@@ -193,14 +198,33 @@ class JobPage extends Page {
             ?>
             <table id="job_info" class="job_info">
                 <tr>
-                    <td colspan="2" class="title"><span id="job.title"><?php echo $job['title']; ?></span></td>
+                    <td colspan="3" class="title"><span id="job.title"><?php echo $job['title']; ?></span></td>
                 </tr>
                 <tr>
-                    <td colspan="2" class="title_reward">Potential Reward of <span id="job.currency_1"><?php echo $job['currency_symbol']; ?></span>$&nbsp;<span id="job.potential_reward"><?php echo $job['potential_reward']; ?></span></td>
-                </tr>
-                <tr>
-                    <td class="label">Industry:</td>
+                    <td class="label">Specialization:</td>
                     <td class="field"><span id="job.industry"><?php echo $job['full_industry'] ?></span></td>
+                    <td rowspan="9" class="title_reward">
+                        <div style="width: 100%; background-color: #EEE; border: 5px solid #EEE; padding-top: 3px; padding-bottom: 3px;">
+                            <span style="color: #28688A;">Referrer's <span style="font-weight: normal;">Potential Reward:</span></span><br/>
+                            <div style="border: 2px solid #777; padding: 3px 3px 3px 3px; background-color: #FFF;">
+                                <span id="job.currency_1"><?php echo $job['currency_symbol']; ?></span>$&nbsp;<span id="job.potential_reward"><?php echo $job['potential_reward']; ?></span>
+                            </div>
+                            <br/>
+                            <span style="color: #28688A;">Candidate's <span style="font-weight: 500;">Bonus:</span></span><br/> 
+                            <div style="border: 2px solid #777; padding: 3px 3px 3px 3px; background-color: #FFF;">
+                                <span id="job.currency_2"><?php echo $job['currency_symbol']; ?></span>$&nbsp;<span id="job.potential_reward"><?php echo $job['potential_token_reward']; ?></span>
+                            </div>
+                        </div>
+                        <br/>
+                        <div style="font-weight: normal;">
+                        <script language="javascript" type="text/javascript">
+                            SHARETHIS.addEntry({
+                                title: '<?php echo $job['title']; ?> on YellowElevator.com',
+                                summary: 'Check this job, by <?php echo $job['employer_name'] ?>, out at yellowelevator.com!'
+                            }, {button:true} );
+                        </script>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td class="label">Employer:</td>
@@ -247,19 +271,6 @@ class JobPage extends Page {
                     <td class="field">&nbsp;</td>
                 </tr>
                 <tr>
-                    <td class="label">&nbsp;</td>
-                    <td class="field">
-                        <script type="text/javascript">
-                            url = '<?php echo 'http://'. $_SERVER['SERVER_NAME']. '/job/'. $this->job_id ?>';
-                        </script>
-                        <script type="text/javascript" src="http://www.retweet.com/static/retweets.js"></script>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label">&nbsp;</td>
-                    <td class="field">&nbsp;</td>
-                </tr>
-                <tr>
                     <td class="label">Created On:</td>
                     <td class="field"><span id="job.created_on"><?php echo $job['formatted_created_on'] ?></span></td>
                 </tr>
@@ -268,7 +279,7 @@ class JobPage extends Page {
                     <td class="field"><span id="job.expire_on"><?php echo $job['formatted_expire_on'] ?></span></td>
                 </tr>
                 <tr>
-                    <td id="job_buttons" class="buttons" colspan="2">
+                    <td id="job_buttons" class="buttons" colspan="3">
                     <?php
                     if (!is_null($this->member)) {
                         ?>
@@ -276,22 +287,10 @@ class JobPage extends Page {
                         <?php
                     } else {
                         ?>
-                        Sign In or Sign Up to <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" /> or <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />
+                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" /> or <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />
                         <?php
                     }
                     ?>
-                    </td>
-                </tr>
-                <tr>
-                    <td id="job_buttons" class="buttons" colspan="2">
-                        You can&nbsp;
-                        <script language="javascript" type="text/javascript">
-                            SHARETHIS.addEntry({
-                                title: '<?php echo $job['title']; ?> on YellowElevator.com',
-                                summary: 'Check this job, by <?php echo $job['employer_name'] ?>, out at yellowelevator.com!'
-                            }, {button:true} );
-                        </script>
-                        &nbsp;with your friends.
                     </td>
                 </tr>
             </table>
@@ -302,8 +301,10 @@ class JobPage extends Page {
             <form onSubmit="retun false;">
                 <table class="refer_form">
                     <tr>
+                    <td colspan="3"><p>You are about to refer the job position,&nbsp;<span id="job_title" style="font-weight: bold;"></span>&nbsp;to your contacts. Please select...</p></td>
+                    </tr>
+                    <tr>
                         <td class="left">
-                            <p>You are about to refer the job position,&nbsp;<span id="job_title" style="font-weight: bold;"></span>&nbsp;to one of your contacts. Please select a contact...</p>
                             <table class="candidate_form">
                                 <tr>
                                     <td class="radio"><input type="radio" id="from_list" name="candidate_from" value="list" checked /></td>
@@ -313,16 +314,21 @@ class JobPage extends Page {
                                         <div class="candidates" id="candidates" name="candidates"></div>
                                     </td>
                                 </tr>
+                            </table>
+                        </td>
+                        <td class="separator"></td>
+                        <td class="right">
+                            <table class="candidate_form">
                                 <tr>
                                     <td class="radio"><input type="radio" id="from_email" name="candidate_from" value="email" /></td>
                                     <td>
-                                        <label for="from_email">or enter e-mail address of a new contact</label><br/>
-                                        <input type="text" class="mini_field" id="email_addr" name="email_addr" />
+                                        <label for="from_email">or enter their e-mail addresses, separated by spaces</label><br/>
+                                        <p><textarea class="mini_field" id="email_addr" name="email_addr"></textarea></p>
                                     </td>
                                 </tr>
                             </table>
                         </td>
-                        <td class="separator"></td>
+                        <!--td class="separator"></td>
                         <td class="right">
                             <p>1. How long have you known and how do you know <span id="candidate_name" style="font-weight: bold;">this contact</span>? (<span id="word_count_q1">0</span>/50 words)</p>
                             <p><textarea class="mini_field" id="testimony_answer_1"></textarea></p>
@@ -330,12 +336,12 @@ class JobPage extends Page {
                             <p><textarea class="mini_field" id="testimony_answer_2"></textarea></p>
                             <p>3. Briefly, what are the areas of improvements for <span id="candidate_name" style="font-weight: bold;">this contact</span>?  (<span id="word_count_q3">0</span>/50 words)</p>
                             <p><textarea class="mini_field" id="testimony_answer_3"></textarea></p>
-                        </td>
+                        </td-->
                     </tr>
                 </table>
-                <div style="padding: 2px 2px 2px 2px; text-align: center; font-style: italic;">
+                <!--div style="padding: 2px 2px 2px 2px; text-align: center; font-style: italic;">
                     Your testimonial for this contact can only be viewed by the employer.
-                </div>
+                </div-->
                 <p class="button"><input type="button" value="Cancel" onClick="close_refer_form();" />&nbsp;<input type="button" value="Refer Now" onClick="refer();" /></p>
             </form>
         </div>

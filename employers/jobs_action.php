@@ -47,7 +47,7 @@ $query = "SELECT DISTINCT jobs.id
           WHERE jobs.employer = '". $_POST['id']. "' AND 
           (jobs.expire_on >= '". $today. "' OR jobs.closed = 'N') AND 
           (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
-          referrals.employer_rejected_on IS NULL AND 
+          referrals.employer_removed_on IS NULL AND 
           (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')";
 $mysqli = Database::connect();
 $result = $mysqli->query($query);

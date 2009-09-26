@@ -52,7 +52,7 @@ class MemberInvitesPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_search($this->member->get_name(). " - Invite Contacts");
+        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Invite Contacts</span>");
         $this->menu('member', 'invites');
         
         ?>

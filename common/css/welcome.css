@@ -1,3 +1,423 @@
+body {
+    margin: 0; 
+    padding: 0;
+    background-color: #FFFFFF;
+    color: #8B8987;
+    background-image: url(../images/welcome_bgfinal.jpg);
+    background-repeat: repeat-x;
+}
+
+#welcome_top {
+    width: 750px;
+    background-image: url(../images/welcome_top_bg.jpg);
+    background-repeat: repeat-x;
+    height: 115px;
+    margin: 0 auto;
+}
+
+#welcome_top #logo {
+    display: block;
+    position: absolute;
+    margin-left: 24px;
+}
+
+#welcome_top .loginpanel {
+    position: absolute;
+    margin-left: 471px;
+    margin-top: 18px;
+}
+
+#welcome_top .loginpanel a.employer {
+    width: 95px;
+    height: 41px;
+    display: block;
+    background-image: url(../images/but-employer.jpg);
+    background-repeat: no-repeat;
+    background-position: left top;
+    position: absolute;
+    margin-top:-28px;
+    *margin-top:-12px;
+    margin-left:80px;
+    *margin-left:0px;
+}
+#welcome_top .loginpanel a.employer:hover {
+    background-position: left bottom;
+}
+
+#welcome_top .loginpanel a.employer strong {
+    display:none;
+}
+
+#welcome_top .loginpanel span.spacer {
+    margin-left:96px;
+}
+
+#welcome_top .loginpanel a.member {
+    width:83px;
+    height:41px;
+    display:block;
+    background-image: url(../images/but-member.jpg);
+    background-repeat: no-repeat;
+    background-position: left top;
+    position: absolute;
+    margin-top:-28px;
+    *margin-top:-12px;
+    margin-left:206px;
+    *margin-left:0px;
+}
+#welcome_top .loginpanel a.member:hover {
+    background-position: left bottom;
+}
+
+#welcome_top .loginpanel a.member strong {
+    display:none;
+}
+
+#welcome_top .topmenu {
+    margin-top:70px;
+    position: absolute;
+    width:750px;
+}
+
+#welcome_top .topmenu table {
+    float:right;
+}
+
+#welcome_top .topmenu strong {
+    display:none;
+}
+
+#welcome_top .topmenu td.topmenudivider {
+    width:2px;
+    height:43px;
+    background-image: url(../images/topmenu-divider.gif);
+    background-repeat: no-repeat;
+}
+
+#welcome_top .topmenu td.contactus {
+    width:101px;
+    height:21px;
+}
+
+#welcome_top .topmenu td.contactus a {
+    width:101px;
+    height:21px;
+    background-image: url(../images/topmenu-contactus.gif);
+    background-repeat: no-repeat;
+    background-position: left top;
+    display: block;
+}
+
+#welcome_top .topmenu td.contactus a:hover {
+    background-position: left bottom;
+}
+
+#welcome_top .topmenu td.aboutus {
+    width:80px;
+    height:20px;
+}
+
+#welcome_top .topmenu td.aboutus a {
+    width:80px;
+    height:20px;
+    background-image: url(../images/topmenu-aboutus.gif);
+    background-repeat: no-repeat;
+    background-position: left top;
+    display: block;
+}
+
+#welcome_top .topmenu td.aboutus a:hover {
+    background-position: left bottom;
+}
+
+#welcome_top .topmenu td.tour {
+    width:84px;
+    height:19px;
+}
+
+#welcome_top .topmenu td.tour a {
+    width:84px;
+    height:19px;
+    background-image: url(../images/topmenu-tour.gif);
+    background-repeat: no-repeat;
+    background-position: left top;
+    display: block;
+}
+
+#welcome_top .topmenu td.tour a:hover {
+    background-position: left bottom;
+}
+
+#search_info {
+    width:750px;
+    background-image: url(../images/welcome_bg-02.jpg);
+    background-repeat: no-repeat;
+    height: 279px;
+    margin: 0 auto;
+}
+
+#search_info div.job_search {
+    width: 450px;
+    position: absolute;
+    margin-left:271px;
+    margin-top:16px;
+}
+
+#search_info div.job_search #employer {
+    width:195px;
+    height:20px;
+    *height:20px;
+    *font-size:90%;
+    border:1px solid #969696;
+}
+
+#search_info div.job_search #industry {
+    width:233px;
+    height:20px;
+    *height:20px;
+    *font-size:90%;
+    border:1px solid #969696;
+}
+
+#search_info div.job_search #keywords {
+    width:346px;
+    height:17px;
+    border:1px solid #969696;
+    padding-top:3px;
+    padding-left:5px;
+    padding-right:5px;
+    font-size: 10pt;
+}
+
+#search_info div.job_search #search_button {
+    position: absolute;
+    margin-left:5px;
+    margin-top:-3px;
+}
+
+#search_info div.intro {
+    color:white;
+    margin-top:164px;
+    position: absolute;
+    margin-left:251px;
+    width:465px;
+    text-align:right;
+    line-height: 15px;
+}
+
+#search_info a.takeatour {
+    position: absolute;
+    margin-top:238px;
+    margin-left:464px;
+}
+
+#action_buttons_jasmine {
+    width:750px;
+    background-image: url(../images/welcome_bg-03.jpg);
+    background-repeat: repeat-x;
+    height: 276px;
+    margin: 0 auto;
+    margin-bottom:1px;
+}
+
+#action_buttons_jasmine .box {
+    width:342px;
+    height:156px;
+    background-image: url(../images/welcome_bg-07.gif);
+    background-repeat: no-repeat;
+    margin-top:54px;
+    position: absolute;
+}
+
+#action_buttons_jasmine .title {
+    margin-top:20px;
+    margin-left:36px;
+}
+
+#action_buttons_jasmine .descr {
+    font-size: 9pt;
+    margin-top: 5px;
+    margin-left:24px;
+}
+
+#action_buttons_jasmine .descr strong {
+    color:#fb8603;
+}
+
+#action_buttons_jasmine .employer {
+    margin-left:30px;
+}
+
+#action_buttons_jasmine .member {
+    margin-left:373px;
+}
+
+#action_buttons_jasmine a.signup {
+    margin-top:40px;
+    margin-left:23px;
+    width:153px;
+    height:30px;
+    display:block;
+    /*background-image: url(../images/signup.gif);
+    background-repeat: no-repeat;*/
+}
+
+#action_buttons_jasmine a.signup2 {
+    margin-top:26px;
+    margin-left:23px;
+    width:153px;
+    height:30px;
+    display:block;
+    /*background-image: url(../images/signup2.gif);
+    background-repeat: no-repeat;*/
+}
+
+#action_buttons_jasmine a.signup strong {
+    display:none;
+}
+
+#action_buttons_jasmine a.signup2 strong {
+    display:none;
+}
+
+#action_buttons_jasmine a:hover {
+    background-position: left bottom;
+}
+
+#sign_up_banner {
+    width:750px;
+    background-image: url(../images/welcome_bg-04.jpg);
+    background-repeat: repeat-y;
+    height: 45px;
+    margin: 0 auto;
+    text-align:center;
+}
+
+#sign_up_banner_details {
+    width:750px;
+    background-image: url(../images/welcome_bg-04.jpg);
+    background-repeat: repeat-y;
+    height: 148px;
+    margin-left: 228px;
+    text-align:center;
+    padding-bottom: 10px;
+}
+
+#top_jobs {
+    width:750px;
+    background-image: url(../images/welcome_bg-05.jpg);
+    background-repeat: repeat-x;
+    margin: 0 auto;
+    background-color:white;
+    padding-top:48px;
+    margin-top:1px;
+}
+
+#top_jobs img.topjobs {
+    margin-left:35px;
+    position: absolute;
+}
+
+#top_jobs table.border {
+    margin-top:40px;
+    *margin-top:88px;
+    margin-left:24px;
+    width:712px;
+}
+
+#top_jobs table.border td.table-tl {
+    font-size: 1pt;
+    background-image: url(../images/table-tl.gif);
+    background-repeat: no-repeat;
+    width: 17px;
+    height: 15px;
+}
+
+#top_jobs table.border td.table-tc {
+    font-size: 1pt;
+    background-image: url(../images/table-tc.gif);
+    background-repeat: repeat-x;
+}
+
+#top_jobs table.border td.table-tr {
+    font-size: 1pt;
+    background-image: url(../images/table-tr.gif);
+    background-repeat: no-repeat;
+    height: 15px;
+    width: 17px;
+}
+
+#top_jobs table.border td.table-cl {
+    font-size: 1px;
+    background-image: url(../images/table-cl.gif);
+    background-repeat: repeat-y;
+    width: 17px;
+}
+
+#top_jobs table.border td.table-cr {
+    font-size: 1px;
+    background-image: url(../images/table-cr.gif);
+    background-repeat: repeat-y;
+}
+
+#top_jobs table.border td.table-bl {
+    font-size: 1px;
+    background-image: url(../images/table-bl.gif);
+    background-repeat: no-repeat;
+    height: 14px;
+    width: 17px;
+}
+
+#top_jobs table.border td.table-bc {
+    font-size: 1px;
+    background-image: url(../images/table-bc.gif);
+    background-repeat: repeat-x;
+}
+
+#top_jobs table.border td.table-br {
+    font-size: 1px;
+    background-image: url(../images/table-br.gif);
+    background-repeat: no-repeat;
+    height: 14px;
+    width: 17px;
+}
+
+#top_jobs td.data {
+    padding:17px 11px 40px 11px;
+}
+
+#top_jobs td.data td {
+    vertical-align: top;
+}
+
+#top_employers {
+    background-image: url(../images/welcome_bg-06.jpg);
+    background-repeat: repeat-x;
+    background-color:white;
+}
+
+#top_employers #employers_carousel {
+    width:950px;
+    margin: 0 auto;
+    height:183px;
+}
+
+#top_employers #employers_carousel table {
+    margin: auto;
+    width: 925px; 
+    border-collapse: collapse;
+}
+
+#top_employers #employers_carousel table td.nav-center {
+    background-image: url(../images/nav-logo.jpg);
+    background-repeat: repeat-x;
+}
+
+#div_twitter {
+    text-align: center;
+    padding-top: 50px;
+}
+
 #splash_floater, div.button_floater {
     position: absolute;
     z-index: 1;
@@ -7,6 +427,7 @@
     width: 800px;
     height: 280px;
 }
+
 
 div.button_floater {
     width: 398px;
@@ -85,6 +506,10 @@ div.top_employers table.top_employers td div.employer_logos {
     text-align: center;
 }
 
+div.employer_logos {
+    text-align: center;
+}
+
 div.top_jobs {
     width: 800px;
     margin: auto;
@@ -117,6 +542,7 @@ table.drop_contact {
     border: none;
     width: 100%;
     margin: auto;
+    color: #000000;
 }
 
 input.drop {

@@ -5,11 +5,15 @@ div.content table td {
 }
 
 table.contact {
+    padding-top: 50px;
+    padding-bottom: 50px;
     margin: auto;
 }
 
 table.contact td {
+    vertical-align: top;
     padding: 5px 5px 5px 5px;
+    color: #666666;
 }
 
 table.contact td.title {
@@ -19,7 +23,6 @@ table.contact td.title {
 }
 
 table.contact td.label {
-    width: 35%;
     text-align: right;
     font-weight: bold;
 }

@@ -37,7 +37,7 @@ if (!isset($_POST['action'])) {
               WHERE invoices.type = 'R' AND 
               (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
-              (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00 00:00:00') AND 
+              (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
               (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
               (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL) AND 
@@ -109,7 +109,7 @@ if ($_POST['action'] == 'get_partially_paid') {
               WHERE invoices.type = 'R' AND 
               (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
-              (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00 00:00:00') AND 
+              (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
               (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
               (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL) AND 
@@ -182,7 +182,7 @@ if ($_POST['action'] == 'get_fully_paid') {
               WHERE invoices.type = 'R' AND 
               (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
-              (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00 00:00:00') AND 
+              (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
               (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
               (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL) AND 
@@ -321,7 +321,7 @@ if ($_POST['action'] == 'get_payment_plan') {
     $due_days = 30;
     for($i=0; $i < $months; $i++) {
         $plans[$i]['due_day'] = $due_days;
-        $plans[$i]['due_on'] = format_date(date_add($employed_on, $due_days, 'day'));
+        $plans[$i]['due_on'] = sql_date_format(sql_date_add($employed_on, $due_days, 'day'));
         if ($i == ($months-1)) {
             $plans[$i]['amount'] = $final_monthly_amount;
         } else {

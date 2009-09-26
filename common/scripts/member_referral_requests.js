@@ -1,4 +1,4 @@
-var order_by = 'referral_requests.requested_on';
+var order_by = 'requested_on';
 var order = 'desc';
 
 var candidate_names = new Array();
@@ -8,6 +8,7 @@ var selected_candidate_id = '';
 var selected_job_title = '';
 var selected_job_id = '';
 var request_id = '';
+var is_request = true;
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -38,18 +39,48 @@ function check_has_banks(_member) {
     request.send(params);
 }
 
+function read_resume(_request_id, _is_req, _candidate_index, _candidate_id, 
+                     _job_index, _job_id, _requested_timestamp, _resume_id) {
+    var is_req_str = 'true';
+    var params = 'id=' + _request_id + '&action=read_resume&is_request=1';
+    if (!_is_req) {
+        params = 'id=' + _request_id + '&action=read_resume&is_request=0';
+        is_req_str = 'false';
+    } 
+    
+    var uri = root + "/members/referral_requests_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post', 
+        onSuccess: function(txt, xml) {
+            if (txt == '1') {
+                var id = 'req_' + _request_id;
+                if (!_is_req) {
+                    id = 'ref_' + _request_id;
+                }
+
+                var html = '<a class="no_link" onClick="show_testimony_form(' + _request_id + ', ' + _candidate_index + ', \'' + _candidate_id + '\', ' + _job_index + ', ' + _job_id + ', \'' + _requested_timestamp + '\', ' + _resume_id + ', ' + is_req_str + ');">Refer</a>';
+                $('testimony_' + id).set('html', html);
+                get_requests_count();
+            }
+        }
+    });
+    
+    request.send(params);
+}
+
 function close_testimony_form() {
     $('div_testimony_form').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');
 }
 
-function show_testimony_form(_request_id, _candidate_index, _candidate_id, 
-                             _job_index, _job_id, _requested_on, _resume_id) {
+function show_testimony_form(_request_id, _candidate_index, _candidate_id, _job_index, _job_id, _requested_on, _resume_id, _is_request) {
     selected_candidate_name = candidate_names[_candidate_index];
     selected_candidate_id = _candidate_id;
     selected_job_title = job_names[_job_index];
     selected_job_id = _job_id;
     request_id = _request_id;
+    is_request = _is_request;
     
     $('div_blanket').setStyle('display', 'block');
     
@@ -122,23 +153,49 @@ function show_requests() {
                 var rewards = xml.getElementsByTagName('potential_reward');
                 var currencies = xml.getElementsByTagName('currency');
                 var resumes = xml.getElementsByTagName('resume');
-
+                var is_requests = xml.getElementsByTagName('is_request');
+                var member_read_resumes = xml.getElementsByTagName('read_resume');
+                
                 for (var i=0; i < ids.length; i++) {
-                    var request_id = ids[i].childNodes[0].nodeValue;
+                    var id = '';
+                    var is_req = true;
+                    var is_req_str = 'true';
+                    if (is_requests[i].childNodes[0].nodeValue == '1') {
+                        id = 'req_' + ids[i].childNodes[0].nodeValue;
+                        is_req = true;
+                        is_req_str = 'true';
+                    } else {
+                        id = 'ref_' + ids[i].childNodes[0].nodeValue;
+                        is_ref = false;
+                        is_req_str = 'false';
+                    }
+                    
+                    var id_only = ids[i].childNodes[0].nodeValue;
+                    
                     candidate_names[i] = candidates[i].childNodes[0].nodeValue;
                     job_names[i] = titles[i].childNodes[0].nodeValue;
                     
-                    html = html + '<tr id="'+ request_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
+                    html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
 
                     html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title"><a class="no_link" onClick="toggle_description(\'' + request_id + '\')">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="title"><a class="no_link" onClick="toggle_description(\'' + id + '\')">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="title">' + candidates[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="date">' + requested_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="reward">' + currencies[i].childNodes[0].nodeValue + '&nbsp;' + rewards[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="actions"><a href="resume_viewer.php?id=' + resumes[i].childNodes[0].nodeValue + '" target="_new">View Resume</a>&nbsp;|&nbsp;<a class="no_link" onClick="show_testimony_form(' + request_id + ', ' + i + ', \'' + candidate_ids[0].childNodes[0].nodeValue + '\', ' + i + ', ' + job_ids[i].childNodes[0].nodeValue + ', \'' + requested_timestamps[i].childNodes[0].nodeValue + '\', ' + resumes[i].childNodes[0].nodeValue + ');">Refer</a>&nbsp;|&nbsp;<a class="no_link" onClick="reject_request(' + request_id + ');">Ignore</a></td>' + "\n";
+                    
+                    var view_resume = '<a href="resume_viewer.php?id=' + resumes[i].childNodes[0].nodeValue + '" target="_new" onClick="read_resume(\'' + id_only + '\', ' + is_req_str + ', ' + i + ', \'' + candidate_ids[i].childNodes[0].nodeValue + '\', ' + i + ', ' + job_ids[i].childNodes[0].nodeValue + ', \'' + requested_timestamps[i].childNodes[0].nodeValue + '\', ' + resumes[i].childNodes[0].nodeValue + ');">View Resume</a>';
+                    
+                    var testimony_form = '<span id="testimony_' + id + '"><a class="no_link" onClick="show_testimony_form(' + id_only + ', ' + i + ', \'' + candidate_ids[i].childNodes[0].nodeValue + '\', ' + i + ', ' + job_ids[i].childNodes[0].nodeValue + ', \'' + requested_timestamps[i].childNodes[0].nodeValue + '\', ' + resumes[i].childNodes[0].nodeValue + ', ' + is_req_str + ');">Refer</a></span>';
+                    if (member_read_resumes[i].childNodes.length <= 0) {
+                        testimony_form = '<span id="testimony_' + id + '"><span style="color: #CCCCCC;">Refer</span></span>';
+                    }
+                    
+                    var ignore = '<a class="no_link" onClick="reject_request(' + id_only + ', ' + is_req_str + ');">Ignore</a>';
+                    
+                    html = html + '<td class="actions">' + view_resume + '&nbsp;|&nbsp;' + testimony_form + '&nbsp;|&nbsp;' + ignore + '</td>' + "\n";
                     html = html + '</tr>' + "\n";
                     html = html + '<tr onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td colspan="7"><div class="description" id="desc_' + request_id + '"></div></td>' + "\n";
+                    html = html + '<td colspan="7"><div class="description" id="desc_' + id + '"></div></td>' + "\n";
                     html = html + '</tr>';
                 }
                 html = html + '</table>';
@@ -150,12 +207,18 @@ function show_requests() {
             
             if (has_requests) {
                 var ids = xml.getElementsByTagName('id');
+                var is_requests = xml.getElementsByTagName('is_request');
                 var descriptions = xml.getElementsByTagName('description');
                 
                 for (var i=0; i < ids.length; i++) {
-                    var request_id = ids[i].childNodes[0].nodeValue;
+                    var id = '';
+                    if (is_requests[i].childNodes[0].nodeValue == '1') {
+                        id = 'req_' + ids[i].childNodes[0].nodeValue;
+                    } else {
+                        id = 'ref_' + ids[i].childNodes[0].nodeValue;
+                    }
                     
-                    $('desc_' + request_id).set('html', descriptions[i].childNodes[0].nodeValue);
+                    $('desc_' + id).set('html', descriptions[i].childNodes[0].nodeValue);
                 }
             }
             set_status('');
@@ -187,8 +250,15 @@ function close_request() {
     request.send(params);
 }
 
-function reject_request() {
+function reject_request(request_id, is_request) {
     var params = 'id=' + request_id + '&action=reject_request';
+    
+    if (is_request) {
+        params = params + '&is_request=1';
+    } else {
+        params = params + '&is_request=0';
+    }
+    
     var uri = root + "/members/referral_requests_action.php";
     var request = new Request({
         url: uri,
@@ -202,24 +272,41 @@ function refer() {
     var answer_1 = $('testimony_answer_1').value;
     var answer_2 = $('testimony_answer_2').value;
     var answer_3 = $('testimony_answer_3').value;
+    var answer_4 = $('testimony_answer_4').value;
+    var meet_requirements = ($('meet_req_yes').checked) ? 'Yes' : 'No';
     
-    if (isEmpty(answer_1) || isEmpty(answer_2) || isEmpty(answer_3)) {
+    if (isEmpty(answer_1) || (meet_requirements == 'Yes' && isEmpty(answer_2)) || isEmpty(answer_3)) {
         alert('Please briefly answer all questions.');
         return false;
-    } else if (answer_1.split(' ').length > 50 || answer_3.split(' ').length > 50 || answer_3.split(' ').length > 50) {
+    } else if (answer_1.split(' ').length > 50 || answer_2.split(' ').length > 50 || 
+               answer_3.split(' ').length > 50 || answer_4.split(' ').length > 50) {
         if (answer_1.split(' ').length > 50) {
             alert('Please keep your 1st answer below 50 words.');
         } else if (answer_2.split(' ').length > 50) {
             alert('Please keep your 2nd answer below 50 words.');
         } else if (answer_3.split(' ').length > 50) {
-            alert('Please keep your 3rd and final answer below 50 words.');
+            alert('Please keep your 3rd answer below 50 words.');
+        } else if (answer_4.split(' ').length > 50) {
+            alert('Please keep your 4th and final answer below 50 words.');
         }
         return false;
     }
     
-    var testimony = answer_1 + '<br/>' + answer_2 + '<br/>' + answer_3;
+    var testimony = 'Experiences and Skillsets:<br/>' + answer_1 + '<br/><br/>';
+    testimony = testimony + 'Meet Requirements: ' + meet_requirements + '<br/>Additional Comments:<br/>' + answer_2 + '<br/><br/>';
+    testimony = testimony + 'Personaliy/Work Attitude:<br/>' + answer_3 + '<br/><br/>';
+    testimony = testimony + 'Additional Recommendations: ' + ((isEmpty(answer_4)) ? 'None provided' : answer_4);
+    
+    var agreed = confirm('By clicking "OK", you confirm that you have screened the candidate\'s resume and have also assessed the candidate\'s suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding the candidate, and you agree to provide any other necessary information requested by the employer.\n\nOtherwise, you may click the "Cancel" button.');
+    
+    if (!agreed) {
+        set_status('');
+        close_testimony_form();
+        return false;
+    }
     
     var params = 'id=' + id + '&action=make_referral';
+    params = params + '&request_id=' + request_id;
     params = params + '&referee=' + selected_candidate_id;
     params = params + '&job=' + selected_job_id;
     params = params + '&testimony=' + testimony;
@@ -227,6 +314,14 @@ function refer() {
     params = params + '&request=1';
     params = params + '&resume=' + $('resume').value;
     params = params + '&requested_on=' + $('requested_on').value;
+    if (!is_request) {
+        params = 'id=' + id + '&action=make_referral';
+        params = params + '&referral_id=' + request_id;
+        params = params + '&testimony=' + testimony;
+        params = params + '&job=' + selected_job_id;
+        params = params + '&referee=' + selected_candidate_id;
+        params = params + '&from=list';
+    }
     
     var uri = root + "/members/refer_action.php";
     var request = new Request({
@@ -265,7 +360,9 @@ function refer() {
             }
             
             close_testimony_form();
-            close_request();
+            if (is_request) {
+                close_request();
+            }
             show_requests();
             get_referrals_count();
             check_has_banks(id);
@@ -299,6 +396,10 @@ function onDomReady() {
        update_word_count_of('word_count_q3', 'testimony_answer_3') 
     });
     
+    $('testimony_answer_4').addEvent('keypress', function() {
+       update_word_count_of('word_count_q4', 'testimony_answer_4') 
+    });
+    
     $('sort_employer').addEvent('click', function() {
         order_by = 'employer';
         ascending_or_descending();
@@ -306,25 +407,25 @@ function onDomReady() {
     });
     
     $('sort_title').addEvent('click', function() {
-        order_by = 'jobs.title';
+        order_by = 'title';
         ascending_or_descending();
         show_requests();
     });
      
     $('sort_candidate').addEvent('click', function() {
-        order_by = 'referrals.referee';
+        order_by = 'candidate';
         ascending_or_descending();
         show_requests();
     });
     
     $('sort_requested_on').addEvent('click', function() {
-        order_by = 'referrals.referred_on';
+        order_by = 'requested_on';
         ascending_or_descending();
         show_requests();
     });
     
     $('sort_reward').addEvent('click', function() {
-        order_by = 'jobs.potential_reward';
+        order_by = 'potential_reward';
         ascending_or_descending();
         show_requests();
     });

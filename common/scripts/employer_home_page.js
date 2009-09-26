@@ -1,3 +1,14 @@
+function show_guide_page(_guide_page) {
+    if (!isEmpty(_guide_page)) {
+        var popup = window.open('guides/' + _guide_page, '', 'width=800px, height=600px, scrollbars');
+
+        if (!popup) {
+            alert('Popup blocker was detected. Please allow pop-up windows for YellowElevator.com and try again.');
+        }
+    }
+}
+
+
 function show_invoice_page(invoice_id) {
     var popup = window.open('invoice.php?id=' + invoice_id, '', 'scrollbars');
     

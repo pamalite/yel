@@ -22,7 +22,9 @@ if (!isset($_POST['action'])) {
               jobs.potential_reward, jobs.currency, referral_requests.resume, 
               referral_requests.member AS candidate_id, referral_requests.requested_on, 
               CONCAT(members.lastname, ', ', members.firstname) AS candidate, jobs.description, 
-              DATE_FORMAT(referral_requests.requested_on, '%e %b, %Y') AS formatted_requested_on 
+              DATE_FORMAT(referral_requests.requested_on, '%e %b, %Y') AS formatted_requested_on, 
+              referral_requests.referrer_read_resume_on AS read_resume, 
+              '1' AS is_request 
               FROM referral_requests 
               LEFT JOIN jobs ON jobs.id = referral_requests.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
@@ -35,14 +37,37 @@ if (!isset($_POST['action'])) {
               (referral_requests.referrer_acknowledged_on IS NULL OR referral_requests.referrer_acknowledged_on = '0000-00-00 00:00:00') AND 
               (referral_requests.acknowledged_by_others_on IS NULL OR referral_requests.acknowledged_by_others_on = '0000-00-00 00:00:00') 
               AND (jobs.closed = 'N' AND jobs.expire_on >= NOW()) 
+              UNION 
+              SELECT referrals.id, employers.name, jobs.id, jobs.title, 
+              jobs.potential_reward, jobs.currency, referrals.resume, 
+              referrals.referee, referrals.referee_acknowledged_on, 
+              CONCAT(referees.lastname, ', ', referees.firstname), jobs.description, 
+              DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y'), 
+              referrals.member_read_resume_on, 
+              '0' 
+              FROM referrals 
+              LEFT JOIN jobs ON jobs.id = referrals.job 
+              LEFT JOIN employers ON employers.id = jobs.employer 
+              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
+              LEFT JOIN member_referees ON member_referees.member = referrals.member AND 
+              member_referees.referee = referrals.referee
+              WHERE referrals.member = '". $_POST['id']. "' AND 
+              member_referees.member = '". $_POST['id']. "' AND 
+              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+              referrals.resume IS NOT NULL AND 
+              (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
+              (referrals.member_confirmed_on IS NULL OR referrals.member_confirmed_on = '0000-00-00 00:00:00') AND 
+              (referrals.member_rejected_on IS NULL OR referrals.member_rejected_on = '0000-00-00 00:00:00') 
+              AND (jobs.closed = 'N' AND jobs.expire_on >= NOW()) 
               ORDER BY ". $order_by;
-              
+
     if ($_POST['id'] == 'initial@yellowelevator.com') {
         $query = "SELECT referral_requests.id, employers.name AS employer, jobs.id AS job_id, jobs.title, 
                   jobs.potential_reward, jobs.currency, referral_requests.resume, 
                   referral_requests.member AS candidate_id, referral_requests.requested_on, 
                   CONCAT(members.lastname, ', ', members.firstname) AS candidate, jobs.description, 
-                  DATE_FORMAT(referral_requests.requested_on, '%e %b, %Y') AS formatted_requested_on 
+                  DATE_FORMAT(referral_requests.requested_on, '%e %b, %Y') AS formatted_requested_on, 
+                  '1' AS is_request 
                   FROM referral_requests 
                   LEFT JOIN jobs ON jobs.id = referral_requests.job 
                   LEFT JOIN employers ON employers.id = jobs.employer 
@@ -92,8 +117,33 @@ if ($_POST['action'] == 'close_request') {
 }
 
 if ($_POST['action'] == 'reject_request') {
-    $query = "UPDATE referral_requests SET rejected = 'Y' WHERE id = ". sanitize($_POST['id']);
+    $query = '';
+    if ($_POST['is_request'] == '1') {
+        $query = "UPDATE referral_requests SET rejected = 'Y' WHERE id = ". sanitize($_POST['id']);
+    } else {
+        $query = "UPDATE referrals SET 
+                  member_rejected_on = NOW(), member_confirmed_on = NULL 
+                  WHERE id = ". sanitize($_POST['id']);
+    }
     $mysqli = Database::connect();
     $mysqli->execute($query);
 }
+
+if ($_POST['action'] == 'read_resume') {
+    $query = '';
+    if ($_POST['is_request'] == '1') {
+        $query = "UPDATE referral_requests SET referrer_read_resume_on = NOW() WHERE id = ". sanitize($_POST['id']);
+    } else {
+        $query = "UPDATE referrals SET member_read_resume_on = NOW() WHERE id = ". sanitize($_POST['id']);
+    }
+    $mysqli = Database::connect();
+    if ($mysqli->execute($query)) {
+        echo '1';
+        exit();
+    }
+    
+    echo '0';
+    exit();
+}
+
 ?>

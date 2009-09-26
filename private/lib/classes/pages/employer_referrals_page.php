@@ -51,7 +51,7 @@ class EmployerReferralsPage extends Page {
     public function show() {
         $this->begin();
         $this->support();
-        $this->top($this->employer->get_name(). " - Referrals");
+        $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Referrals</span>");
         $this->menu('employer', 'referrals');
         
         $query = "SELECT currencies.symbol FROM currencies 
@@ -122,7 +122,7 @@ class EmployerReferralsPage extends Page {
                         <td class="checkbox"><input type="checkbox" id="remove_all_referred" /></td>
                         <!--td class="id">&nbsp;</td-->
                         <td class="indicator">&nbsp;</td>
-                        <td class="view">&nbsp;</td>
+                        <!--td class="view">&nbsp;</td-->
                         <td class="member"><span class="sort" id="sort_referred_member">Referrer</span></td>
                         <td class="referee"><span class="sort" id="sort_referred_referee">Candidate</span></td>
                         <td class="date"><span class="sort" id="sort_referred_referred_on">Referred On</span></td>
@@ -153,7 +153,7 @@ class EmployerReferralsPage extends Page {
                         <!--td class="id">&nbsp;</td-->
                         <td class="indicator">&nbsp;</td>
                         <td class="score"><span class="sort" id="sort_suggested_score">Score</span></td>
-                        <td class="view">&nbsp;</td>
+                        <!--td class="view">&nbsp;</td-->
                         <td class="member"><span class="sort" id="sort_suggested_member">Referrer</span></td>
                         <td class="referee"><span class="sort" id="sort_suggested_referee">Candidate</span></td>
                         <td class="date"><span class="sort" id="sort_suggested_referred_on">Referred On</span></td>
@@ -183,7 +183,7 @@ class EmployerReferralsPage extends Page {
                         <td class="checkbox"><input type="checkbox" id="remove_all_shortlisted" /></td>
                         <!--td class="id">&nbsp;</td-->
                         <td class="indicator">&nbsp;</td>
-                        <td class="view">&nbsp;</td>
+                        <!--td class="view">&nbsp;</td-->
                         <td class="member"><span class="sort" id="sort_shortlisted_member">Referrer</span></td>
                         <td class="referee"><span class="sort" id="sort_shortlisted_referee">Candidate</span></td>
                         <td class="date"><span class="sort" id="sort_shortlisted_referred_on">Referred On</span></td>

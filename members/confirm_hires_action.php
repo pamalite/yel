@@ -34,7 +34,7 @@ if (!isset($_POST['action'])) {
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
               (referrals.referee_acknowledged_others_on IS NULL OR referrals.referee_acknowledged_others_on = '0000-00-00 00:00:00') AND
               (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
-              referrals.employer_rejected_on IS NULL 
+              referrals.employer_rejected_on IS NULL AND referrals.employer_removed_on IS NULL 
               ORDER BY ". $order_by;
     
     $mysqli = Database::connect();

@@ -30,12 +30,22 @@ td.checkbox {
     width: 10px;
 }
 
-td.industry, td.employer, td.title {
-   width: 150px;
+td.industry, td.employer, td.title, 
+td.potential_reward_title, td.potential_reward {
+    width: 150px;
+}
+
+td.actions {
+    width: 220px;
+    text-align: center;
 }
 
 td.date {
     width: 150px;
+}
+
+td.potential_reward {
+    text-align: right;
 }
 
 table.list div.description {
@@ -55,3 +65,130 @@ span.sort:hover {
     color: #FF0000;
 }
 
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_refer_form {
+    display: none;
+    background-color: #FFFFFF;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 675px;
+    height: 430px;
+    overflow: auto;
+}
+
+#div_refer_form table.refer_form, 
+#div_acknowledge_form table.request_form {
+    width: 95%;
+    margin: auto;
+}
+
+#div_refer_form table.refer_form td.separator, 
+#div_acknowledge_form table.request_form td.separator {
+    width: 1px;
+    border-left: 1px solid #CCCCCC;
+    /*background-color: #CCCCCC;*/
+}
+
+#div_refer_form table.refer_form td,
+#div_acknowledge_form table.request_form td {
+    vertical-align: top;
+    font-size: 10pt;
+}
+
+#div_refer_form table.refer_form td.right {
+    width: 50%;
+}
+
+#div_refer_form textarea.mini_field {
+    width: 99%;
+    height: 100px;
+}
+
+#div_refer_form input.mini_field {
+    width: 99%;
+}
+
+#div_refer_form table.candidate_form {
+    width: 95%;
+    margin: auto;
+}
+
+#div_refer_form div.candidates, 
+#div_acknowledge_form div.referrers {
+    width: 100%;
+    height: 295px;
+    overflow: auto;
+    border: 1px solid #CCCCCC;
+}
+
+#div_refer_form p {
+    font-size: 10pt;
+    margin: 3px 3px 3px 3px;
+}
+
+#div_refer_form p.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+    background-color: #CCCCCC;
+}
+
+#div_refer_form span.filter,
+#div_acknowledge_form span.filter {
+    font-size: 7pt;
+    font-weight: bold;
+}
+
+#div_acknowledge_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 950px;
+    height: 450px;
+    overflow: auto;
+}
+
+#div_acknowledge_form p {
+    text-align: center;
+}
+
+#div_acknowledge_form p.button {
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#div_acknowledge_form select.field {
+    font-size: 12pt;
+}
+
+#div_refer_form table.candidate_form td.radio,
+#div_acknowledge_form table.request_form td.radio {
+    width: 5px;
+}
+
+#div_acknowledge_form table.request_form td.option {
+    width: 30%;
+}
+
+#div_acknowledge_form table.request_form textarea, 
+#div_refer_form table.refer_form textarea  {
+    width: 98%;
+    height: 290px;
+}

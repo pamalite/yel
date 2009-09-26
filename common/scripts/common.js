@@ -1,7 +1,7 @@
 var root = "";
 
 function set_root() {
-    root = location.protocol + "//" + location.hostname + "/yel";
+    root = location.protocol + "//" + location.hostname + "/yel2";
 }
 
 function set_status(msg) {
@@ -285,9 +285,9 @@ function list_industries_in(selected, placeholder, used_id, used_name, for_searc
             
             if (selected == '0') {
                 if (for_search) {
-                    html = html + '<option value="0" selected>Any Industry</option>' + "\n";
+                    html = html + '<option value="0" selected>Any Specialization</option>' + "\n";
                 } else {
-                    html = html + '<option value="0" selected>Select an Industry</option>' + "\n";
+                    html = html + '<option value="0" selected>Select an Specialization</option>' + "\n";
                 }
                 html = html + '<option value="0" disabled>&nbsp;</option>' + "\n";
             } else {
@@ -336,7 +336,7 @@ function list_industries_in(selected, placeholder, used_id, used_name, for_searc
             $(placeholder).set('html', html);
         },
         onFailure: function() {
-            $(placeholder).set('html', 'Error loading industries.');
+             $(placeholder).set('html', 'Error loading industries.');
         },
         onRequest: function(instance) {
             $(placeholder).set('html', 'Loading industries...');
@@ -766,6 +766,16 @@ function verify_mini() {
     
     return true;
 }
+
+function prs_verify_mini() {
+    if ($('mini_keywords').value == '') {
+        alert('Please enter some keywords in order to do a search.');
+        return false;
+    }
+    
+    return true;
+}
+
 
 function set_mini_keywords() {
     $('mini_keywords').addEvent('focus', function() {

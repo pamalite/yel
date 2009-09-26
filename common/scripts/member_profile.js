@@ -97,8 +97,18 @@ function save() {
     
     if ($('like_newsletter').checked) {
         params = params + '&like_newsletter=Y';
+        if (!$('filter_jobs').disabled) {
+            if ($('filter_jobs').checked) {
+                params = params + '&filter_jobs=Y';
+            } else {
+                params = params + '&filter_jobs=N';
+            }
+        } else {
+            params = params + '&filter_jobs=N';
+        }
     } else {
         params = params + '&like_newsletter=N';
+        params = params + '&filter_jobs=N';
     }
     
     if (password != '') {
@@ -197,6 +207,15 @@ function onDomReady() {
     
     $('save').addEvent('click', save);
     $('save_1').addEvent('click', save);
+    
+    $('like_newsletter').addEvent('click', function() {
+        if ($('like_newsletter').checked) {
+            $('filter_jobs').disabled = false;
+        } else {
+            $('filter_jobs').checked = false;
+            $('filter_jobs').disabled = true;
+        }
+    });
     
     var suggest_url = root + '/common/php/search_suggest.php';
     new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {

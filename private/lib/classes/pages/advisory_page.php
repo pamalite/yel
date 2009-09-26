@@ -25,7 +25,7 @@ class AdvisoryPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top("Yelow Elevator - Members of the Advisory Board");
+        $this->top("Yelow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Members of the Advisory Board</a>");
         ?>
         <div class="content">
             <div class="advisory_member">

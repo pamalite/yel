@@ -36,6 +36,8 @@ $query = "SELECT employers.name AS employer, employers.email_addr, employers.con
           LEFT JOIN industries ON industries.id = jobs.industry 
           WHERE employers.like_newsletter = true AND 
           (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+          (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
+          (referrals.member_rejected_on IS NULL OR referrals.member_rejected_on = '0000-00-00 00:00:00') AND 
           (referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00 00:00:00') 
           GROUP BY referrals.job 
           ORDER BY referrals.referee_acknowledged_on DESC";

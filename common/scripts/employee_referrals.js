@@ -37,6 +37,7 @@ function show_acknowledged_referrals() {
                 var candidate_emails = xml.getElementsByTagName('candidate_email');
                 var referred_ons = xml.getElementsByTagName('formatted_referred_on');
                 var acknowledged_ons = xml.getElementsByTagName('formatted_acknowledged_on');
+                var member_confirmed_ons = xml.getElementsByTagName('formatted_member_confirmed_on');
                 var agreed_terms_ons = xml.getElementsByTagName('formatted_agreed_terms_on');
                 var employed_ons = xml.getElementsByTagName('formatted_employed_on');
                 var commence_ons = xml.getElementsByTagName('formatted_commence_on');
@@ -53,6 +54,12 @@ function show_acknowledged_referrals() {
                     html = html + '<td class="candidate"><a class="no_link" onClick="show_contact(\'' + add_slashes(candidate_emails[i].childNodes[0].nodeValue) + '\', true);">' + candidates[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="date">' + referred_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="date">' + acknowledged_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    
+                    var member_confirmed_on = '';
+                    if (member_confirmed_ons[i].childNodes.length > 0) {
+                        member_confirmed_on = member_confirmed_ons[i].childNodes[0].nodeValue;
+                    }
+                    html = html + '<td class="date">' + member_confirmed_on + '</td>' + "\n";
                     
                     var agreed_terms_on = '';
                     if (agreed_terms_ons[i].childNodes.length > 0) {
@@ -97,7 +104,8 @@ function show_acknowledged_referrals() {
                         html = html + '<td class="header_referrer">Referrer</td>' + "\n";
                         html = html + '<td class="header_candidate">Candidate</td>' + "\n";
                         html = html + '<td class="header_date">Referred On</td>' + "\n";
-                        html = html + '<td class="header_date">Candidated Responded On</td>' + "\n";
+                        html = html + '<td class="header_date">Candidate Responded On</td>' + "\n";
+                        html = html + '<td class="header_date">Referrer Submitted On</td>' + "\n";
                         html = html + '<td class="header_date">Employer Viewed Resume On</td>' + "\n";
                         html = html + '<td class="header_date">Employed On</td>' + "\n";
                         html = html + '<td class="header_date">Work Commence On</td>' + "\n";
@@ -261,6 +269,12 @@ function onDomReady() {
     
     $('sort_acknowledged_on').addEvent('click', function() {
         order_by = 'referee_acknowledged_on';
+        ascending_or_descending();
+        show_acknowledged_referrals();
+    });
+    
+    $('sort_member_confirmed_on').addEvent('click', function() {
+        order_by = 'member_confirmed_on';
         ascending_or_descending();
         show_acknowledged_referrals();
     });

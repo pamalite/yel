@@ -4,7 +4,6 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 session_start();
 
 $invited = false;
-$_SESSION['yel']['sign_up']['personal_id'] = $_POST['personal_id'];
 $_SESSION['yel']['sign_up']['firstname'] = $_POST['firstname'];
 $_SESSION['yel']['sign_up']['lastname'] = $_POST['lastname'];
 $_SESSION['yel']['sign_up']['primary_industry'] = $_POST['primary_industry'];
@@ -23,9 +22,9 @@ if (!empty($_POST['member']) && !empty($_POST['referee'])) {
     $invited = true;
 } 
 
-if (!isset($_POST['email_addr']) || !isset($_POST['phone_num']) || !isset($_POST['personal_id']) ||
-    !isset($_POST['zip']) || !isset($_POST['country']) || !isset($_POST['password']) ||
-    !isset($_POST['firstname']) || !isset($_POST['lastname']) || !isset($_POST['security_code']) || 
+if (!isset($_POST['email_addr']) || !isset($_POST['phone_num']) || !isset($_POST['zip']) || 
+    !isset($_POST['country']) || !isset($_POST['password']) || !isset($_POST['firstname']) || 
+    !isset($_POST['lastname']) || !isset($_POST['security_code']) || 
     !isset($_POST['forget_password_question']) || !isset($_POST['forget_password_answer'])) {
     if ($invited) {
         redirect_to('sign_up.php?referee='. $_POST['referee']. '&member='. $_POST['member']);
@@ -64,7 +63,6 @@ $joined_on = today();
 $member = new Member($_POST['email_addr']);
 
 $data = array();
-$data['personal_id'] = $_POST['personal_id'];
 $data['firstname'] = $_POST['firstname'];
 $data['lastname'] = $_POST['lastname'];
 $data['primary_industry'] = $_POST['primary_industry'];
@@ -81,6 +79,10 @@ $data['like_newsletter'] = $_SESSION['yel']['sign_up']['like_newsletter'];
 $data['joined_on'] = $joined_on;
 $data['active'] = 'N';
 $data['invites_available'] = '10';
+
+if ($data['like_newsletter'] == 'Y') {
+    $data['filte_jobs'] == 'Y';
+}
 
 if (!$inactive) {
     if (!$member->create($data)) {
@@ -264,10 +266,10 @@ $subject = "Member Activation Required";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
 mail($_POST['email_addr'], $subject, $message, $headers);
 
-/*$handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
-fwrite($handle, 'Subject: '. $subject. "\n\n");
-fwrite($handle, $message);
-fclose($handle);*/
+// $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
+// fwrite($handle, 'Subject: '. $subject. "\n\n");
+// fwrite($handle, $message);
+// fclose($handle);
 
 redirect_to('login.php?signed_up=success');
 ?>

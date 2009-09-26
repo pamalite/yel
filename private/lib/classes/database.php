@@ -13,6 +13,7 @@ class Database {
                                                         $GLOBALS['DB_USERNAME'],
                                                         $GLOBALS['DB_PASSWORD'],
                                                         $GLOBALS['DB_NAME']);
+                    self::$instance->set_charset($GLOBAL['DB_CHARSET']);
                     break;
             }
         }

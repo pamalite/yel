@@ -25,57 +25,74 @@ class ContactPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top("Yellow Elevator - Contact Us");
+        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Contact Us</span>");
         ?>
         <div class="content">
             <table class="contact">
                 <tr>
-                    <td colspan="2" class="title">Sales &amp; Enquiries</td>
+                    <td colspan="4" style="text-align: center; padding-bottom: 50px;">
+                        <span style="font-weight: bold;">Technical Support, Password Reset &amp; Help:</span><br/><br/>
+                        support@yellowelevator.com
+                    </td>
                 </tr>
                 <tr>
-                    <td class="label">Telephone:</td>
-                    <td class="text">+6 04 640 6363</td>
-                </tr>
-                <tr>
-                    <td class="label">E-mail:</td>
-                    <td class="text">sales@yellowelevator.com</td>
-                </tr>
-                <tr>
-                    <td colspan="2" class="title">Billing Information</td>
-                </tr>
-                <tr>
-                    <td class="label">Telephone:</td>
-                    <td class="text">+6 04 640 6363</td>
-                </tr>
-                <tr>
-                    <td class="label">Fax:</td>
-                    <td class="text">+6 04 640 6366</td>
-                </tr>
-                <tr>
-                    <td class="label">E-mail:</td>
-                    <td class="text">billing@yellowelevator.com</td>
-                </tr>
-                <tr>
-                    <td colspan="2" class="title">Support</td>
-                </tr>
-                <tr>
-                    <td class="label">Telephone:</td>
-                    <td class="text">+6 04 640 6363</td>
-                </tr>
-                <tr>
-                    <td class="label">E-mail:</td>
-                    <td class="text">support@yellowelevator.com</td>
-                </tr>
-                <tr>
-                    <td colspan="2" class="title">Mailing Address</td>
-                </tr>
-                <tr>
-                    <td class="label">Main Office:</td>
-                    <td class="text">
-                        Yellow Elevator Sdn. Bhd.<br>
-                        1-12B-9, Suntech @ Penang Cybercity,<br>
-                        Lintang Mayang Pasir 3, <br>
-                        11950 Penang, Malaysia.<br>
+                    <td rowspan="1">
+                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/my.gif" />
+                    </td>
+                    <td style="padding-right: 20px;">
+                        <div>
+                            <span style="font-weight: bold;">Malaysia</span><br/>
+                            Yellow Elevator Sdn. Bhd.<br/>
+                            1-12B-9, Suntech @ Penang Cybercity,<br/>
+                            Lintang Mayang Pasir 3, <br/>
+                            11950 Penang, Malaysia.
+                        </div>
+                        <div style="padding-top: 10px;">
+                            <span style="font-weight: bold;">Tel:</span> +6 04 640 6363<br/>
+                            <span style="font-weight: bold;">Fax:</span> +6 04 640 6366<br/>
+                        </div>
+                        <div style="padding-top: 10px;">
+                            <span style="font-weight: bold;">E-mail addresses:</span>
+                            <ul>
+                                <li>
+                                    <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
+                                    sales.my@yellowelevator.com
+                                </li>
+                                <li>
+                                    <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
+                                    billing.my@yellowelevator.com
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                    <td rowspan="1" style="padding-left: 20px; border-left: 1px dashed #CCCCCC;">
+                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/au.gif" />
+                    </td>
+                    <td>
+                        <div>
+                            <span style="font-weight: bold;">Australia</span><br/>
+                            Yellow Elevator Pty Ltd<br/>
+                            Suite 3, 22 Council St, <br/>
+                            Hawthorn East, <br/>
+                            VIC  3123, Australia.
+                        </div>
+                        <div style="padding-top: 10px;">
+                            <span style="font-weight: bold;">Tel:</span> +61 03 9882 7164<br/>
+                            <span style="font-weight: bold;">Fax:</span> +61 03 9882 9792<br/>
+                        </div>
+                        <div style="padding-top: 10px;">
+                            <span style="font-weight: bold;">E-mail addresses:</span>
+                            <ul>
+                                <li>
+                                    <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
+                                    sales.au@yellowelevator.com
+                                </li>
+                                <li>
+                                    <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
+                                    billing.au@yellowelevator.com
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
             </table>

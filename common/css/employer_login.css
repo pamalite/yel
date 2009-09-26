@@ -95,7 +95,7 @@ table.drop_contact {
 }
 
 input.login, input.drop {
-    font-size: 10pt;
+    font-size: 12pt;
     /*height: 23px;*/
 }
 
@@ -116,7 +116,7 @@ td.title {
 
 #id, #password {
     font-family: verdana, tahoma, arial;
-    font-size: 10pt;
+    font-size: 12pt;
     width: 97%;
     /*height: 23px;*/
 }

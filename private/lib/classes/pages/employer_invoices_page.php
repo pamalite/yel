@@ -33,7 +33,7 @@ class EmployerInvoicesPage extends Page {
     public function show() {
         $this->begin();
         $this->support();
-        $this->top($this->employer->get_name(). " - Invoices &amp; Receipts");
+        $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Invoices &amp; Receipts</span>");
         $this->menu('employer', 'invoices');
         
         ?>

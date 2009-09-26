@@ -52,6 +52,7 @@ class EmployeeReferralsPage extends Page {
                     <td class="candidate"><span class="sort" id="sort_candidate">Candidate</span></td>
                     <td class="date"><span class="sort" id="sort_referred_on">Referred On</span></td>
                     <td class="date"><span class="sort" id="sort_acknowledged_on">Candidate Responded On</span></td>
+                    <td class="date"><span class="sort" id="sort_member_confirmed_on">Referrer Submitted On</span></td>
                     <td class="date"><span class="sort" id="sort_agreed_terms_on">Employer Viewed Resume On</span></td>
                     <td class="date"><span class="sort" id="sort_employed_on">Employed On</span></td>
                     <td class="date"><span class="sort" id="sort_commence_on">Work Commence On</span></td>

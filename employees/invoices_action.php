@@ -53,7 +53,7 @@ if (!isset($_POST['action'])) {
     foreach($result as $i=>$row) {
         $result[$i]['padded_id'] = pad($row['id'], 11, '0');
         $result[$i]['amount_payable'] = number_format($row['amount_payable'], 2, '.', ', ');
-        $delta = date_diff($today, $row['payable_by']);
+        $delta = sql_date_diff($today, $row['payable_by']);
         if ($delta > 0) {
             $result[$i]['expired'] = 'expired';
         } else if ($delta == 0) {

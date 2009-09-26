@@ -36,7 +36,7 @@ if (!isset($_POST['action'])) {
               WHERE invoices.type = 'R' AND 
               (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
-              (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00 00:00:00') AND 
+              (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
               (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
               (referrals.replaced_on IS NULL OR referrals.replaced_on = '0000-00-00 00:00:00') AND 
@@ -84,7 +84,7 @@ if ($_POST['action'] == 'authorize_replacement') {
     $result = $mysqli->query($query);
     
     $data = array();
-    $data['expire_on'] = date_add($today, 30, 'day');
+    $data['expire_on'] = sql_date_add($today, 30, 'day');
     $data['closed'] = 'N';
     $job = new Job($result[0]['job']);
     if (!$job->update($data)) {

@@ -62,7 +62,7 @@ if ($_POST['action'] == 'publish') {
     $data['salary_end'] = $_POST['salary_end'];
     $data['salary_negotiable'] = $_POST['salary_negotiable'];
     $data['created_on'] = now();
-    $data['expire_on'] = date_add($data['created_on'], 30, 'day');
+    $data['expire_on'] = sql_date_add($data['created_on'], 30, 'day');
     $data['title'] = $_POST['title'];
     //$data['description'] = str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['description']);
     $data['description'] = $_POST['description'];
@@ -75,7 +75,6 @@ if ($_POST['action'] == 'publish') {
         $data['salary_end'] = 'NULL';
     }
     $data['potential_reward'] = Job::calculate_potential_reward_from($salary_end, $_POST['employer']);
-    
     
     // Check whether employer's account is ready.
     if ($data['potential_reward'] <= 0) {
@@ -151,7 +150,7 @@ if ($_POST['action'] == 'save') {
     $data['salary_end'] = $_POST['salary_end'];
     $data['salary_negotiable'] = $_POST['salary_negotiable'];
     $data['created_on'] = now();
-    $data['expire_on'] = date_add($data['created_on'], 30, 'day');
+    $data['expire_on'] = sql_date_add($data['created_on'], 30, 'day');
     $data['title'] = $_POST['title'];
     //$data['description'] = str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['description']);
     $data['description'] = $_POST['description'];
@@ -164,6 +163,7 @@ if ($_POST['action'] == 'save') {
         $data['salary_end'] = 'NULL';
     }
     $data['potential_reward'] = Job::calculate_potential_reward_from($salary_end, $_POST['employer']);
+    $data['potential_token_reward'] = $data['potential_reward'] * 0.05;
     
     // Check whether employer's account is ready.
     if ($data['potential_reward'] <= 0) {
@@ -231,7 +231,7 @@ if ($_POST['action'] == 'extend') {
     
     $data = array();
     $data['created_on'] = now();
-    $data['expire_on'] = date_add($data['created_on'], 30, 'day');
+    $data['expire_on'] = sql_date_add($data['created_on'], 30, 'day');
     $data['closed'] = 'N';
     $job = new Job($_POST['job']);
     if ($job->update($data) == false) {

@@ -46,7 +46,7 @@ foreach ($employers as $employer) {
         $data['issued_on'] = $today;
         $data['type'] = 'J';
         $data['employer'] = $id;
-        $data['payable_by'] = date_add($data['issued_on'], $employer['payment_terms_days'], 'day');
+        $data['payable_by'] = sql_date_add($data['issued_on'], $employer['payment_terms_days'], 'day');
         
         $invoice = Invoice::create($data);
         if (!$invoice) {

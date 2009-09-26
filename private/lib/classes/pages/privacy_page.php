@@ -25,7 +25,7 @@ class PrivacyPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top("Yellow Elevator - Privacy Policy");
+        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Privacy Policy</span>");
         ?>
         <div class="content">
             <span class="title">Introduction</span></br>

@@ -38,6 +38,15 @@ class WelcomePage extends Page {
         $result = $mysql->query($query);
         
         ?>
+    <table border="0" cellspacing="0" cellpadding="0" class="border">
+        <tr>
+          <td class="table-tl"></td>
+          <td class="table-tc"></td>
+          <td class="table-tr"></td>
+        </tr>
+        <tr>
+          <td class="table-cl"></td>
+          <td class="data">
     <table class="top_jobs">
         <?php
         if (count($result) > 0 && !is_null($result)) {
@@ -70,14 +79,19 @@ class WelcomePage extends Page {
             <td class="top_jobs_item">
                 <?php 
                     if ($job['salary_end'] <= 0) {
-                        echo 'from '. $job['currency']. ' '. number_format($job['salary_start'], 2, '.', ', '); 
+                        echo 'from '. $job['currency']. ' '. number_format($job['salary_start'], 0, '.', ', '); 
                     } else {
-                        echo $job['currency']. ' '. number_format($job['salary_start'], 2, '.', ', '). ' - '. number_format($job['salary_end'], 2, '.', ', '); 
+                        echo $job['currency']. ' '. number_format($job['salary_start'], 0, '.', ', '). ' - '. number_format($job['salary_end'], 0, '.', ', '); 
                     }
                 ?>
                 </td>
             <td class="top_jobs_item">
-                <?php echo $job['currency']. ' '. number_format($job['potential_reward'], 2, '.', ', '); ?>
+                <?php 
+                    $total_potential_reward = $job['potential_reward'];
+                    $potential_token_reward = $total_potential_reward * 0.05;
+                    $potential_reward = $total_potential_reward - $potential_token_reward;
+                    echo $job['currency']. ' '. number_format($potential_reward, 0, '.', ', '); 
+                ?>
             </td>
         </tr>
                 <?php
@@ -91,6 +105,15 @@ class WelcomePage extends Page {
         }
         ?>
     </table>
+          </td>
+          <td class="table-cr"></td>
+        </tr>
+        <tr>
+          <td class="table-bl"></td>
+          <td class="table-bc"></td>
+          <td class="table-br"></td>
+        </tr>
+    </table>
         <?php
     }
     
@@ -98,112 +121,115 @@ class WelcomePage extends Page {
         $this->begin();
         $this->top_welcome();
         ?>
-        <div id="splash_banner" class="splash_banner">
-            <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/tour.php">
-                <div id="splash_floater"></div>
-            </a>
-            <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" class="splash_banner">
-                <param name="movie" value="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/top_banner.swf" />
-                <param name="allowScriptAccess" value="sameDomain" />
-                <param name="quality" value="high" />
-                <param name="wmode" value="transparent" />
-                <embed src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/top_banner.swf" quality="high"type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" wmode="transparent" class="splash_banner" allowScriptAccess="sameDomain" />
-            </object><br/>
-            <span style="font-size: 9pt;"><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/tour.php">Click here to Take a Tour</a></span>
+        <div id="search_info">
+            <div class="job_search">
+                <form method="post" action="search.php" onSubmit="return verify();">
+                    <div class="search_form">
+                        <span id="employer_drop_down"></span>
+                        <span id="industry_drop_down"></span><br/>
+                        <div style="padding-top: 5px;">
+                            <input type="text" name="keywords" id="keywords" value="Job title or keywords">
+                            <!--input id="search_button" type="submit" value="Search"-->
+                            <input type="image" name="submit" id="search_button" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/but-search.gif" value="Search" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="intro" style="font-size: 8pt;"> While you search for mid-high level job opportunities for yourself, you can also refer jobs to your contacts and earn rewards for every successful referral. Furthermore, we will contact you directly whenever there are job opportunities that match your resume. So sign up and upload your resume today!</div>
+            <a href="members/sign_up.php" class="takeatour"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/sign_up_upload_resume.gif" /></a>
         </div>
-        <div class="action_buttons">
-            <table class="action_buttons">
-                <tr>
-                    <td id="contact_us" class="action_button">
-                        <a class="no_link" onClick="show_contact_drop_form();">
-                            <div class="button_floater"></div>
-                        </a>
-                        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" class="action_button">
-                            <param name="movie" value="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/employers.swf" />
-                            <param name="allowScriptAccess" value="sameDomain" />
-                            <param name="quality" value="high" />
-                            <param name="wmode" value="transparent" />
-                            <embed src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/employers.swf" quality="high"type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" class="action_button" wmode="transparent" allowScriptAccess="sameDomain"/>
-                        </object>
-                        <span style="font-size: 9pt;"><a class="no_link" onClick="show_contact_drop_form();">Click here to Drop Us Your Contact</a></span>
-                    </td>
-                    <td id="sign_up" class="action_button">
-                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">
-                            <div class="button_floater"></div>
-                        </a>
-                        <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" class="action_button">
-                            <param name="movie" value="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/member.swf" />
-                            <param name="allowScriptAccess" value="sameDomain" />
-                            <param name="quality" value="high" />
-                            <param name="wmode" value="transparent" />
-                            <embed src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/member.swf" quality="high"type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" class="action_button" allowScriptAccess="sameDomain" wmode="transparent" />
-                        </object>
-                        <span style="font-size: 9pt;"><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Click here to Sign Up</a></span>
-                    </td>
-                </tr>
-            </table>
+        <div id="action_buttons_jasmine">
+            <div class="box employer">
+                <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/but-be-emp.gif" width="257" height="28" class="title" />
+                <div class="descr">
+                    &gt; Better Screened Candidates<br/>
+                    &gt; Faster Turn Around Time<br/>
+                    &gt; <strong>Free Job Postings</strong><br/>
+                    &gt; <strong>Free Registration</strong><br/>
+                </div>
+                <a href="#" class="signup" onClick="show_contact_drop_form();"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/contact_sign_up.jpg" /></a>
+            </div>
+            <div class="box member"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/but-be-mem.gif" width="257" height="28" class="title" />
+                <div class="descr">
+                    &gt; Access To Mid-High Level Job Opportunities<br/>
+                    &gt; Greater Rewards For Every Successful Referral<br/>
+                    &gt; Effective Tracking Of Job Applications<br/>
+                    &gt; Bonus if you are hired<br/>
+                    &gt; <strong>Free Membership</strong><br/>
+                </div>
+                <a href="members/sign_up.php" class="signup2"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/click_sign_up.jpg" /></a>
+            </div>
         </div>
-        <div id="promotion_banner" class="promotion_banner">
-            <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" class="promotion_banner">
-                <param name="movie" value="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/bonus.swf" />
-                <param name="allowScriptAccess" value="sameDomain" />
-                <param name="quality" value="high" />
-                <param name="wmode" value="transparent" />
-                <embed src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/bonus.swf" quality="high"type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" class="promotion_banner" wmode="transparent" allowScriptAccess="sameDomain" />
-            </object>
+        <div id="sign_up_banner">
+            <a href="members/sign_up.php"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/bigtitle.gif" /></a>
         </div>
-        <div class="top_jobs">
-            <div style="color: #0071BC; font-weight: bold; font-size: 12pt; padding-top: 20px; padding-bottom: 10px; text-align: center;">Top Jobs</div>
+        
+        <div id="top_jobs">
+            <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/topjobs.gif" width="326" height="46" class="topjobs" />
             <?php echo $this->generate_top_jobs() ?>
         </div>
+        
         <div class="rewards" id="total_potential_rewards">
             Loading potential rewards...
         </div>
-        <div class="top_employers">
-            <div style="color: #666666; font-weight: bold; font-size: 10pt; padding-top: 20px; padding-bottom: 10px; text-align: center;">Who uses Yellow Elevator?</div>
-            <table id="table_top_employers" class="top_employers">
-                <tr>
-                    <td class="arrow" id="td_toggle_left"><a id="toggle_left" class="no_link">&lt;&lt;</a></td>
-                    <td id="employer_tabs">
-                        <div class="employer_logos" id="employers_0">
-                            <a href="http://www.mattel.com" target="_new">
-                                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/mattel.jpg" alt="Mattel" style="vertical-align: middle;" />
-                            </a>
-                            &nbsp;&nbsp;&nbsp;
-                            <a href="http://www.wdc.com" target="_new">
-                                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/wd.jpg" alt="Western Digital" style="vertical-align: middle;" />
-                            </a>
-                            &nbsp;&nbsp;&nbsp;
-                            <a href="http://www.digi.com.my" target="_new">
-                                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/digi.jpg" alt="digi" style="vertical-align: middle;" />
-                            </a>
-                            &nbsp;&nbsp;&nbsp;
-                            <a href="http://www.altera.com" target="_new">
-                                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/altera.jpg" alt="digi" style="vertical-align: middle;" />
-                            </a>
-                            &nbsp;&nbsp;&nbsp;
-                            <a href="http://www.exabytes.com.my" target="_new">
-                                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/ex.jpg" alt="Exabytes" style="width: 105px; vertical-align: middle;" />
-                            </a>
-                            &nbsp;&nbsp;&nbsp;
-                            <a href="http://www.dsem.com" target="_new">
-                                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/dsem.jpg" alt="dsem" style="width: 105px; height: 93px; vertical-align: middle;" />
-                            </a>
-                        </div>
-                        <div class="employer_logos" id="employers_1">
-                            <a href="http://www.rstn.com" target="_new">
-                                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/rstn.jpg" alt="RSTN" style="vertical-align: middle;" />
-                            </a>
-                            &nbsp;&nbsp;&nbsp;
-                            <a href="http://www.elawyer.com.my" target="_new">
-                                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/el.jpg" alt="elawyers" style="width: 105px; height: 93px; vertical-align: middle;" />
-                            </a>
-                        </div>
-                    </td>
-                    <td class="arrow" id="td_toggle_right"><a id="toggle_right" class="no_link">&gt;&gt;</a></td>
-                </tr>
-            </table>
-        </div><br/>
+        
+        <div id="top_employers">
+            <div id="employers_carousel">
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td colspan="3"><img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/head-whousesye.jpg" width="328" height="46" style="margin-left: 45px; vertical-align: bottom;" /></td>
+                    </tr>
+                    <tr>
+                        <td width="23"><a id="toggle_left" class="no_link"><img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/nav-logo-left.jpg" width="23" height="134" class="prev" /></a></td>
+                        <td class="nav-center" id="employer_tabs">
+                            <div class="employer_logos" id="employers_0">
+                                <a href="http://www.mattel.com" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/mattel.jpg" alt="Mattel" style="vertical-align: middle;" />
+                                </a>
+                                &nbsp;&nbsp;&nbsp;
+                                <a href="http://www.wdc.com" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/wd.jpg" alt="Western Digital" style="vertical-align: middle;" />
+                                </a>
+                                &nbsp;&nbsp;&nbsp;
+                                <a href="http://www.digi.com.my" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/digi.jpg" alt="digi" style="vertical-align: middle;" />
+                                </a>
+                                &nbsp;&nbsp;&nbsp;
+                                <a href="http://www.altera.com" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/altera.jpg" alt="digi" style="vertical-align: middle;" />
+                                </a>
+                                &nbsp;&nbsp;&nbsp;
+                                <a href="http://www.entegris.com" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/entegris.jpg" alt="entegris" style="width: 105px; height: 93px; vertical-align: middle;" />
+                                </a>
+                                &nbsp;&nbsp;&nbsp;
+                                <a href="http://www.nuskin.com" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/nuskin.jpg" alt="nuskin" style="width: 105px; height: 93px; vertical-align: middle;" />
+                                </a>
+                            </div>
+                            <div class="employer_logos" id="employers_1">
+                                <a href="http://www.rstn.com" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/rstn.jpg" alt="RSTN" style="vertical-align: middle;" />
+                                </a>
+                                &nbsp;&nbsp;&nbsp;
+                                <a href="http://www.elawyer.com.my" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/el.jpg" alt="elawyers" style="width: 105px; height: 93px; vertical-align: middle;" />
+                                </a>
+                                &nbsp;&nbsp;&nbsp;
+                                <a href="http://www.exabytes.com.my" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/ex.jpg" alt="Exabytes" style="width: 105px; vertical-align: middle;" />
+                                </a>
+                                &nbsp;&nbsp;&nbsp;
+                                <a href="http://www.dsem.com" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/dsem.jpg" alt="dsem" style="width: 105px; height: 93px; vertical-align: middle;" />
+                                </a>
+                            </div>
+                        </td>
+                        <td width="23"><a id="toggle_right" class="no_link"><img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/nav-logo-right.jpg" width="23" height="134" class="prev" /></a></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
         
         <div id="div_blanket"></div>
         <div id="div_contact_drop_form">

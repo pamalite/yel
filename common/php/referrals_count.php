@@ -18,6 +18,7 @@ $query = "SELECT COUNT(referrals.id) AS num_responses
           (referrals.work_commence_on IS NULL OR referrals.work_commence_on = '0000-00-00 00:00:00') AND 
           (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
           (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
+          (referrals.member_rejected_on IS NULL OR referrals.member_rejected_on = '0000-00-00 00:00:00') AND 
           (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
           (referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00 00:00:00') 
           AND jobs.closed = 'N' AND jobs.expire_on >= NOW()";
@@ -42,6 +43,9 @@ $query = "SELECT COUNT(referrals.id) AS num_views
           (referrals.work_commence_on IS NULL OR referrals.work_commence_on = '0000-00-00 00:00:00') AND 
           (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
           (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
+          (referrals.member_rejected_on IS NULL OR referrals.member_rejected_on = '0000-00-00 00:00:00') AND 
+          (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00 00:00:00') AND 
+          (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
           (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
           (referrals.employer_agreed_terms_on IS NOT NULL AND referrals.employer_agreed_terms_on <> '0000-00-00 00:00:00') 
           AND jobs.closed = 'N' AND jobs.expire_on >= NOW()";
@@ -61,6 +65,7 @@ $query = "SELECT COUNT(referrals.id) AS num_rewards
           WHERE referrals.member = '". $_SESSION['yel']['member']['id']. "' AND 
           member_referees.member = '". $_SESSION['yel']['member']['id']. "' AND
           referrals.reward_counted = false AND 
+          (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
           (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
           (referrals.work_commence_on IS NOT NULL AND referrals.work_commence_on <> '0000-00-00 00:00:00') AND 
           (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') 

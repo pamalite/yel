@@ -81,7 +81,7 @@ class MemberMyReferralsPage extends Page {
         $this->mark_all_referrals_viewed();
         
         $this->begin();
-        $this->top_search($this->member->get_name(). " - My Referrals");
+        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">My Referrals</span>");
         $this->menu('member', 'my_referrals');
         
         ?>
@@ -105,6 +105,7 @@ class MemberMyReferralsPage extends Page {
                     <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
                     <td class="title"><span class="sort" id="sort_title">Job</span></td>
                     <td class="title"><span class="sort" id="sort_candidate">Contact</span></td>
+                    <td class="testimony_title">Testimonial</td>
                     <td class="date"><span class="sort" id="sort_referred_on">Referred On</span></td>
                     <td class="date"><span class="sort" id="sort_acknowledged_on">Resume Submitted On (R)</span></td>
                     <td class="date"><span class="sort" id="sort_employer_view_resume_on">Employer Viewed On (V)</span></td>
@@ -128,6 +129,14 @@ class MemberMyReferralsPage extends Page {
                 </tr>
             </table>
             <div id="div_rewarded_list">
+            </div>
+        </div>
+        
+        <div id="div_blanket"></div>
+        <div id="div_testimony">
+            <div id="testimony" class="testimony"></div>
+            <div class="buttons">
+                <input type="button" onClick="close_testimony();" value="Close" />
             </div>
         </div>
         <?php

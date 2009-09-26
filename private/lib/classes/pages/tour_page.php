@@ -25,14 +25,11 @@ class TourPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top("Yellow Elevator - Take a Tour");
+        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Take a Tour</span>");
         ?>
         <div class="content">
-            <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0">
-                <param name="movie" value="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/steps.swf" />
-                <param name="quality" value="high" />
-                <embed src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flash/steps.swf" quality="high"type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
-            </object>
+            <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/out_of_order.jpg" /><br/><br/>
+            Sorry, the touring elevator will be back soon.
         </div>
         <?php
     }

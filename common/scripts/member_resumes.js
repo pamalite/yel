@@ -215,7 +215,7 @@ function show_resumes() {
                     }
                     
                     if (file_hashes[i].childNodes.length > 0) {
-                        html = html + '<td class="title"><span class="reupload"><a class="no_link" onClick="upload_new_resume(\'' + resume_id.childNodes[0].nodeValue + '\');">Update by re-upload</a></span>&nbsp;<a href="resume.php?id=' + resume_id.childNodes[0].nodeValue + '&member=' + id + '">' + names[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                        html = html + '<td class="title"><span class="reupload"><a class="no_link" onClick="upload_new_resume(\'' + resume_id.childNodes[0].nodeValue + '\');">Update File</a></span>&nbsp;<a href="resume.php?id=' + resume_id.childNodes[0].nodeValue + '&member=' + id + '">' + names[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     } else {
                         html = html + '<td class="title"><a href="#" onClick="show_resume(\'' + resume_id.childNodes[0].nodeValue + '\')">' + names[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     }

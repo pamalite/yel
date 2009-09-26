@@ -75,7 +75,7 @@ class SearchPage extends Page {
     public function show() {
         $this->begin();
         if (is_null($this->member)) {
-            $this->top_search("Yellow Elevator - Job Search Results");
+            $this->top_search("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Job Search Results</span>");
         } else {
             $this->top_search($this->member->get_name(). " - Job Search Results");
             $this->menu('member');
@@ -96,7 +96,7 @@ class SearchPage extends Page {
                 <tr>
                     <td class="match_percentage"><span class="sort" id="sort_match_percentage">Match</span></td>
                     <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
-                    <td class="industry"><span class="sort" id="sort_industry">Industry</span></td>
+                    <td class="industry"><span class="sort" id="sort_industry">Specialization</span></td>
                     <td class="title"><span class="sort" id="sort_title">Job</span></td>
                     <!--td class="date"><span class="sort" id="sort_created_on">Created On</span></td-->
                     <td class="country"><span class="sort" id="sort_country">Country</span></td>

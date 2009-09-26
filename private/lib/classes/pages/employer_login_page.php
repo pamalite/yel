@@ -25,7 +25,7 @@ class EmployerLoginPage extends Page {
     
     public function show($_error = "") {
         $this->begin();
-        $this->top("Yellow Elevator - Employers");
+        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Employers</span>");
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
@@ -58,21 +58,20 @@ class EmployerLoginPage extends Page {
                         <div class="login">
                             <table class="login">
                                 <tr>
-                                    <td colspan="2" class="title">Employer Sign In</td>
+                                    <td class="title">Employer Sign In</td>
                                 </tr>
                                 <tr>
-                                    <td class="id"><label for="id">User ID:</label></td>
-                                    <td><input type="text" id="id" name="id" value=""></td>
+                                    <td><label for="id">User ID:</label><br/>
+                                    <input type="text" id="id" name="id" value=""></td>
                                 </tr>
                                 <tr>
-                                    <td class="password"><label for="password">Password:</label></td>
-                                    <td><input type="password" id="password" name="password"></td>
+                                    <td><label for="password">Password:</label><br/>
+                                    <input type="password" id="password" name="password"></td>
                                 </tr>
                                 <tr>
-                                    <td>&nbsp;</td>
                                     <td>
                                         <input type="submit" class="login" id="login" value="Sign In">
-                                        <br/>
+                                        &nbsp;
                                         <span class="forgot_password"><a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/contact.php">Forgot Password? Call Support.</a></span>
                                     </td>
                                 </tr>
@@ -83,7 +82,7 @@ class EmployerLoginPage extends Page {
                         <table class="login">
                             <tr>
                                 <td style="text-align: center; font-weight: bold; font-size: 12pt; padding-bottom: 5px;">
-                                    <span class="forgot_password"><a class="no_link" onClick="show_contact_drop_form();">Interested? Drop Us Your Contact Now</a></span>
+                                    <a href="#" class="signup" onClick="show_contact_drop_form();"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/contact_sign_up.jpg" /></a>
                                 </td>
                             </tr>
                         </table>

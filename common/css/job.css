@@ -27,7 +27,7 @@ table.job_info {
 }
 
 table.job_info td.label {
-    width: 25%;
+    width: 175px;
     text-align: right;
     padding-right: 20px;
     vertical-align: top;
@@ -41,9 +41,13 @@ table.job_info td.title {
 }
 
 table.job_info td.title_reward {
-    text-align: center;
+    /*text-align: center;
     font-weight: bold;
-    font-style: italic;
+    font-style: italic;*/
+    vertical-align: top;
+    font-weight: bold;
+    width: 150px;
+    padding-right: 10px;
 }
 
 table.job_info td.buttons {
@@ -80,7 +84,7 @@ table.job_info div.job_description {
     border: 3px solid #0000FF;
     text-align: center;
     width: 675px;
-    height: 480px;
+    height: 430px;
     overflow: auto;
 }
 
@@ -114,6 +118,11 @@ table.job_info div.job_description {
 
 #div_refer_form input.mini_field {
     width: 99%;
+}
+
+#div_refer_form table.candidate_form {
+    width: 95%;
+    margin: auto;
 }
 
 #div_refer_form div.candidates, 
@@ -169,6 +178,7 @@ table.job_info div.job_description {
     font-size: 12pt;
 }
 
+#div_refer_form table.candidate_form td.radio,
 #div_acknowledge_form table.request_form td.radio {
     width: 5px;
 }
@@ -177,7 +187,8 @@ table.job_info div.job_description {
     width: 30%;
 }
 
-#div_acknowledge_form table.request_form textarea {
+#div_acknowledge_form table.request_form textarea, 
+#div_refer_form table.refer_form textarea  {
     width: 98%;
     height: 290px;
 }

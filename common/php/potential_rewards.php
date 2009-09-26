@@ -34,7 +34,7 @@ foreach ($result as $row) {
 
 // format the rewards
 foreach ($response as $i => $row) {
-    $response[$i]['sumReward'] = number_format($row['sumReward'], 2, ".", ", ");
+    $response[$i]['sumReward'] = number_format($row['sumReward'], 0, '.', ', ');
 }
 
 $xml_array = array('rewards' => array('potential' => $response));

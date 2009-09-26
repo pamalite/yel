@@ -49,7 +49,7 @@ class EmployerProfilePage extends Page {
     public function show() {
         $this->begin();
         $this->support();
-        $this->top($this->employer->get_name(). " - Profile");
+        $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Profile</span>");
         $this->menu('employer', 'profile');
         
         $profile = desanitize($this->employer->get());

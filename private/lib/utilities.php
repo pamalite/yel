@@ -117,21 +117,21 @@ function today() {
     return date('Y-m-d');
 }
 
-function date_add($date, $interval, $unit) {
+function sql_date_add($date, $interval, $unit) {
     $query = "SELECT DATE_ADD('". $date. "', INTERVAL ". $interval. " ". strtoupper($unit). ") AS new_date";
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
     return $result[0]['new_date'];
 }
 
-function date_diff($date_1, $date_2) {
+function sql_date_diff($date_1, $date_2) {
     $query = "SELECT DATEDIFF('". $date_1. "', '". $date_2. "') AS delta";
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
     return $result[0]['delta'];
 }
 
-function format_date($date) {
+function sql_date_format($date) {
     $query = "SELECT DATE_FORMAT('". $date. "', '%e %b, %Y') AS formatted_date";
     $mysqli = Database::connect();
     $result = $mysqli->query($query);

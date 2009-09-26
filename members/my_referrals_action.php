@@ -179,4 +179,18 @@ if ($_POST['action'] == 'mark_all_rewards_viewed') {
     $mysql->execute($query);
     exit();
 }
+
+if ($_POST['action'] == 'get_testimony') {
+    $query = "SELECT testimony FROM referrals WHERE id = ". $_POST['id'];
+    
+    $mysqli = Database::connect();
+    if ($result = $mysqli->query($query)) {
+        header('Content-type: text/xml');
+        echo $xml_dom->get_xml_from_array(array('testimony' => htmlspecialchars_decode(desanitize($result[0]['testimony']))));
+        exit();
+    }
+    
+    echo "ko";
+    exit();
+}
 ?>

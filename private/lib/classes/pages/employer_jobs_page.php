@@ -93,7 +93,7 @@ class EmployerJobsPage extends Page {
     public function show() {
         $this->begin();
         $this->support();
-        $this->top($this->employer->get_name(). " - Job Ads");
+        $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Job Ads</span>");
         $this->menu('employer', 'jobs');
         
         $currency = Currency::symbol_from_country_code($this->employer->get_country_code());
@@ -119,7 +119,7 @@ class EmployerJobsPage extends Page {
                 <tr>
                     <td class="checkbox"><input type="checkbox" id="close_all" /></td>
                     <!--td class="id">&nbsp;</td-->
-                    <td class="industry"><span class="sort" id="sort_industry">Industry</span></td>
+                    <td class="industry"><span class="sort" id="sort_industry">Specialization</span></td>
                     <td class="title"><span class="sort" id="sort_title">Title</span></td>
                     <td class="date"><span class="sort" id="sort_created_on">Created On</span></td>
                     <td class="date"><span class="sort" id="sort_expire_on">Expire On</span></td>
@@ -141,7 +141,7 @@ class EmployerJobsPage extends Page {
             <table class="header">
                 <tr>
                     <!--td class="id">&nbsp;</td-->
-                    <td class="industry"><span class="sort" id="sort_industry_closed">Industry</span></td>
+                    <td class="industry"><span class="sort" id="sort_industry_closed">Specialization</span></td>
                     <td class="title"><span class="sort" id="sort_title_closed">Title</span></td>
                     <td class="date"><span class="sort" id="sort_created_on_closed">Created On</span></td>
                     <td class="date"><span class="sort" id="sort_expire_on_closed">Expire On</span></td>
@@ -169,7 +169,7 @@ class EmployerJobsPage extends Page {
                         <td class="field"><input class="field" type="text" id="title" name="title" /></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="industry">Industry:</label></td>
+                        <td class="label"><label for="industry">Specialization:</label></td>
                         <td class="field"><?php $this->generate_all_industry_list(); ?></td>
                     </tr>
                     <tr>
@@ -222,7 +222,7 @@ class EmployerJobsPage extends Page {
                     <td colspan="2" class="title"><span id="job.title">Loading</span></td>
                 </tr>
                 <tr>
-                    <td class="label">Industry:</td>
+                    <td class="label">Specialization:</td>
                     <td class="field"><span id="job.industry">Loading</span></td>
                 </tr>
                 <tr>

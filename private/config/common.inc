@@ -2,8 +2,8 @@
 // General settings
 $COMPANYNAME = 'Yellow Elevator';
 $protocol = 'http'; // change this https when launched
-$root = $_SERVER['SERVER_NAME']. "/yel";
-$root_path = $_SERVER['DOCUMENT_ROOT']. "/yel";
+$root = $_SERVER['SERVER_NAME']. "/yel2";
+$root_path = $_SERVER['DOCUMENT_ROOT']. "/yel2";
 $data_path = "/Users/pamalite/yel2_files/db";
 $forex_feed = 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml'; // the file is updated daily between 14:15 and 15:00 CET
 $openinviter_path = '/../../openinviter';

@@ -31,6 +31,7 @@ if (!isset($_POST['action'])) {
     
     foreach ($result as $key=>$row) {
         $result[$key]['description'] = htmlspecialchars_decode($row['description']);
+        $result[$key]['potential_reward'] = number_format($row['potential_reward'], 2, '.', ', ');
     }
     
     header('Content-type: text/xml');
@@ -50,6 +51,14 @@ if ($_POST['action'] == 'remove_from_saved_jobs') {
     }
     
     echo "ok";
+    exit();
+}
+
+if ($_POST['action'] == 'get_job_title') {
+    $job = new Job($_POST['id']);
+    $result = $job->get();
+    
+    echo htmlspecialchars_decode($result[0]['title']);
     exit();
 }
 ?>

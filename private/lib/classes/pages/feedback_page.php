@@ -66,7 +66,7 @@ class FeedbackPage extends Page {
     }
     public function show($_session) {
         $this->begin();
-        $this->top("Yellow Elevator - Feedback");
+        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Feedback</span>");
         
         if ($this->success) {
             ?>

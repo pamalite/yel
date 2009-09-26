@@ -98,7 +98,7 @@ class MemberProfilePage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_search($this->member->get_name(). " - Profile");
+        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Profile</span>");
         $this->menu('member', 'profile');
         
         $profile = desanitize($this->member->get());
@@ -113,12 +113,6 @@ class MemberProfilePage extends Page {
                         <td  class="buttons_bar" colspan="2"><input type="button" id="save" value="Save &amp; Update Profile" /></td>
                     </tr>
                     <tr>
-                        <td class="label">NRIC / ID / Passport No.:</td>
-                        <td class="field">
-                            <?php echo $profile[0]['personal_id']; ?>
-                        </td>
-                    </tr>
-                    <tr>
                         <td class="label">First Name / Given Names:</td>
                         <td class="field"><?php echo $profile[0]['firstname']; ?></td>
                     </tr>
@@ -130,13 +124,13 @@ class MemberProfilePage extends Page {
                         <td class="title" colspan="2">Expertise</td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="primary_industry">Primary/Majoring Industry:</label></td>
+                        <td class="label"><label for="primary_industry">Primary/Majoring Specialization:</label></td>
                         <td class="field">
                             <?php $this->generate_industries('primary_industry', $profile[0]['primary_industry']); ?>
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="secondary_industry">Secondary/Minoring Industry:</label></td>
+                        <td class="label"><label for="secondary_industry">Secondary/Minoring Specialization:</label></td>
                         <td class="field">
                             <?php 
                                 $this->generate_industries('secondary_industry', $profile[0]['secondary_industry']); 
@@ -206,8 +200,10 @@ class MemberProfilePage extends Page {
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="like_newsletter">Get Weekly Highlights of Latest Jobs To Refer To Your Contacts:</label></td>
-                        <td class="field">
+                        <td class="title" colspan="2">Weekly Highlights Preferences</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="padding-left: 25%; padding-top: 15px; padding-bottom: 15px;">
                             <?php
                                 if ($profile[0]['like_newsletter'] == 'Y') {
                                     ?><input type="checkbox" id="like_newsletter" name="like_newsletter" checked><?php
@@ -215,6 +211,22 @@ class MemberProfilePage extends Page {
                                     ?><input type="checkbox" id="like_newsletter" name="like_newsletter"><?php
                                 }
                             ?>
+                            &nbsp;
+                            <label for="like_newsletter">Get Weekly Highlights of Latest Jobs To Refer To Your Contacts:</label>
+                            <br/>
+                            <?php
+                                if ($profile[0]['like_newsletter'] == 'Y') {
+                                    if ($profile[0]['filter_jobs'] == 'Y') {
+                                        ?><input type="checkbox" id="filter_jobs" name="filter_jobs" checked><?php
+                                    } else {
+                                        ?><input type="checkbox" id="filter_jobs" name="filter_jobs"><?php
+                                    }
+                                } else {
+                                    ?><input type="checkbox" id="filter_jobs" name="filter_jobs" disabled><?php
+                                }
+                            ?>
+                            &nbsp;
+                            <label for="filter_jobs">Filter Weekly Highlights to Only my Primary and Secondary Specilizations:</label>
                         </td>
                     </tr>
                     <tr>

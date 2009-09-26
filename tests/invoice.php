@@ -18,7 +18,7 @@ $data = array();
 $data['issued_on'] = today();
 $data['type'] = 'R';
 $data['employer'] = 'acme123';
-$data['payable_by'] = date_add(today(), 30, 'day');
+$data['payable_by'] = sql_date_add(today(), 30, 'day');
 
 $id = 0;
 if ($id = Invoice::create($data)) {
@@ -47,7 +47,7 @@ if (Invoice::add_item($id, 0.05, 93, 'some other charges')) {
 ?></p><p style="font-weight: bold;">Pay an invoice... </p><p><?php
 $data = array();
 $data['id'] = $id;
-$data['paid_on'] = date_add(today(), 30, 'day');
+$data['paid_on'] = sql_date_add(today(), 30, 'day');
 $data['paid_through'] = 'CHQ';
 $data['paid_id'] = 'a_cheque_number';
 

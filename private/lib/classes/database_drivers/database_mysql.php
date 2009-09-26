@@ -27,6 +27,10 @@ class DatabaseMySQL {
         $this->close();
     }
     
+    public function set_charset($_charset) {
+        $this->mysqli->set_charset($_charset);
+    }
+    
     /**
      * Close the MySQL connection.
      */

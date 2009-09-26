@@ -22,7 +22,7 @@ if ($_POST['action'] == 'get_recent_referrals') {
               WHERE jobs.employer = '". $_POST['id']. "' AND 
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
               (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-              referrals.employer_rejected_on IS NULL 
+              referrals.employer_removed_on IS NULL 
               GROUP BY referrals.job 
               ORDER BY num_referrals DESC, referrals.referee_acknowledged_on DESC 
               LIMIT 10";
@@ -68,7 +68,7 @@ if ($_POST['action'] == 'get_new_invoices') {
     $today = today();
     foreach($result as $i=>$row) {
         $result[$i]['padded_id'] = pad($row['id'], 11, '0');
-        $delta = date_diff($today, $row['payable_by']);
+        $delta = sql_date_diff($today, $row['payable_by']);
         if ($delta > 0) {
             $result[$i]['expired'] = 'expired';
         } else if ($delta == 0) {

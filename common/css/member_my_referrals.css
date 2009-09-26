@@ -59,6 +59,15 @@ td.title {
     width: 150px;
 }
 
+td.testimony_title {
+    width: 50px;
+}
+
+td.testimony {
+    width: 83px;
+    text-align: center;
+}
+
 td.date {
     width: 150px;
 }
@@ -85,3 +94,27 @@ span.sort:hover {
 input.button {
     font-size: 10pt;
 }
+
+#div_testimony {
+    background-color: #FFFFFF;
+    display: none;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 640px;
+    height: 480px;
+}
+
+#div_testimony div.buttons {
+    background-color: #CCCCCC;
+    text-align: center;
+}
+
+#div_testimony div.testimony {
+    height: 445px;
+    margin: 5px 5px 5px 5px;
+    text-align: left;
+    font-size: 10pt;
+    overflow: auto;
+}
+

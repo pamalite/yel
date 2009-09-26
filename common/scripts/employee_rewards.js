@@ -122,10 +122,13 @@ function confirm_payment() {
         return false;
     }
     
+    var tmp = $('reward').get('html');
+    var raw_reward = tmp.split(' ');
+    var calculated_reward = raw_reward[0];
     if (isEmpty($('amount').value) || parseFloat($('amount').value) <= 0.00) {
         alert('Amount cannot be empty or less than or equals to 0.');
         return false;
-    } else if (parseFloat($('amount').value) > parseFloat($('reward').get('html'))) {
+    } else if (parseFloat($('amount').value) > parseFloat(calculated_reward)) {
         alert('Amount cannot be more than the calculated reward.');
         return false;
     }

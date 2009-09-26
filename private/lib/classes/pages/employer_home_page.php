@@ -33,14 +33,26 @@ class EmployerHomePage extends Page {
     public function show() {
         $this->begin();
         $this->support($this->employer->id());
-        $this->top($this->employer->get_name(). " - Home");
+        $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Home</span>");
         $this->menu('employer', 'home');
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
         <div class="banner">
-            <img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/employer_banners/home.jpg" />
+            <div style="text-align: center;">
+                <a class="no_link guides" onClick="show_guide_page('manage_job_post.php');">
+                    How to <span style="font-weight: bold;">Create &amp; Publish a Job Ad</span>?
+                </a>
+            </div>
+            <br/>
+            <div style="text-align: center;">
+                <a class="no_link guides" onClick="show_guide_page('view_resume_hire.php');">
+                    How to <span style="font-weight: bold;">View Resumes &amp; Hire Candidates</span>?
+                </a>
+            </div>
+            
+            <!--img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/employer_banners/home.jpg" /-->
         </div>
         <!--div class="referred_jobs">
             <div style="text-align: center; margin-top: 5px; margin-bottom: 5px; padding-top: 5px; padding-bottom: 5px; font-weight: bold; border: 1px solid #CCCCCC;">Recent referrals</div>

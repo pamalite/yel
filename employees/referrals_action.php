@@ -24,11 +24,13 @@ if (!isset($_POST['action'])) {
               employers.id AS employer_id, candidates.email_addr AS candidate_email, 
               DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
               DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y') AS formatted_acknowledged_on, 
+              DATE_FORMAT(referrals.member_confirmed_on, '%e %b, %Y') AS formatted_member_confirmed_on, 
               DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_agreed_terms_on, 
               DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
               DATE_FORMAT(referrals.work_commence_on, '%e %b, %Y') AS formatted_commence_on, 
               DATE_FORMAT(referrals.referee_confirmed_hired_on, '%e %b, %Y') AS formatted_confirmed_on, 
-              DATE_FORMAT(referrals.employment_contract_received_on, '%e %b, %Y') AS formatted_coe_received_on 
+              DATE_FORMAT(referrals.employment_contract_received_on, '%e %b, %Y') AS formatted_coe_received_on, 
+              DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
@@ -36,10 +38,10 @@ if (!isset($_POST['action'])) {
               LEFT JOIN members AS referrers ON referrers.email_addr = referrals.member 
               LEFT JOIN members AS candidates ON candidates.email_addr = referrals.referee 
               WHERE  (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
               ((referrals.referee_confirmed_hired_on IS NOT NULL AND referrals.referee_confirmed_hired_on <> '0000-00-00 00:00:00') OR 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00')) AND
-              (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
-              (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00 00:00:00') AND 
+              (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
               employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " 
               ORDER BY ". $_POST['order_by'];

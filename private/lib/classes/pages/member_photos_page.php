@@ -32,7 +32,7 @@ class MemberPhotosPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_search($this->member->get_name(). " - Photo");
+        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Photo</span>");
         $this->menu('member', 'photos');
         
         $has_photo = false;

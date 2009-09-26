@@ -32,7 +32,7 @@ class MemberBanksPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_search($this->member->get_name(). " - Bank Accounts");
+        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Bank Accounts</span>");
         $this->menu('member', 'banks');
         
         ?>

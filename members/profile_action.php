@@ -31,6 +31,7 @@ if (!isset($_POST['action'])) {
     $data['address'] = $_POST['address'];
     $data['state'] = $_POST['state'];
     $data['like_newsletter'] = $_POST['like_newsletter'];
+    $data['filter_jobs'] = $_POST['filter_jobs'];
 
     if (!$member->update($data)) {
         echo "ko";

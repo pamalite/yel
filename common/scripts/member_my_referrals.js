@@ -69,6 +69,64 @@ function display_total_reward_earned() {
     request.send(params);
 }
 
+function close_testimony() {
+    $('div_testimony').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+}
+
+function show_testimony(referral_id) {
+    $('testimony').set('html', '');
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_testimony').getStyle('height'));
+    var div_width = parseInt($('div_testimony').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_testimony').setStyle('top', ((window_height - div_height) / 2));
+    $('div_testimony').setStyle('left', ((window_width - div_width) / 2));
+    
+    var params = 'id=' + referral_id;
+    params = params + '&action=get_testimony';
+    
+    var uri = root + "/members/candidate_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                set_status('An error occured while retrieving testimony.');
+                return;
+            }
+            
+            var testimonies = xml.getElementsByTagName('testimony');
+            var html = 'No testimony found.';
+            if (testimonies[0].childNodes.length > 0) {
+                html = testimonies[0].childNodes[0].nodeValue.replace(/\n/g, '<br/>');
+            }
+            $('testimony').set('html', html);
+            $('div_blanket').setStyle('display', 'block');
+            $('div_testimony').setStyle('display', 'block');
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading testimony...');
+        }
+    });
+    
+    request.send(params);
+}
+
 function show_referrals() {
     $('div_pendings').setStyle('display', 'block');
     $('div_rewardeds').setStyle('display', 'none');
@@ -119,6 +177,7 @@ function show_referrals() {
                     html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="title"><a class="no_link" onClick="toggle_description(\'' + referral_id + '\')">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="title">' + candidates[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="testimony"><a class="no_link" onClick="show_testimony(' + referral_id + ');">View</a></td>' + "\n";
                     html = html + '<td class="date">' + referred_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
 
                     var acknowledged_on = '<span style="font-size: 9pt; color: #AAAAAA;">Pending...</span>';

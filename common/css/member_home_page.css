@@ -1,10 +1,14 @@
+a.guides {
+    color: #666666;
+}
+
 div.banner, div.rewards, div.job_count {
     text-align: center;
 }
 
 #div_banner {
     overflow: hidden;
-    height: 315px;
+    /*height: 175px;*/
 }
 
 #div_approvals, #div_rewards, #div_jobs, 
@@ -91,6 +95,16 @@ span.sort {
 
 span.sort:hover {
     color: #FF0000;
+}
+
+table.guides {
+    width: 50%;
+    margin: auto;
+}
+
+table.guides td.spacer {
+    width: 1px;
+    border-left: 1px solid #CCCCCC;
 }
 
 table.job_info {

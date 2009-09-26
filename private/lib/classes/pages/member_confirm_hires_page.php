@@ -32,7 +32,7 @@ class MemberConfirmHiresPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_search($this->member->get_name(). " - Jobs Applied");
+        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Jobs Applied</span>");
         $this->menu('member', 'confirm_hires');
         
         ?>

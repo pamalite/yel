@@ -208,18 +208,32 @@ if ($_POST['action'] == 'make_referral') {
         }
     } 
     
-    $data = array();
-    $data['member'] = $_POST['id'];
-    $data['job'] = $jobs;
-    $data['referred_on'] = now();
-    $data['testimony'] = $_POST['testimony'];
-    $data['referee'] = $_POST['referee'];
-    
     $referral_id = 0;
+    $data = array();
+    if (isset($_POST['referral_id'])) {
+        $data['id'] = $_POST['referral_id'];
+        $data['testimony'] = $_POST['testimony'];
+        $data['member_confirmed_on'] = now();
+        $data['member_rejected_on'] = 'NULL';
+        $referral_id = $data['id'];
+    } else {
+        $data['member'] = $_POST['id'];
+        $data['job'] = $jobs;
+        $data['referred_on'] = now();
+        $data['member_confirmed_on'] = $data['referred_on'];
+        $data['member_rejected_on'] = 'NULL';
+        $data['testimony'] = $_POST['testimony'];
+        $data['referee'] = $_POST['referee'];
+    }
+    
     if (isset($_POST['request'])) {
         $data['job'] = $jobs[0]['id'];
         $data['resume'] = $_POST['resume'];
         $data['referee_acknowledged_on'] = $_POST['requested_on'];
+        
+        $query = "SELECT referrer_read_resume_on FROM referral_requests WHERE id = ". $_POST['request_id']. " LIMIT 1";
+        $result = $mysqli->query($query);
+        $data['member_read_resume_on'] = $result[0]['referrer_read_resume_on'];
         
         $referral_id = Referral::create($data);
         if ($referral_id === false || $referral_id <= 0) {
@@ -228,6 +242,16 @@ if ($_POST['action'] == 'make_referral') {
         } 
         
         if (!Referral::close_similar_referrals_with_id($referral_id)) {
+            echo 'ko';
+            exit();
+        }
+    } elseif (isset($_POST['referral_id'])) {
+        if (Referral::update($data) !== false) {
+            if (!Referral::close_similar_referrals_with_id($referral_id)) {
+                echo 'ko';
+                exit();
+            }
+        } else {
             echo 'ko';
             exit();
         }
@@ -240,7 +264,7 @@ if ($_POST['action'] == 'make_referral') {
     
     $positions = '';
     $i = 0;
-    if (isset($_POST['request'])) {
+    if (isset($_POST['request']) || isset($_POST['referral_id'])) {
         $positions = desanitize($jobs[0]['job']). ' at '. desanitize($jobs[0]['employer']);
     } else {
         foreach ($jobs as $job) {
@@ -259,7 +283,7 @@ if ($_POST['action'] == 'make_referral') {
         $lines = file(dirname(__FILE__). '/../private/mail/member_referred_approval.txt');
     }
     
-    if (isset($_POST['request'])) {
+    if (isset($_POST['request']) || isset($_POST['referral_id'])) {
         $lines = file(dirname(__FILE__). '/../private/mail/member_referred_acknowledged.txt');
     }
     
@@ -277,46 +301,46 @@ if ($_POST['action'] == 'make_referral') {
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     $message = str_replace('%positions%', $positions, $message);
-    $subject = htmlspecialchars_decode(desanitize($member->get_name())). " referred you to a job!";
+    $subject = htmlspecialchars_decode(desanitize($member->get_name())). " has screened and submitted your resume for the ". htmlspecialchars_decode($job['job']). " position";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     mail($_POST['referee'], $subject, $message, $headers);
     
-    /*$handle = fopen('/tmp/email_to_'. $_POST['referee']. '.txt', 'w');
+    /*$handle = fopen('/tmp/ref_email_to_'. $_POST['referee']. '.txt', 'w');
     fwrite($handle, 'Subject: '. $subject. "\n\n");
     fwrite($handle, $message);
     fclose($handle);*/
     
-    if (isset($_POST['request'])) {
-            $query = "SELECT employers.like_instant_notification, employers.email_addr, 
-                      employers.name AS employer_name, jobs.title AS job_title 
-                      FROM referrals 
-                      LEFT JOIN jobs ON jobs.id = referrals.job 
-                      LEFT JOIN employers ON employers.id = jobs.employer 
-                      WHERE referrals.id = ". $referral_id. " LIMIT 1";
-            $result = $mysqli->query($query);
-            if ($result[0]['like_instant_notification'] == '1') {
-                $employer = $result[0]['employer_name'];
-                $job = $result[0]['job_title'];
+    if (isset($_POST['request']) || isset($_POST['referral_id'])) {
+        $query = "SELECT employers.like_instant_notification, employers.email_addr, 
+                  employers.name AS employer_name, jobs.title AS job_title 
+                  FROM referrals 
+                  LEFT JOIN jobs ON jobs.id = referrals.job 
+                  LEFT JOIN employers ON employers.id = jobs.employer 
+                  WHERE referrals.id = ". $referral_id. " LIMIT 1";
+        $result = $mysqli->query($query);
+        if ($result[0]['like_instant_notification'] == '1') {
+            $employer = $result[0]['employer_name'];
+            $job = $result[0]['job_title'];
 
-                $lines = file(dirname(__FILE__). '/../private/mail/employer_new_referral.txt');
-                $message = '';
-                foreach($lines as $line) {
-                    $message .= $line;
-                }
-
-                $message = str_replace('%company%', desanitize($employer), $message);
-                $message = str_replace('%job%', desanitize($job), $message);
-                $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
-                $message = str_replace('%root%', $GLOBALS['root'], $message);
-                $subject = "New application for ". desanitize($job). " position";
-                $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-                mail($result[0]['email_addr'], $subject, $message, $headers);
-
-                /*$handle = fopen('/tmp/email_to_'. $result[0]['email_addr']. '.txt', 'w');
-                fwrite($handle, 'Subject: '. $subject. "\n\n");
-                fwrite($handle, $message);
-                fclose($handle);*/
+            $lines = file(dirname(__FILE__). '/../private/mail/employer_new_referral.txt');
+            $message = '';
+            foreach($lines as $line) {
+                $message .= $line;
             }
+
+            $message = str_replace('%company%', desanitize($employer), $message);
+            $message = str_replace('%job%', desanitize($job), $message);
+            $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+            $message = str_replace('%root%', $GLOBALS['root'], $message);
+            $subject = "New application for ". desanitize($job). " position";
+            $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+            mail($result[0]['email_addr'], $subject, $message, $headers);
+
+            /*$handle = fopen('/tmp/email_to_'. $result[0]['email_addr']. '.txt', 'w');
+            fwrite($handle, 'Subject: '. $subject. "\n\n");
+            fwrite($handle, $message);
+            fclose($handle);*/
+        }
     }
     echo $return;
     exit();

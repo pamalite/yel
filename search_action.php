@@ -182,13 +182,21 @@ if ($_POST['action'] == 'get_candidates') {
 }
 
 if ($_POST['action'] == 'make_referral') {
+    $raw_referees = explode('|', $_POST['referee']);
+    $referees = array();
+    foreach ($raw_referees as $i=>$raw_referee) {
+        $referees[$i]['email_addr'] = $raw_referee;
+        $referees[$i]['is_contact'] = true;
+        $referees[$i]['is_member'] = true;
+    }
+    
     // Cannot refer one self!!
     if (strtoupper($_POST['id']) == strtoupper($_POST['referee'])) {
         echo "ko";
         exit();
     }
     
-    $_POST['testimony'] = sanitize($_POST['testimony']);
+    //$_POST['testimony'] = sanitize($_POST['testimony']);
     $from = $_POST['from'];
     $return = 'ok';
     $member = new Member($_POST['id'], $_SESSION['yel']['member']['sid']);
@@ -206,59 +214,60 @@ if ($_POST['action'] == 'make_referral') {
     }
     
     if ($from == 'email') {
-        $query = "SELECT COUNT(*) AS is_referee 
-                  FROM member_referees 
-                  WHERE member = '". $_POST['id']. "' AND
-                  referee = '". $_POST['referee']. "'";
-        $mysqli = Database::connect();
-        $result = $mysqli->query($query);
-        if ($result[0]['is_referee'] <= 0) {
-            $query = "SELECT COUNT(*) AS is_member 
-                      FROM members 
-                      WHERE email_addr = '". $_POST['referee']. "'";
+        foreach ($referees as $i=>$referee) {
+            $query = "SELECT COUNT(*) AS is_referee 
+                      FROM member_referees 
+                      WHERE member = '". $_POST['id']. "' AND
+                      referee = '". $referee['email_addr']. "'";
+            $mysqli = Database::connect();
             $result = $mysqli->query($query);
-            if ($result[0]['is_member'] >= 1) {
-                // The given email is a member, but not in the member's candidates list.
-                // - Will need to wait for approval before the referral can be viewed.
-                if (!$member->create_referee($_POST['referee'])) {
-                    echo "-900";
-                    exit();
+            if ($result[0]['is_referee'] <= 0) {
+                $query = "SELECT COUNT(*) AS is_member 
+                          FROM members 
+                          WHERE email_addr = '". $_POST['referee']. "'";
+                $result = $mysqli->query($query);
+                if ($result[0]['is_member'] >= 1) {
+                    // The given email is a member, but not in the member's candidates list.
+                    // - Will need to wait for approval before the referral can be viewed.
+                    if (!$member->create_referee($_POST['referee'])) {
+                        echo "-900";
+                        exit();
+                    }
+                    
+                    $referees[$i]['is_contact'] = false;
+                } else {
+                    // Just create the invite and wait for the member to sign-up.
+                    $query = "INSERT INTO member_invites SET 
+                              referee_email = '". $referee['email_addr']. "', 
+                              member = '". $_POST['id']. "', 
+                              invited_on = '". now(). "', 
+                              referred_job = ". $_POST['job']. ", 
+                              testimony = '". $_POST['testimony']. "'";
+                    if (!$mysqli->execute($query)) {
+                        echo "-901";
+                        exit();
+                    }
+
+                    $lines = file(dirname(__FILE__). '/private/mail/member_referred_new.txt');
+                    $message = '';
+                    foreach($lines as $line) {
+                        $message .= $line;
+                    }
+                    
+                    $position = '- '. htmlspecialchars_decode($job). ' by '. htmlspecialchars_decode($employer);
+                    $message = str_replace('%member_name%', htmlspecialchars_decode($member->get_name()), $message);
+                    $message = str_replace('%member_email_addr%', $member->id(), $message);
+                    $message = str_replace('%referee_email_addr%', $referee, $message);
+                    $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+                    $message = str_replace('%root%', $GLOBALS['root'], $message);
+                    $message = str_replace('%positions%', $position, $message);
+                    $subject = "You Have Been Referred";
+                    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+                    mail($referee['email_addr'], $subject, $message, $headers);
+
+                    $referees[$i]['is_contact'] = false;
+                    $referees[$i]['is_member'] = false;
                 }
-                
-                
-                $return = '-2';
-            } else {
-                // Just create the invite and wait for the member to sign-up.
-                $query = "INSERT INTO member_invites SET 
-                          referee_email = '". $_POST['referee']. "', 
-                          member = '". $_POST['id']. "', 
-                          invited_on = '". now(). "', 
-                          referred_job = ". $_POST['job']. ", 
-                          testimony = '". $_POST['testimony']. "'";
-                if (!$mysqli->execute($query)) {
-                    echo "-901";
-                    exit();
-                }
-                
-                $lines = file(dirname(__FILE__). '/private/mail/member_referred_new.txt');
-                $message = '';
-                foreach($lines as $line) {
-                    $message .= $line;
-                }
-                
-                $position = '- '. desanitize($job). ' by '. desanitize($employer);
-                $message = str_replace('%member_name%', $member->get_name(), $message);
-                $message = str_replace('%member_email_addr%', $member->id(), $message);
-                $message = str_replace('%referee_email_addr%', $_POST['referee'], $message);
-                $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
-                $message = str_replace('%root%', $GLOBALS['root'], $message);
-                $message = str_replace('%positions%', $position, $message);
-                $subject = "You Have Been Referred";
-                $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-                mail($_POST['referee'], $subject, $message, $headers);
-                
-                echo '-3';
-                exit();
             }
         }
     } 
@@ -267,38 +276,40 @@ if ($_POST['action'] == 'make_referral') {
     $data['member'] = $_POST['id'];
     $data['job'] = $_POST['job'];
     $data['referred_on'] = now();
-    $data['testimony'] = $_POST['testimony'];
-    $data['referee'] = $_POST['referee'];
-    
-    
-    if (!Referral::create($data)) {
-        echo 'ko';
-        exit();
+    foreach ($referees as $referee) {
+        if ($referee['is_member']) {
+            $data['referee'] = $referee['email_addr'];
+            
+            if (!Referral::create($data)) {
+                echo 'ko';
+                exit();
+            }
+            
+            $lines = file(dirname(__FILE__). '/private/mail/member_referred.txt');
+            if ($from == 'email') {
+                $lines = file(dirname(__FILE__). '/private/mail/member_referred_approval.txt');
+            }
+            $message = '';
+            foreach($lines as $line) {
+                $message .= $line;
+            }
+            
+            $position = '- '. htmlspecialchars_decode($job). ' at '. htmlspecialchars_decode($employer);
+            $message = str_replace('%member_name%', htmlspecialchars_decode($member->get_name()), $message);
+            $message = str_replace('%member_email_addr%', $member->id(), $message);
+            $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+            $message = str_replace('%root%', $GLOBALS['root'], $message);
+            $message = str_replace('%positions%', $position, $message);
+            $subject = htmlspecialchars_decode($member->get_name()). " referred you to a job!";
+            $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+            mail($referee['email_addr'], $subject, $message, $headers);
+
+            /*$handle = fopen('/tmp/email_to_'. $_POST['referee']. '.txt', 'w');
+            fwrite($handle, 'Subject: '. $subject. "\n\n");
+            fwrite($handle, $message);
+            fclose($handle);*/
+        }
     }
-    
-    $lines = file(dirname(__FILE__). '/private/mail/member_referred.txt');
-    if ($from == 'email') {
-        $lines = file(dirname(__FILE__). '/private/mail/member_referred_approval.txt');
-    }
-    $message = '';
-    foreach($lines as $line) {
-        $message .= $line;
-    }
-    
-    $position = '- '. desanitize($job). ' at '. desanitize($employer);
-    $message = str_replace('%member_name%', $member->get_name(), $message);
-    $message = str_replace('%member_email_addr%', $member->id(), $message);
-    $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
-    $message = str_replace('%root%', $GLOBALS['root'], $message);
-    $message = str_replace('%positions%', $position, $message);
-    $subject = desanitize($member->get_name()). " referred you to a job!";
-    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    mail($_POST['referee'], $subject, $message, $headers);
-    
-    /*$handle = fopen('/tmp/email_to_'. $_POST['referee']. '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);*/
     
     echo $return;
     exit();
@@ -387,7 +398,7 @@ if ($_POST['action'] == 'refer_me') {
             $raw_message = str_replace('%member_email_addr%', $member->id(), $raw_message);
             $raw_message = str_replace('%protocol%', $GLOBALS['protocol'], $raw_message);
             $raw_message = str_replace('%root%', $GLOBALS['root'], $raw_message);
-            $raw_message = str_replace('%job%', desanitize($job_title), $raw_message);
+            $raw_message = str_replace('%job%', htmlspecialchars_decode($job_title), $raw_message);
             $raw_message = str_replace('%employer%', htmlspecialchars_decode(desanitize($employer_name)), $raw_message);
             $subject = htmlspecialchars_decode(desanitize($member->get_name())). " requested for your referral!";
             $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
@@ -451,7 +462,7 @@ if ($_POST['action'] == 'refer_me') {
                             $message .= $line;
                         }
 
-                        $position = desanitize($job_title). ' at '. desanitize($employer_name);
+                        $position = htmlspecialchars_decode($job_title). ' at '. htmlspecialchars_decode($employer_name);
 
                         $message = str_replace('%member_name%', htmlspecialchars_decode(desanitize($member->get_name())), $message);
                         $message = str_replace('%member_email_addr%', $member->id(), $message);
@@ -493,7 +504,7 @@ if ($_POST['action'] == 'refer_me') {
                         $raw_message = str_replace('%member_email_addr%', $member->id(), $raw_message);
                         $raw_message = str_replace('%protocol%', $GLOBALS['protocol'], $raw_message);
                         $raw_message = str_replace('%root%', $GLOBALS['root'], $raw_message);
-                        $raw_message = str_replace('%job%', desanitize($job_title), $raw_message);
+                        $raw_message = str_replace('%job%', htmlspecialchars_decode($job_title), $raw_message);
                         $raw_message = str_replace('%employer%', htmlspecialchars_decode(desanitize($employer_name)), $raw_message);
                         $subject = htmlspecialchars_decode(desanitize($member->get_name())). " needs to be referred to a job!";
                         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
@@ -519,7 +530,7 @@ if ($_POST['action'] == 'refer_me') {
                         $message = str_replace('%member_email_addr%', $member->id(), $message);
                         $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
                         $message = str_replace('%root%', $GLOBALS['root'], $message);
-                        $message = str_replace('%job%', desanitize($job_title), $message);
+                        $message = str_replace('%job%', htmlspecialchars_decode($job_title), $message);
                         $message = str_replace('%employer%', htmlspecialchars_decode(desanitize($employer_name)), $message);
                         $subject = htmlspecialchars_decode(desanitize($member->get_name())). " needs to be referred to a job!";
                         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";

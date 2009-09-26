@@ -1,7 +1,7 @@
 var order_by = 'relevance';
 var order = 'desc';
 var filter_by = '0';
-var candidates_list = new ListBox('candidates', 'candidates_list');
+var candidates_list = new ListBox('candidates', 'candidates_list', true);
 var referrers_list = new ListBox('referrers', 'referrers_list', true);
 
 function ascending_or_descending() {
@@ -38,6 +38,7 @@ function show_candidates() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            
             if (txt == 'ko') {
                 alert('An error occured while loading candidates.');
                 return false;
@@ -214,7 +215,7 @@ function check_referred_already() {
                       '&id=' + id + 
                       '&candidate=' + candidates_list.selected_value + 
                       '&action=referred_already';
-
+        
         var uri = root + "/search_action.php";
         var request = new Request({
             url: uri,
@@ -239,49 +240,87 @@ function refer() {
     var referee = '';
     var from = 'list'; // list or email
     if ($('from_list').checked) {
-        if (isEmpty(candidates_list.selected_value)) {
-            alert('Please select a candidate.');
+        var referees = candidates_list.get_selected_values();
+        var number_of_referees = referees.length;
+        
+        if (number_of_referees <= 0) {
+            alert('Please select at least a candidate.');
             return false;
         }
         
-        referee = candidates_list.selected_value;
+        for (var i=0; i < number_of_referees; i++) {
+            var referee_details = referees[i].split('|');
+            referee = referee + referee_details[1];
+
+            if (i < number_of_referees-1) {
+                referee = referee + '|';
+            }
+        }
     } else {
-        if (isEmpty($('email_addr').value) || !isEmail($('email_addr').value)) {
-            alert('Please provide a valid email address of the candidate.');
+        if (isEmpty($('email_addr').value)) {
+            alert('Please provide at least a valid email address of the candidate.');
             return false;
         }
         
-        referee = $('email_addr').value;
+        var temp = $('email_addr').value;
+        temp = temp.replace(/ /g, ',');
+        temp = temp.replace(/;/g, ',');
+        temp = temp.replace(/\n/g, ',');
+        var emails = temp.split(',');
+        for (var i=0; i < emails.length; i++) {
+            if (!isEmail(emails[i])) {
+                if (!isEmpty(emails[i])) {
+                    alert('One of your e-mail addresses is invalid- <strong>' + emails[i] + '</strong>');
+                    return false;
+                }
+            }
+
+            if (!isEmpty(emails[i]) && !duplicated(referee, emails[i])) {
+                if (isEmpty(referee)) {
+                    referee = emails[i];
+                } else {
+                    referee = referee + '|' + emails[i];
+                }
+            }
+        }
+        
         from = 'email';
     }
     
-    var answer_1 = $('testimony_answer_1').value;
-    var answer_2 = $('testimony_answer_2').value;
-    var answer_3 = $('testimony_answer_3').value;
+    // var answer_1 = $('testimony_answer_1').value;
+    // var answer_2 = $('testimony_answer_2').value;
+    // var answer_3 = $('testimony_answer_3').value;
     
-    if (isEmpty(answer_1) || isEmpty(answer_2) || isEmpty(answer_3)) {
-        alert('Please briefly answer all questions.');
-        return false;
-    } else if (answer_1.split(' ').length > 50 || answer_3.split(' ').length > 50 || answer_3.split(' ').length > 50) {
-        if (answer_1.split(' ').length > 50) {
-            alert('Please keep your 1st answer below 50 words.');
-        } else if (answer_2.split(' ').length > 50) {
-            alert('Please keep your 2nd answer below 50 words.');
-        } else if (answer_3.split(' ').length > 50) {
-            alert('Please keep your 3rd and final answer below 50 words.');
-        }
-        return false;
-    }
-    
-    var testimony = answer_1 + '<br/>' + answer_2 + '<br/>' + answer_3;
+    // if (isEmpty(answer_1) || isEmpty(answer_2) || isEmpty(answer_3)) {
+    //     alert('Please briefly answer all questions.');
+    //     return false;
+    // } else if (answer_1.split(' ').length > 50 || answer_3.split(' ').length > 50 || answer_3.split(' ').length > 50) {
+    //     if (answer_1.split(' ').length > 50) {
+    //         alert('Please keep your 1st answer below 50 words.');
+    //     } else if (answer_2.split(' ').length > 50) {
+    //         alert('Please keep your 2nd answer below 50 words.');
+    //     } else if (answer_3.split(' ').length > 50) {
+    //         alert('Please keep your 3rd and final answer below 50 words.');
+    //     }
+    //     return false;
+    // }
+    // 
+    // var testimony = answer_1 + '<br/>' + answer_2 + '<br/>' + answer_3;
     
     check_has_banks(id);
+    
+    var proceed = confirm('Your referred candidates will be requested to submit their resumes. As a referrer, you are responsible for screening your candidates\' resumes to confirm that they are suitable for this job position before recommending them.\n\nYou will be notified by email to check the "Referral Requests" section once the resumes are submitted.\n\nClick "OK" to continue or "Cancel" to make changes.');
+    
+    if (!proceed) {
+        set_status('');
+        return false;
+    }
     
     var params = 'id=' + id + '&action=make_referral';
     params = params + '&from=' + from;
     params = params + '&referee=' + referee;
     params = params + '&job=' + $('job_id').value;
-    params = params + '&testimony=' + testimony;
+    // params = params + '&testimony=' + testimony;
     
     var uri = root + "/search_action.php";
     var request = new Request({
@@ -313,11 +352,11 @@ function refer() {
                 close_refer_form();
                 set_status('');
                 return false;
-            } else if (txt == '-2') {
+            } /*else if (txt == '-2') {
                 alert('It appears that this candidate is not in your candidates list. The candidate will be notified before the referral can be made. \n\nYellow Elevator will automatically complete the referral process once the candidate approved the request of being added to your list.');
             } else if (txt == '-3') {
                 alert('It appears that this candidate is not in a member of Yellow Elevator. The candidate will be notified before the referral can be made. \n\nYellowElevator.com will automatically complete the referral process once the candidate had signed up as a member. The candidate will be added into your contacts list automatically.');
-            }
+            }*/
             
             close_refer_form();
             set_status('Your contact was successfully referred. A notification email has been sent to the referred contact. You may make another referrals.');
@@ -416,8 +455,10 @@ function refer_me() {
         }
         
         var temp = $('referrer_emails').value;
-        temp = temp.replace(/\n/g, ' ');
-        var emails = temp.split(' ');
+        temp = temp.replace(/ /g, ',');
+        temp = temp.replace(/;/g, ',');
+        temp = temp.replace(/\n/g, ',');
+        var emails = temp.split(',');
         for (var i=0; i < emails.length; i++) {
             if (!isEmail(emails[i])) {
                 if (!isEmpty(emails[i])) {
@@ -482,6 +523,12 @@ function onDomReady() {
     get_industries_for_mini();
     set_mini_keywords();
     
+    if (id != '0') {
+        get_referrals_count();
+        get_requests_count();
+        get_jobs_employed_count();
+    }
+    
     $('candidates').addEvent('click', function() {
         check_referred_already();
     });
@@ -492,17 +539,17 @@ function onDomReady() {
         $('mini_keywords').value = keywords;
     }
     
-    $('testimony_answer_1').addEvent('keypress', function() {
-       update_word_count_of('word_count_q1', 'testimony_answer_1') 
-    });
-
-    $('testimony_answer_2').addEvent('keypress', function() {
-       update_word_count_of('word_count_q2', 'testimony_answer_2') 
-    });
-    
-    $('testimony_answer_3').addEvent('keypress', function() {
-       update_word_count_of('word_count_q3', 'testimony_answer_3') 
-    });
+    // $('testimony_answer_1').addEvent('keypress', function() {
+    //    update_word_count_of('word_count_q1', 'testimony_answer_1') 
+    // });
+    // 
+    // $('testimony_answer_2').addEvent('keypress', function() {
+    //    update_word_count_of('word_count_q2', 'testimony_answer_2') 
+    // });
+    // 
+    // $('testimony_answer_3').addEvent('keypress', function() {
+    //    update_word_count_of('word_count_q3', 'testimony_answer_3') 
+    // });
     
     var suggest_url = root + '/common/php/search_suggest.php';
     new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
