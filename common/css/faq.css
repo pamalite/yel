@@ -1,0 +1,16 @@
+div.questions, div.answers {
+    padding-top: 25px;
+    font-size: 10pt;
+}
+
+div.questions {
+    padding-bottom: 25px;
+}
+
+div.answers div.question {
+    font-weight: bold;
+}
+
+li {
+    padding-bottom: 10px;
+}

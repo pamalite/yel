@@ -1,0 +1,14 @@
+Hi %referrer_name%,
+
+%candidate_name% (e-mail: %candidate_email_addr%) had just acknowledged to the position 
+%job% at %employer%.
+
+You can view %candidate_name%'s submitted resume by signing into your Members account 
+to refer this request under "Referral Requests".
+
+To sign in, go to:
+
+%protocol%://%root%/members/
+
+Yellow Elevator
+Refer a job

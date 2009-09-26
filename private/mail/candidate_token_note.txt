@@ -1,0 +1,13 @@
+Congratulations, %candidate%!
+
+You have been awarded with a bonus of %currency%$ %token% from 
+Yellow Elevator for successfully being employed by %employer% for 
+the %job% position. 
+
+We hope that you love your new job and wish you all the best in 
+all your future undertakings. 
+
+Thank you for using Yellow Elevator.
+
+Yellow Elevator
+Refer a job

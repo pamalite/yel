@@ -1,0 +1,15 @@
+Hi %employer%,
+
+We would like to inform you that the following positions are about to expire:
+ 
+%jobs%
+
+Please login through the following URL to extend the expiry period for another 
+30 days, if the positions are still opened:
+
+%protocol%://%root%/employers/
+
+Thank you for using Yellow Elevator.
+
+Yellow Elevator
+Refer a job
