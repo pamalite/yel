@@ -37,7 +37,7 @@ class ContactPage extends Page {
                 </tr>
                 <tr>
                     <td rowspan="1">
-                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/my.gif" />
+                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/MY.gif" />
                     </td>
                     <td style="padding-right: 20px;">
                         <div>
@@ -66,7 +66,7 @@ class ContactPage extends Page {
                         </div>
                     </td>
                     <td rowspan="1" style="padding-left: 20px; border-left: 1px dashed #CCCCCC;">
-                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/au.gif" />
+                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/AU.gif" />
                     </td>
                     <td>
                         <div>
