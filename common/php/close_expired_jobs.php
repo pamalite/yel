@@ -21,23 +21,27 @@ if ($jobs === false) {
     exit();
 }
 
-// 2. For each job set closed = 'Y'
-log_activity('Entering main loop...', 'yellowel_job_closure.log');
-$jobs_string = '';
-foreach ($jobs as $i=>$job) {
-    $jobs_string .= $job['id'];
-    
-    if ($i < count($jobs)-1) {
-        $jobs_string .= ', ';
-    }
-}
+if (!is_null($jobs) && !empty($jobs)) {
+    // 2. For each job set closed = 'Y'
+    log_activity('Entering main loop...', 'yellowel_job_closure.log');
+    $jobs_string = '';
+    foreach ($jobs as $i=>$job) {
+        $jobs_string .= $job['id'];
 
-$query = "UPDATE jobs SET closed = 'Y' WHERE id IN (". $jobs_string. ")";
-if (!$mysqli->execute($query)) {
-    $errors = $mysqli->error();
-    log_activity('Error on executing: '. $errors['errno']. ': '. $errors['error'], 'yellowel_job_closure.log');
-    log_activity('Unable to complete task!', 'yellowel_job_closure.log');
-    exit();
+        if ($i < count($jobs)-1) {
+            $jobs_string .= ', ';
+        }
+    }
+
+    $query = "UPDATE jobs SET closed = 'Y' WHERE id IN (". $jobs_string. ")";
+    if (!$mysqli->execute($query)) {
+        $errors = $mysqli->error();
+        log_activity('Error on executing: '. $errors['errno']. ': '. $errors['error'], 'yellowel_job_closure.log');
+        log_activity('Unable to complete task!', 'yellowel_job_closure.log');
+        exit();
+    }
+} else {
+    log_activity('No expired jobs.', 'yellowel_job_closure.log');
 }
 
 log_activity('Task completed. Goodbye!', 'yellowel_job_closure.log');
