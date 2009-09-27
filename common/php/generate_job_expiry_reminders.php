@@ -14,7 +14,7 @@ $employers = $mysqli->query($query);
 log_activity('Preparing reminders...', 'yellowel_job_expiry_reminders_generator.log');
 foreach ($employers as $employer) {
     
-    log_activity('Getting expired jobs for employer: '. $employer['employer'], 'yellowel_job_expire_reminders_generator.log');
+    log_activity('Getting expired jobs for employer: '. $employer['employer'], 'yellowel_job_expiry_reminders_generator.log');
     $query = "SELECT title, 
               DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on 
               FROM jobs 
@@ -50,7 +50,7 @@ foreach ($employers as $employer) {
         // fclose($handle);
     }
     
-    log_activity('Getting expiring jobs for employer: '. $employer['employer'], 'yellowel_job_expire_reminders_generator.log');
+    log_activity('Getting expiring jobs for employer: '. $employer['employer'], 'yellowel_job_expiry_reminders_generator.log');
     $query = "SELECT title, 
               DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on 
               FROM jobs 
@@ -87,5 +87,5 @@ foreach ($employers as $employer) {
     }
 }
 
-log_activity('Task completed. Goodbye!', 'yellowel_job_expire_reminders_generator.log');
+log_activity('Task completed. Goodbye!', 'yellowel_job_expiry_reminders_generator.log');
 ?>
