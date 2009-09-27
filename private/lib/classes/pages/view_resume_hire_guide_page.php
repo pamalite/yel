@@ -44,7 +44,7 @@ class ViewResumeHireGuidePage extends Page {
                 <br/>
                 <br/>
                 <div style="text-align: center;">
-                    <a class="no_link" onClick="toggle_tip('step3_1', '35')">The Shortlist Feature</a>
+                    <a class="no_link" onClick="toggle_tip('step3_1', '35')">The "Shortlist" Feature</a>
                 </div>
                 <br/>
                 <div class="tip" id="step3_1">
@@ -52,7 +52,7 @@ class ViewResumeHireGuidePage extends Page {
                 </div>
                 <br/>
                 <div style="text-align: center;">
-                    <a class="no_link" onClick="toggle_tip('step3_2', '100')">The Reject Feature</a>
+                    <a class="no_link" onClick="toggle_tip('step3_2', '100')">The "Reject" Feature</a>
                 </div>
                 <br/>
                 <div class="tip" id="step3_2">

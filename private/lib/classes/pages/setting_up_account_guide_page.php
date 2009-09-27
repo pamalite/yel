@@ -47,11 +47,9 @@ class SettingUpAccountGuidePage extends Page {
         <div class="flow_arrow"><img style="height: 25px;" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/flow_arrow.jpg" /></div>
         <div class="step">
             <div style="text-align: center; font-weight: bold;">Step 3:  Submit your bank account information at <a class="no_link" onClick="window.opener.location.replace('../../members/banks.php');">Bank Accounts</a></div><br/>
-            <div style="text-align: center;">To apply for the job position, you need to be referred (recommended) by a referrer (recommender). Click on "Request for a Referral". You are then required to select your resume and your desired referrer.<br/><br/>
-            If your desired referrer is not in your Contacts, then enter the email address of your new referrer. When ready, click on "Submit". Your referrer will receive a notification email requesting him/her to refer (recommend) you to the job position.</div>
             <br/>
             <div style="text-align: center;">
-                <a class="no_link" onClick="toggle_tip('step3', '130')">Tips and Hints</a>
+                <a class="no_link" onClick="toggle_tip('step3', '135')">Tips and Hints</a>
             </div>
             <br/>
             <div class="tip" id="step3">
