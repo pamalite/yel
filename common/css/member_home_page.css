@@ -1,5 +1,6 @@
 a.guides {
     color: #1D3E6E;
+    font-size: 11pt;
 }
 
 div.banner, div.rewards, div.job_count {
@@ -98,7 +99,7 @@ span.sort:hover {
 }
 
 table.guides {
-    width: 50%;
+    width: 65%;
     margin: auto;
 }
 

@@ -64,37 +64,37 @@ class MemberHomePage extends Page {
         </div>
         <div class="banner" id="div_banner">
             <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guides</a>
-            <br/><br/>
+            <br/><br/><br/>
             <table class="guides">
                 <tr>
                     <td colspan="3" style="text-align: center; padding-bottom: 5px;">
                         <a class="no_link guides" onClick="show_guide_page('setting_up_account.php');">
-                            <span style="font-weight: bold;">Setting Up My Account</span> <span style="color: #FC8503;">&raquo;</span>
+                            <span style="font-weight: bold;">Setting Up My Account <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
                         </a>
                     </td>
                 </tr>
                 <tr>
                     <td style="text-align: right; padding-bottom: 5px; padding-right: 8px;">
                         <a class="no_link guides" onClick="show_guide_page('job_referral.php');">
-                            How to <span style="font-weight: bold;">Make a Job Referral</span>? <span style="color: #FC8503;">&raquo;</span>
+                            <span style="font-weight: bold;">How to Make a Job Referral? <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
                         </a>
                     </td>
                     <td rowspan="2" class="spacer"></td>
                     <td style="padding-bottom: 5px; padding-left: 5px;">
                         <a class="no_link guides" onClick="show_guide_page('apply_job.php');">
-                            How to <span style="font-weight: bold;">Apply for a Job Position</span>? <span style="color: #FC8503;">&raquo;</span>
+                            <span style="font-weight: bold;">How to Apply for a Job Position? <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
                         </a>
                     </td>
                 </tr>
                 <tr>
                     <td style="text-align: right; padding-bottom: 5px; padding-right: 8px;">
                         <a class="guides" href="my_referrals.php">
-                            How to <span style="font-weight: bold;">Track My Job Referrals</span>? <span style="color: #FC8503;">&raquo;</span>
+                            <span style="font-weight: bold;">How to Track My Job Referrals? <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
                         </a>
                     </td>
                     <td style="padding-bottom: 5px; padding-left: 5px;">
                         <a class="guides" href="confirm_hires.php">
-                            How to <span style="font-weight: bold;">Track My Job Applications </span>? <span style="color: #FC8503;">&raquo;</span>
+                            <span style="font-weight: bold;">How to Track My Job Applications? <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
                         </a>
                     </td>
                 </tr>
