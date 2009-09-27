@@ -42,13 +42,13 @@ class EmployerHomePage extends Page {
         <div class="banner" style="padding-top: 55px; padding-bottom: 55px;">
             <div style="text-align: center;">
                 <a class="no_link guides" onClick="show_guide_page('manage_job_post.php');">
-                    <span style="font-weight: bold;">How to Create &amp; Publish a Job Ad? <span style="color: #FC8503; font-size: 12pt;">&raquo;</span></span>
+                    <span style="font-weight: bold;">How to Create &amp; Publish a Job Ad? <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/icons/triangle.jpg" style="vertical-align: baseline;" /></span>
                 </a>
             </div>
             <br/>
             <div style="text-align: center;">
                 <a class="no_link guides" onClick="show_guide_page('view_resume_hire.php');">
-                    <span style="font-weight: bold;">How to View Resumes &amp; Hire Candidates? <span style="color: #FC8503; font-size: 12pt;">&raquo;</span></span>
+                    <span style="font-weight: bold;">How to View Resumes &amp; Hire Candidates? <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/icons/triangle.jpg" style="vertical-align: baseline;" /></span>
                 </a>
             </div>
             

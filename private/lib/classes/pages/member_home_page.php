@@ -69,32 +69,32 @@ class MemberHomePage extends Page {
                 <tr>
                     <td colspan="3" style="text-align: center; padding-bottom: 5px;">
                         <a class="no_link guides" onClick="show_guide_page('setting_up_account.php');">
-                            <span style="font-weight: bold;">Setting Up My Account <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
+                            <span style="font-weight: bold;">Setting Up My Account <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/icons/triangle.jpg" style="vertical-align: baseline;" /></span>
                         </a>
                     </td>
                 </tr>
                 <tr>
                     <td style="text-align: right; padding-bottom: 5px; padding-right: 8px;">
                         <a class="no_link guides" onClick="show_guide_page('job_referral.php');">
-                            <span style="font-weight: bold;">How to Make a Job Referral? <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
+                            <span style="font-weight: bold;">How to Make a Job Referral? <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/icons/triangle.jpg" style="vertical-align: baseline;" /></span>
                         </a>
                     </td>
                     <td rowspan="2" class="spacer"></td>
                     <td style="padding-bottom: 5px; padding-left: 5px;">
                         <a class="no_link guides" onClick="show_guide_page('apply_job.php');">
-                            <span style="font-weight: bold;">How to Apply for a Job Position? <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
+                            <span style="font-weight: bold;">How to Apply for a Job Position? <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/icons/triangle.jpg" style="vertical-align: baseline;" /></span>
                         </a>
                     </td>
                 </tr>
                 <tr>
                     <td style="text-align: right; padding-bottom: 5px; padding-right: 8px;">
                         <a class="guides" href="my_referrals.php">
-                            <span style="font-weight: bold;">How to Track My Job Referrals? <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
+                            <span style="font-weight: bold;">How to Track My Job Referrals? <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/icons/triangle.jpg" style="vertical-align: baseline;" /></span>
                         </a>
                     </td>
                     <td style="padding-bottom: 5px; padding-left: 5px;">
                         <a class="guides" href="confirm_hires.php">
-                            <span style="font-weight: bold;">How to Track My Job Applications? <span style="color: #FC8503; font-size: 15pt;">&raquo;</span></span>
+                            <span style="font-weight: bold;">How to Track My Job Applications? <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/icons/triangle.jpg" style="vertical-align: baseline;" /></span>
                         </a>
                     </td>
                 </tr>
