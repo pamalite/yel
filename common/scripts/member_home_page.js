@@ -651,7 +651,7 @@ function toggle_banner() {
         params = params + '&hide=1';
     } else {
         $('hide_show_label').set('html', 'Hide');
-        $('div_banner').tween('height', '105px');
+        $('div_banner').tween('height', '125px');
         params = params + '&hide=0';
     }
     
@@ -677,7 +677,7 @@ function hide_show_banner() {
                 $('div_banner').setStyle('height', '15px');
             } else {
                 $('hide_show_label').set('html', 'Hide');
-                $('div_banner').setStyle('height', '105px');
+                $('div_banner').setStyle('height', '125px');
             }
         }
     });

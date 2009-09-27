@@ -42,13 +42,13 @@ class EmployerHomePage extends Page {
         <div class="banner">
             <div style="text-align: center;">
                 <a class="no_link guides" onClick="show_guide_page('manage_job_post.php');">
-                    How to <span style="font-weight: bold;">Create &amp; Publish a Job Ad</span>?
+                    How to <span style="font-weight: bold;">Create &amp; Publish a Job Ad</span>? <span style="color: #FC8503;">&raquo;</span>
                 </a>
             </div>
             <br/>
             <div style="text-align: center;">
                 <a class="no_link guides" onClick="show_guide_page('view_resume_hire.php');">
-                    How to <span style="font-weight: bold;">View Resumes &amp; Hire Candidates</span>?
+                    How to <span style="font-weight: bold;">View Resumes &amp; Hire Candidates</span>? <span style="color: #FC8503;">&raquo;</span>
                 </a>
             </div>
             
