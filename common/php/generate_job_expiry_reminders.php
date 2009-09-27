@@ -39,7 +39,7 @@ foreach ($employers as $employer) {
         $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
         $message = str_replace('%root%', $GLOBALS['root'], $message);
         $subject = 'Expired Job Ads';
-        $headers .= 'To: '.  $employer['email_addr']. '<'. $employer['email_addr']. ">\n";
+        $headers = 'To: '.  $employer['email_addr']. '<'. $employer['email_addr']. ">\n";
         $headers .= 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         log_activity('Sending e-mail to: '. $employer['email_addr'], 'yellowel_job_expiry_reminders_generator.log');
         mail($employer['email_addr'], $subject, $message, $headers);
@@ -75,7 +75,7 @@ foreach ($employers as $employer) {
         $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
         $message = str_replace('%root%', $GLOBALS['root'], $message);
         $subject = 'Expired Job Ads';
-        $headers .= 'To: '.  $employer['email_addr']. '<'. $employer['email_addr']. ">\n";
+        $headers = 'To: '.  $employer['email_addr']. '<'. $employer['email_addr']. ">\n";
         $headers .= 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         log_activity('Sending e-mail to: '. $employer['email_addr'], 'yellowel_job_expiry_reminders_generator.log');
         mail($employer['email_addr'], $subject, $message, $headers);
