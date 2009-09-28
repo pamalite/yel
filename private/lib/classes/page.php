@@ -208,7 +208,7 @@ class Page {
                                     !empty($_SESSION['yel']['member']['sid']) && 
                                     !empty($_SESSION['yel']['member']['hash'])) {
                                 ?>
-                                <span style="font-size: 10pt; position: absolute; right: 20px"><a target="_new" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/help/members/">Help</a></span>
+                                <!--span style="font-size: 10pt; position: absolute; right: 20px"><a target="_new" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/help/members/">Help</a></span-->
                                 <?php    
                                 }
                                 ?>
@@ -473,7 +473,7 @@ class Page {
             }
         ?>
             Billing: <span class="phone"><?php echo $phone_number ?></span> (fax: <span class="phone"><?php echo $fax_number ?></span>) or <span class="phone">billing.<?php echo strtolower($country_code); ?>@yellowelevator.com</span>
-            &nbsp;<span style="font-size: 10pt; position: absolute; right: 20px;"><a target="_new" href="../help/employers/">Help</a></span>
+            <!--&nbsp;<span style="font-size: 10pt; position: absolute; right: 20px;"><a target="_new" href="../help/employers/">Help</a></span-->
         </div>
         <?php
     } 

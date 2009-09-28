@@ -53,7 +53,7 @@ class ContactPage extends Page {
                         </div>
                         <div style="padding-top: 10px;">
                             <span style="font-weight: bold;">E-mail addresses:</span>
-                            <ul>
+                            <ul style="margin-top: 3px; margin-left: -20px;">
                                 <li>
                                     <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
                                     sales.my@yellowelevator.com
@@ -82,7 +82,7 @@ class ContactPage extends Page {
                         </div>
                         <div style="padding-top: 10px;">
                             <span style="font-weight: bold;">E-mail addresses:</span>
-                            <ul>
+                            <ul style="margin-top: 3px; margin-left: -20px;">
                                 <li>
                                     <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
                                     sales.au@yellowelevator.com
