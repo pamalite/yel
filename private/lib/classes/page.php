@@ -404,17 +404,17 @@ class Page {
                 <li <?php echo ($page == 'home') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/home.php">Home</a></li>
         
         <?php
-        if (Employee::has_clearances_for('prs_recommenders', $_clearances)) {
+        if (Employee::has_clearances_for('prs_resumes_privileged', $_clearances)) {
         ?>
-                <li <?php echo ($page == 'recommenders') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/recommenders.php">Recommenders</a></li>
+                <li <?php echo ($page == 'resumes_privileged') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/resumes_privileged.php">Privileged Candidates</a></li>
         <?php
         }
         ?>
         
         <?php
-        if (Employee::has_clearances_for('prs_resumes_privileged', $_clearances)) {
+        if (Employee::has_clearances_for('prs_recommenders', $_clearances)) {
         ?>
-                <li <?php echo ($page == 'resumes_privileged') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/resumes_privileged.php">Privileged Resumes</a></li>
+                <li <?php echo ($page == 'recommenders') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/recommenders.php">Recommenders</a></li>
         <?php
         }
         ?>

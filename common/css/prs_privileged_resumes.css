@@ -1,0 +1,89 @@
+#div_candidates, #div_candidate {
+    padding-top: 10px;
+}
+
+#div_candidate, 
+#div_candidate #div_tab_resumes {
+    display: none;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    border: 1px solid black;
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_profile {
+    border: 1px solid #CCCCCC;
+}
+
+#li_resumes {
+    border: 1px solid #0000FF;
+}
+
+td.date {
+    width: 100px;
+}
+
+td.candidate {
+    width: 210px;
+}
+
+td.actions {
+    text-align: center;
+    width: 100px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_recommender_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 160px;
+    overflow: auto;
+}
