@@ -75,6 +75,24 @@ class PrsPrivilegedResumesPage extends Page {
         echo '</select>'. "\n";
     }
     
+    private function generateIndustries() {
+        $mysqli = Database::connect();
+        $query = "SELECT id, industry, parent_id FROM industries";
+        $result = $mysqli->query($query);
+        
+        echo '<select class="field" style="height: 200px;" id="recommender_industries" name="recommender_industries" multiple>'. "\n";
+        
+        foreach ($result as $row) {
+            if (empty($row['parent_id']) || is_null($row['parent_id'])) {
+                echo '<option value="'. $row['id']. '" style="font-weight: bold;">'. $row['industry']. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $row['id']. '">&nbsp;&nbsp;&nbsp;'. $row['industry']. '</option>'. "\n";
+            }
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
     public function show() {
         $this->begin();
         $this->top_prs($this->employee->get_name(). " - Privileged Candidates");
@@ -111,7 +129,7 @@ class PrsPrivilegedResumesPage extends Page {
         <div id="div_candidate">
             <div id="div_tabs">
                 <ul>
-                    <li id="li_back">&lt;&lt;</li>
+                    <li class="back" id="li_back">&lt;&lt;</li>
                     <li id="li_profile">Profile</li>
                     <li id="li_resumes">Resumes</li>
                 </ul>
@@ -203,6 +221,12 @@ class PrsPrivilegedResumesPage extends Page {
         </div>
         
         <div id="div_new_member_form">
+            <div id="div_tabs">
+                <ul>
+                    <li class="back" id="li_back_1">&lt;&lt; Back to Privileged Candidates</li>
+                </ul>
+            </div>
+            
             <table class="profile">
                 <tr>
                     <td class="title" colspan="2">Contact Details</td>
@@ -268,6 +292,10 @@ class PrsPrivilegedResumesPage extends Page {
                                         <tr>
                                             <td class="label"><label for="recommender_phone_num">Telephone:</label></td>
                                             <td class="field"><input type="text" class="field" id="recommender_phone_num" name="recommender_phone_num" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label"><label for="recommender_industries">Specializations:</label></td>
+                                            <td class="field"><?php echo $this->generateIndustries(); ?></td>
                                         </tr>
                                     </table>
                                 </td>

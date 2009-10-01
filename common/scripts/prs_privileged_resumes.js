@@ -22,6 +22,36 @@ function resumes_ascending_or_descending() {
     }
 }
 
+function validate_new_candidate_form() {
+    if (!isEmail($('member_email_addr').value)) {
+        alert('The e-mail address provided is not valid.');
+        return false;
+    }
+    
+    if (isEmpty($('member_firstname').value)) {
+        alert('Candidate firstnames cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('member_lastname').value)) {
+        alert('Candidate lastnames cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('member_phone_num').value)) {
+        alert('Candidate telephone cannot be empty.');
+        return false;
+    }
+    
+    if ($('country').options[$('country').selectedIndex].value == 0) {
+        alert('You must at least choose a country of residence.');
+        return false;
+    } 
+    
+    
+    return true;
+}
+
 function show_candidates() {
     $('div_candidates').setStyle('display', 'block');
     $('div_candidate').setStyle('display', 'none');
@@ -241,7 +271,9 @@ function show_resumes(_member_email_addr) {
 }
 
 function add_new_candidate() {
-    
+    if (!validate_new_candidate_form()) {
+        return false;
+    }
 }
 
 function show_new_candidate_form() {
@@ -249,8 +281,6 @@ function show_new_candidate_form() {
     $('div_candidate').setStyle('display', 'none');
     $('div_new_member_form').setStyle('display', 'block');
     $('div_upload_resume_form').setStyle('display', 'none');
-    
-    
 }
 
 function close_refer_now_form() {
@@ -304,6 +334,19 @@ function set_mouse_events() {
         });
     });
     
+    $('li_back_1').addEvent('mouseover', function() {
+        $('li_back_1').setStyles({
+            'color': '#FF0000',
+            'text-decoration': 'underline'
+        });
+    });
+    
+    $('li_back_1').addEvent('mouseout', function() {
+        $('li_back_1').setStyles({
+            'color': '#000000',
+            'text-decoration': 'none'
+        });
+    });
 }
 
 function onDomReady() {
@@ -311,11 +354,14 @@ function onDomReady() {
     set_mouse_events();
     
     $('li_back').addEvent('click', show_candidates);
+    $('li_back_1').addEvent('click', show_candidates);
     $('li_profile').addEvent('click', show_current_candidate_profile);
     $('li_resumes').addEvent('click', show_current_candidate_resumes);
     
     $('add_new_candidate').addEvent('click', show_new_candidate_form);
     $('add_new_candidate_1').addEvent('click', show_new_candidate_form);
+    
+    $('save').addEvent('click', add_new_candidate);
     
     $('sort_joined_on').addEvent('click', function() {
         order_by = 'members.joined_on';
