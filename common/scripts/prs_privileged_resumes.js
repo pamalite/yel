@@ -48,6 +48,46 @@ function validate_new_candidate_form() {
         return false;
     } 
     
+    if (isEmpty($('zip').value)) {
+        alert('Postal/Zip Code cannot be empty.');
+        return false;
+    }
+    
+    if ($('recommender_from_list').checked) {
+        if ($('recommender').options[$('recommender').selectedIndex].value == 0) {
+            alert('You need to choose one of the existing recommenders.');
+            return false;
+        } 
+    } else if ($('recommender_from_new').checked) {
+        if (!isEmail($('recommender_email_addr').value)) {
+            alert('The recommender\'s e-mail address provided is not valid.');
+            return false;
+        }
+
+        if (isEmpty($('recommender_firstname').value)) {
+            alert('Recommender firstnames cannot be empty.');
+            return false;
+        }
+
+        if (isEmpty($('recommender_lastname').value)) {
+            alert('Recommender lastnames cannot be empty.');
+            return false;
+        }
+        
+        var selected_count = 0;
+        for (var i=0; i < $('recommender_industries').options.length; i++) {
+            if ($('recommender_industries').options[i].selected) {
+                selected_count++;
+            }
+        }
+        
+        if (selected_count <= 0) {
+            var msg = 'Are you sure not to classify the recommender with any of the specilizations?';
+            if (!confirm(msg)) {
+                return false;
+            }
+        }
+    }
     
     return true;
 }
@@ -273,6 +313,34 @@ function show_resumes(_member_email_addr) {
 function add_new_candidate() {
     if (!validate_new_candidate_form()) {
         return false;
+    }
+    
+    var params = 'id=' + id + '&action=add_new_candidate';
+    params = params + '&member_email_addr=' + $('member_email_addr').value;
+    params = params + '&member_firstname=' + $('member_firstname').value;
+    params = params + '&member_lastname=' + $('member_lastname').value;
+    params = params + '&member_phone_num=' + $('member_phone_num').value;
+    params = params + '&member_country=' + $('country').options[$('country').selectedIndex].value;
+    params = params + '&member_zip=' + $('zip').value;
+    
+    if ($('recommender_from_list').checked) {
+        params = params + '&recommender_from=list';
+        params = params + '&recommender=' + $('recommender').options[$('recommender').selectedIndex].value;
+    } else {
+        params = params + '&recommender_from=new';
+        params = params + '&recommender_email_addr=' + $('recommender_email_addr').value;
+        params = params + '&recommender_firstname=' + $('recommender_firstname').value;
+        params = params + '&recommender_lastname=' + $('recommender_lastname').value;
+        params = params + '&recommender_phone_num=' + $('recommender_phone_num').value;
+        
+        var industries = '';
+        for (var i=0; i < $('recommender_industries').options.length; i++) {
+            if ($('recommender_industries').options[i].selected) {
+                industries = industries + ',' + $('recommender_industries').options[i].value;
+            }
+        }
+        
+        params = params + '&recommender_industries=' + indudstries;
     }
 }
 
