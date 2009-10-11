@@ -1,12 +1,12 @@
 <?php
 require_once dirname(__FILE__)."/../private/lib/utilities.php";
-require_once dirname(__FILE__)."/../private/lib/classes/pages/prs_privileged_resumes_page.php";
+require_once dirname(__FILE__)."/../private/lib/classes/pages/prs_recommenders_page.php";
 
 session_start();
 
 if ($GLOBALS['protocol'] == 'https') {
     if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') {
-        redirect_to('https://'. $GLOBALS['root']. '/prs/resumes_privileged.php');
+        redirect_to('https://'. $GLOBALS['root']. '/prs/recommenders.php');
         exit();
     }
 }
@@ -19,11 +19,11 @@ if (!isset($_SESSION['yel']['employee']) ||
     redirect_to('login.php');
 }
 
-$home = new PrsPrivilegedResumesPage($_SESSION['yel']['employee']);
+$home = new PrsRecommendersPage($_SESSION['yel']['employee']);
 $home->header(array('root_dir' => '../', 
-                    'title' => 'Priviledged Candidates'));
-$home->insert_prs_privileged_resumes_css();
-$home->insert_prs_privileged_resumes_scripts();
+                    'title' => 'Recommenders'));
+$home->insert_prs_recommenders_css();
+$home->insert_prs_recommenders_scripts();
 $home->insert_inline_scripts();
 $home->show();
 $home->footer();

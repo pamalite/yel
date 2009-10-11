@@ -135,9 +135,10 @@ if ($_POST['action'] == 'add_new_candidate') {
             }
         } else {
             // update the industries
+            $industries = explode(',', $_POST['recommender_industries']);
             $query = "DELETE FROM recommender_industries WHERE recommender = '". $_POST['recommender_email_addr']. "'";
             $mysqli->execute($query);
-            if (!$recommender->add_to_industries($_POST['recommender_industries'])) {
+            if (!$recommender->add_to_industries($industries)) {
                 $recommender_industries_adding_error = true;
             }
         }
@@ -192,12 +193,12 @@ if ($_POST['action'] == 'add_new_candidate') {
                 $message = str_replace('%root%', $GLOBALS['root'], $message);
                 $subject = "Member Activation Required";
                 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-                // mail($_POST['member_email_addr'], $subject, $message, $headers);
+                mail($_POST['member_email_addr'], $subject, $message, $headers);
                             
-                $handle = fopen('/tmp/email_to_'. $_POST['member_email_addr']. '_token.txt', 'w');
-                fwrite($handle, 'Subject: '. $subject. "\n\n");
-                fwrite($handle, $message);
-                fclose($handle);
+                // $handle = fopen('/tmp/email_to_'. $_POST['member_email_addr']. '_token.txt', 'w');
+                // fwrite($handle, 'Subject: '. $subject. "\n\n");
+                // fwrite($handle, $message);
+                // fclose($handle);
             } else {
                 echo '-4';  // failed to create token
                 exit();
