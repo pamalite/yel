@@ -104,4 +104,164 @@ if ($_POST['action'] == 'get_resumes') {
     exit();
 }
 
+if ($_POST['action'] == 'add_new_candidate') {
+    $recommender_industries_adding_error = false;
+    
+    $mysqli = Database::connect();
+    $joined_on = today();
+    
+    // check recommender
+    $recommender = new Recommender($_POST['recommender_email_addr']);
+    if ($_POST['recommender_from'] == 'new') {
+        // create recommender
+        $query = "SELECT COUNT(*) AS id_used FROM recommenders WHERE email_addr = '". $_POST['recommender_email_addr']. "'";
+        $result = $mysqli->query($query);
+        if ($result[0]['id_used'] == '0') {
+            $recommender_data = array();
+            $recommender_data['firstname'] = $_POST['recommender_firstname'];
+            $recommender_data['lastname'] = $_POST['recommender_lastname'];
+            $recommender_data['phone_num'] = $_POST['recommender_phone_num'];
+            $recommender_data['added_by'] = $_POST['id'];
+            $recommender_data['added_on'] = $joined_on;
+            
+            if ($recommender->create($recommender_data)) {
+                $industries = explode(',', $_POST['recommender_industries']);
+                if (!$recommender->add_to_industries($industries)) {
+                    $recommender_industries_adding_error = true;
+                }
+            } else {
+                echo '-1'; // failed to create new recommender
+                exit();
+            }
+        } else {
+            // update the industries
+            $query = "DELETE FROM recommender_industries WHERE recommender = '". $_POST['recommender_email_addr']. "'";
+            $mysqli->execute($query);
+            if (!$recommender->add_to_industries($_POST['recommender_industries'])) {
+                $recommender_industries_adding_error = true;
+            }
+        }
+    }
+    
+    // check member
+    $query = "SELECT COUNT(*) AS id_used FROM members WHERE email_addr = '". $_POST['member_email_addr']. "'";
+    $result = $mysqli->query($query);
+    if ($result[0]['id_used'] == '0') {
+        $new_password = generate_random_string_of(6);
+        $member = new Member($_POST['member_email_addr']);
+        $member_data = array();
+        $member_data['firstname'] = $_POST['member_firstname'];
+        $member_data['lastname'] = $_POST['member_lastname'];
+        $member_data['password'] = md5($new_password);
+        $member_data['forget_password_question'] = 1;
+        $member_data['forget_password_answer'] = '(System generated)';
+        $member_data['phone_num'] = $_POST['member_phone_num'];
+        $member_data['zip'] = $_POST['member_zip'];
+        $member_data['country'] = $_POST['member_country'];
+        $member_data['joined_on'] = $joined_on;
+        $member_data['active'] = 'N';
+        $member_data['invites_available'] = '10';
+        
+        if ($member_data['like_newsletter'] == 'Y') {
+            $member_data['filte_jobs'] = 'Y';
+        }
+        
+        $member_data['added_by'] = $_POST['id'];
+        $member_data['recommender'] = $_POST['recommender_email_addr'];
+        
+        if ($member->create($member_data)) {
+            // Create activation token and email
+            $activation_id = microtime(true);
+            $query = "INSERT INTO member_activation_tokens SET 
+                      id = '". $activation_id. "', 
+                      member = '". $_POST['member_email_addr']. "', 
+                      joined_on = '". $joined_on. "'";
+            if ($mysqli->execute($query)) {
+                $mail_lines = file('../private/mail/member_activation_with_password.txt');
+                $message = '';
+                foreach ($mail_lines as $line) {
+                    $message .= $line;
+                }
+                
+                $recommender = htmlspecialchars_decode($_POST['recommender_firstname']). ', '. htmlspecialchars_decode($_POST['recommender_lastname']);
+                $message = str_replace('%recommender%', $recommender, $message);
+                $message = str_replace('%recommender_email_addr%', $_POST['recommender_email_addr'], $message);
+                $message = str_replace('%activation_id%', $activation_id, $message);
+                $message = str_replace('%password%', $new_password, $message);
+                $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+                $message = str_replace('%root%', $GLOBALS['root'], $message);
+                $subject = "Member Activation Required";
+                $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+                // mail($_POST['member_email_addr'], $subject, $message, $headers);
+                            
+                $handle = fopen('/tmp/email_to_'. $_POST['member_email_addr']. '_token.txt', 'w');
+                fwrite($handle, 'Subject: '. $subject. "\n\n");
+                fwrite($handle, $message);
+                fclose($handle);
+            } else {
+                echo '-4';  // failed to create token
+                exit();
+            }
+        } else {
+            echo '-3'; // failed to create member
+            exit();
+        }
+    } else {
+        echo '-2'; // member already exists
+        exit();
+    }
+    
+    if ($recommender_industries_adding_error) {
+        echo '-5';
+    } else {
+        echo '0';
+    }
+    exit();
+}
+
+if ($_POST['action'] == 'upload_resume') {
+    $resume = NULL;
+    $is_update = false;
+    $data = array();
+    $data['modified_on'] = now();
+    $data['name'] = $_FILES['my_file']['name'];
+    
+    if ($_POST['id'] == '0') {
+        $resume = new Resume($_POST['resume_member_email_addr']);
+        if (!$resume->create($data)) {
+            ?>
+                <script type="text/javascript">window.top.window.stop_upload(<?php echo '0'; ?>);</script>
+            <?php
+            exit();
+        }
+    } else {
+        $resume = new Resume($_POST['resume_member_email_addr'], $_POST['id']);
+        $is_update = true;
+        if (!$resume->update($data)) {
+            ?>
+                <script type="text/javascript">window.top.window.stop_upload(<?php echo '0'; ?>);</script>
+            <?php
+            exit();
+        }
+    }
+    
+    $data = array();
+    $data['FILE'] = array();
+    $data['FILE']['type'] = $_FILES['my_file']['type'];
+    $data['FILE']['size'] = $_FILES['my_file']['size'];
+    $data['FILE']['name'] = $_FILES['my_file']['name'];
+    $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
+    
+    if (!$resume->upload_file($data, $is_update)) {
+        $query = "DELETE FROM resume_index WHERE resume = ". $resume->id(). ";
+                  DELETE FROM resumes WHERE id = ". $resume->id();
+        $mysqli = Database::connect();
+        $mysqli->transact($query);
+        ?><script type="text/javascript">window.top.window.stop_upload(<?php echo "0"; ?>);</script><?php
+        exit();
+    }
+    
+    ?><script type="text/javascript">window.top.window.stop_upload(<?php echo "1"; ?>);</script><?php
+    exit();
+}
 ?>

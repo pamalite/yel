@@ -5,6 +5,7 @@ var resumes_order_by = 'modified_on';
 var resumes_order = 'desc';
 
 var current_member_email_addr = '';
+var current_member_name = '';
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -204,6 +205,9 @@ function show_profile(_member_email_addr) {
             $('profile.joined_on').set('html', member_joined_on[0].childNodes[0].nodeValue);
             $('profile.firstname').set('html', member_firstname[0].childNodes[0].nodeValue);
             $('profile.lastname').set('html', member_lastname[0].childNodes[0].nodeValue);
+            
+            current_member_name = member_firstname[0].childNodes[0].nodeValue + ', ' + member_lastname[0].childNodes[0].nodeValue;
+            
             $('profile.email_addr').set('html', current_member_email_addr);
             $('profile.phone_num').set('html', member_phone_num[0].childNodes[0].nodeValue);
             $('profile.country').set('html', country[0].childNodes[0].nodeValue);
@@ -288,7 +292,7 @@ function show_resumes(_member_email_addr) {
                     html = html + '<td class="date">' + modified_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     
                     if (file_hashes[i].childNodes.length > 0) {
-                        html = html + '<td class="title"><span class="reupload"><a class="no_link" onClick="upload_new_resume(\'' + resume_id.childNodes[0].nodeValue + '\');">Update File</a></span>&nbsp;<a href="resume.php?id=' + resume_id.childNodes[0].nodeValue + '&member=' + id + '">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                        html = html + '<td class="title"><span class="reupload"><a class="no_link" onClick="show_upload_resume_form(' + resume_id.childNodes[0].nodeValue + ');">Update File</a></span>&nbsp;<a href="resume.php?id=' + resume_id.childNodes[0].nodeValue + '&member=' + current_member_email_addr + '">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     } else {
                         html = html + '<td class="title"><a class="no_link" onClick="show_resume_page(\'' + resume_id.childNodes[0].nodeValue + '\')">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     }
@@ -325,7 +329,7 @@ function add_new_candidate() {
     
     if ($('recommender_from_list').checked) {
         params = params + '&recommender_from=list';
-        params = params + '&recommender=' + $('recommender').options[$('recommender').selectedIndex].value;
+        params = params + '&recommender_email_addr=' + $('recommender').options[$('recommender').selectedIndex].value;
     } else {
         params = params + '&recommender_from=new';
         params = params + '&recommender_email_addr=' + $('recommender_email_addr').value;
@@ -336,12 +340,53 @@ function add_new_candidate() {
         var industries = '';
         for (var i=0; i < $('recommender_industries').options.length; i++) {
             if ($('recommender_industries').options[i].selected) {
-                industries = industries + ',' + $('recommender_industries').options[i].value;
+                if (isEmpty(industries)) {
+                    industries = $('recommender_industries').options[i].value;
+                } else {
+                    industries = industries + ',' + $('recommender_industries').options[i].value;
+                }
             }
         }
         
-        params = params + '&recommender_industries=' + indudstries;
+        params = params + '&recommender_industries=' + industries;
     }
+    
+    var uri = root + "/prs/resumes_privileged_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            switch (txt) {
+                case '-1':
+                    alert('Unable to create new recommender. No new candidate created.\n\nPlease try again later.');
+                    break;
+                case '-2':
+                    alert('The candidate you want to create is already in the system.\n\nYou cannot overwrite or update once the candidate is created.');
+                    show_candidates();
+                    break;
+                case '-3':
+                    alert('Unable to create new candidate. No new candidate created.\n\nPlease try again later.')
+                    break;
+                case '-4':
+                    alert('Unable to create new candidate activation token.\n\nThe new candidate has been created, but please contact system administrator to reset the candidate\'s token and password.');
+                    show_candidates();
+                    break;
+                case '-5':
+                    alert('Everything was created successfully, except for recommender\'s industries are not added into the system.\n\nPlease update through the Recommenders section.');
+                    show_candidates();
+                    break;
+                default:
+                    show_candidates();
+                    break;
+            }
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Saving candidate...');
+        }
+    });
+    
+    request.send(params);
 }
 
 function show_new_candidate_form() {
@@ -349,6 +394,42 @@ function show_new_candidate_form() {
     $('div_candidate').setStyle('display', 'none');
     $('div_new_member_form').setStyle('display', 'block');
     $('div_upload_resume_form').setStyle('display', 'none');
+}
+
+function upload_new_resume() {
+    show_upload_resume_form(0);
+}
+
+function show_upload_resume_form(_resume_id) {
+    $('candidate_name').set('html', current_member_name);
+    $('resume_member_email_addr').value = current_member_email_addr;
+    $('resume_id').value = '0';
+    if (_resume_id > 0) {
+        $('resume_id').value = _resume_id;
+    }
+    
+    $('div_candidates').setStyle('display', 'none');
+    $('div_candidate').setStyle('display', 'none');
+    $('div_new_member_form').setStyle('display', 'none');
+    $('div_upload_resume_form').setStyle('display', 'block');
+}
+
+function start_upload() {
+    $('upload_progress').setStyle('display', 'block');
+    set_status('Uploading resume...');
+    return true;
+}
+
+function stop_upload(success) {
+    var result = '';
+    $('upload_progress').setStyle('display', 'none');
+    if (success == 1) {
+        show_current_candidate_resumes();
+        return true;
+    } else {
+        set_status('An error occured while uploading the candidate\'s resume. Make sure the resume file meets the conditions stated below.');
+        return false;
+    }
 }
 
 function close_refer_now_form() {
@@ -415,6 +496,20 @@ function set_mouse_events() {
             'text-decoration': 'none'
         });
     });
+    
+    $('li_back_2').addEvent('mouseover', function() {
+        $('li_back_2').setStyles({
+            'color': '#FF0000',
+            'text-decoration': 'underline'
+        });
+    });
+    
+    $('li_back_2').addEvent('mouseout', function() {
+        $('li_back_2').setStyles({
+            'color': '#000000',
+            'text-decoration': 'none'
+        });
+    });
 }
 
 function onDomReady() {
@@ -423,6 +518,7 @@ function onDomReady() {
     
     $('li_back').addEvent('click', show_candidates);
     $('li_back_1').addEvent('click', show_candidates);
+    $('li_back_2').addEvent('click', show_current_candidate_resumes);
     $('li_profile').addEvent('click', show_current_candidate_profile);
     $('li_resumes').addEvent('click', show_current_candidate_resumes);
     
@@ -430,6 +526,9 @@ function onDomReady() {
     $('add_new_candidate_1').addEvent('click', show_new_candidate_form);
     
     $('save').addEvent('click', add_new_candidate);
+    
+    $('upload_new_resume').addEvent('click', upload_new_resume);
+    $('upload_new_resume_1').addEvent('click', upload_new_resume);
     
     $('sort_joined_on').addEvent('click', function() {
         order_by = 'members.joined_on';

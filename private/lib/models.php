@@ -15,4 +15,5 @@ require_once "classes/models/invoice.php";
 require_once "classes/models/industry.php";
 require_once "classes/models/referral_requests.php";
 require_once "classes/models/referral_token_reward.php";
+require_once "classes/models/recommender.php";
 ?>

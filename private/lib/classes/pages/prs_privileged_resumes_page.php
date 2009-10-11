@@ -311,10 +311,16 @@ class PrsPrivilegedResumesPage extends Page {
         </div>
         
         <div id="div_upload_resume_form">
+            <div id="div_tabs">
+                <ul>
+                    <li class="back" id="li_back_2">&lt;&lt; Back to <span id="candidate_name"></span>'s Resumes</li>
+                </ul>
+            </div>
+            
             <form action="resumes_privileged_action.php" method="post" enctype="multipart/form-data" target="upload_target">
                 <input type="hidden" id="resume_id" name="id" value="0" />
-                <input type="hidden" name="member" id="member_email_addr" value="" />
-                <input type="hidden" name="action" value="upload" />
+                <input type="hidden" name="resume_member_email_addr" id="resume_member_email_addr" value="" />
+                <input type="hidden" name="action" value="upload_resume" />
                 <p id="upload_progress" style="text-align: center;">
                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
                 </p>

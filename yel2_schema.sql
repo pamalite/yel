@@ -755,11 +755,12 @@ DROP TABLE IF EXISTS `recommenders`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `recommenders` (
   `email_addr` varchar(100) NOT NULL,
-  `phone_num` varchar(20) NOT NULL,
+  `phone_num` varchar(20) DEFAULT NULL,
   `firstname` varchar(50) NOT NULL,
   `lastname` varchar(50) NOT NULL,
   `title` varchar(10) DEFAULT NULL,
   `added_by` int(11) NOT NULL,
+  `added_on` datetime DEFAULT NULL,
   PRIMARY KEY (`email_addr`),
   KEY `added_by` (`added_by`),
   CONSTRAINT `recommenders_ibfk_1` FOREIGN KEY (`added_by`) REFERENCES `employees` (`id`) ON UPDATE CASCADE
@@ -1169,7 +1170,7 @@ CREATE TABLE `seeds` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `seed` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=592 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=647 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1201,4 +1202,4 @@ CREATE TABLE `visitors` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-09-26 12:24:40
+-- Dump completed on 2009-10-11 12:06:44

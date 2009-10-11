@@ -186,7 +186,7 @@ class Recommender {
         
         $all_success = true;
         foreach ($_industry_ids as $industry_id) {
-            if (!$this->add_to_industry($industry_id)) {
+            if (!$this->add_to_industry(trim($industry_id))) {
                 $all_success = false;
             }
         }

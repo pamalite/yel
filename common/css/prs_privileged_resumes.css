@@ -150,7 +150,59 @@ div.phone_num {
     font-style: italic;
 }
 
+#upload_progress {
+    display: none;
+}
 
+table.upload_form {
+    width: 65%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.upload_form td {
+    vertical-align: top;
+}
+
+table.upload_form td.label {
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.upload_form td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+
+table.upload_form input.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+td.buttons_left, td.buttons_right {
+    background-color: #CCCCCC;
+}
+
+td.buttons_right {
+    text-align: right;
+}
+
+span.upload_note {
+    font-style: italic;
+    font-size: 9pt;
+}
+
+span.reupload {
+    border: none;
+    font-size: 8pt;
+    background-color: #FFFF99;
+    padding-left: 5px;
+    padding-right: 5px;
+}
 
 #div_blanket {
     display: none;
