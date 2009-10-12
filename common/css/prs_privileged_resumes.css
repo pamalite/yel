@@ -2,9 +2,8 @@
     padding-top: 10px;
 }
 
-#div_candidate, 
-#div_candidate #div_tab_resumes, 
-#div_new_member_form, #div_upload_resume_form {
+#div_candidate, #div_new_member_form, 
+#div_upload_resume_form {
     display: none;
 }
 

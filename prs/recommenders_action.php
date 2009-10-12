@@ -12,18 +12,24 @@ if (!isset($_POST['id'])) {
 $xml_dom = new XMLDOM();
 
 if (!isset($_POST['action'])) {
-    $order_by = 'added_on desc';
+    $order_by = 'recommenders.added_on desc';
     
     if (isset($_POST['order_by'])) {
         $order_by = $_POST['order_by'];
     }
     
-    $query = "SELECT email_addr, phone_num, 
-              CONCAT(firstname, ', ', lastname) AS recommender_name, 
-              DATE_FORMAT(added_on, '%e %b, %Y') AS formatted_added_on 
-              FROM recommenders 
-              WHERE added_by = ". $_POST['id']. " 
-              ORDER BY ". $_POST['order_by'];
+    $query = "SELECT recommenders.email_addr, recommenders.phone_num, 
+              CONCAT(recommenders.firstname, ', ', recommenders.lastname) AS recommender_name, 
+              DATE_FORMAT(recommenders.added_on, '%e %b, %Y') AS formatted_added_on 
+              FROM recommenders ";
+    if ($_POST['filter_by'] == '0') {
+        $query .= "WHERE recommenders.added_by = '". $_POST['id']. "'";
+    } else {
+        $query .= "LEFT JOIN recommender_industries ON recommender_industries.recommender = recommenders.email_addr 
+                   WHERE recommenders.added_by = '". $_POST['id']. "' AND 
+                   recommender_industries.industry = ". $_POST['filter_by'];
+    }
+    $query .= " ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
     if (count($result) <= 0 || is_null($result)) {
@@ -37,16 +43,7 @@ if (!isset($_POST['action'])) {
     }
     
     foreach($result as $i=>$row) {
-        $result[$i]['recommender_name'] = htmlspecialchars_decode($row['recommender_name']);
-        $industries = array();
-        $query = "SELECT industries.industry 
-                  FROM recommender_industries 
-                  LEFT JOIN industries ON industries.id = recommender_industries.industry 
-                  WHERE recommender_industries.recommender = '". $row['email_addr']. "'";
-        $industries = $mysqli->query($query);
-        if (!empty($industries) && !is_null($industries)) {
-            $result[$i]['industries'] = array('industry' => $industries);
-        }
+        $result[$i]['recommender_name'] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($row['recommender_name']))));
     }
     
     $response = array('recommenders' => array('recommender' => $result));
@@ -68,16 +65,20 @@ if ($_POST['action'] == 'get_profile') {
         $profile[$key] = $value;
         
         if (stripos($key, 'firstname') !== false || stripos($key, 'lastname') !== false) {
-            $profile[$key] = htmlspecialchars_decode(html_entity_decode(desanitize($value)));
+            $profile[$key] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($value))));
         }
     }
     
     $industries = array();
     $query = "SELECT industry FROM recommender_industries 
               WHERE recommender = '". $_POST['id']. "'";
-    $industries = $mysqli->query($query);
+    $result = $mysqli->query($query);
+    foreach ($result as $row) {
+        $industries['industry'][] = array(0 => $row['industry']);
+    }
+    
     if (!empty($industries) && !is_null($industries)) {
-        $profile['industries'] = array('industry' => $industries);
+        $profile['industries'] = $industries;
     }
     
     $response =  array('profile' => $profile);
@@ -88,11 +89,11 @@ if ($_POST['action'] == 'get_profile') {
 }
 
 if ($_POST['action'] == 'update_profile') {
-    $recommender = new Recommender($_POST['email_addr']);
+    $recommender = new Recommender($_POST['id']);
     
     $data = array();
-    $data['firstname'] = $_POST['firstname'];
-    $data['lastname'] = $_POST['lastname'];
+    $data['firstname'] = sanitize($_POST['firstname']);
+    $data['lastname'] = sanitize($_POST['lastname']);
     $data['phone_num'] = $_POST['phone_num'];
     
     if (!$recommender->update($data)) {
@@ -101,12 +102,15 @@ if ($_POST['action'] == 'update_profile') {
     }
     
     // update the industries
-    $industries = explode(',', $_POST['industries']);
     $query = "DELETE FROM recommender_industries WHERE recommender = '". $_POST['id']. "'";
+    $mysqli = Database::connect();
     $mysqli->execute($query);
-    if (!$recommender->add_to_industries($industries)) {
-        echo '-2'; // failed to update industries
-        exit();
+    if ($_POST['industries'] != '0') {
+        $industries = explode(',', $_POST['industries']);
+        if (!$recommender->add_to_industries($industries)) {
+            echo '-2'; // failed to update industries
+            exit();
+        }
     }
     
     echo 'ok';
@@ -153,5 +157,25 @@ if ($_POST['action'] == 'add_new_recommender') {
         echo '0';
     }
     exit();
+}
+
+if ($_POST['action'] == 'get_filters') {
+    $mysqli = Database::connect();
+    $query = "SELECT DISTINCT industries.id, industries.industry 
+              FROM recommender_industries 
+              LEFT JOIN industries ON industries.id = recommender_industries.industry 
+              ORDER BY industries.industry";
+    $result = $mysqli->query($query);
+    
+    $filters = array();
+    foreach ($result as $i=>$row) {
+        $filters[$i]['id'] = $row['id'];
+        $filters[$i]['industry'] = $row['industry'];
+    }
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('filters' => array('filter' => $filters)));
+    exit();
+    
 }
 ?>

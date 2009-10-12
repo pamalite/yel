@@ -33,23 +33,36 @@ class PrsRecommendersPage extends Page {
         echo '</script>'. "\n";
     }
     
-    private function generateIndustries($_for_profile = false;) {
+    private function generateIndustries() {
         $mysqli = Database::connect();
         $query = "SELECT id, industry, parent_id FROM industries";
         $result = $mysqli->query($query);
         
-        if ($_for_profile) {
-            echo '<select class="field" style="height: 200px;" id="profile_industries" name="profile_industries" multiple>'. "\n";
-        } else {
-            echo '<select class="field" style="height: 200px;" id="recommender_industries" name="recommender_industries" multiple>'. "\n";
-        }
-        
+        echo '<select class="field" style="height: 200px;" id="profile.industries" name="profile_industries" multiple>'. "\n";
         foreach ($result as $row) {
             if (empty($row['parent_id']) || is_null($row['parent_id'])) {
                 echo '<option value="'. $row['id']. '" style="font-weight: bold;">'. $row['industry']. '</option>'. "\n";
             } else {
                 echo '<option value="'. $row['id']. '">&nbsp;&nbsp;&nbsp;'. $row['industry']. '</option>'. "\n";
             }
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
+    private function generateRecommendersFilter() {
+        $mysqli = Database::connect();
+        $query = "SELECT DISTINCT industries.id, industries.industry 
+                  FROM recommender_industries 
+                  LEFT JOIN industries ON industries.id = recommender_industries.industry 
+                  ORDER BY industries.industry";
+        $result = $mysqli->query($query);
+        
+        echo '<select id="recommender_filter" name="recommender_filter" onChange="refresh_recommenders();">'. "\n";
+        echo '<option value="0">all specializations</option>'. "\n";
+        echo '<option value="-1" disabled>&nbsp;</option>'. "\n";
+        foreach ($result as $row) {
+            echo '<option value="'. $row['id']. '">'. $row['industry']. '</option>'. "\n";
         }
         
         echo '</select>'. "\n";
@@ -65,7 +78,7 @@ class PrsRecommendersPage extends Page {
             <span id="span_status" class="status"></span>
         </div>
         
-        <div id="div_candidates">
+        <div id="div_recommenders">
             <table class="buttons">
                 <tr>
                     <td class="right"><input class="button" type="button" id="add_new_recommender" name="add_new_recommender" value="Add New Recommender" /></td>
@@ -74,8 +87,11 @@ class PrsRecommendersPage extends Page {
             <table class="header">
                 <tr>
                     <td class="date"><span class="sort" id="sort_added_on">Added On</span></td>
-                    <td class="recommender"><span class="sort" id="sort_recommender">Recommender</span></td>
-                    <td class="industries">Specializations</td>
+                    <td class="recommender">
+                        <span class="sort" id="sort_recommender">Recommender</span>
+                        &nbsp;
+                        <span style="font-size: 8pt;">[ Show <span id="recommender_filters_dropdown"></span> ]</span>
+                    </td>
                     <td class="actions">&nbsp;</td>
                 </tr>
             </table>
@@ -107,23 +123,23 @@ class PrsRecommendersPage extends Page {
                     </tr>
                     <tr>
                         <td class="label">E-mail Address:</td>
-                        <td class="field"><span id="profile_email_addr">Loading...</span></td>
+                        <td class="field"><span id="profile.email_addr">Loading...</span></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="profile_firstname">Firstnames:</label></td>
-                        <td class="field"><input type="text" class="field" id="profile_firstname" name="profile_firstname" /></td>
+                        <td class="label"><label for="profile.firstname">Firstnames:</label></td>
+                        <td class="field"><input type="text" class="field" id="profile.firstname" name="profile_firstname" /></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="profile_lastname">Lastnames:</label></td>
-                        <td class="field"><input type="text" class="field" id="profile_lastname" name="profile_lastname" /></td>
+                        <td class="label"><label for="profile.lastname">Lastnames:</label></td>
+                        <td class="field"><input type="text" class="field" id="profile.lastname" name="profile_lastname" /></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="profile_phone_num">Telephone:</label></td>
-                        <td class="field"><input type="text" class="field" id="profile_phone_num" name="profile_phone_num" /></td>
+                        <td class="label"><label for="profile.phone_num">Telephone:</label></td>
+                        <td class="field"><input type="text" class="field" id="profile.phone_num" name="profile_phone_num" /></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="profile_industries">Specializations:</label></td>
-                        <td class="field"><?php echo $this->generateIndustries(true); ?></td>
+                        <td class="label"><label for="profile.industries">Specializations:</label></td>
+                        <td class="field"><?php echo $this->generateIndustries(); ?></td>
                     </tr>
                     <tr>
                         <td  class="buttons_bar" colspan="2"><input type="button" id="save" value="Save Profile" /></td>
@@ -144,7 +160,7 @@ class PrsRecommendersPage extends Page {
             </div>
         </div>
         
-        <div id="div_new_candidate_form">
+        <div id="div_new_recommender_form">
             <div id="div_tabs">
                 <ul>
                     <li class="back" id="li_back_1">&lt;&lt; Back to Recommenders</li>
