@@ -139,7 +139,7 @@ if ($_POST['action'] == 'add_new_recommender') {
     $data['lastname'] = $_POST['lastname'];
     $data['phone_num'] = $_POST['phone_num'];
     $data['added_by'] = $_POST['id'];
-    $data['added_on'] = $joined_on;
+    $data['added_on'] = $added_on;
     
     if ($recommender->create($data)) {
         $industries = explode(',', $_POST['industries']);

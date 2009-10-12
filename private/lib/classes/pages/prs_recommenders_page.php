@@ -33,36 +33,23 @@ class PrsRecommendersPage extends Page {
         echo '</script>'. "\n";
     }
     
-    private function generateIndustries() {
+    private function generateIndustries($_for_new_recommender = false) {
         $mysqli = Database::connect();
         $query = "SELECT id, industry, parent_id FROM industries";
         $result = $mysqli->query($query);
         
-        echo '<select class="field" style="height: 200px;" id="profile.industries" name="profile_industries" multiple>'. "\n";
+        if ($_for_new_recommender) {
+            echo '<select class="field" style="height: 200px;" id="industries" name="industries" multiple>'. "\n";
+        } else {
+            echo '<select class="field" style="height: 200px;" id="profile.industries" name="profile_industries" multiple>'. "\n";
+        }
+        
         foreach ($result as $row) {
             if (empty($row['parent_id']) || is_null($row['parent_id'])) {
                 echo '<option value="'. $row['id']. '" style="font-weight: bold;">'. $row['industry']. '</option>'. "\n";
             } else {
                 echo '<option value="'. $row['id']. '">&nbsp;&nbsp;&nbsp;'. $row['industry']. '</option>'. "\n";
             }
-        }
-        
-        echo '</select>'. "\n";
-    }
-    
-    private function generateRecommendersFilter() {
-        $mysqli = Database::connect();
-        $query = "SELECT DISTINCT industries.id, industries.industry 
-                  FROM recommender_industries 
-                  LEFT JOIN industries ON industries.id = recommender_industries.industry 
-                  ORDER BY industries.industry";
-        $result = $mysqli->query($query);
-        
-        echo '<select id="recommender_filter" name="recommender_filter" onChange="refresh_recommenders();">'. "\n";
-        echo '<option value="0">all specializations</option>'. "\n";
-        echo '<option value="-1" disabled>&nbsp;</option>'. "\n";
-        foreach ($result as $row) {
-            echo '<option value="'. $row['id']. '">'. $row['industry']. '</option>'. "\n";
         }
         
         echo '</select>'. "\n";
@@ -172,24 +159,24 @@ class PrsRecommendersPage extends Page {
                     <td class="title" colspan="2">Contact Details</td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="recommender_firstname">Firstnames:</label></td>
-                    <td class="field"><input type="text" class="field" id="recommender_firstname" name="recommender_firstname" /></td>
+                    <td class="label"><label for="firstname">Firstnames:</label></td>
+                    <td class="field"><input type="text" class="field" id="firstname" name="firstname" /></td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="recommender_lastname">Lastnames:</label></td>
-                    <td class="field"><input type="text" class="field" id="recommender_lastname" name="recommender_lastname" /></td>
+                    <td class="label"><label for="lastname">Lastnames:</label></td>
+                    <td class="field"><input type="text" class="field" id="lastname" name="lastname" /></td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="recommender_email_addr">E-mail Address:</label></td>
-                    <td class="field"><input type="text" class="field" id="recommender_email_addr" name="recommender_email_addr" /></td>
+                    <td class="label"><label for="email_addr">E-mail Address:</label></td>
+                    <td class="field"><input type="text" class="field" id="email_addr" name="email_addr" /></td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="recommender_phone_num">Telephone:</label></td>
-                    <td class="field"><input type="text" class="field" id="recommender_phone_num" name="recommender_phone_num" /></td>
+                    <td class="label"><label for="phone_num">Telephone:</label></td>
+                    <td class="field"><input type="text" class="field" id="phone_num" name="phone_num" /></td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="recommender_industries">Specializations:</label></td>
-                    <td class="field"><?php echo $this->generateIndustries(); ?></td>
+                    <td class="label"><label for="industries">Specializations:</label></td>
+                    <td class="field"><?php echo $this->generateIndustries(true); ?></td>
                 </tr>
                 <tr>
                     <td  class="buttons_bar" colspan="2"><input type="button" id="add" value="Save &amp; Add Recommender" /></td>

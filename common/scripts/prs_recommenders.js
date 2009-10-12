@@ -25,69 +25,32 @@ function candidates_ascending_or_descending() {
 }
 
 function validate_new_recommender_form() {
-    if (!isEmail($('member_email_addr').value)) {
+    if (!isEmail($('email_addr').value)) {
         alert('The e-mail address provided is not valid.');
         return false;
     }
     
-    if (isEmpty($('member_firstname').value)) {
-        alert('Candidate firstnames cannot be empty.');
+    if (isEmpty($('firstname').value)) {
+        alert('Firstnames cannot be empty.');
         return false;
     }
     
-    if (isEmpty($('member_lastname').value)) {
-        alert('Candidate lastnames cannot be empty.');
+    if (isEmpty($('lastname').value)) {
+        alert('Lastnames cannot be empty.');
         return false;
     }
     
-    if (isEmpty($('member_phone_num').value)) {
-        alert('Candidate telephone cannot be empty.');
-        return false;
+    var selected_count = 0;
+    for (var i=0; i < $('industries').options.length; i++) {
+        if ($('industries').options[i].selected) {
+            selected_count++;
+        }
     }
     
-    if ($('country').options[$('country').selectedIndex].value == 0) {
-        alert('You must at least choose a country of residence.');
-        return false;
-    } 
-    
-    if (isEmpty($('zip').value)) {
-        alert('Postal/Zip Code cannot be empty.');
-        return false;
-    }
-    
-    if ($('recommender_from_list').checked) {
-        if ($('recommender').options[$('recommender').selectedIndex].value == 0) {
-            alert('You need to choose one of the existing recommenders.');
+    if (selected_count <= 0) {
+        var msg = 'Are you sure not to classify the recommender with any of the specilizations?';
+        if (!confirm(msg)) {
             return false;
-        } 
-    } else if ($('recommender_from_new').checked) {
-        if (!isEmail($('recommender_email_addr').value)) {
-            alert('The recommender\'s e-mail address provided is not valid.');
-            return false;
-        }
-
-        if (isEmpty($('recommender_firstname').value)) {
-            alert('Recommender firstnames cannot be empty.');
-            return false;
-        }
-
-        if (isEmpty($('recommender_lastname').value)) {
-            alert('Recommender lastnames cannot be empty.');
-            return false;
-        }
-        
-        var selected_count = 0;
-        for (var i=0; i < $('recommender_industries').options.length; i++) {
-            if ($('recommender_industries').options[i].selected) {
-                selected_count++;
-            }
-        }
-        
-        if (selected_count <= 0) {
-            var msg = 'Are you sure not to classify the recommender with any of the specilizations?';
-            if (!confirm(msg)) {
-                return false;
-            }
         }
     }
     
@@ -195,7 +158,7 @@ function show_recommenders() {
     request.send(params);
 }
 
-function show_current_candidate_profile() {
+function show_current_recommender_profile() {
     show_profile(current_recommender_email_addr);
 }
 
@@ -213,7 +176,7 @@ function show_profile(_recommender_email_addr) {
     
     // unselect all industries
     for (var i=0; i < $('profile.industries').options.length; i++) {
-        $('profile.industries').options.selected = false;
+        $('profile.industries').options[i].selected = false;
     }
     
     var params = 'id=' + current_recommender_email_addr + '&action=get_profile';
@@ -242,7 +205,7 @@ function show_profile(_recommender_email_addr) {
             
             $('profile.email_addr').set('html', current_recommender_email_addr);
             
-            var phone = 'N/A';
+            var phone = '';
             if (phone_num[0].childNodes.length > 0) {
                 phone = phone_num[0].childNodes[0].nodeValue;
             }
@@ -421,86 +384,64 @@ function show_resumes(_member_email_addr) {
     request.send(params);
 }
 
-function add_new_candidate() {
-    if (!validate_new_candidate_form()) {
+function add_new_recommender() {
+    if (!validate_new_recommender_form()) {
         return false;
     }
     
-    var params = 'id=' + id + '&action=add_new_candidate';
-    params = params + '&member_email_addr=' + $('member_email_addr').value;
-    params = params + '&member_firstname=' + $('member_firstname').value;
-    params = params + '&member_lastname=' + $('member_lastname').value;
-    params = params + '&member_phone_num=' + $('member_phone_num').value;
-    params = params + '&member_country=' + $('country').options[$('country').selectedIndex].value;
-    params = params + '&member_zip=' + $('zip').value;
-    
-    if ($('recommender_from_list').checked) {
-        params = params + '&recommender_from=list';
-        params = params + '&recommender_email_addr=' + $('recommender').options[$('recommender').selectedIndex].value;
-    } else {
-        params = params + '&recommender_from=new';
-        params = params + '&recommender_email_addr=' + $('recommender_email_addr').value;
-        params = params + '&recommender_firstname=' + $('recommender_firstname').value;
-        params = params + '&recommender_lastname=' + $('recommender_lastname').value;
-        params = params + '&recommender_phone_num=' + $('recommender_phone_num').value;
+    var params = 'id=' + id + '&action=add_new_recommender';
+    params = params + '&email_addr=' + $('email_addr').value;
+    params = params + '&firstname=' + $('firstname').value;
+    params = params + '&lastname=' + $('lastname').value;
+    params = params + '&phone_num=' + $('phone_num').value;
         
-        var industries = '';
-        for (var i=0; i < $('recommender_industries').options.length; i++) {
-            if ($('recommender_industries').options[i].selected) {
-                if (isEmpty(industries)) {
-                    industries = $('recommender_industries').options[i].value;
-                } else {
-                    industries = industries + ',' + $('recommender_industries').options[i].value;
-                }
+    var industries = '';
+    for (var i=0; i < $('industries').options.length; i++) {
+        if ($('industries').options[i].selected) {
+            if (isEmpty(industries)) {
+                industries = $('industries').options[i].value;
+            } else {
+                industries = industries + ',' + $('industries').options[i].value;
             }
         }
-        
-        params = params + '&recommender_industries=' + industries;
     }
+    params = params + '&industries=' + industries;
     
-    var uri = root + "/prs/resumes_privileged_action.php";
+    var uri = root + "/prs/recommenders_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
             switch (txt) {
                 case '-1':
-                    alert('Unable to create new recommender. No new candidate created.\n\nPlease try again later.');
+                    alert('Recommender already exists in the system.');
                     break;
                 case '-2':
-                    alert('The candidate you want to create is already in the system.\n\nYou cannot overwrite or update once the candidate is created.');
-                    show_candidates();
+                    alert('Unable to create new candidate. No new candidate created.\n\nPlease try again later.');
+                    show_recommenders();
                     break;
                 case '-3':
-                    alert('Unable to create new candidate. No new candidate created.\n\nPlease try again later.')
-                    break;
-                case '-4':
-                    alert('Unable to create new candidate activation token.\n\nThe new candidate has been created, but please contact system administrator to reset the candidate\'s token and password.');
-                    show_candidates();
-                    break;
-                case '-5':
-                    alert('Everything was created successfully, except for recommender\'s industries are not added into the system.\n\nPlease update through the Recommenders section.');
-                    show_candidates();
+                    alert('Everything was created successfully, except for recommender\'s industries are not added into the system.\n\nPlease update later.');
+                    show_recommenders();
                     break;
                 default:
-                    show_candidates();
+                    show_recommenders();
                     break;
             }
             set_status('');
         },
         onRequest: function(instance) {
-            set_status('Saving candidate...');
+            set_status('Saving new recommender...');
         }
     });
     
     request.send(params);
 }
 
-function show_new_candidate_form() {
-    $('div_candidates').setStyle('display', 'none');
-    $('div_candidate').setStyle('display', 'none');
-    $('div_new_member_form').setStyle('display', 'block');
-    $('div_upload_resume_form').setStyle('display', 'none');
+function show_new_recommender_form() {
+    $('div_recommenders').setStyle('display', 'none');
+    $('div_recommender').setStyle('display', 'none');
+    $('div_new_recommender_form').setStyle('display', 'block');
 }
 
 function set_mouse_events() {
@@ -546,20 +487,20 @@ function set_mouse_events() {
         });
     });
     
-    // $('li_back_1').addEvent('mouseover', function() {
-    //     $('li_back_1').setStyles({
-    //         'color': '#FF0000',
-    //         'text-decoration': 'underline'
-    //     });
-    // });
-    // 
-    // $('li_back_1').addEvent('mouseout', function() {
-    //     $('li_back_1').setStyles({
-    //         'color': '#000000',
-    //         'text-decoration': 'none'
-    //     });
-    // });
-    // 
+    $('li_back_1').addEvent('mouseover', function() {
+        $('li_back_1').setStyles({
+            'color': '#FF0000',
+            'text-decoration': 'underline'
+        });
+    });
+    
+    $('li_back_1').addEvent('mouseout', function() {
+        $('li_back_1').setStyles({
+            'color': '#000000',
+            'text-decoration': 'none'
+        });
+    });
+    
     // $('li_back_2').addEvent('mouseover', function() {
     //     $('li_back_2').setStyles({
     //         'color': '#FF0000',
@@ -580,18 +521,16 @@ function onDomReady() {
     set_mouse_events();
     
     $('li_back').addEvent('click', show_recommenders);
-    // $('li_back_1').addEvent('click', show_candidates);
+    $('li_back_1').addEvent('click', show_recommenders);
     // $('li_back_2').addEvent('click', show_current_candidate_resumes);
-    // $('li_profile').addEvent('click', show_current_candidate_profile);
+    $('li_profile').addEvent('click', show_current_recommender_profile);
     // $('li_resumes').addEvent('click', show_current_candidate_resumes);
-    // 
-    // $('add_new_candidate').addEvent('click', show_new_candidate_form);
-    // $('add_new_candidate_1').addEvent('click', show_new_candidate_form);
+    
+    $('add_new_recommender').addEvent('click', show_new_recommender_form);
+    $('add_new_recommender_1').addEvent('click', show_new_recommender_form);
     
     $('save').addEvent('click', save_profile);
-    
-    // $('upload_new_resume').addEvent('click', upload_new_resume);
-    // $('upload_new_resume_1').addEvent('click', upload_new_resume);
+    $('add').addEvent('click', add_new_recommender);
     
     $('sort_added_on').addEvent('click', function() {
         order_by = 'recommenders.added_on';
