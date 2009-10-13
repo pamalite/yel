@@ -138,18 +138,15 @@ function show_profile(_member_email_addr) {
     
     $('div_candidates').setStyle('display', 'none');
     $('div_candidate').setStyle('display', 'block');
-    $('div_new_member_form').setStyle('display', 'none');
-    $('div_upload_resume_form').setStyle('display', 'none');
     
     $('li_profile').setStyle('border', '1px solid #CCCCCC');
     $('li_resumes').setStyle('border', '1px solid #0000FF');
     $('div_profile').setStyle('display', 'block');
     $('div_resumes').setStyle('display', 'none');
     
-    
     var params = 'id=' + current_member_email_addr + '&action=get_profile';
     
-    var uri = root + "/prs/resumes_privileged_action.php";
+    var uri = root + "/prs/resumes_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
@@ -159,25 +156,23 @@ function show_profile(_member_email_addr) {
                 return false;
             } 
             
-            var member_firstname = xml.getElementsByTagName('member_firstname');
-            var member_lastname = xml.getElementsByTagName('member_lastname');
-            var recommender_firstname = xml.getElementsByTagName('recommender_firstname');
-            var recommender_lastname = xml.getElementsByTagName('recommender_lastname');
-            var member_phone_num = xml.getElementsByTagName('member_phone_num');
+            var firstname = xml.getElementsByTagName('firstname');
+            var lastname = xml.getElementsByTagName('lastname');
+            var phone_num = xml.getElementsByTagName('phone_num');
             var country = xml.getElementsByTagName('country');
             var zip = xml.getElementsByTagName('zip');
-            var recommender_email_addr = xml.getElementsByTagName('recommender_email_addr');
-            var recommender_phone_num = xml.getElementsByTagName('recommender_phone_num');
-            var member_joined_on = xml.getElementsByTagName('formatted_joined_on');
+            var joined_on = xml.getElementsByTagName('formatted_joined_on');
+            var primary_industry = xml.getElementsByTagName('first_industry');
+            var secondary_industry = xml.getElementsByTagName('second_industry');
             
-            $('profile.joined_on').set('html', member_joined_on[0].childNodes[0].nodeValue);
-            $('profile.firstname').set('html', member_firstname[0].childNodes[0].nodeValue);
-            $('profile.lastname').set('html', member_lastname[0].childNodes[0].nodeValue);
+            $('profile.joined_on').set('html', joined_on[0].childNodes[0].nodeValue);
+            $('profile.firstname').set('html', firstname[0].childNodes[0].nodeValue);
+            $('profile.lastname').set('html', lastname[0].childNodes[0].nodeValue);
             
-            current_member_name = member_firstname[0].childNodes[0].nodeValue + ', ' + member_lastname[0].childNodes[0].nodeValue;
+            current_member_name = firstname[0].childNodes[0].nodeValue + ', ' + lastname[0].childNodes[0].nodeValue;
             
             $('profile.email_addr').set('html', current_member_email_addr);
-            $('profile.phone_num').set('html', member_phone_num[0].childNodes[0].nodeValue);
+            $('profile.phone_num').set('html', phone_num[0].childNodes[0].nodeValue);
             $('profile.country').set('html', country[0].childNodes[0].nodeValue);
             
             var zip_code = 'N/A';
@@ -186,15 +181,16 @@ function show_profile(_member_email_addr) {
             }
             $('profile.zip').set('html', zip_code);
             
-            $('profile.recommender.firstname').set('html', recommender_firstname[0].childNodes[0].nodeValue);
-            $('profile.recommender.lastname').set('html', recommender_lastname[0].childNodes[0].nodeValue);
-            $('profile.recommender.email_addr').set('html', recommender_email_addr[0].childNodes[0].nodeValue);
-            
-            var phone_num = 'N/A';
-            if (recommender_phone_num[0].childNodes.length > 0) {
-                phone_num = recommender_phone_num[0].childNodes[0].nodeValue;
+            var specializations = '<span style="color: #666666;">No specializations selected.</span>';
+            if (primary_industry[0].childNodes.length > 0) {
+                specializations = '<span class="specialization">' + primary_industry[0].childNodes[0].nodeValue + '</span>&nbsp;&nbsp;&nbsp;';
             }
-            $('profile.recommender.phone_num').set('html', phone_num);
+            
+            if (secondary_industry[0].childNodes.length > 0) {
+                specializations = specializations + '<span class="specialization">' + secondary_industry[0].childNodes[0].nodeValue + '</span>'
+            }
+            
+            $('profile.specializations').set('html', specializations);
             set_status('');
         },
         onRequest: function(instance) {
@@ -214,8 +210,6 @@ function show_resumes(_member_email_addr) {
     
     $('div_candidates').setStyle('display', 'none');
     $('div_candidate').setStyle('display', 'block');
-    $('div_new_member_form').setStyle('display', 'none');
-    $('div_upload_resume_form').setStyle('display', 'none');
     
     $('li_resumes').setStyle('border', '1px solid #CCCCCC');
     $('li_profile').setStyle('border', '1px solid #0000FF');
@@ -225,7 +219,7 @@ function show_resumes(_member_email_addr) {
     var params = 'id=' + current_member_email_addr + '&action=get_resumes';
     params = params + '&order_by=' + resumes_order_by + ' ' + resumes_order;
     
-    var uri = root + "/prs/resumes_privileged_action.php";
+    var uri = root + "/prs/resumes_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
@@ -242,9 +236,12 @@ function show_resumes(_member_email_addr) {
             var file_hashes = xml.getElementsByTagName('file_hash');
             var file_names = xml.getElementsByTagName('file_name');
             
+            $('candidate_name').set('html', current_member_name);
+            $('candidate_specializations').set('html', $('profile.specializations').get('html'));
+            
             var html = '<table id="list" class="list">';
             if (ids.length <= 0) {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">Please click on the \"Upload Resume\" to upload resume.</div>';
+                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">No resumes created/uploaded by candidate.</div>';
             } else {
                 for (var i=0; i < ids.length; i++) {
                     var resume_id = ids[i];
@@ -260,7 +257,7 @@ function show_resumes(_member_email_addr) {
                     html = html + '<td class="date">' + modified_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     
                     if (file_hashes[i].childNodes.length > 0) {
-                        html = html + '<td class="title"><span class="reupload"><a class="no_link" onClick="show_upload_resume_form(' + resume_id.childNodes[0].nodeValue + ');">Update File</a></span>&nbsp;<a href="resume.php?id=' + resume_id.childNodes[0].nodeValue + '&member=' + current_member_email_addr + '">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                        html = html + '<td class="title"><span class="reupload"><a href="resume.php?id=' + resume_id.childNodes[0].nodeValue + '&member=' + current_member_email_addr + '">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     } else {
                         html = html + '<td class="title"><a class="no_link" onClick="show_resume_page(\'' + resume_id.childNodes[0].nodeValue + '\')">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     }

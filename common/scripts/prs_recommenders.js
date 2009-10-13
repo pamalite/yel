@@ -327,7 +327,7 @@ function update_recommender_industries() {
                 
                 var html = '';
                 for (var i=0; i < industries.length; i++) {
-                    html = html + '<span class="specialization">' + industries[i].childNodes[0].nodeValue + '</span>&nbsp;';
+                    html = html + '<span class="specialization">' + industries[i].childNodes[0].nodeValue + '</span>&nbsp;&nbsp;&nbsp;';
                 }
                 
                 $('recommender_industries').set('html', html);

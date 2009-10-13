@@ -146,6 +146,16 @@ span.sort:hover {
     color: #FF0000;
 }
 
+span.specialization {
+    font-size: 9pt;
+    color: #0000FF;
+    background-color: #FFFF99;
+    border: none;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+
 div.phone_num {
     padding-top: 3px;
     padding-bottom: 3px;

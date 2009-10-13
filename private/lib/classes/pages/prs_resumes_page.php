@@ -80,7 +80,7 @@ class PrsResumesPage extends Page {
                     </tr>
                     <tr>
                         <td class="specializations" colspan="2">
-                            <div style="text-align: center;">
+                            <div style="text-align: center; padding-top: 5px; padding-bottom: 5px;">
                                 <span id="profile.specializations">Loading...</span>
                             </div>
                         </td>
@@ -119,7 +119,11 @@ class PrsResumesPage extends Page {
             </div>
             
             <div id="div_resumes">
-                 <table class="header">
+                <div style="width: 50%; margin: auto; text-align: center; padding-bottom: 5px;">
+                    <span id="candidate_name" style="font-weight: bold;"></span><br/>
+                    <span id="candidate_specializations"></span>
+                </div>
+                <table class="header">
                     <tr>
                         <td class="private">&nbsp;</td>
                         <td class="date"><span class="sort" id="sort_resumes_modified_on">Modified On</span></td>

@@ -61,8 +61,8 @@ if ($_POST['action'] == 'get_profile') {
     $query = "SELECT members.email_addr AS email_addr, members.phone_num AS phone_num, 
               members.firstname, members.lastname, 
               DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
-              primary_industries.industry AS primary_industry, 
-              secondary_industries.industry AS secondary_industry, 
+              primary_industries.industry AS first_industry, 
+              secondary_industries.industry AS second_industry, 
               countries.country, members.zip 
               FROM members 
               LEFT JOIN countries ON countries.country_code = members.country 
@@ -116,12 +116,14 @@ if ($_POST['action'] == 'get_filters') {
     $query = "SELECT DISTINCT industries.id, industries.industry FROM 
               (SELECT DISTINCT primary_industry AS industry 
                FROM members 
-               WHERE primary_industry IS NOT NULL 
+               WHERE primary_industry IS NOT NULL AND 
+               (added_by IS NULL OR added_by = '') 
                UNION 
                SELECT DISTINCT secondary_industry 
                FROM members 
-               WHERE secondary_industry IS NOT NULL) AS primary_secondary_industry 
-              LEFT JOIN industries ON industries.id = primary_secondary_industry.industry 
+               WHERE secondary_industry IS NOT NULL AND 
+               (added_by IS NULL OR added_by = '')) AS member_industry 
+              LEFT JOIN industries ON industries.id = member_industry.industry 
               ORDER BY industries.industry";
     $result = $mysqli->query($query);
     
