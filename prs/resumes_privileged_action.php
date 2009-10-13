@@ -12,7 +12,7 @@ if (!isset($_POST['id'])) {
 $xml_dom = new XMLDOM();
 
 if (!isset($_POST['action'])) {
-    $order_by = 'members.joined desc';
+    $order_by = 'members.joined_on desc';
     
     if (isset($_POST['order_by'])) {
         $order_by = $_POST['order_by'];
@@ -118,8 +118,8 @@ if ($_POST['action'] == 'add_new_candidate') {
         $result = $mysqli->query($query);
         if ($result[0]['id_used'] == '0') {
             $recommender_data = array();
-            $recommender_data['firstname'] = $_POST['recommender_firstname'];
-            $recommender_data['lastname'] = $_POST['recommender_lastname'];
+            $recommender_data['firstname'] = sanitize($_POST['recommender_firstname']);
+            $recommender_data['lastname'] = sanitize($_POST['recommender_lastname']);
             $recommender_data['phone_num'] = $_POST['recommender_phone_num'];
             $recommender_data['added_by'] = $_POST['id'];
             $recommender_data['added_on'] = $joined_on;
@@ -151,8 +151,8 @@ if ($_POST['action'] == 'add_new_candidate') {
         $new_password = generate_random_string_of(6);
         $member = new Member($_POST['member_email_addr']);
         $member_data = array();
-        $member_data['firstname'] = $_POST['member_firstname'];
-        $member_data['lastname'] = $_POST['member_lastname'];
+        $member_data['firstname'] = sanitize($_POST['member_firstname']);
+        $member_data['lastname'] = sanitize($_POST['member_lastname']);
         $member_data['password'] = md5($new_password);
         $member_data['forget_password_question'] = 1;
         $member_data['forget_password_answer'] = '(System generated)';

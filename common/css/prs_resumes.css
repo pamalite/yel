@@ -1,0 +1,233 @@
+#div_candidates, #div_candidate {
+    padding-top: 10px;
+}
+
+#div_candidate, #div_new_member_form, 
+#div_upload_resume_form {
+    display: none;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+li.back {
+    border: 1px solid #0000FF;
+}
+
+#li_profile {
+    border: 1px solid #CCCCCC;
+}
+
+#li_resumes {
+    border: 1px solid #0000FF;
+}
+
+#div_profile, #div_resumes {
+    text-align: center;
+    display: none;
+    padding-top: 10px;
+}
+
+table.recommender, table.recommender table.new_recommender_form {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.recommender td.option {
+    width: 10px;
+    vertical-align: top;
+}
+
+table.profile {
+    width: 65%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.profile td {
+    padding: 3px 3px 3px 3px;
+}
+
+table.profile td.label {
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.profile td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+table.profile td.added_on_date {
+    text-align: right;
+    color: #666666;
+    font-size: 9pt;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+input.mini_button {
+    font-size: 9pt;
+}
+
+input.field, #div_new_member_form select.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+table.profile td.buttons_bar {
+    text-align: right;
+    background-color: #CCCCCC;
+}
+
+td.date {
+    width: 100px;
+}
+
+td.candidate {
+    width: 350px;
+}
+
+td.contact_data {
+    width: 250px;
+}
+
+td.actions {
+    text-align: center;
+    width: 210px;
+}
+
+td.private {
+   width: 60px;
+   text-align: center;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
+#upload_progress {
+    display: none;
+}
+
+table.upload_form {
+    width: 65%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.upload_form td {
+    vertical-align: top;
+}
+
+table.upload_form td.label {
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.upload_form td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+
+table.upload_form input.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+td.buttons_left, td.buttons_right {
+    background-color: #CCCCCC;
+}
+
+td.buttons_right {
+    text-align: right;
+}
+
+span.upload_note {
+    font-style: italic;
+    font-size: 9pt;
+}
+
+span.reupload {
+    border: none;
+    font-size: 8pt;
+    background-color: #FFFF99;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_recommender_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 160px;
+    overflow: auto;
+}
