@@ -135,9 +135,13 @@ class PrsRecommendersPage extends Page {
             </div>
             
             <div id="div_candidates">
+                <div style="padding-top: 3px; padding-bottom: 10px; text-align: center;">
+                    <span id="recommender_name" style="font-weight: bold;"></span><br/>
+                    <div id="recommender_industries" style="text-align: center; width: 50%; margin: auto;"></div>
+                </div>
                 <table class="header">
                     <tr>
-                        <td class="date"><span class="sort" id="sort_join_on">Joined On</span></td>
+                        <td class="date"><span class="sort" id="sort_joined_on">Joined On</span></td>
                         <td class="candidate"><span class="sort" id="sort_candidate">Candidate</span></td>
                         <td class="actions">&nbsp;</td>
                     </tr>

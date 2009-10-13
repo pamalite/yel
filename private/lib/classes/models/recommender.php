@@ -202,7 +202,8 @@ class Recommender {
         if (empty($_order)) {
             $_order = 'joined_on DESC';
         }
-        $query = "SELECT email_addr, CONCAT(firstname, ', ', lastname) AS member, joined_on 
+        $query = "SELECT email_addr, CONCAT(firstname, ', ', lastname) AS member, phone_num, 
+                  DATE_FORMAT(joined_on, '%e %b, %Y') AS formatted_joined_on 
                   FROM members 
                   WHERE recommender = '". $this->id(). "' AND 
                   added_by = '". $_added_by. "' 

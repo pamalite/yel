@@ -178,4 +178,57 @@ if ($_POST['action'] == 'get_filters') {
     exit();
     
 }
+
+if ($_POST['action'] == 'get_candidates') {
+    $order_by = '';
+    if (isset($_POST['order_by'])) {
+        $order_by = $_POST['order_by'];
+    }
+    
+    $recommender = new Recommender($_POST['recommender']);
+    $result = $recommender->get_recommended_candidates($_POST['id'], $order_by);
+    if (count($result) <= 0 || is_null($result)) {
+        echo '0';
+        exit();
+    }
+    
+    if (!$result) {
+        echo 'ko';
+        exit();
+    }
+    
+    foreach($result as $i=>$row) {
+        $result[$i]['member'] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($row['member']))));
+    }
+    
+    $response = array('candidates' => array('candidate' => $result));
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
+if ($_POST['action'] == 'get_recommender_industries') {
+    $mysqli = Database::connect();
+    $query = "SELECT industries.industry 
+              FROM recommender_industries 
+              LEFT JOIN industries ON industries.id = recommender_industries.industry 
+              WHERE recommender_industries.recommender = '". $_POST['id']. "' 
+              ORDER BY industries.industry";
+    $result = $mysqli->query($query);
+    
+    if (is_null($result) || empty($result)) {
+        echo '0';
+        exit();
+    }
+    
+    $industries = array();
+    foreach ($result as $row) {
+        $industries[] = array($row['industry']);
+    }
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('industries' => array('industry' => $industries)));
+    exit();
+    
+}
 ?>

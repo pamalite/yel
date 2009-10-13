@@ -19,12 +19,17 @@ if (!isset($_SESSION['yel']['employee']) ||
     redirect_to('login.php');
 }
 
+$candidate_id = '';
+if (isset($_GET['candidate'])) {
+    $candidate_id = $_GET['candidate'];
+}
+
 $home = new PrsPrivilegedResumesPage($_SESSION['yel']['employee']);
 $home->header(array('root_dir' => '../', 
                     'title' => 'Priviledged Candidates'));
 $home->insert_prs_privileged_resumes_css();
 $home->insert_prs_privileged_resumes_scripts();
-$home->insert_inline_scripts();
+$home->insert_inline_scripts($candidate_id);
 $home->show();
 $home->footer();
 ?>

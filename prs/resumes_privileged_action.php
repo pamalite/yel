@@ -41,8 +41,8 @@ if (!isset($_POST['action'])) {
     }
     
     foreach($result as $i=>$row) {
-        $result[$i]['candidate'] = htmlspecialchars_decode($row['candidate']);
-        $result[$i]['recommender'] = htmlspecialchars_decode($row['recommender']);
+        $result[$i]['candidate_name'] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($row['candidate_name']))));
+        $result[$i]['recommender_name'] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($row['recommender_name']))));
     }
     
     $response = array('candidates' => array('candidate' => $result));
@@ -70,7 +70,7 @@ if ($_POST['action'] == 'get_profile') {
         $profile[$key] = $value;
         
         if (stripos($key, 'firstname') !== false || stripos($key, 'lastname') !== false) {
-            $profile[$key] = htmlspecialchars_decode(html_entity_decode(desanitize($value)));
+            $profile[$key] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($value))));
         }
     }
 

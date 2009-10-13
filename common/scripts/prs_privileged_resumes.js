@@ -560,7 +560,11 @@ function onDomReady() {
         show_current_candidate_resumes();
     });
     
-    show_candidates();
+    if (!isEmpty(candidate_id)) {
+        show_profile(candidate_id);
+    } else {
+        show_candidates();
+    }
 }
 
 window.addEvent('domready', onDomReady);

@@ -307,27 +307,65 @@ function save_profile() {
     request.send(params);
 }
 
-function show_current_candidate_resumes() {
-    show_resumes(current_member_email_addr);
+function update_recommender_industries() {
+    var params = 'id=' + current_recommender_email_addr + '&action=get_recommender_industries';
+    
+    var uri = root + "/prs/recommenders_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                $('recommender_industries').set('html', 'An error occured while loading industries.');
+                return false;
+            } 
+            
+            if (txt == '0') {
+                $('recommender_industries').set('html', 'No industries associated to this recommender.');
+            } else {
+                var industries = xml.getElementsByTagName('industry');
+                
+                var html = '';
+                for (var i=0; i < industries.length; i++) {
+                    html = html + '<span class="specialization">' + industries[i].childNodes[0].nodeValue + '</span>&nbsp;';
+                }
+                
+                $('recommender_industries').set('html', html);
+            }
+            
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading industries...');
+        }
+    });
+    
+    request.send(params);
 }
 
-function show_resumes(_member_email_addr) {
-    current_member_email_addr = _member_email_addr;
+function show_current_recommender_candidates() {
+    show_candidates(current_recommender_email_addr);
+}
+
+function show_candidates(_recommender_email_addr) {
+    current_recommender_email_addr = _recommender_email_addr;
     
-    $('div_candidates').setStyle('display', 'none');
-    $('div_candidate').setStyle('display', 'block');
-    $('div_new_member_form').setStyle('display', 'none');
-    $('div_upload_resume_form').setStyle('display', 'none');
+    $('div_recommenders').setStyle('display', 'none');
+    $('div_recommender').setStyle('display', 'block');
+    $('div_new_recommender_form').setStyle('display', 'none');
     
-    $('li_resumes').setStyle('border', '1px solid #CCCCCC');
+    $('li_candidates').setStyle('border', '1px solid #CCCCCC');
     $('li_profile').setStyle('border', '1px solid #0000FF');
     $('div_profile').setStyle('display', 'none');
-    $('div_resumes').setStyle('display', 'block');
+    $('div_candidates').setStyle('display', 'block');
     
-    var params = 'id=' + current_member_email_addr + '&action=get_resumes';
-    params = params + '&order_by=' + resumes_order_by + ' ' + resumes_order;
+    $('recommender_name').set('html', current_recommender_name);
+    update_recommender_industries();
     
-    var uri = root + "/prs/resumes_privileged_action.php";
+    var params = 'id=' + id + '&recommender=' + current_recommender_email_addr + '&action=get_candidates';
+    params = params + '&order_by=' + candidates_order_by + ' ' + candidates_order;
+    
+    var uri = root + "/prs/recommenders_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
@@ -337,47 +375,38 @@ function show_resumes(_member_email_addr) {
                 return false;
             } 
             
-            var ids = xml.getElementsByTagName('id');
-            var privates = xml.getElementsByTagName('private');
-            var labels = xml.getElementsByTagName('name');
-            var modified_ons = xml.getElementsByTagName('modified_date');
-            var file_hashes = xml.getElementsByTagName('file_hash');
-            var file_names = xml.getElementsByTagName('file_name');
-            
             var html = '<table id="list" class="list">';
-            if (ids.length <= 0) {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">Please click on the \"Upload Resume\" to upload resume.</div>';
+            if (txt == '0') {
+                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">No candidates recommended at the moment.</div>';
             } else {
+                var ids = xml.getElementsByTagName('email_addr');
+                var members = xml.getElementsByTagName('member');
+                var joined_ons = xml.getElementsByTagName('formatted_joined_on');
+                var phone_nums = xml.getElementsByTagName('phone_num');
+                
                 for (var i=0; i < ids.length; i++) {
-                    var resume_id = ids[i];
+                    var id = ids[i].childNodes[0].nodeValue;
                     
-                    html = html + '<tr id="'+ resume_id.childNodes[0].nodeValue + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
+                    html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                     
-                    if (privates[i].childNodes[0].nodeValue == 'N') {
-                        html = html + '<td class="private">&nbsp;</td>' + "\n";
-                    } else {
-                        html = html + '<td class="private">Private</td>' + "\n";
+                    html = html + '<td class="date">' + joined_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    
+                    var phone_num = 'N/A';
+                    if (phone_nums[i].childNodes.length > 0) {
+                        phone_num = phone_nums[i].childNodes[0].nodeValue;
                     }
-                    
-                    html = html + '<td class="date">' + modified_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    
-                    if (file_hashes[i].childNodes.length > 0) {
-                        html = html + '<td class="title"><span class="reupload"><a class="no_link" onClick="show_upload_resume_form(' + resume_id.childNodes[0].nodeValue + ');">Update File</a></span>&nbsp;<a href="resume.php?id=' + resume_id.childNodes[0].nodeValue + '&member=' + current_member_email_addr + '">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    } else {
-                        html = html + '<td class="title"><a class="no_link" onClick="show_resume_page(\'' + resume_id.childNodes[0].nodeValue + '\')">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    }
-                    
-                    html = html + '<td class="actions"><a class="no_link" onClick="show_refer_now_form(\'' + resume_id.childNodes[0].nodeValue + '\')">Refer Now</a></td>' + "\n";
+                    html = html + '<td class="candidate"><a href="mailto: ' + id + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_num + '<br/><strong>E-mail:</strong> ' + id + '</div></td>' + "\n";
+                    html = html + '<td class="actions"><a href="resumes_privileged.php?candidate=' + id + '">View Profile &amp; Resumes</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
                 html = html + '</table>';
             }
             
-            $('div_resumes_list').set('html', html);
+            $('div_candidates_list').set('html', html);
             set_status('');
         },
         onRequest: function(instance) {
-            set_status('Loading resumes...');
+            set_status('Loading candidates...');
         }
     });
     
@@ -500,20 +529,6 @@ function set_mouse_events() {
             'text-decoration': 'none'
         });
     });
-    
-    // $('li_back_2').addEvent('mouseover', function() {
-    //     $('li_back_2').setStyles({
-    //         'color': '#FF0000',
-    //         'text-decoration': 'underline'
-    //     });
-    // });
-    // 
-    // $('li_back_2').addEvent('mouseout', function() {
-    //     $('li_back_2').setStyles({
-    //         'color': '#000000',
-    //         'text-decoration': 'none'
-    //     });
-    // });
 }
 
 function onDomReady() {
@@ -522,9 +537,8 @@ function onDomReady() {
     
     $('li_back').addEvent('click', show_recommenders);
     $('li_back_1').addEvent('click', show_recommenders);
-    // $('li_back_2').addEvent('click', show_current_candidate_resumes);
     $('li_profile').addEvent('click', show_current_recommender_profile);
-    // $('li_resumes').addEvent('click', show_current_candidate_resumes);
+    $('li_candidates').addEvent('click', show_current_recommender_candidates);
     
     $('add_new_recommender').addEvent('click', show_new_recommender_form);
     $('add_new_recommender_1').addEvent('click', show_new_recommender_form);
@@ -543,7 +557,19 @@ function onDomReady() {
         ascending_or_descending();
         show_recommenders();
     });
-        
+    
+    $('sort_joined_on').addEvent('click', function() {
+        candidates_order_by = 'joined_on';
+        candidates_ascending_or_descending();
+        show_current_recommender_candidates();
+    });
+    
+    $('sort_candidate').addEvent('click', function() {
+        candidates_order_by = 'lastname';
+        candidates_ascending_or_descending();
+        show_current_recommender_candidates();
+    });
+    
     show_recommenders();
 }
 

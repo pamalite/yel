@@ -26,10 +26,11 @@ class PrsPrivilegedResumesPage extends Page {
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/prs_privileged_resumes.js"></script>'. "\n";
     }
     
-    public function insert_inline_scripts() {
+    public function insert_inline_scripts($_candidate_id = '') {
         echo '<script type="text/javascript">'. "\n";
         echo 'var id = "'. $this->employee->id(). '";'. "\n";
         echo 'var user_id = "'. $this->employee->get_user_id(). '";'. "\n";
+        echo 'var candidate_id = "'. $_candidate_id. '";'. "\n";
         echo '</script>'. "\n";
     }
     
