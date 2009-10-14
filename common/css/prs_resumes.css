@@ -122,7 +122,7 @@ td.candidate {
     width: 350px;
 }
 
-td.contact_data {
+td.country, td.zip {
     width: 250px;
 }
 

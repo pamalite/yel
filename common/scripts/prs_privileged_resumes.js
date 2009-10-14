@@ -514,6 +514,7 @@ function set_mouse_events() {
 
 function onDomReady() {
     set_root();
+    list_available_industries('0');
     set_mouse_events();
     
     $('li_back').addEvent('click', show_candidates);

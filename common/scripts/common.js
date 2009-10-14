@@ -768,10 +768,10 @@ function verify_mini() {
 }
 
 function prs_verify_mini() {
-    if ($('mini_keywords').value == '') {
-        alert('Please enter some keywords in order to do a search.');
-        return false;
-    }
+    // if ($('mini_keywords').value == '') {
+    //     alert('Please enter some keywords in order to do a search.');
+    //     return false;
+    // }
     
     return true;
 }
@@ -809,3 +809,45 @@ function update_word_count_of(_counter_id, _field_id) {
     }
 }
 
+function list_available_industries(_industry) {
+    var params = 'id=0&action=get_available_industries';
+    
+    var uri = root + "/prs/search_resume_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            var ids = xml.getElementsByTagName('id');
+            var industries = xml.getElementsByTagName('industry_name');
+            
+            var html = '<select id="mini_industry" name="industry" onChange="refresh_search();">' + "\n";
+            
+            if (_industry == '0' || isEmpty(_industry)) {
+                html = html + '<option value="0" selected>all specializations</option>' + "\n";
+            } else {
+                html = html + '<option value="0">all specializations</option>' + "\n";
+            }
+            
+            html = html + '<option value="-1" disabled>&nbsp;</option>' + "\n";
+            for (var i=0; i < ids.length; i++) {
+                var id = ids[i].childNodes[0].nodeValue;
+                var industry = industries[i].childNodes[0].nodeValue;
+                
+                if (id == _industry) {
+                    html = html + '<option value="'+ id + '" selected>' + industry + '</option>' + "\n";
+                } else {
+                    html = html + '<option value="'+ id + '">' + industry + '</option>' + "\n";
+                }
+            }
+            
+            html = html + '</select>' + "\n";
+            
+            $('mini_industry_drop_down').set('html', html);
+        },
+        onRequest: function(instance) {
+            $('mini_industry_drop_down').set('html', 'Loading specializations...');
+        }
+    });
+    
+    request.send(params);
+}

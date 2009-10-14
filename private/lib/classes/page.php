@@ -252,9 +252,9 @@ class Page {
                 </tr>
                 <tr>
                     <td>
-                        <form method="post" action="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/resume_search.php" onSubmit="return prs_verify_mini();">
+                        <form method="post" action="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/search_resume.php" onSubmit="return prs_verify_mini();">
                             <div class="mini_search">
-                                Resume Keywords: 
+                                <span id="mini_industry_drop_down"></span>
                                 &nbsp;
                                 <input type="text" name="keywords" id="mini_keywords">
                                 &nbsp;

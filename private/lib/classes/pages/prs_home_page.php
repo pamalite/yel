@@ -23,7 +23,7 @@ class PRSHomePage extends Page {
     public function insert_prs_home_scripts() {
         $this->insert_scripts();
         
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_home_page.js"></script>'. "\n";
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/prs_home_page.js"></script>'. "\n";
     }
     
     public function insert_inline_scripts() {

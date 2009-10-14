@@ -2,6 +2,8 @@ var selected_tab = 'li_profile';
 var order_by = 'members.joined_on';
 var order = 'desc';
 var filter = '0';
+var filter_country = '';
+var filter_zip = '';
 var resumes_order_by = 'modified_on';
 var resumes_order = 'desc';
 
@@ -64,6 +66,8 @@ function update_filter() {
 
 function refresh_candidates() {
     filter = $('candidate_filter').options[$('candidate_filter').selectedIndex].value;
+    filter_country = $('country_filter').options[$('country_filter').selectedIndex].value;
+    filter_zip = $('zip_filter').options[$('zip_filter').selectedIndex].value;
     show_candidates();
 }
 
@@ -73,6 +77,8 @@ function show_candidates() {
     
     var params = 'id=' + id + '&order_by=' + order_by + ' ' + order;
     params = params + '&filter_by=' + filter;
+    params = params + '&filter_country_by=' + filter_country;
+    params = params + '&filter_zip_by=' + filter_zip;
     
     update_filter();
     
@@ -94,15 +100,17 @@ function show_candidates() {
                 var members = xml.getElementsByTagName('member_name');
                 var phone_nums = xml.getElementsByTagName('phone_num');
                 var joined_ons = xml.getElementsByTagName('formatted_joined_on');
+                var countries = xml.getElementsByTagName('country');
+                var zips = xml.getElementsByTagName('zip');
                 
                 for (var i=0; i < email_addrs.length; i++) {
                     var id = email_addrs[i].childNodes[0].nodeValue;
                     
                     html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                     html = html + '<td class="date">' + joined_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="candidate"><a href="mailto: ' + id + '">' + members[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="contact_data">' + phone_nums[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="contact_data">' + id + '</td>' + "\n";
+                    html = html + '<td class="candidate"><a href="mailto: ' + id + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + id + '</div></td>' + "\n";
+                    html = html + '<td class="country">' + countries[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="zip">' + zips[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="actions"><a class="no_link" onClick="show_profile(\'' + id + '\');">View Profile &amp; Resumes</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
@@ -325,6 +333,7 @@ function set_mouse_events() {
 
 function onDomReady() {
     set_root();
+    list_available_industries('0');
     set_mouse_events();
     
     $('li_back').addEvent('click', show_candidates);
@@ -343,6 +352,18 @@ function onDomReady() {
         show_candidates();
     });
     
+    $('sort_country').addEvent('click', function() {
+        order_by = 'countries.country';
+        ascending_or_descending();
+        show_candidates();
+    });
+    
+    $('sort_zip').addEvent('click', function() {
+        order_by = 'members.zip';
+        ascending_or_descending();
+        show_candidates();
+    });
+    
     $('sort_resumes_label').addEvent('click', function() {
         resumes_order_by = 'name';
         resumes_ascending_or_descending();
@@ -355,7 +376,11 @@ function onDomReady() {
         show_current_candidate_resumes();
     });
     
-    show_candidates();
+    if (!isEmpty(candidate_id)) {
+        show_profile(candidate_id);
+    } else {
+        show_candidates();
+    }
 }
 
 window.addEvent('domready', onDomReady);

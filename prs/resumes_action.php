@@ -24,16 +24,44 @@ if (!isset($_POST['action'])) {
             $filter = $_POST['filter_by'];
         }
     }
+    
+    $filter_country = '';
+    if (isset($_POST['filter_country_by'])) {
+        if (!empty($_POST['filter_country_by'])) {
+            $filter_country = $_POST['filter_country_by'];
+        }
+    }
+    
+    $filter_zip = '';
+    if (isset($_POST['filter_zip_by'])) {
+        if (!empty($_POST['filter_zip_by'])) {
+            $filter_zip = $_POST['filter_zip_by'];
+        }
+    }
+    
     $query = "SELECT DISTINCT members.email_addr AS email_addr, members.phone_num AS phone_num, 
+              members.zip, countries.country, 
               CONCAT(members.firstname, ', ', members.lastname) AS member_name, 
               DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on 
               FROM members
               LEFT JOIN industries AS primary_industries ON primary_industries.id = members.primary_industry 
               LEFT JOIN industries AS secondary_industries ON secondary_industries.id = members.secondary_industry 
-              WHERE (members.added_by IS NULL OR members.added_by = '') ";
+              LEFT JOIN countries ON countries.country_code = members.country 
+              WHERE (members.added_by IS NULL OR members.added_by = '') AND 
+              (members.zip IS NOT NULL AND members.zip <> '') ";
+    
     if (!empty($filter)) {
         $query .= "AND (members.primary_industry = ". $filter. " OR members.secondary_industry = ". $filter. ") ";
     }
+    
+    if (!empty($filter_country)) {
+        $query .= "AND members.country = '". $filter_country. "' ";
+    }
+    
+    if (!empty($filter_zip)) {
+        $query .= "AND members.zip = '". $filter_zip. "' ";
+    }
+    
     $query .= "ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
