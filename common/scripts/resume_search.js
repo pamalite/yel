@@ -94,8 +94,6 @@ function show_resumes() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            set_status('<pre>' + txt + '</pre>');
-            return;
             if (txt == 'ko') {
                 set_status('An error occured while searching resumes.');
                 return false;
@@ -150,15 +148,22 @@ function show_resumes() {
             for (var i=0; i < ids.length; i++) {
                 var resume_id = ids[i].childNodes[0].nodeValue;
                 
-                html = html + '<tr id="'+ job_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
+                html = html + '<tr id="'+ resume_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                 html = html + '<td class="match_percentage"><img src="' + root + '/common/images/match_bar.jpg" style="height: 4px; width: ' + Math.floor(matches[i].childNodes[0].nodeValue / 100 * 50) + 'px; vertical-align: middle;" /></td>' + "\n";
                 html = html + '<td class="date">' + joined_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                 html = html + '<td class="member"><a href="mailto:' + email_addrs[i].childNodes[0].nodeValue + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + email_addrs[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                 html = html + '<td class="industry">' + primary_industries[i].childNodes[0].nodeValue + '</td>' + "\n";
                 html = html + '<td class="industry">' + secondary_industries[i].childNodes[0].nodeValue + '</td>' + "\n";
+                
+                if (file_hashes[i].childNodes.length > 0) {
+                    html = html + '<td class="title"><span class="reupload"><a href="resume.php?id=' + resume_id + '&member=' + email_addrs[i].childNodes[0].nodeValue + '">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                } else {
+                    html = html + '<td class="title"><a class="no_link" onClick="show_resume_page(\'' + resume_id + '\')">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                }
+                
                 html = html + '<td class="country">' + countries[i].childNodes[0].nodeValue + '</td>' + "\n";
                 html = html + '<td class="country">' + zips[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '<td class="title"><a href="' + root + '/job/' + job_id + '">' + job_titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                
                 html = html + '</tr>' + "\n";
             }
             html = html + '</table>';

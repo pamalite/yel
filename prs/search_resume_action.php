@@ -50,8 +50,6 @@ if (!isset($_POST['action'])) {
     }
     
     $result = $resume_search->search_using($criteria);
-    echo $result;
-    exit();
     if ($result == 0) {
         echo "0";
         exit();
@@ -77,6 +75,10 @@ if (!isset($_POST['action'])) {
         $result[$i]['member'] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($row['member']))));
         $result[$i]['total_results'] = $total_results;
         $result[$i]['current_page'] = $current_page;
+        
+        if (is_null($result[$i]['zip']) || empty($result[$i]['zip'])) {
+            $result[$i]['zip'] = '0';
+        }
         
         if (is_null($result[$i]['primary_industry']) || empty($result[$i]['primary_industry'])) {
             $result[$i]['primary_industry'] = 'N/A';

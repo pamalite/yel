@@ -62,7 +62,7 @@ class ResumeSearch {
             $filter_country = "members.country = '". $this->country_code. "'";
         }
         
-        $query = "SELECT members.email_addr, members.zip, members.phone_num, members.added_by, 
+        $query = "SELECT DISTINCT members.email_addr, members.zip, members.phone_num, members.added_by, 
                   primary_industries.industry AS prime_industry, secondary_industries.industry AS second_industry, 
                   countries.country, resumes.id AS resume_id, resumes.name AS resume_label, 
                   resumes.file_hash, resumes.file_name, 
@@ -141,7 +141,6 @@ class ResumeSearch {
         }
         
         $query = $this->make_query();
-        return $query;
         $mysqli = Database::connect();
         $result = $mysqli->query($query);
         if (!is_null($result) && !empty($result)) {
