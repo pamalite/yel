@@ -79,6 +79,14 @@ function go_to_page() {
     show_resumes();
 }
 
+function show_resume_page(resume_id) {
+    var popup = window.open('../employees/resume.php?id=' + resume_id, '', 'scrollbars');
+    
+    if (!popup) {
+        alert('Popup blocker was detected. Please allow pop-up windows for YellowElevator.com and try again.');
+    }
+}
+
 function show_resumes() {
     $('div_search_results').setStyle('display', 'block');
     
