@@ -84,12 +84,12 @@ if (!isset($_POST['action'])) {
             $result[$i]['zip'] = '0';
         }
         
-        if (is_null($result[$i]['primary_industry']) || empty($result[$i]['primary_industry'])) {
-            $result[$i]['primary_industry'] = 'N/A';
+        if (is_null($result[$i]['prime_industry']) || empty($result[$i]['prime_industry'])) {
+            $result[$i]['prime_industry'] = 'N/A';
         }
         
-        if (is_null($result[$i]['secondary_industry']) || empty($result[$i]['secondary_industry'])) {
-            $result[$i]['secondary_industry'] = 'N/A';
+        if (is_null($result[$i]['second_industry']) || empty($result[$i]['second_industry'])) {
+            $result[$i]['second_industry'] = 'N/A';
         }
     }
 

@@ -207,8 +207,8 @@ function show_resumes() {
             var ids = xml.getElementsByTagName('resume_id');
             var matches = xml.getElementsByTagName('match_percentage');
             var members = xml.getElementsByTagName('member');
-            var primary_industries = xml.getElementsByTagName('primary_industry');
-            var secondary_industries = xml.getElementsByTagName('secondary_industry');
+            var primary_industries = xml.getElementsByTagName('prime_industry');
+            var secondary_industries = xml.getElementsByTagName('second_industry');
             var countries = xml.getElementsByTagName('country');
             var zips = xml.getElementsByTagName('zip');
             var email_addrs = xml.getElementsByTagName('email_addr');
