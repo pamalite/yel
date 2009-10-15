@@ -29,7 +29,7 @@ function show_pagination_dropdown() {
 }
 
 function show_limit_dropdown() {
-    var html = '<select id="limit_dropdown" name="limit" onChange="filter_jobs();">' + "\n";
+    var html = '<select id="limit_dropdown" name="limit" onChange="filter_resumes();">' + "\n";
     for (var i = 5; i <= 50; i += 5) {
         if (i == limit) {
             html = html + '<option value="' + i + '" selected>' + i + '</option>' + "\n";
@@ -43,8 +43,8 @@ function show_limit_dropdown() {
 }
 
 function filter_resumes() {
-    $('industry_dropdown').selectedIndex = industry;
-    $('country_dropdown').selectedIndex = country_code;
+    // $('industry_dropdown').selectedIndex = industry;
+    // $('country_dropdown').selectedIndex = country_code;
     
     industry = $('industry_dropdown').options[$('industry_dropdown').selectedIndex].value;
     country_code = $('country_dropdown').options[$('country_dropdown').selectedIndex].value;
@@ -85,6 +85,92 @@ function show_resume_page(resume_id) {
     if (!popup) {
         alert('Popup blocker was detected. Please allow pop-up windows for YellowElevator.com and try again.');
     }
+}
+
+function list_industries_filter(_industry) {
+    var params = 'id=0&action=get_available_industries';
+    
+    var uri = root + "/prs/search_resume_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            var ids = xml.getElementsByTagName('id');
+            var industries = xml.getElementsByTagName('industry_name');
+            
+            var html = '<select id="industry_dropdown" name="industry_dropdown" onChange="filter_resumes();">' + "\n";
+            
+            if (_industry == '0' || isEmpty(_industry)) {
+                html = html + '<option value="0" selected>all specializations</option>' + "\n";
+            } else {
+                html = html + '<option value="0">all specializations</option>' + "\n";
+            }
+            
+            html = html + '<option value="-1" disabled>&nbsp;</option>' + "\n";
+            for (var i=0; i < ids.length; i++) {
+                var id = ids[i].childNodes[0].nodeValue;
+                var industry = industries[i].childNodes[0].nodeValue;
+                
+                if (id == _industry) {
+                    html = html + '<option value="'+ id + '" selected>' + industry + '</option>' + "\n";
+                } else {
+                    html = html + '<option value="'+ id + '">' + industry + '</option>' + "\n";
+                }
+            }
+            
+            html = html + '</select>' + "\n";
+            
+            $('filter_industry_dropdown').set('html', html);
+        },
+        onRequest: function(instance) {
+            $('filter_industry_dropdown').set('html', 'Loading specializations...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function list_countries_filter(_country) {
+    var params = 'id=0&action=get_available_countries';
+    
+    var uri = root + "/prs/search_resume_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            var ids = xml.getElementsByTagName('country_code');
+            var countries = xml.getElementsByTagName('country_name');
+            
+            var html = '<select id="country_dropdown" name="country_dropdown" onChange="filter_resumes();">' + "\n";
+            
+            if (isEmpty(_country)) {
+                html = html + '<option value="" selected>all countries</option>' + "\n";
+            } else {
+                html = html + '<option value="">all countries</option>' + "\n";
+            }
+            
+            html = html + '<option value="-1" disabled>&nbsp;</option>' + "\n";
+            for (var i=0; i < ids.length; i++) {
+                var id = ids[i].childNodes[0].nodeValue;
+                var country = countries[i].childNodes[0].nodeValue;
+                
+                if (id == _country) {
+                    html = html + '<option value="'+ id + '" selected>' + country + '</option>' + "\n";
+                } else {
+                    html = html + '<option value="'+ id + '">' + country + '</option>' + "\n";
+                }
+            }
+            
+            html = html + '</select>' + "\n";
+            
+            $('filter_country_dropdown').set('html', html);
+        },
+        onRequest: function(instance) {
+            $('filter_country_dropdown').set('html', 'Loading countries...');
+        }
+    });
+    
+    request.send(params);
 }
 
 function show_resumes() {
@@ -159,14 +245,19 @@ function show_resumes() {
                 html = html + '<tr id="'+ resume_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                 html = html + '<td class="match_percentage"><img src="' + root + '/common/images/match_bar.jpg" style="height: 4px; width: ' + Math.floor(matches[i].childNodes[0].nodeValue / 100 * 50) + 'px; vertical-align: middle;" /></td>' + "\n";
                 html = html + '<td class="date">' + joined_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '<td class="member"><a href="mailto:' + email_addrs[i].childNodes[0].nodeValue + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + email_addrs[i].childNodes[0].nodeValue + '</div></td>' + "\n";
+                
+                var link = 'resumes_privileged.php?candidate=' + email_addrs[i].childNodes[0].nodeValue;
+                if (added_bys[i].childNodes[0].nodeValue == '-1') {
+                    link = 'resumes.php?candidate=' + email_addrs[i].childNodes[0].nodeValue;
+                }
+                html = html + '<td class="member"><a href="' + link + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + email_addrs[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                 html = html + '<td class="industry">' + primary_industries[i].childNodes[0].nodeValue + '</td>' + "\n";
                 html = html + '<td class="industry">' + secondary_industries[i].childNodes[0].nodeValue + '</td>' + "\n";
                 
                 if (file_hashes[i].childNodes.length > 0) {
                     html = html + '<td class="title"><span class="reupload"><a href="resume.php?id=' + resume_id + '&member=' + email_addrs[i].childNodes[0].nodeValue + '">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                 } else {
-                    html = html + '<td class="title"><a class="no_link" onClick="show_resume_page(\'' + resume_id + '\')">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="label"><a class="no_link" onClick="show_resume_page(\'' + resume_id + '\')">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                 }
                 
                 html = html + '<td class="country">' + countries[i].childNodes[0].nodeValue + '</td>' + "\n";
@@ -190,10 +281,10 @@ function show_resumes() {
             show_limit_dropdown();
             set_status('');
             
-            // if (changed_country_code[0].childNodes[0].nodeValue == '1') {
-            //     country_code = '';
-            //     list_countries_in('', 'filter_country_dropdown', 'country_dropdown', 'country_dropdown', true, 'filter_jobs();');
-            // }
+            if (changed_country_code[0].childNodes[0].nodeValue == '1') {
+                country_code = '';
+                list_countries_filter(country_code);
+            }
         },
         onRequest: function(instance) {
             set_status('Searching resumes...');
@@ -202,8 +293,8 @@ function show_resumes() {
     
     request.send(params);
     
-    // list_industries_in(industry, 'filter_industry_dropdown', 'industry_dropdown', 'industry_dropdown', true, 'filter_jobs();');
-    // list_countries_in(country_code, 'filter_country_dropdown', 'country_dropdown', 'country_dropdown', true, 'filter_jobs();');
+    list_industries_filter(industry);
+    list_countries_filter(country_code);
 }
 
 function onDomReady() {

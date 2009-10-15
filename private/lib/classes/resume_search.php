@@ -91,8 +91,8 @@ class ResumeSearch {
        }
        
        $query .= $filter_resume_status. " 
-                  AND ". $filter_industry. " 
-                  AND ". $filter_country. " ";
+                  AND (". $filter_industry. ") 
+                  AND (". $filter_country. ") ";
         
         if ($with_limit) {
             $query .= "ORDER BY ". $this->order_by. " 

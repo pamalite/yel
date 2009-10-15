@@ -27,7 +27,7 @@ class PrsResumeSearchPage extends Page {
         $this->insert_scripts();
         
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/list_box.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/resume_search.js"></script>'. "\n";
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/prs_resume_search.js"></script>'. "\n";
     }
     
     public function insert_inline_scripts() {
@@ -44,44 +44,6 @@ class PrsResumeSearchPage extends Page {
         $offset = (isset($this->criterias['offset'])) ? $this->criterias['offset'] : 0;
         echo 'var offset = "'. $offset. '";'. "\n";
         echo '</script>'. "\n";
-    }
-    
-    private function generateCountryFilters() {
-        $mysqli = Database::connect();
-        $query = "SELECT DISTINCT countries.country_code AS id, countries.country 
-                  FROM members 
-                  LEFT JOIN countries ON countries.country_code = members.country 
-                  ORDER BY countries.country";
-        $result = $mysqli->query($query);
-        
-        echo '<select id="country_filter" name="country_filter" onChange="refresh_candidates();">'. "\n";
-        echo '<option value="">all countries</option>'. "\n";
-        echo '<option value="" disabled>&nbsp;</option>'. "\n";
-        
-        foreach ($result as $row) {
-            echo '<option value="'. $row['id']. '">'. $row['country']. '</option>'. "\n";
-        }
-        
-        echo '</select>'. "\n";
-    }
-    
-    private function generateZipFilters() {
-        $mysqli = Database::connect();
-        $query = "SELECT DISTINCT zip 
-                  FROM members 
-                  WHERE zip IS NOT NULL AND zip <> '' 
-                  ORDER BY zip";
-        $result = $mysqli->query($query);
-        
-        echo '<select id="zip_filter" name="zip_filter" onChange="refresh_candidates();">'. "\n";
-        echo '<option value="">all areas</option>'. "\n";
-        echo '<option value="" disabled>&nbsp;</option>'. "\n";
-        
-        foreach ($result as $row) {
-            echo '<option value="'. $row['zip']. '">'. $row['zip']. '</option>'. "\n";
-        }
-        
-        echo '</select>'. "\n";
     }
     
     public function show() {
@@ -107,7 +69,7 @@ class PrsResumeSearchPage extends Page {
                     <td class="member"><span class="sort" id="sort_member">Candidate</span></td>
                     <td class="industry"><span class="sort" id="sort_primary_industry">Specialization 1</span></td>
                     <td class="industry"><span class="sort" id="sort_secondary_industry">Specialization 2</span></td>
-                    <td class="title"><span class="sort" id="sort_title">Resume</span></td>
+                    <td class="label"><span class="sort" id="sort_title">Resume</span></td>
                     <td class="country"><span class="sort" id="sort_country">Country</span></td>
                     <td class="zip"><span class="sort" id="sort_zip">Zip</span></td>
                 </tr>

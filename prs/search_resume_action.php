@@ -76,6 +76,10 @@ if (!isset($_POST['action'])) {
         $result[$i]['total_results'] = $total_results;
         $result[$i]['current_page'] = $current_page;
         
+        if (is_null($result[$i]['added_by']) || empty($result[$i]['added_by'])) {
+            $result[$i]['added_by'] = '-1';
+        }
+        
         if (is_null($result[$i]['zip']) || empty($result[$i]['zip'])) {
             $result[$i]['zip'] = '0';
         }
@@ -113,12 +117,31 @@ if ($_POST['action'] == 'get_available_industries') {
     
     $industries = array();
     foreach ($result as $i=>$row) {
-        $filters[$i]['id'] = $row['id'];
-        $filters[$i]['industry_name'] = $row['industry'];
+        $industries[$i]['id'] = $row['id'];
+        $industries[$i]['industry_name'] = $row['industry'];
     }
     
     header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array(array('industries' => array('industry' => $filters)));
+    echo $xml_dom->get_xml_from_array(array('industries' => array('industry' => $industries)));
+    exit();
+}
+
+if ($_POST['action'] == 'get_available_countries') {
+    $mysqli = Database::connect();
+    $query = "SELECT DISTINCT countries.country_code AS id, countries.country 
+              FROM members 
+              LEFT JOIN countries ON countries.country_code = members.country 
+              ORDER BY countries.country";
+    $result = $mysqli->query($query);
+    
+    $countries = array();
+    foreach ($result as $i=>$row) {
+        $countries[$i]['country_code'] = $row['id'];
+        $countries[$i]['country_name'] = $row['country'];
+    }
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('countries' => array('country' => $countries)));
     exit();
 }
 ?>

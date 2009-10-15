@@ -202,3 +202,24 @@ table.job_info div.job_description {
     font-size: 7pt;
     font-weight: bold;
 }
+
+/* For PRS search -start- */
+td.member {
+    width: 250px;
+}
+
+td.industry, td.label {
+    width: 170px;
+}
+
+td.zip {
+    width: 100px;
+}
+
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+/* For PRS search -stop- */
