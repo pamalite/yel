@@ -86,6 +86,7 @@ if ($_POST['action'] == 'upload') {
     $data = array();
     $data['modified_on'] = now();
     $data['name'] = $_FILES['my_file']['name'];
+    $data['private'] = 'N';
     
     if ($_POST['id'] == '0') {
         $resume = new Resume($_POST['member']);
