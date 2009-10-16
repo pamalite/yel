@@ -102,16 +102,16 @@ if (!isset($_POST['action'])) {
 if ($_POST['action'] == 'get_available_industries') {
     $mysqli = Database::connect();
     $query = "SELECT DISTINCT industries.id, industries.industry FROM 
-              (SELECT DISTINCT primary_industry AS industry 
+              (SELECT email_addr, primary_industry AS industry 
                FROM members 
-               WHERE primary_industry IS NOT NULL AND 
-               (added_by IS NULL OR added_by = '') 
+               WHERE primary_industry IS NOT NULL 
                UNION 
-               SELECT DISTINCT secondary_industry 
+               SELECT email_addr, secondary_industry 
                FROM members 
-               WHERE secondary_industry IS NOT NULL AND 
-               (added_by IS NULL OR added_by = '')) AS member_industry 
+               WHERE secondary_industry IS NOT NULL) AS member_industry 
               LEFT JOIN industries ON industries.id = member_industry.industry 
+              LEFT JOIN resumes ON resumes.member = member_industry.email_addr 
+              WHERE resumes.private = 'N' 
               ORDER BY industries.industry";
     $result = $mysqli->query($query);
     
@@ -131,6 +131,8 @@ if ($_POST['action'] == 'get_available_countries') {
     $query = "SELECT DISTINCT countries.country_code AS id, countries.country 
               FROM members 
               LEFT JOIN countries ON countries.country_code = members.country 
+              LEFT JOIN resumes ON resumes.member = members.email_addr 
+              WHERE resumes.private = 'N' 
               ORDER BY countries.country";
     $result = $mysqli->query($query);
     
