@@ -81,7 +81,7 @@ $data['active'] = 'N';
 $data['invites_available'] = '10';
 
 if ($data['like_newsletter'] == 'Y') {
-    $data['filte_jobs'] = 'Y';
+    $data['filter_jobs'] = 'Y';
 }
 
 if (!$inactive) {

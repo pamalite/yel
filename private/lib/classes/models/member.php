@@ -218,9 +218,9 @@ class Member {
         }
         
         if ($i == 0) {
-            $query .= "email_addr = '". $this->id. "'";
+            $query .= "`email_addr` = '". $this->id. "'";
         } else {
-            $query .= ", email_addr = '". $this->id. "'";
+            $query .= ", `email_addr` = '". $this->id. "'";
         }
         
         if ($this->mysqli->execute($query)) {
@@ -270,7 +270,7 @@ class Member {
             $i++;
         }
     
-        $query .= "WHERE email_addr = '". $this->id. "'";
+        $query .= "WHERE `email_addr` = '". $this->id. "'";
         if ($this->mysqli->execute($query)) {
             if ($password_updated && !$_new_member) {
                 return $this->session_reset($data['password']);
