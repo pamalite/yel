@@ -67,7 +67,7 @@ if (!isset($_POST['action'])) {
                   referral_requests.member AS candidate_id, referral_requests.requested_on, 
                   CONCAT(members.lastname, ', ', members.firstname) AS candidate, jobs.description, 
                   DATE_FORMAT(referral_requests.requested_on, '%e %b, %Y') AS formatted_requested_on, 
-                  '1' AS is_request 
+                  '1' AS is_request, referral_requests.referrer_read_resume_on AS read_resume 
                   FROM referral_requests 
                   LEFT JOIN jobs ON jobs.id = referral_requests.job 
                   LEFT JOIN employers ON employers.id = jobs.employer 
