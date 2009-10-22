@@ -163,7 +163,6 @@ if ($_POST['action'] == 'save') {
         $data['salary_end'] = 'NULL';
     }
     $data['potential_reward'] = Job::calculate_potential_reward_from($salary_end, $_POST['employer']);
-    $data['potential_token_reward'] = $data['potential_reward'] * 0.05;
     
     // Check whether employer's account is ready.
     if ($data['potential_reward'] <= 0) {
