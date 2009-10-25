@@ -2,7 +2,7 @@ var selected_tab = 'li_open';
 var order_by = 'jobs.created_on';
 var order = 'desc';
 
-var editor = new Editor();
+// var editor = new Editor();
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -60,9 +60,14 @@ function validate() {
         return false;
     }*/
     
-    if (isEmpty(editor.getValue())) {
+    // if (isEmpty(editor.getValue())) {
+    //     set_status('Description cannot be empty');
+    //     return false;
+    // }
+    
+    if (isEmpty(document.getElementById(rteFormName).value)) {
         set_status('Description cannot be empty');
-        return false;
+        return false;        
     }
     
     set_status('');
@@ -70,6 +75,10 @@ function validate() {
 }
 
 function save_job() {
+    // Must do this because the FreeRTE do not have a getValue() method to update the value
+    rteModeType('rte_preview_mode');
+    rteModeType('rte_design_mode');
+    
     if (!validate()) {
         return false;
     }
@@ -91,7 +100,8 @@ function save_job() {
     params = params + '&salary_end=' + $('salary_end').value;
     params = params + '&salary_negotiable=' + salary_negotiable;
     //params = params + '&description=' + encodeURIComponent($('description').value);
-    params = params + '&description=' + encodeURIComponent(editor.getValue());
+    // params = params + '&description=' + encodeURIComponent(editor.getValue());
+    params = params + '&description=' + encodeURIComponent(document.getElementById(rteFormName).value);
     params = params + '&resume_type=' + $('acceptable_resume_type').options[$('acceptable_resume_type').selectedIndex].value;
     
     var uri = root + "/employers/job_action.php";
@@ -121,6 +131,10 @@ function save_job() {
 }
 
 function publish_job() {
+    // Must do this because the FreeRTE do not have a getValue() method to update the value
+    rteModeType('rte_preview_mode');
+    rteModeType('rte_design_mode');
+    
     if (!validate()) {
         return false;
     }
@@ -151,7 +165,8 @@ function publish_job() {
     params = params + '&salary_end=' + salary_end;
     params = params + '&salary_negotiable=' + salary_negotiable;
     //params = params + '&description=' + encodeURIComponent($('description').value);
-    params = params + '&description=' + encodeURIComponent(editor.getValue());
+    // params = params + '&description=' + encodeURIComponent(editor.getValue());
+    params = params + '&description=' + encodeURIComponent($(rteFormName).value);
     params = params + '&resume_type=' + $('acceptable_resume_type').options[$('acceptable_resume_type').selectedIndex].value;
     
     var uri = root + "/employers/job_action.php";
@@ -390,6 +405,8 @@ function add_new_job() {
     $('div_open').setStyle('display', 'none');
     $('div_closed').setStyle('display', 'none');
     $('div_tabs').setStyle('display', 'none');
+    
+    startRTE('');
 }
 
 function new_from_job(job_id) {    
@@ -439,7 +456,8 @@ function new_from_job(job_id) {
             }
             
             //$('description').value = description[0].childNodes[0].nodeValue.replace(/<br\/>/g, "\n");
-            editor.setValue(description[0].childNodes[0].nodeValue);
+            // editor.setValue(description[0].childNodes[0].nodeValue);
+            startRTE(description[0].childNodes[0].nodeValue);
             
             if (salary_negotiable[0].childNodes[0].nodeValue == 'Y') {
                 $('salary_negotiable').checked = true;
@@ -531,7 +549,8 @@ function show_update_job(job_id) {
             }
             
             //$('description').value = description[0].childNodes[0].nodeValue.replace(/<br\/>/g, "\n");
-            editor.setValue(description[0].childNodes[0].nodeValue);
+            // editor.setValue(description[0].childNodes[0].nodeValue);
+            startRTE(description[0].childNodes[0].nodeValue);
             
             if (salary_negotiable[0].childNodes[0].nodeValue == 'Y') {
                 $('salary_negotiable').checked = true;
@@ -843,7 +862,7 @@ function onDomReady() {
     $('add_new_job_1').addEvent('click', add_new_job);
     $('close_all').addEvent('click', select_all_jobs);
     
-    editor.render($('description'));
+    // editor.render($('description'));
     
     $('li_back').addEvent('click', function() {
         $('div_open').setStyle('display', 'block');

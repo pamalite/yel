@@ -1,6 +1,17 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
 
+function replace_characters($_description) {
+    // Strip newline characters.
+    $_description = str_replace(chr(10), " ", $_description);
+    $_description = str_replace(chr(13), " ", $_description);
+    // Replace single quotes.
+    $_description = str_replace(chr(145), chr(39), $_description);
+    $_description = str_replace(chr(146), chr(39), $_description);
+    // Return the result.
+    return $_description;
+}
+
 session_start();
 
 if (!isset($_POST['job'])) {
@@ -30,6 +41,7 @@ if (!isset($_POST['action'])) {
         
         if ($key == 'description') {
             $job[$key] = htmlspecialchars_decode(html_entity_decode(desanitize($value)));
+            $job[$key] = replace_characters($job[$key]);
         } else if ($key == 'title') {
             $job[$key] = html_entity_decode(desanitize($value));
         }

@@ -21,7 +21,9 @@ class EmployerJobsPage extends Page {
     public function insert_employer_jobs_scripts() {
         $this->insert_scripts();
         
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/ggEdit.js"></script>'. "\n";
+        //echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/ggEdit.js"></script>'. "\n";
+        echo '<script src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/freerte/js/richtext.js" type="text/javascript" language="javascript"></script>';
+        echo '<script src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/freerte/js/config.js" type="text/javascript" language="javascript"></script>';
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employer_jobs.js"></script>'. "\n";
     }
     
@@ -192,8 +194,13 @@ class EmployerJobsPage extends Page {
                     <tr>
                         <td class="label"><label for="description">Description:</label></td>
                         <!--td class="field"><textarea id="description" name="description"></textarea></td-->
-                        <td class="field">
+                        <!--td class="field">
                             <div id="description" class="description_field">
+                            </div><br/><br/>
+                        </td-->
+                        <td class="field">
+                            <div id="description">
+                                <script>initRTE('', root + '/common/freerte/examples/example.css');</script>
                             </div><br/><br/>
                         </td>
                     </tr>
