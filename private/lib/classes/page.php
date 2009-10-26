@@ -319,7 +319,7 @@ class Page {
         <?php
         if (Employee::has_clearances_for('employers', $_clearances)) {
         ?>
-                <li <?php echo ($page == 'employers') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/employers.php">My Employers</a></li>
+                <li <?php echo ($page == 'employers') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/employers.php">Employers</a></li>
         <?php
         }
         ?>
@@ -366,7 +366,8 @@ class Page {
         ?>
         
         <?php
-        if (Employee::has_clearances_for('admin_employers', $_clearances)) {
+        if (Employee::has_clearances_for('admin_employers', $_clearances) && 
+            !Employee::has_clearances_for('employers', $_clearances)) {
         ?>
                 <li <?php echo ($page == 'admin_employers') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/admin_employers.php">Employers</a></li>
         <?php
@@ -382,11 +383,11 @@ class Page {
         ?>
         
         <?php
-        if (Employee::has_clearances_for('refer_requests', $_clearances)) {
+        //if (Employee::has_clearances_for('refer_requests', $_clearances)) {
         ?>
-                <li <?php echo ($page == 'refer_requests') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/refer_requests.php">Refer Requests</a></li>
+                <!--li <?php echo ($page == 'refer_requests') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/refer_requests.php">Refer Requests</a></li-->
         <?php
-        }
+        //}
         ?>
         
                 <li><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/logout.php">Logout</a></li>

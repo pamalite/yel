@@ -1,5 +1,5 @@
 var selected_tab = 'li_profile';
-var order_by = 'joined_on';
+var order_by = 'employers.joined_on';
 var order = 'desc';
 
 var copy_from_employer = '0';
@@ -180,6 +180,7 @@ function show_employers() {
             } else {
                 var ids = xml.getElementsByTagName('id');
                 var employers = xml.getElementsByTagName('name');
+                var created_bys = xml.getElementsByTagName('employee');
                 var joined_ons = xml.getElementsByTagName('formatted_joined_on');
                 var first_logins = xml.getElementsByTagName('formatted_first_login');
                 var is_actives = xml.getElementsByTagName('active');
@@ -198,6 +199,7 @@ function show_employers() {
                     
                     html = html + '<td class="user_id">' + employer_id + '</td>' + "\n";
                     html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="employer">' + created_bys[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="date">' + joined_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     
                     var first_login = '<span style="font-size: 7pt; color: #666666;">Pending...</span>';
@@ -1354,6 +1356,12 @@ function onDomReady() {
     
     $('sort_first_login').addEvent('click', function() {
         order_by = 'employer_sessions.first_login';
+        ascending_or_descending();
+        show_employers();
+    });
+    
+    $('sort_employee').addEvent('click', function() {
+        order_by = 'employees.lastname';
         ascending_or_descending();
         show_employers();
     });

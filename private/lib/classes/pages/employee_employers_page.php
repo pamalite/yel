@@ -55,6 +55,7 @@ class EmployeeEmployersPage extends Page {
                     <td class="checkbox"><input type="checkbox" id="deactivate_all" /></td>
                     <td class="user_id"><span class="sort" id="sort_user_id">User ID</span></td>
                     <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
+                    <td class="employer"><span class="sort" id="sort_employee">Created By</span></td>
                     <td class="date"><span class="sort" id="sort_joined_on">Joined On</span></td>
                     <td class="date"><span class="sort" id="sort_first_login">First Signed In On</span></td>
                     <td class="actions">&nbsp;</td>

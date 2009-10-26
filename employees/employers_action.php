@@ -19,11 +19,14 @@ if (!isset($_POST['action'])) {
     }
     
     $query = "SELECT employers.id, employers.name, employers.active, 
+              CONCAT(employees.firstname, ', ', employees.lastname) AS employee, 
               DATE_FORMAT(employers.joined_on, '%e %b, %Y') AS formatted_joined_on, 
               DATE_FORMAT(employer_sessions.first_login, '%e %b, %Y') AS formatted_first_login 
               FROM employers 
               LEFT JOIN employer_sessions ON employer_sessions.employer = employers.id 
-              WHERE employers.registered_by = ". $_POST['employee']. " 
+              LEFT JOIN employees ON employees.id = employers.registered_by 
+              LEFT JOIN branches ON employees.branch = branches.id 
+              WHERE branches.id = ". $_SESSION['yel']['employee']['branch']['id']. "
               ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
