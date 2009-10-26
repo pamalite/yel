@@ -117,6 +117,7 @@ function show_candidates() {
             } else {
                 var member_emails = xml.getElementsByTagName('member_email_addr');
                 var recommender_emails = xml.getElementsByTagName('recommender_email_addr');
+                var added_bys = xml.getElementsByTagName('employee');
                 var candidates = xml.getElementsByTagName('candidate_name');
                 var recommenders = xml.getElementsByTagName('recommender_name');
                 var candidate_phone_nums = xml.getElementsByTagName('member_phone_num');
@@ -128,6 +129,7 @@ function show_candidates() {
                     
                     html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                     html = html + '<td class="date">' + joined_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="date">' + added_bys[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="candidate"><a href="mailto: ' + id + '">' + candidates[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + candidate_phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + id + '</div></td>' + "\n";
                     
                     var phone_num = 'N/A';
@@ -533,6 +535,12 @@ function onDomReady() {
     
     $('sort_joined_on').addEvent('click', function() {
         order_by = 'members.joined_on';
+        ascending_or_descending();
+        show_candidates();
+    });
+    
+    $('sort_added_by').addEvent('click', function() {
+        order_by = 'employees.lastname';
         ascending_or_descending();
         show_candidates();
     });

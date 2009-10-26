@@ -113,6 +113,7 @@ class PrsPrivilegedResumesPage extends Page {
             <table class="header">
                 <tr>
                     <td class="date"><span class="sort" id="sort_joined_on">Added On</span></td>
+                    <td class="date"><span class="sort" id="sort_added_by">Added By</span></td>
                     <td class="candidate"><span class="sort" id="sort_candidate">Candidate</span></td>
                     <td class="candidate"><span class="sort" id="sort_recommender">Recommended By</span></td>
                     <td class="actions">&nbsp;</td>

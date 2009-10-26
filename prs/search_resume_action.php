@@ -146,4 +146,43 @@ if ($_POST['action'] == 'get_available_countries') {
     echo $xml_dom->get_xml_from_array(array('countries' => array('country' => $countries)));
     exit();
 }
+
+if ($_POST['action'] == 'save_to_mailing_list') {
+    $candidates = explode(',', $_POST['candidates']);
+    
+    if (!empty($candidates) && !is_null($candidates)) {
+        $mysqli = Database::connect();
+        $mailing_list_id = $_POST['id'];
+        
+        if ($mailing_list_id == 'new') {
+            $query = "INSERT INTO candidates_mailing_lists SET 
+                      label = '". $_POST['label']. "', 
+                      created_on = now(), 
+                      created_by = ". $_POST['employee'];
+            $mailing_list_id = $mysqli->execute($query, true);
+        }
+        
+        if ($mailing_list_id > 0) {
+            $has_problem = false;
+            foreach ($candidates as $candidate) {
+                $query = "INSERT INTO candidate_email_manifests SET 
+                          mailing_list = ". $_POST['id']. ", 
+                          email_addr = '". $candidate. "'";
+                if (!$mysqli->execute($query)) {
+                    $has_problem = true;
+                }
+            }
+
+            if ($has_problem) {
+                echo '-1';
+            } else {
+                echo '0';
+            }
+        } else {
+            echo 'ko';
+        }
+    }
+    
+    exit();
+}
 ?>

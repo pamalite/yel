@@ -25,8 +25,7 @@ if (!isset($_POST['action'])) {
               FROM employers 
               LEFT JOIN employer_sessions ON employer_sessions.employer = employers.id 
               LEFT JOIN employees ON employees.id = employers.registered_by 
-              LEFT JOIN branches ON employees.branch = branches.id 
-              WHERE branches.id = ". $_SESSION['yel']['employee']['branch']['id']. "
+              WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. "
               ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);

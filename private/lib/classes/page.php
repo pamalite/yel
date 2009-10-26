@@ -435,6 +435,14 @@ class Page {
         <?php
         }
         ?>
+    
+        <?php
+        if (Employee::has_clearances_for('prs_mailing_lists', $_clearances)) {
+        ?>
+                <li <?php echo ($page == 'mailing_lists') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/mailing_lists.php">Mailing Lists</a></li>
+        <?php
+        }
+        ?>
         
                 <li><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/logout.php">Logout</a></li>
             </ul>

@@ -19,6 +19,7 @@ if (!isset($_POST['action'])) {
     }
     
     $query = "SELECT members.email_addr AS member_email_addr, members.phone_num AS member_phone_num, 
+              CONCAT(employees.firstname, ', ', employees.lastname) AS employee, 
               CONCAT(members.firstname, ', ', members.lastname) AS candidate_name, 
               DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
               recommenders.email_addr AS recommender_email_addr, 
@@ -26,7 +27,9 @@ if (!isset($_POST['action'])) {
               CONCAT(recommenders.firstname, ', ', recommenders.lastname) AS recommender_name  
               FROM members
               LEFT JOIN recommenders ON recommenders.email_addr = members.recommender 
-              WHERE members.added_by = ". $_POST['id']. " 
+              LEFT JOIN employees ON members.added_by = employees.id 
+              WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " AND 
+              members.email_addr != 'initial@yellowelevator.com' 
               ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
