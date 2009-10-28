@@ -96,13 +96,20 @@ if ($_POST['action'] == 'rename_mailing_list') {
 }
 
 if ($_POST['action'] == 'get_candidates') {
+    $order_by = 'members.joined_on desc';
+    
+    if (isset($_POST['order_by'])) {
+        $order_by = $_POST['order_by'];
+    }
+    
     $mysqli = Database::connect();
     $query = "SELECT members.email_addr, members.phone_num, members.added_by, 
               CONCAT(members.firstname, ', ', members.lastname) AS candidate_name, 
               DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on 
               FROM candidate_email_manifests 
               LEFT JOIN members ON members.email_addr = candidate_email_manifests.email_addr 
-              WHERE candidate_email_manifests.mailing_list = ". $_POST['id'];
+              WHERE candidate_email_manifests.mailing_list = ". $_POST['id']. " 
+              ORDER BY ". $order_by;
     $result = $mysqli->query($query);
     
     if (count($result) <= 0 || is_null($result)) {
@@ -136,6 +143,37 @@ if ($_POST['action'] == 'remove_candidate') {
         echo 'ko';
     }
     
+    exit();
+}
+
+if ($_POST['action'] == 'send_email_to_list') {
+    $message = sanitize($_POST['message']);
+    
+    $mysqli = Database::connect();
+    
+    $query = "SELECT email_addr, CONCAT(firstname, ', ', lastname) AS employee 
+              FROM employees WHERE id = ". $_POST['employee']. " LIMIT 1";
+    $result = $mysqli->query($query);
+    $employee['email_addr'] = $result[0]['email_addr'];
+    $employee['name'] = $result[0]['employee'];
+    
+    $query = "SELECT email_addr FROM candidate_email_manifests WHERE mailing_list = ". $_POST['id'];
+    $result = $mysqli->query($query);
+    
+    foreach ($result as $row) {
+        $email_addr = $row['email_addr'];
+        $subject = "A Message From YellowElevator.com";
+        $headers = 'From: '. $employee['name']. ' <'. $employee['email_addr']. '>' . "\n";
+        mail($row['email_addr'], $subject, $message, $headers);
+                    
+        // $handle = fopen('/tmp/email_to_'. $row['email_addr']. '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, 'Header: '. $headers. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
+    }
+    
+    echo '0';
     exit();
 }
 ?>

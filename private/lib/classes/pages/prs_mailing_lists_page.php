@@ -68,8 +68,15 @@ class PrsMailingListsPage extends Page {
         </div>
         
         <div id="div_candidates">
+            <div id="div_tabs">
+                <ul>
+                    <li class="back" id="li_back">&lt;&lt; Back to Mailing Lists</li>
+                </ul>
+            </div>
+            
             <div style="padding-top: 3px; padding-bottom: 10px; text-align: center;">
-                <span id="mailing_list_label" style="font-weight: bold;"></span>
+                <span id="mailing_list_label" style="font-weight: bold;"></span><br/><br/>
+                <a class="no_link" onClick="show_email_form();">Click here to send email message to this mailing list.</a>
             </div>
             <table class="header">
                 <tr>
@@ -82,6 +89,17 @@ class PrsMailingListsPage extends Page {
             </div>
         </div>
         
+        <div id="div_blanket"></div>
+        <div id="div_email_form">
+            <form onSubmit="retun false;">
+                <input type="hidden" id="mailing_list_id" name="mailing_list_id" value="0" />
+                <div style="text-align: center;">
+                    Enter an email message to <span id="list_label" style="font-weight: bold;"></span> in the following text field.<br/><br/>
+                    <textarea class="email_message" id="email_message" name="email_message"></textarea>
+                </div>
+                <p class="button"><input type="button" value="Cancel" onClick="close_email_form();" />&nbsp;<input type="button" value="Send Email" onClick="send_email_to_list();" /></p>
+            </form>
+        </div>
         <?php
     }
 }
