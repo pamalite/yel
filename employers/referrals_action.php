@@ -30,7 +30,7 @@ function get_suggested_candidates($_job_id, $_referral_id_only = false) {
               FROM referrals 
               LEFT JOIN resumes ON resumes.id = referrals.resume 
               WHERE referrals.job = ". $_job_id. " AND 
-              (resumes.deleted = 'N' resumes.private = 'N') AND 
+              (resumes.deleted = 'N' AND resumes.private = 'N') AND 
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
               (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
               -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
