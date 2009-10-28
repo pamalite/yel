@@ -321,7 +321,7 @@ function refer() {
         
         from = 'email'; 
     } else {
-        candidate = candidates_list.selected_value
+        candidate = candidates_list.selected_value;
     }
     
     var testimony = answer_1 + '<br/>' + answer_2 + '<br/>' + answer_3;

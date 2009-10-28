@@ -1,0 +1,89 @@
+td.action {
+    text-align: center;
+    width: 20px;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_email_add_form {
+    display: none;
+    background-color: #FFFFFF;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 675px;
+    height: 400px;
+    overflow: auto;
+}
+
+#div_email_add_form table.email_add_form {
+    width: 95%;
+    margin: auto;
+}
+
+#div_email_add_form table.email_add_form td.separator {
+    width: 1px;
+    border-left: 1px solid #CCCCCC;
+    /*background-color: #CCCCCC;*/
+}
+
+#div_email_add_form table.email_add_form td {
+    vertical-align: top;
+    font-size: 10pt;
+}
+
+#div_email_add_form table.email_add_form td.right {
+    width: 50%;
+}
+
+#div_email_add_form input.mini_field {
+    width: 99%;
+}
+
+#div_email_add_form table.lists_form {
+    width: 95%;
+    margin: auto;
+}
+
+#div_email_add_form div.mailing_lists {
+    width: 100%;
+    height: 295px;
+    overflow: auto;
+    border: 1px solid #CCCCCC;
+}
+
+#div_email_add_form p {
+    font-size: 10pt;
+    margin: 3px 3px 3px 3px;
+}
+
+#div_email_add_form p.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+    background-color: #CCCCCC;
+}
+
+#div_email_add_form span.filter {
+    font-size: 7pt;
+    font-weight: bold;
+}
+
+#div_email_add_form table.lists_form td.radio {
+    width: 5px;
+}
+
+#div_email_add_form table.email_add_form textarea  {
+    width: 98%;
+    height: 290px;
+}

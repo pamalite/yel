@@ -21,6 +21,7 @@ class PrsResumeSearchPage extends Page {
         
         echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/list_box.css">'. "\n";
         echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/search.css">'. "\n";
+        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/prs_search_resumes.css">'. "\n";
     }
     
     public function insert_resume_search_scripts() {
@@ -72,6 +73,7 @@ class PrsResumeSearchPage extends Page {
                     <td class="label"><span class="sort" id="sort_title">Resume</span></td>
                     <td class="country"><span class="sort" id="sort_country">Country</span></td>
                     <td class="zip"><span class="sort" id="sort_zip">Zip</span></td>
+                    <td class="action">&nbsp;</td>
                 </tr>
             </table>
             <div id="div_list">
@@ -79,6 +81,43 @@ class PrsResumeSearchPage extends Page {
             <div class="page_navigation">
                 <span id="previous_page_1"></span>&nbsp;&nbsp;&nbsp;Page <span id="current_page_1"></span> of <span id="total_page_1"></span>&nbsp;&nbsp;&nbsp;<span id="next_page_1"></span>
             </div>
+        </div>
+        
+        <div id="div_blanket"></div>
+        <div id="div_email_add_form">
+            <form onSubmit="retun false;">
+                <table class="email_add_form">
+                    <tr>
+                    <td colspan="3"><p style="text-align: center;">Add&nbsp;<span id="candidate_email" style="font-weight: bold;"></span>&nbsp;to...</p></td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            <table class="lists_form">
+                                <tr>
+                                    <td class="radio"><input type="radio" id="to_existing" name="mailing_list" value="list" checked /></td>
+                                    <td>
+                                        <label for="mailing_lists">an existing mailing list</label><br/>
+                                        <div class="mailing_lists" id="mailing_lists" name="mailing_lists"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="separator"></td>
+                        <td class="right">
+                            <table class="lists_form">
+                                <tr>
+                                    <td class="radio"><input type="radio" id="to_new" name="mailing_list" value="new" /></td>
+                                    <td>
+                                        <label for="new_list_label">a new mailing list</label><br/>
+                                        <p><input type="text" class="mini_field" id="new_list_label" name="new_list_label" /></p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <p class="button"><input type="button" value="Cancel" onClick="close_email_add_form();" />&nbsp;<input type="button" value="Add" onClick="add_email_to_list();" /></p>
+            </form>
         </div>
         
         <?php

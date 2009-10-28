@@ -147,42 +147,57 @@ if ($_POST['action'] == 'get_available_countries') {
     exit();
 }
 
-if ($_POST['action'] == 'save_to_mailing_list') {
-    $candidates = explode(',', $_POST['candidates']);
+if ($_POST['action'] == 'save_to_mailing_list') {    
+    $mysqli = Database::connect();
+    $mailing_list_id = $_POST['id'];
     
-    if (!empty($candidates) && !is_null($candidates)) {
-        $mysqli = Database::connect();
-        $mailing_list_id = $_POST['id'];
-        
-        if ($mailing_list_id == 'new') {
-            $query = "INSERT INTO candidates_mailing_lists SET 
-                      label = '". $_POST['label']. "', 
-                      created_on = now(), 
-                      created_by = ". $_POST['employee'];
-            $mailing_list_id = $mysqli->execute($query, true);
-        }
-        
-        if ($mailing_list_id > 0) {
-            $has_problem = false;
-            foreach ($candidates as $candidate) {
-                $query = "INSERT INTO candidate_email_manifests SET 
-                          mailing_list = ". $_POST['id']. ", 
-                          email_addr = '". $candidate. "'";
-                if (!$mysqli->execute($query)) {
-                    $has_problem = true;
-                }
-            }
-
-            if ($has_problem) {
-                echo '-1';
-            } else {
-                echo '0';
-            }
+    if ($mailing_list_id == 'new') {
+        $query = "INSERT INTO candidates_mailing_lists SET 
+                  label = '". $_POST['label']. "', 
+                  created_on = now(), 
+                  created_by = ". $_POST['employee'];
+        $mailing_list_id = $mysqli->execute($query, true);
+    }
+    
+    if ($mailing_list_id > 0) {
+        $query = "INSERT INTO candidate_email_manifests SET 
+                  mailing_list = ". $mailing_list_id. ", 
+                  email_addr = '". $_POST['candidate']. "'";
+        if (!$mysqli->execute($query)) {
+            echo '-1';
         } else {
-            echo 'ko';
+            echo '0';
+        }
+    } else {
+        echo 'ko';
+    }
+    
+    exit();
+}
+
+if ($_POST['action'] == 'get_mailing_lists') {
+    $query = "SELECT id, label FROM candidates_mailing_lists ORDER BY label";
+    $mysqli = Database::connect();
+    
+    $result = $mysqli->query($query);
+    if (is_null($result) || empty($result)) {
+        echo '0';
+        exit();
+    }
+    
+    $lists = array();
+    foreach ($result as $i=>$row) {
+        $lists[$i]['id'] = $row['id'];
+        
+        if (is_null($row['label']) || empty($row['label'])) {
+            $lists[$i]['label'] = 'Unlabeled';
+        } else {
+            $lists[$i]['label'] = $row['label'];
         }
     }
     
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('lists' => array('list' => $lists)));
     exit();
 }
 ?>

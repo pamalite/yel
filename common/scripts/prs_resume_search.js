@@ -5,12 +5,54 @@ var current_page = 1;
 var total_pages = 1;
 var filter_by = '0';
 
+var mailing_lists_list = new ListBox('mailing_lists', 'mailing_lists_list', false);
+
 function ascending_or_descending() {
     if (order == 'desc') {
         order = 'asc';
     } else {
         order = 'desc';
     }
+}
+
+function show_mailing_lists() {
+    $('mailing_lists').set('html', '');
+    
+    var params = 'id=0&action=get_mailing_lists';
+    
+    var uri = root + '/prs/search_resume_action.php';
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            mailing_lists_list.clear();
+            
+            if (txt == '0') {
+                $('mailing_lists').set('html', 'No mailing list found.');
+                $('to_existing').disabled = true;
+                $('to_new').checked = true;
+                return;
+            } else {
+                $('to_existing').disabled = false;
+                $('to_existing').checked = true;
+            }
+            
+            var ids = xml.getElementsByTagName('id');
+            var labels = xml.getElementsByTagName('label');
+            
+            for (var i=0; i < ids.length; i++) {
+                mailing_lists_list.add_item(labels[i].childNodes[0].nodeValue, ids[i].childNodes[0].nodeValue);
+            }
+            
+            mailing_lists_list.show();
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading mailing lists...');
+        }
+    });
+    
+    request.send(params);
 }
 
 function show_pagination_dropdown() {
@@ -263,6 +305,8 @@ function show_resumes() {
                 html = html + '<td class="country">' + countries[i].childNodes[0].nodeValue + '</td>' + "\n";
                 html = html + '<td class="country">' + zips[i].childNodes[0].nodeValue + '</td>' + "\n";
                 
+                html = html + '<td class="action"><a class="no_link" onClick="show_email_add_form(\'' + email_addrs[i].childNodes[0].nodeValue + '\');">+</a></td>' + "\n";
+                
                 html = html + '</tr>' + "\n";
             }
             html = html + '</table>';
@@ -296,6 +340,86 @@ function show_resumes() {
     list_industries_filter(industry);
     list_countries_filter(country_code);
 }
+
+function add_email_to_list() {
+    var params = 'employee=' + id + '&action=save_to_mailing_list';
+    params = params + '&candidate=' + $('candidate_email').get('html');
+    
+    if ($('to_new').checked) {
+        params = params + '&id=new&label=' + $('new_list_label').value;
+    } else {
+        if (isEmpty(mailing_lists_list.selected_value)) {
+            alert('Please select one mailing list to be added to.');
+            return;
+        }
+        
+        params = params + '&id=' + mailing_lists_list.selected_value;
+    }
+    
+    var uri = root + '/prs/search_resume_action.php';
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('Cannot create mailing list. Please try again later.');
+                close_email_add_form();
+                set_status('');
+                return false;
+            } else if (txt == '-1') {
+                alert('Mailing list was successfully created, but an error occurred while adding the candidate to the newly created list. Please try again later.');
+                close_email_add_form();
+                set_status('');
+                return false;
+            }
+            
+            close_email_add_form();
+            set_status('Mailing list was successfully saved.');
+        },
+        onRequest: function(instance) {
+            set_status('Saving mailing list...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_email_add_form() {
+    $('div_email_add_form').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+    set_status('');
+}
+
+function show_email_add_form(_candidate_email) {
+    $('div_blanket').setStyle('display', 'block');
+    
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_email_add_form').getStyle('height'));
+    var div_width = parseInt($('div_email_add_form').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_email_add_form').setStyle('top', ((window_height - div_height) / 2));
+    $('div_email_add_form').setStyle('left', ((window_width - div_width) / 2));
+    
+    $('candidate_email').set('html', _candidate_email);
+    
+    $('div_email_add_form').setStyle('display', 'block');
+    show_mailing_lists();
+}
+
+
 
 function onDomReady() {
     set_root();
