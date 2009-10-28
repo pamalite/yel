@@ -1,0 +1,78 @@
+#div_mailing_lists, #div_candidates {
+    padding-top: 10px;
+}
+
+#div_candidates {
+    text-align: center;
+    display: none;
+    padding-top: 10px;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+input.mini_button {
+    font-size: 9pt;
+}
+
+input.field, select.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+td.date {
+    width: 100px;
+}
+
+td.candidate {
+    width: 210px;
+}
+
+td.label {
+    width: 100px;
+}
+
+td.actions {
+    text-align: center;
+    width: 100px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
+td.buttons_left, td.buttons_right {
+    background-color: #CCCCCC;
+}
+
+td.buttons_right {
+    text-align: right;
+}

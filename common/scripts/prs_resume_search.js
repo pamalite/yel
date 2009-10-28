@@ -419,8 +419,6 @@ function show_email_add_form(_candidate_email) {
     show_mailing_lists();
 }
 
-
-
 function onDomReady() {
     set_root();
     list_available_industries(industry);
