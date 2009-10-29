@@ -298,13 +298,14 @@ function show_email_form() {
 }
 
 function send_email_to_list() {
-    if (isEmpty($('email_message').value)) {
-        alert('You need to enter a message to be send.');
+    if (isEmpty($('email_message').value) || isEmpty($('email_subject').value)) {
+        alert('You need to enter a subject and a message to be send.');
         return;
     }
     
     var params = 'id=' + $('mailing_list_id').value + '&action=send_email_to_list';
     params = params + '&employee=' + id;
+    params = params + '&subject=' + $('email_subject').value;
     params = params + '&message=' + $('email_message').value;
     
     var uri = root + "/prs/mailing_lists_action.php";

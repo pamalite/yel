@@ -148,22 +148,18 @@ if ($_POST['action'] == 'remove_candidate') {
 
 if ($_POST['action'] == 'send_email_to_list') {
     $message = sanitize($_POST['message']);
+    $subject = sanitize($_POST['subject']);
     
     $mysqli = Database::connect();
-    
-    $query = "SELECT email_addr, CONCAT(firstname, ', ', lastname) AS employee 
+    $query = "SELECT email_addr, CONCAT(firstname, lastname) AS employee 
               FROM employees WHERE id = ". $_POST['employee']. " LIMIT 1";
     $result = $mysqli->query($query);
-    $employee['email_addr'] = $result[0]['email_addr'];
-    $employee['name'] = $result[0]['employee'];
+    $headers = 'From: '. $result[0]['employee']. ' <'. $result[0]['email_addr']. '>' . "\n";
     
     $query = "SELECT email_addr FROM candidate_email_manifests WHERE mailing_list = ". $_POST['id'];
     $result = $mysqli->query($query);
     
     foreach ($result as $row) {
-        $email_addr = $row['email_addr'];
-        $subject = "A Message From YellowElevator.com";
-        $headers = 'From: '. $employee['name']. ' <'. $employee['email_addr']. '>' . "\n";
         mail($row['email_addr'], $subject, $message, $headers);
                     
         // $handle = fopen('/tmp/email_to_'. $row['email_addr']. '.txt', 'w');

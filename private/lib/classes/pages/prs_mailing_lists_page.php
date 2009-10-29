@@ -93,10 +93,20 @@ class PrsMailingListsPage extends Page {
         <div id="div_email_form">
             <form onSubmit="retun false;">
                 <input type="hidden" id="mailing_list_id" name="mailing_list_id" value="0" />
-                <div style="text-align: center;">
-                    Enter an email message to <span id="list_label" style="font-weight: bold;"></span> in the following text field.<br/><br/>
-                    <textarea class="email_message" id="email_message" name="email_message"></textarea>
-                </div>
+                <table class="email_form">
+                    <tr>
+                        <td class="label">To:</td>
+                        <td class="field"><span id="list_label" style="font-weight: bold;"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Subject:</td>
+                        <td class="field"><input type="text" class="textfield" maxlength="50" id="email_subject" name="email_subject" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Message:</td>
+                        <td class="field"><textarea class="email_message" id="email_message" name="email_message"></textarea></td>
+                    </tr>
+                </table>
                 <p class="button"><input type="button" value="Cancel" onClick="close_email_form();" />&nbsp;<input type="button" value="Send Email" onClick="send_email_to_list();" /></p>
             </form>
         </div>

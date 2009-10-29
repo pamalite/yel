@@ -121,8 +121,24 @@ td.buttons_right {
     border: 3px solid #0000FF;
     text-align: center;
     width: 675px;
-    height: 365px;
+    height: 400px;
     overflow: auto;
+}
+
+#div_email_form table.email_form {
+    margin: auto;
+    width: 100%;
+}
+
+#div_email_form table.email_form td {
+    padding: 3px 3px 3px 3px;
+    vertical-align: top;
+}
+
+#div_email_form table.email_form td.label {
+    color: #666666;
+    text-align: right;
+    width: 15%;
 }
 
 #div_email_form p {
@@ -140,4 +156,8 @@ td.buttons_right {
 #div_email_form textarea  {
     width: 98%;
     height: 290px;
+}
+
+#div_email_form input.textfield  {
+    width: 98%;
 }
