@@ -39,6 +39,13 @@ if (isset($_SESSION['yel']['member']) &&
     $job = new JobPage(NULL, $job_id, $criteria);
 }
 
+if (isset($_SESSION['yel']['employee']) && 
+    !empty($_SESSION['yel']['employee']['uid']) || 
+    !empty($_SESSION['yel']['employee']['id']) || 
+    !empty($_SESSION['yel']['employee']['sid']) || 
+    !empty($_SESSION['yel']['employee']['hash'])) {
+    $job->is_employee_viewing();
+}
 $mysqli = Database::connect();
 $query = "SELECT jobs.title, employers.name 
           FROM jobs 

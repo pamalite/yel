@@ -25,18 +25,22 @@ if (!isset($_POST['action'])) {
               DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
               DATE_FORMAT(referrals.referee_confirmed_hired_on, '%e %b, %Y') AS formatted_referee_confirmed_on 
               FROM referrals 
+              LEFT JOIN invoice_items ON invoice_items.item = referrals.id 
+              LEFT JOIN invoices ON invoices.id = invoice_items.invoice 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN members ON members.email_addr = referrals.member 
               LEFT JOIN employers ON employers.id = jobs.employer 
               LEFT JOIN currencies ON currencies.country_code = employers.country 
               LEFT JOIN employees ON employers.registered_by = employees.id 
-              WHERE (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
+              WHERE invoices.type = 'R' AND 
+              (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
+              (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
               (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
               (referrals.total_token_reward IS NOT NULL AND referrals.total_token_reward > 0) AND 
               (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
               (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
-              -- (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL) AND 
+              (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL) AND 
               employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " AND 
               referrals.id NOT IN (SELECT referral FROM referral_token_rewards) 
               GROUP BY referrals.id 

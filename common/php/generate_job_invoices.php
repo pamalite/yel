@@ -10,7 +10,7 @@ $mysqli = Database::connect();
 log_activity('Getting the employers which joined more than a year ago.', 'yellowel_job_invoice_generator.log');
 $query = "SELECT id, joined_on, payment_terms_days, DATE_ADD(joined_on, INTERVAL 1 YEAR) AS invoice_start_date 
           FROM employers 
-          WHERE DATE_ADD(joined_on, INTERVAL 1 YEAR) <= '". $today. "'";
+          -- WHERE DATE_ADD(joined_on, INTERVAL 1 YEAR) <= '". $today. "'";
 $employers = $mysqli->query($query);
 
 if ($employers === false) {
@@ -42,6 +42,20 @@ foreach ($employers as $employer) {
     if (count($jobs) > 0 && !is_null($jobs)) {
         log_activity('Got some jobs to be invoiced for employer: '. $id, 'yellowel_job_invoice_generator.log');
         
+        // check extensions
+        $query = "SELECT job, COUNT(*) AS number_of_extensions 
+                  FROM job_extensions 
+                  WHERE invoiced = 'N' AND for_replacement = 'N' 
+                  GROUP BY job";
+        $extension_results = $mysqli->query($query);
+        
+        $extensions = array();
+        if (count($extension_results) > 0 && !empty($extension_results)) {
+            foreach ($extension_results as $row) {
+                $extensions[$row['job']] = $row['number_of_extensions'];
+            }
+        }
+        
         $data = array();
         $data['issued_on'] = $today;
         $data['type'] = 'J';
@@ -59,7 +73,15 @@ foreach ($employers as $employer) {
         $sub_query = '';
         foreach ($jobs as $i=>$job) {
             $desc = '['. $job['id']. '] '. $job['title'];
-            $item_added = Invoice::add_item($invoice, 10, $job['id'], $desc);
+            $total_fee = 10;
+            
+            if (count($extensions) > 0 && !empty($extensions)) {
+                if (array_key_exists($job['id'], $extensions)) {
+                    $total_fee += 10 * $extensions[$job['id']];
+                }
+            }
+            
+            $item_added = Invoice::add_item($invoice, $total_fee, $job['id'], $desc);
             if (!$item_added) {
                 log_activity('Cannot create invoice item of job: '. $job['id']. '. The rest of the jobs for employer: '. $id. ' skipped.', 'yellowel_job_invoice_generator.log');
                 continue;
@@ -81,6 +103,13 @@ foreach ($employers as $employer) {
                 log_activity('Error on executing: '. $errors['errno']. ': '. $error['error'], 'yellowel_job_invoice_generator.log');
                 continue;
             } 
+            
+            $query = "UPDATE job_extensions SET invoiced = 'Y' WHERE job IN ". $sub_query;
+            if (!$mysqli->execute($query)) {
+                log_activity('Cannot mark job extensions for employer: '. $id. ' as invoiced. Jobs: '. $sub_query, 'yellowel_job_invoice_generator.log');
+                log_activity('Error on executing: '. $errors['errno']. ': '. $error['error'], 'yellowel_job_invoice_generator.log');
+                continue;
+            }
             log_activity('All jobs invoiced for employer: '. $id, 'yellowel_job_invoice_generator.log');
         }
     } else {

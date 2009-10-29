@@ -5,6 +5,7 @@ class JobPage extends Page {
     private $member = NULL;
     private $job_id = 0;
     private $criterias = NULL;
+    private $is_employee_viewing = false;
     
     function __construct($_session = NULL, $_job_id, $_criterias = NULL) {
         if (!is_null($_session)) {
@@ -58,6 +59,10 @@ class JobPage extends Page {
         
         echo '</script>'. "\n";
         echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
+    }
+    
+    public function is_employee_viewing() {
+        $this->is_employee_viewing = true;
     }
     
     private function generate_networks_list($_for_request_form = false) {
@@ -167,8 +172,10 @@ class JobPage extends Page {
             $error_message = 'An error occured while loading the job details.';
         } 
         
-        if ($job['expired'] > 0 || $job['closed'] == 'Y') {
-            $error_message = 'The job that you are looking for is no longer available.';
+        if (!$this->is_employee_viewing) {
+            if ($job['expired'] > 0 || $job['closed'] == 'Y') {
+                $error_message = 'The job that you are looking for is no longer available.';
+            }
         }
         
         ?>

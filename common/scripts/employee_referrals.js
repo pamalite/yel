@@ -32,6 +32,7 @@ function show_acknowledged_referrals() {
                 var employers = xml.getElementsByTagName('employer');
                 var employer_ids = xml.getElementsByTagName('employer_id');
                 var jobs = xml.getElementsByTagName('title');
+                var job_ids = xml.getElementsByTagName('job_id');
                 var referrers = xml.getElementsByTagName('referrer');
                 var candidates = xml.getElementsByTagName('candidate');
                 var candidate_emails = xml.getElementsByTagName('candidate_email');
@@ -49,7 +50,7 @@ function show_acknowledged_referrals() {
                     
                     html = html + '<tr id="'+ referral + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                     html = html + '<td class="employer"><a class="no_link" onClick="show_contact(\'' + employer_ids[i].childNodes[0].nodeValue + '\', false);">' + employers[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="title">' + jobs[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="title"><a href="' + root + '/job/' + job_ids[i].childNodes[0].nodeValue + '">' + jobs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="referrer">' + referrers[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="candidate"><a class="no_link" onClick="show_contact(\'' + add_slashes(candidate_emails[i].childNodes[0].nodeValue) + '\', true);">' + candidates[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="date">' + referred_ons[i].childNodes[0].nodeValue + '</td>' + "\n";

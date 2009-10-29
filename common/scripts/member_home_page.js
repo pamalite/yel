@@ -407,7 +407,7 @@ function show_approvals() {
     //$('div_acknowledgements').setStyle('display', 'none');
     $('li_jobs').setStyle('border', '1px solid #0000FF');
     //$('li_rewards').setStyle('border', '1px solid #0000FF');
-    //$('li_approvals').setStyle('border', '1px solid #CCCCCC');
+    $('li_approvals').setStyle('border', '1px solid #CCCCCC');
     //$('li_acknowledgements').setStyle('border', '1px solid #0000FF');
     
     var params = 'id=' + id + '&action=get_approvals';
@@ -602,7 +602,7 @@ function show_acknowledgements() {
     request.send(params);
 }
 
-function count_items() {
+function count_items_and_show_tab() {
     var params = 'id=' + id + '&action=get_counts';
     
     var uri = root + "/members/home_action.php";
@@ -635,6 +635,11 @@ function count_items() {
             //    $('responses_count').set('html', ' (' + responses[0].childNodes[0].nodeValue + ')');
             //}
             
+            if (approvals[0].childNodes[0].nodeValue > 0 && referrals[0].childNodes[0].nodeValue <= 0) {
+                show_approvals();
+            } else {
+                show_referred_jobs();
+            }
         }
     });
     
@@ -882,8 +887,7 @@ function onDomReady() {
         show_acknowledgements();
     });*/
     
-    count_items();
-    show_referred_jobs();
+    count_items_and_show_tab();
     
     var suggest_url = root + '/common/php/search_suggest.php';
     new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {

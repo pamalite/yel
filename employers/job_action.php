@@ -233,19 +233,19 @@ if ($_POST['action'] == 'close') {
 if ($_POST['action'] == 'extend') {
     $mysqli = Database::connect();
     $query = "INSERT INTO job_extensions 
-              SELECT 0, id, created_on, expire_on, 'N' FROM jobs WHERE id = ". $_POST['job'];
+              SELECT 0, id, created_on, expire_on, for_replacement, invoiced FROM jobs WHERE id = ". $_POST['job'];
     if (!$mysqli->execute($query)) {
         echo "ko";
         exit();
     }
     
-    $query = "SELECT closed, expire_on 
+    $query = "SELECT expire_on 
               FROM jobs 
               WHERE id = ". $_POST['job']. " LIMIT 1";
     $result = $mysqli->query($query);
-    $is_closed = ($result[0]['closed'] == 'Y') ? true : false;
+    $is_expired = (sql_date_diff($result[0]['expire_on'], now()) <= 0) ? true : false;
     $expire_on = $result[0]['expire_on'];
-    if ($is_closed) {
+    if ($is_expired) {
         $expire_on = now();
     }
     

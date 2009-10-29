@@ -86,6 +86,7 @@ if ($_POST['action'] == 'authorize_replacement') {
     $data = array();
     $data['expire_on'] = sql_date_add($today, 30, 'day');
     $data['closed'] = 'N';
+    $data['for_replacement'] = 'Y';
     $job = new Job($result[0]['job']);
     if (!$job->update($data)) {
         echo 'ko';

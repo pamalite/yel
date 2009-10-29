@@ -18,7 +18,7 @@ if (!isset($_POST['action'])) {
         $order_by = $_POST['order_by'];
     }
     
-    $query = "SELECT referrals.id, employers.name AS employer, jobs.title AS title, 
+    $query = "SELECT referrals.id, employers.name AS employer, jobs.id AS job_id, jobs.title AS title, 
               CONCAT(referrers.lastname, ', ', referrers.firstname) AS referrer, 
               CONCAT(candidates.lastname, ', ', candidates.firstname) AS candidate,  
               employers.id AS employer_id, candidates.email_addr AS candidate_email, 
