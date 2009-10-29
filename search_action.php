@@ -339,15 +339,19 @@ if ($_POST['action'] == 'refer_me') {
     $job_title = '';
     $employer_name = '';
 
-    $query = "SELECT jobs.title, employers.name, jobs.acceptable_resume_type 
+    $query = "SELECT jobs.title, employers.name, jobs.acceptable_resume_type, 
+              branches.country AS branch_country 
               FROM jobs 
               LEFT JOIN employers ON employers.id = jobs.employer 
+              LEFT JOIN branches ON branches.id = employers.branch 
               WHERE jobs.id = ". $_POST['job']. " LIMIT 1";
     $result = $mysqli->query($query);
     $acceptable_resume_type = $result[0]['acceptable_resume_type'];
     $job_title = $result[0]['title'];
     $employer_name = $result[0]['name'];
-
+    $branch = $result[0]['branch_country'];
+    $branch_email = 'team.'. strtolower($branch). '@yellowelevator.com';
+    
     $query = "SELECT file_hash FROM resumes WHERE id = ". $_POST['resume']. " LIMIT 1";
     $result = $mysqli->query($query);
     $file_hash = $result[0]['file_hash'];
@@ -421,6 +425,11 @@ if ($_POST['action'] == 'refer_me') {
     
     if ($_POST['from'] == 'others' || $_POST['from'] == 'yel') {
         $has_errors = array();
+        
+        if ($_POST['from'] == 'yel') {
+            $referrers = array();
+            $referrers[0] = $branch_email;
+        }
         
         foreach ($referrers as $referrer) {
             $data['referrer'] = $referrer;
@@ -520,6 +529,25 @@ if ($_POST['action'] == 'refer_me') {
                             fclose($handle);*/
                         }
                     } else if ($_POST['from'] == 'yel') {
+                        // pre-approve for the candidate 
+                        $query = "SELECT id FROM member_referees 
+                                  WHERE member = '". $member->id(). "' AND 
+                                  referee = '". $branch_email. "' AND 
+                                  approved = 'N' LIMIT 1";
+                        $result = $mysqli->query($query);
+                        if (!is_null($result) && !empty($result)) {
+                            $referee_id = $result[0]['id'];
+                            $query = "UPDATE member_referees SET
+                                      approved = 'Y' 
+                                      WHERE id = ". $referee_id. "; 
+                                      INSERT INTO member_referees SET 
+                                      member = '". $branch_email. "', 
+                                      referee = '". $member->id() "', 
+                                      referred_on = NOW(), 
+                                      approved = 'Y'";
+                            $mysqli->transact($query);
+                        }
+                        
                         $lines = file(dirname(__FILE__). '/private/mail/candidate_refer_request.txt');
                         $message = '';
                         foreach($lines as $line) {
@@ -534,12 +562,12 @@ if ($_POST['action'] == 'refer_me') {
                         $message = str_replace('%employer%', htmlspecialchars_decode(desanitize($employer_name)), $message);
                         $subject = htmlspecialchars_decode(desanitize($member->get_name())). " needs to be referred to a job!";
                         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-                        mail('initial@yellowelevator.com', $subject, $message, $headers);
+                        mail($branch_email, $subject, $message, $headers);
 
-                        /*$handle = fopen('/tmp/email_to_initial.txt', 'w');
-                        fwrite($handle, 'Subject: '. $subject. "\n\n");
-                        fwrite($handle, $message);
-                        fclose($handle);*/
+                        // $handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
+                        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+                        // fwrite($handle, $message);
+                        // fclose($handle);
                     }
                     
                 } else {

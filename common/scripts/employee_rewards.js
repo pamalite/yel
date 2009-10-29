@@ -674,6 +674,8 @@ function onDomReady() {
     set_root();
     set_mouse_events();
     get_unapproved_photos_count();
+    get_employee_rewards_count();
+    get_employee_tokens_count();
     
     $('li_new').addEvent('click', show_new_rewards);
     $('li_partially_paid').addEvent('click', show_partially_paid_rewards);

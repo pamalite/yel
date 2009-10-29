@@ -318,6 +318,8 @@ function onDomReady() {
     set_root();
     set_mouse_events();
     get_unapproved_photos_count();
+    get_employee_rewards_count();
+    get_employee_tokens_count();
     
     $('li_new').addEvent('click', show_new_invoices);
     $('li_paid').addEvent('click', show_paid_invoices);

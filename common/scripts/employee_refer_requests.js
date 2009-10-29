@@ -94,6 +94,8 @@ function toggle_description(request_id) {
 function onDomReady() {
     set_root();
     get_unapproved_photos_count();
+    get_employee_rewards_count();
+    get_employee_tokens_count();
     
     $('sort_job').addEvent('click', function() {
         order_by = 'job_title';

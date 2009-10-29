@@ -88,6 +88,8 @@ function reset_password(_id) {
 function onDomReady() {
     set_root();
     get_unapproved_photos_count();
+    get_employee_rewards_count();
+    get_employee_tokens_count();
     
     $('sort_employer').addEvent('click', function() {
         order_by = 'employers.name';

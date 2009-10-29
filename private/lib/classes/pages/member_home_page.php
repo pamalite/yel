@@ -103,7 +103,7 @@ class MemberHomePage extends Page {
         <div id="div_tabs">
             <ul>
                 <li id="li_jobs">Jobs Referred To Me<span id="referred_count"></span></li>
-                <li id="li_approvals">Approve New Contacts<span id="approval_count"></span></li>
+                <li id="li_approvals">New Contacts Requests<span id="approval_count"></span></li>
                 <!--li id="li_rewards">My Rewards<span id="rewards_count"></span></li-->
                 <!--li id="li_acknowledgements">Contacts' Responses<span id="responses_count"></span></li-->
             </ul>

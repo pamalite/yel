@@ -514,13 +514,13 @@ function refer() {
     if (isEmpty(answer_1) || isEmpty(answer_2) || isEmpty(answer_3)) {
         alert('Please briefly answer all questions.');
         return false;
-    } else if (answer_1.split(' ').length > 50 || answer_3.split(' ').length > 50 || answer_3.split(' ').length > 50) {
-        if (answer_1.split(' ').length > 50) {
-            alert('Please keep your 1st answer below 50 words.');
-        } else if (answer_2.split(' ').length > 50) {
-            alert('Please keep your 2nd answer below 50 words.');
-        } else if (answer_3.split(' ').length > 50) {
-            alert('Please keep your 3rd and final answer below 50 words.');
+    } else if (answer_1.split(' ').length > 200 || answer_2.split(' ').length > 200 || answer_3.split(' ').length > 200) {
+        if (answer_1.split(' ').length > 200) {
+            alert('Please keep your 1st answer below 200 words.');
+        } else if (answer_2.split(' ').length > 200) {
+            alert('Please keep your 2nd answer below 200 words.');
+        } else if (answer_3.split(' ').length > 200) {
+            alert('Please keep your 3rd and final answer below 200 words.');
         }
         return false;
     }

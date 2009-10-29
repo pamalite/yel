@@ -145,6 +145,8 @@ function show_contact(_name, _contact_person, _email, _phone) {
 function onDomReady() {
     set_root();
     get_unapproved_photos_count();
+    get_employee_rewards_count();
+    get_employee_tokens_count();
     
     show_replacements();
 }

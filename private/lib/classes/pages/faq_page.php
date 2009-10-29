@@ -72,7 +72,7 @@ class FaqPage extends Page {
                     </li>
                     <li>
                         <a name="general.4"></a>
-                        <div class="question">Can anyone join Yellow Elevator?</div>
+                        <div class="question">Do I have the option to unsubscribe from notifications?</div>
                         <div class="answer">Yes, you can. Simply click on "Unsubscribe" in the "Profile" section to unsubscribe.</div>
                     </li>
                     <li>

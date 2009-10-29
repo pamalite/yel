@@ -1310,6 +1310,8 @@ function onDomReady() {
     set_root();
     set_mouse_events();
     get_unapproved_photos_count();
+    get_employee_rewards_count();
+    get_employee_tokens_count();
     
     $('li_employers').addEvent('click', show_employers);
     $('li_profile').addEvent('click', show_employer_profile);

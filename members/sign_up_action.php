@@ -43,9 +43,9 @@ if ($_POST['security_code'] != $_SESSION['security_code']) {
 }
 
 // 1. Check whether the e-mail has been taken. If taken, then inform user to use another.
+$mysqli = Database::connect();
 $inactive = false;
 $query = "SELECT COUNT(*) AS id_used FROM members WHERE email_addr = '". $_POST['email_addr']. "'";
-$mysqli = Database::connect();
 $result = $mysqli->query($query);
 if ($result[0]['id_used'] != '0') {
     // 1.1 Check whether this e-mail was previously unsubscribed or not active.
@@ -103,7 +103,6 @@ if (!$inactive) {
 $query = "SELECT DISTINCT member, invited_on FROM member_invites 
           WHERE referee_email = '". $_POST['email_addr']. "' AND 
           (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
-$mysqli = Database::connect();
 $result = $mysqli->query($query);
 if (count($result) > 0 && !is_null($result)) {
     foreach ($result as $row) {
@@ -117,7 +116,6 @@ if (count($result) > 0 && !is_null($result)) {
                     referee = '". $row['member']. "', 
                     referred_on = '". $row['invited_on']. "', 
                     approved = 'Y'";
-        $mysqli = Database::connect();
         if (!$mysqli->transact($queries)) {
             redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
             //echo $query;
@@ -170,12 +168,9 @@ if (count($result) > 0 && !is_null($result)) {
 $query = "SELECT DISTINCT member, invited_on FROM referrer_invites 
           WHERE referrer_email = '". $_POST['email_addr']. "' AND 
           (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
-$mysqli = Database::connect();
 $result = $mysqli->query($query);
 if (count($result) > 0 && !is_null($result)) {
     foreach ($result as $row) {
-        $mysqli = Database::connect();
-        
         $query = "SELECT COUNT(*) AS connections FROM member_referees 
                   WHERE ((member = '". $row['member']. "' AND referee = '". $_POST['email_addr']. "') OR 
                   (member = '".  $_POST['email_addr']. "' AND referee = '". $row['member']. "')) AND
@@ -239,14 +234,28 @@ if (count($result) > 0 && !is_null($result)) {
     }
 } 
 
+// 4. Add the closest branch as a friend
+$query = "SELECT DISTINCT country FROM branches";
+$result = $mysqli->query($query);
+$available_branches = array();
+foreach ($result as $row) {
+    $available_branches[] = $row['country'];
+}
 
-// 4. Create activation token and email
+$team = NULL;
+if (in_array($member->get_country_code(), $available_branches)) {
+    $team = new Member('team.'. strtolower($member->get_country_code()). '@yellowelevator.com');
+} else {
+    $team = new Member('team.my@yellowelevator.com');
+}
+$team->create_referee($member->id());
+
+// 5. Create activation token and email
 $activation_id = microtime(true);
 $query = "INSERT INTO member_activation_tokens SET 
           id = '". $activation_id. "', 
           member = '". $_POST['email_addr']. "', 
           joined_on = '". $joined_on. "'";
-$mysqli = Database::connect();
 if (!$mysqli->execute($query)) {
     redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
     //echo $query;

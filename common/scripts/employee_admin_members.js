@@ -124,6 +124,8 @@ function activate_member(_id) {
 function onDomReady() {
     set_root();
     get_unapproved_photos_count();
+    get_employee_rewards_count();
+    get_employee_tokens_count();
     
     $('sort_email_addr').addEvent('click', function() {
         order_by = 'email_addr';

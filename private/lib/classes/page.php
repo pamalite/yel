@@ -278,7 +278,7 @@ class Page {
                     <li <?php echo ($page == 'home') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/home.php">Home</a></li>
                     <li <?php echo ($page == 'profile') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/profile.php">Profile</a></li>
                     <li <?php echo ($page == 'jobs') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/jobs.php">Job Ads</a></li>
-                    <li <?php echo ($page == 'referrals') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/referrals.php">Referrals</a> <span style="color: #666666; font-size: 9pt; font-weight: bold;" id="emp_referrals_count"></span></li>
+                    <li <?php echo ($page == 'referrals') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/referrals.php">Referrals</a><span style="color: #666666; font-size: 9pt; font-weight: bold;" id="emp_referrals_count"></span></li>
                     <li <?php echo ($page == 'employments') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/employments.php">Employment Records</a></li>
                     <li <?php echo ($page == 'invoices') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/invoices.php">Invoices &amp; Receipts</a></li>
                     <li><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/logout.php">Logout</a></li>
@@ -297,9 +297,9 @@ class Page {
                     <li <?php echo ($page == 'candidates') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/candidates.php">Contacts</a></li>
                     <li <?php echo ($page == 'saved_jobs') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/saved_jobs.php">Saved Jobs</a></li>
                     <!--li <?php echo ($page == 'refer') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/refer.php">Refer</a></li-->
-                    <li <?php echo ($page == 'referral_requests') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/referral_requests.php">Referral Requests</a> <span style="color: #666666; font-size: 9pt; font-weight: bold;" id="requests_count"></span></li>
-                    <li <?php echo ($page == 'my_referrals') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/my_referrals.php">My Referrals</a> <span style="color: #666666; font-size: 9pt; font-weight: bold;" id="referrals_count"></span></li>
-                    <li <?php echo ($page == 'confirm_hires') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/confirm_hires.php">Jobs Applied</a> <span style="color: #666666; font-size: 9pt; font-weight: bold;" id="jobs_employed_count"></span></li>
+                    <li <?php echo ($page == 'referral_requests') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/referral_requests.php">Referral Requests</a><span style="color: #666666; font-size: 9pt; font-weight: bold;" id="requests_count"></span></li>
+                    <li <?php echo ($page == 'my_referrals') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/my_referrals.php">My Referrals</a><span style="color: #666666; font-size: 9pt; font-weight: bold;" id="referrals_count"></span></li>
+                    <li <?php echo ($page == 'confirm_hires') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/confirm_hires.php">Jobs Applied</a><span style="color: #666666; font-size: 9pt; font-weight: bold;" id="jobs_employed_count"></span></li>
                     <li><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/logout.php">Logout</a></li>
                 </ul>
             </div>
@@ -327,7 +327,7 @@ class Page {
         <?php
         if (Employee::has_clearances_for('photos', $_clearances)) {
         ?>
-                <li <?php echo ($page == 'photos') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/photos.php">Photos</a> <span style="color: #FF0000; font-size: 7pt; font-weight: bold;" id="unapproved_photos_count"></span></li>
+                <li <?php echo ($page == 'photos') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/photos.php">Photos</a><span style="color: #FF0000; font-size: 7pt; font-weight: bold;" id="unapproved_photos_count"></span></li>
         <?php
         }
         ?>
@@ -343,8 +343,8 @@ class Page {
         <?php
         if (Employee::has_clearances_for('rewards', $_clearances)) {
         ?>
-                <li <?php echo ($page == 'rewards') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/rewards.php">Rewards</a></li>
-                <li <?php echo ($page == 'tokens') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/token_rewards.php">Bonuses</a></li>
+                <li <?php echo ($page == 'rewards') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/rewards.php">Rewards</a><span style="color: #FF0000; font-size: 7pt; font-weight: bold;" id="rewards_count"></span></li>
+                <li <?php echo ($page == 'tokens') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/token_rewards.php">Bonuses</a><span style="color: #FF0000; font-size: 7pt; font-weight: bold;" id="tokens_count"></span></li>
         <?php
         }
         ?>

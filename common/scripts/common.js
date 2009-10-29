@@ -616,7 +616,7 @@ function get_referrals_count() {
                 $('referrals_count').setStyle('display', 'none');
             } else {
                 $('referrals_count').setStyle('display', 'inline');
-                $('referrals_count').set('html', '(' + counts + ')');
+                $('referrals_count').set('html', ' (' + counts + ')');
             }
         }
     });
@@ -633,7 +633,7 @@ function get_requests_count() {
                 $('requests_count').setStyle('display', 'none');
             } else {
                 $('requests_count').setStyle('display', 'inline');
-                $('requests_count').set('html', '(' + txt + ')');
+                $('requests_count').set('html', ' (' + txt + ')');
             }
         }
     });
@@ -650,7 +650,7 @@ function get_jobs_employed_count() {
                 $('jobs_employed_count').setStyle('display', 'none');
             } else {
                 $('jobs_employed_count').setStyle('display', 'inline');
-                $('jobs_employed_count').set('html', '(' + txt + ')');
+                $('jobs_employed_count').set('html', ' (' + txt + ')');
             }
         }
     });
@@ -667,7 +667,7 @@ function get_employer_referrals_count() {
                 $('emp_referrals_count').setStyle('display', 'none');
             } else {
                 $('emp_referrals_count').setStyle('display', 'inline');
-                $('emp_referrals_count').set('html', '(' + txt + ')');
+                $('emp_referrals_count').set('html', ' (' + txt + ')');
             }
         }
     });
@@ -684,10 +684,49 @@ function get_unapproved_photos_count() {
                 $('unapproved_photos_count').setStyle('display', 'none');
             } else {
                 $('unapproved_photos_count').setStyle('display', 'inline');
+                $('unapproved_photos_count').set('html', '  (' + txt + ')');
             }
         }
     });
     
+    request.send();
+}
+
+function get_employee_rewards_count() {
+    var uri = root + "/common/php/employee_rewards_count.php";
+    var request = new Request({
+        url: uri,
+        onSuccess: function(txt, xml) {
+            if ($('rewards_count') != null) {
+                if (txt == '0') {
+                    $('rewards_count').setStyle('display', 'none');
+                } else {
+                    $('rewards_count').setStyle('display', 'inline');
+                    $('rewards_count').set('html', ' (' + txt + ')');
+                }
+            }
+        }
+    });
+     
+    request.send();
+}
+
+function get_employee_tokens_count() {
+    var uri = root + "/common/php/employee_tokens_count.php";
+    var request = new Request({
+        url: uri,
+        onSuccess: function(txt, xml) {
+            if ($('tokens_count') != null) {
+                if (txt == '0') {
+                    $('tokens_count').setStyle('display', 'none');
+                } else {
+                    $('tokens_count').setStyle('display', 'inline');
+                    $('tokens_count').set('html', ' (' + txt + ')');
+                }
+            }
+        }
+    });
+     
     request.send();
 }
 
@@ -800,7 +839,7 @@ function update_word_count_of(_counter_id, _field_id) {
     
     $(_counter_id).set('html', word_count);
     
-    if (word_count > 50) {
+    if (word_count > 200) {
         $(_counter_id).setStyle('font-weight', 'bold');
         $(_counter_id).setStyle('color', '#ff0000');
     } else {

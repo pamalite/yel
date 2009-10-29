@@ -101,6 +101,8 @@ function save() {
 function onDomReady() {
     set_root();
     get_unapproved_photos_count();
+    get_employee_rewards_count();
+    get_employee_tokens_count();
     
     $('save').addEvent('click', save);
     $('save_1').addEvent('click', save);

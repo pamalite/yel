@@ -158,6 +158,8 @@ function disapprove_photo(_photo_id, _email_addr) {
 
 function onDomReady() {
     set_root();
+    get_employee_rewards_count();
+    get_employee_tokens_count();
     
     $('sort_photo_id').addEvent('click', function() {
         order_by = 'id';
