@@ -126,7 +126,7 @@ rteSelectAll = true;
 // Spell Checker.
 rteSpellCheck = false;
 // Show Preview Button.
-rtePreviewMode = false;
+rtePreviewMode = true;
 // Show Code Edit Button.
 rteCodeMode = false;
 // Show Design Mode Button.

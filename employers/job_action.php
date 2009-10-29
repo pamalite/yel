@@ -231,17 +231,26 @@ if ($_POST['action'] == 'close') {
 }
 
 if ($_POST['action'] == 'extend') {
+    $mysqli = Database::connect();
     $query = "INSERT INTO job_extensions 
               SELECT 0, id, created_on, expire_on, 'N' FROM jobs WHERE id = ". $_POST['job'];
-    $mysqli = Database::connect();
-
     if (!$mysqli->execute($query)) {
         echo "ko";
         exit();
     }
     
+    $query = "SELECT closed, expire_on 
+              FROM jobs 
+              WHERE id = ". $_POST['job']. " LIMIT 1";
+    $result = $mysqli->query($query);
+    $is_closed = ($result[0]['closed'] == 'Y') ? true : false;
+    $expire_on = $result[0]['expire_on'];
+    if ($is_closed) {
+        $expire_on = now();
+    }
+    
     $data = array();
-    $data['created_on'] = now();
+    $data['created_on'] = $expire_on;
     $data['expire_on'] = sql_date_add($data['created_on'], 30, 'day');
     $data['closed'] = 'N';
     $job = new Job($_POST['job']);
