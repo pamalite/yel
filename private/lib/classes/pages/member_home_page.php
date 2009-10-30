@@ -100,6 +100,17 @@ class MemberHomePage extends Page {
                 </tr>
             </table>
         </div>
+        <div id="div_completeness">
+            <div style="padding-bottom: 3px; font-size: 9pt; text-align: center; width: 100%;">
+                You are <span id="progress_percent" style="font-weight: bold;"></span>% ready to be rewarded or elevated to a new job.
+            </div>
+            <div id="progress">
+                <div id="progress_bar"></div>
+            </div>
+            <div class="progress_details">
+                <span id="details"></span>
+            </div>
+        </div>
         <div id="div_tabs">
             <ul>
                 <li id="li_jobs">Jobs Referred To Me<span id="referred_count"></span></li>

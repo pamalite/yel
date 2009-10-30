@@ -79,6 +79,7 @@ $data['like_newsletter'] = $_SESSION['yel']['sign_up']['like_newsletter'];
 $data['joined_on'] = $joined_on;
 $data['active'] = 'N';
 $data['invites_available'] = '10';
+$data['checked_profile'] = 'Y';
 
 if ($data['like_newsletter'] == 'Y') {
     $data['filter_jobs'] = 'Y';

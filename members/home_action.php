@@ -504,4 +504,28 @@ if ($_POST['action'] == 'set_hide_banner') {
     
     exit();
 }
+
+if ($_POST['action'] == 'get_completeness_status') {
+    $mysqli = Database::connect();
+    $query = "SELECT members.checked_profile, bank.has_bank, cv.has_resume, photo.has_photo 
+              FROM members, 
+              (SELECT COUNT(*) AS has_bank FROM member_banks WHERE member = '". $_POST['id']. "') bank, 
+              (SELECT COUNT(*) AS has_resume FROM resumes WHERE member = '". $_POST['id']. "') cv, 
+              (SELECT COUNT(*) AS has_photo FROM member_photos WHERE member = '". $_POST['id']. "') photo 
+              WHERE members.email_addr = '". $_POST['id']. "'";
+    $result = $mysqli->query($query);
+    if (is_null($result) || empty($result) || !$result) {
+        echo '0';
+        exit();
+    }
+    
+    $response = array();
+    $response['checked_profile'] = ($result[0]['checked_profile'] == 'Y') ? '1' : '0';
+    $response['has_bank'] = ($result[0]['has_bank'] > 0) ? '1' : '0';
+    $response['has_resume'] = ($result[0]['has_resume'] > 0) ? '1' : '0';
+    $response['has_photo'] = ($result[0]['has_photo'] > 0) ? '1' : '0';
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('completeness' => $response));
+}
 ?>

@@ -76,4 +76,33 @@ if ($_POST['action'] == 'unsubscribe') {
     echo 'ok';
     exit();
 }
+
+if ($_POST['action'] == 'checked_profile') {
+    $member = new Member($_POST['email_addr']);
+
+    $data = array();
+    $data['checked_profile'] = 'Y';
+    
+    if (!$member->update($data)) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'is_checked_profile') {
+    $mysqli = Database::connect();
+    $query = "SELECT COUNT(*) AS is_checked FROM members 
+              WHERE email_addr = '". $_POST['email_addr']. "' AND 
+              checked_profile = 'N' LIMIT 1";
+    $result = $mysqli->query($query);
+    if (!is_null($result) && !empty($result)) {
+        echo 'N';
+    } else {
+        echo 'Y';
+    }
+    exit();
+}
 ?>

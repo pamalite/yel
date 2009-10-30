@@ -49,6 +49,37 @@ div.banner, div.rewards, div.job_count {
     border: 1px solid #0000FF;
 }
 
+#div_completeness {
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#progress_bar {
+    border: 1px solid #0000FF;
+    background-color: #0000FF;
+    height: 5px;
+}
+
+#progress {
+    border: 1px solid #0000FF;
+    background-color: #FFFFFF;
+    padding: 1px 1px 1px 1px;
+    width: 260px;
+    height: 7px;
+    margin: auto;
+}
+
+div.progress_details {
+    padding-top: 3px;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    font-size: 9pt;
+}
+
 td.id {
     width: 35px;
 }

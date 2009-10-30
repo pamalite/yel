@@ -196,6 +196,50 @@ function show_unsubscribe_form() {
     $('div_unsubscribe_form').setStyle('display', 'block');
 }
 
+function checked_profile() {
+    var params = 'action=checked_profile&email_addr=' + email_addr;
+    
+    var uri = root + "/members/profile_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                set_status('An error occured while confirming profile. Please try again later.');
+            } else {
+                $('confirm_profile').setStyle('display', 'none');
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Processing...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function show_confirm_profile() {
+    var params = 'action=is_checked_profile&email_addr=' + email_addr;
+    
+    var uri = root + "/members/profile_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                set_status('An error occured while confirming profile. Please try again later.');
+            } else {
+                $('confirm_profile').setStyle('display', 'none');
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Processing...');
+        }
+    });
+    
+    request.send(params);
+}
+
 function onDomReady() {
     set_root();
     get_employers_for_mini();
