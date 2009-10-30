@@ -246,7 +246,13 @@ class MemberProfilePage extends Page {
                             <table class="buttons">
                                 <tr>
                                     <td class="left"><a class="no_link" onClick="show_unsubscribe_form();">Unsubscribe</a></td>
-                                    <td class="right"><input type="button" id="save_1" value="Save &amp; Update Profile" /></td>
+                                    <td class="right">
+                                        <span id="confirm_profile_form">
+                                            <input type="checkbox" id="confirm_profile" onClick="checked_profile();" /><label for="confirm_profile">I verified that my profile is correct.</label>
+                                            &nbsp;&nbsp;&nbsp;
+                                        </span>
+                                        <input type="button" id="save_1" value="Save &amp; Update Profile" />
+                                    </td>
                                 </tr>
                             </table>
                         </td>

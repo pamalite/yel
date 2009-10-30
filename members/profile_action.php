@@ -96,13 +96,9 @@ if ($_POST['action'] == 'is_checked_profile') {
     $mysqli = Database::connect();
     $query = "SELECT COUNT(*) AS is_checked FROM members 
               WHERE email_addr = '". $_POST['email_addr']. "' AND 
-              checked_profile = 'N' LIMIT 1";
+              checked_profile = 'N'";
     $result = $mysqli->query($query);
-    if (!is_null($result) && !empty($result)) {
-        echo 'N';
-    } else {
-        echo 'Y';
-    }
+    echo ($result[0]['is_checked'] == '0') ? 'Y' : 'N';
     exit();
 }
 ?>

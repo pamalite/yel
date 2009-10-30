@@ -207,7 +207,8 @@ function checked_profile() {
             if (txt == 'ko') {
                 set_status('An error occured while confirming profile. Please try again later.');
             } else {
-                $('confirm_profile').setStyle('display', 'none');
+                $('confirm_profile_form').setStyle('display', 'none');
+                set_status('');
             }
         },
         onRequest: function(instance) {
@@ -226,14 +227,11 @@ function show_confirm_profile() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while confirming profile. Please try again later.');
+            if (txt == 'N') {
+                $('confirm_profile_form').setStyle('display', 'inline');
             } else {
-                $('confirm_profile').setStyle('display', 'none');
+                $('confirm_profile_form').setStyle('display', 'none');
             }
-        },
-        onRequest: function(instance) {
-            set_status('Processing...');
         }
     });
     
@@ -260,6 +258,8 @@ function onDomReady() {
             $('filter_jobs').disabled = true;
         }
     });
+    
+    show_confirm_profile();
     
     var suggest_url = root + '/common/php/search_suggest.php';
     new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {

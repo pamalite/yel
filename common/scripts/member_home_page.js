@@ -667,8 +667,8 @@ function get_completeness_status() {
             
             var total = parseInt(checked_profiles[0].childNodes[0].nodeValue) + parseInt(has_banks[0].childNodes[0].nodeValue) + parseInt(has_resumes[0].childNodes[0].nodeValue) + parseInt(has_photos[0].childNodes[0].nodeValue);
             var completeness = (total / 4) * 100;
-            $('progress_bar').setStyle('width', completeness + '%');
-            $('progress_percent').set('html', completeness);
+            $('progress_bar').setStyle('width', (completeness - 1) + '%');
+            $('progress_percent').set('html', completeness + '%');
             
             var progress_details = '';
             if (checked_profiles[0].childNodes[0].nodeValue == '0') {
