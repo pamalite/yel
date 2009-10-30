@@ -7,6 +7,7 @@ var candidates_order = 'desc';
 
 var current_recommender_email_addr = '';
 var current_recommender_name = '';
+var email_addrs = new Array();
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -128,11 +129,13 @@ function show_recommenders() {
                 var recommenders = xml.getElementsByTagName('recommender_name');
                 var phone_nums = xml.getElementsByTagName('phone_num');
                 var added_ons = xml.getElementsByTagName('formatted_added_on');
+                var remarks = xml.getElementsByTagName('remarks');
                 
                 for (var i=0; i < email_addrs.length; i++) {
                     var id = email_addrs[i].childNodes[0].nodeValue;
                     
                     html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
+                    html = html + '<td class="checkbox"><input type="checkbox" onClick="sync_mailing_list(\'' + id + '\');" /></td>' + "\n";
                     html = html + '<td class="date">' + added_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     
                     var phone_num = 'N/A';
@@ -140,6 +143,13 @@ function show_recommenders() {
                         phone_num = phone_nums[i].childNodes[0].nodeValue;
                     }
                     html = html + '<td class="recommender"><a href="mailto: ' + id + '">' + recommenders[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_num + '<br/><strong>E-mail:</strong> ' + id + '</div></td>' + "\n";
+                    
+                    if (remarks[i].childNodes.length > 0) {
+                        html = html + '<td class="recommender">' + remarks[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    } else {
+                        html = html + '<td class="recommender">&nbsp;</td>' + "\n";
+                    }
+                    
                     html = html + '<td class="actions"><a class="no_link" onClick="show_profile(\'' + id + '\');">View Profile &amp; Candidates</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
@@ -194,6 +204,7 @@ function show_profile(_recommender_email_addr) {
             var firstname = xml.getElementsByTagName('firstname');
             var lastname = xml.getElementsByTagName('lastname');
             var phone_num = xml.getElementsByTagName('phone_num');
+            var remarks = xml.getElementsByTagName('remarks');
             var added_on = xml.getElementsByTagName('formatted_added_on');
             var industries = xml.getElementsByTagName('industry');
             
@@ -219,6 +230,11 @@ function show_profile(_recommender_email_addr) {
                         }
                     }
                 }
+            }
+            
+            $('profile.remarks').value = '';
+            if (remarks[0].childNodes.length > 0) {
+                $('profile.remarks').value = remarks[0].childNodes[0].nodeValue;
             }
             
             set_status('');
@@ -260,6 +276,7 @@ function save_profile() {
     params = params + '&firstname=' + $('profile.firstname').value;
     params = params + '&lastname=' + $('profile.lastname').value;
     params = params + '&phone_num=' + $('profile.phone_num').value;
+    params = params + '&remarks=' + $('profile.remarks').value;
     
     if (selected_count <= 0) {
         params = params + '&industries=0';
@@ -423,6 +440,7 @@ function add_new_recommender() {
     params = params + '&firstname=' + $('firstname').value;
     params = params + '&lastname=' + $('lastname').value;
     params = params + '&phone_num=' + $('phone_num').value;
+    params = params + '&remarks=' + $('remarks').value;
         
     var industries = '';
     for (var i=0; i < $('industries').options.length; i++) {
@@ -471,6 +489,103 @@ function show_new_recommender_form() {
     $('div_recommenders').setStyle('display', 'none');
     $('div_recommender').setStyle('display', 'none');
     $('div_new_recommender_form').setStyle('display', 'block');
+}
+
+function sync_mailing_list(_email_addr) {
+    if (email_addrs.length <= 0) {
+        email_addrs[0] = _email_addr;
+    } else {
+        var already_added = false;
+        var new_list = new Array();
+        var new_list_count = 0;
+        for (var i=0; i < email_addrs.length; i++) {
+            if (email_addrs[i] == _email_addr) {
+                already_added = true;
+            } else {
+                new_list[new_list_count] = email_addrs[i];
+                new_list_count++;
+            }
+        }
+        
+        if (!already_added) {
+            new_list[new_list.length] = _email_addr;
+        }
+        
+        email_addrs = new_list;
+    }
+}
+
+function close_email_form() {
+    $('div_email_form').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+    set_status('');
+}
+
+function show_email_form() {
+    if (email_addrs.length <= 0) {
+        alert('You need to select at least one recommender.');
+        return;
+    }
+    
+    $('div_blanket').setStyle('display', 'block');
+    
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_email_form').getStyle('height'));
+    var div_width = parseInt($('div_email_form').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_email_form').setStyle('top', ((window_height - div_height) / 2));
+    $('div_email_form').setStyle('left', ((window_width - div_width) / 2));
+    
+    $('div_email_form').setStyle('display', 'block');
+}
+
+function send_email_to_list() {
+    if (isEmpty($('email_message').value) || isEmpty($('email_subject').value)) {
+        alert('You need to enter a subject and a message to be send.');
+        return;
+    }
+    
+    var params = 'id=' + id + '&action=send_email_to_list';
+    params = params + '&subject=' + $('email_subject').value;
+    params = params + '&message=' + $('email_message').value;
+    
+    var emails = '';
+    for (var i=0; i < email_addrs.length; i++) {
+        if (i == 0) {
+            emails = email_addrs[i];
+        } else {
+            emails = emails + ',' + email_addrs[i];
+        }
+    }
+    params = params + '&emails=' + emails;
+    
+    var uri = root + "/prs/recommenders_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            close_email_form();
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Sending message to recommenders...');
+        }
+    });
+
+    request.send(params);
 }
 
 function set_mouse_events() {

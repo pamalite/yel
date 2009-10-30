@@ -41,7 +41,6 @@ li.back {
     padding-top: 10px;
 }
 
-
 table.profile {
     width: 65%;
     margin: auto;
@@ -93,7 +92,7 @@ input.mini_button {
     font-size: 9pt;
 }
 
-input.field, select.field {
+input.field, select.field, input.textfield {
     width: 98%;
     font-size: 10pt;
 }
@@ -105,6 +104,11 @@ table.profile td.buttons_bar {
 
 td.date {
     width: 100px;
+}
+
+td.checkbox {
+    text-align: center;
+    width: 20px;
 }
 
 td.recommender {
@@ -170,3 +174,46 @@ td.buttons_right {
     height: 100%;
 }
 
+#div_email_form {
+    display: none;
+    background-color: #FFFFFF;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 675px;
+    height: 380px;
+    overflow: auto;
+}
+
+#div_email_form table.email_form {
+    margin: auto;
+    width: 100%;
+}
+
+#div_email_form table.email_form td {
+    padding: 3px 3px 3px 3px;
+    vertical-align: top;
+}
+
+#div_email_form table.email_form td.label {
+    color: #666666;
+    text-align: right;
+    width: 15%;
+}
+
+#div_email_form p {
+    font-size: 10pt;
+    margin: 3px 3px 3px 3px;
+}
+
+#div_email_form p.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+    background-color: #CCCCCC;
+}
+
+#div_email_form textarea  {
+    width: 98%;
+    height: 290px;
+}

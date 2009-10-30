@@ -15,7 +15,7 @@ if (!isset($_POST['action'])) {
     $criteria['limit'] = $GLOBALS['default_results_per_page'];
     $criteria['offset'] = 0;
     $criteria['keywords'] = $_POST['keywords'];
-    
+    $criteria['use_exact'] = (isset($_POST['use_exact'])) ? true : false;
     $_SESSION['yel']['prs']['resume_search']['criteria'] = array();
     $_SESSION['yel']['prs']['resume_search']['criteria']['order_by'] = 'relevance desc';
     $_SESSION['yel']['prs']['resume_search']['criteria']['industry'] = 0;
@@ -23,6 +23,7 @@ if (!isset($_POST['action'])) {
     $_SESSION['yel']['prs']['resume_search']['criteria']['limit'] = $GLOBALS['default_results_per_page'];
     $_SESSION['yel']['prs']['resume_search']['criteria']['offset'] = 0;
     $_SESSION['yel']['prs']['resume_search']['criteria']['keywords'] = $_POST['keywords'];
+    $_SESSION['yel']['prs']['resume_search']['criteria']['use_exact'] = $criteria['use_exact'];
     
     if (isset($_POST['order_by'])) {
         $criteria['order_by'] = $_POST['order_by'];
@@ -51,12 +52,20 @@ if (!isset($_POST['action'])) {
     
     $result = $resume_search->search_using($criteria);
     if ($result == 0) {
-        echo "0";
+        if ($criteria['use_exact']) {
+            echo "01";
+        } else {
+            echo "0";
+        }
         exit();
     }
 
     if (!$result) {
-        echo "ko";
+        if ($criteria['use_exact']) {
+            echo "ko1";
+        } else {
+            echo "ko";
+        }
         exit();
     }
     
@@ -75,6 +84,12 @@ if (!isset($_POST['action'])) {
         $result[$i]['member'] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($row['member']))));
         $result[$i]['total_results'] = $total_results;
         $result[$i]['current_page'] = $current_page;
+        
+        if ($criteria['use_exact']) {
+            $result[$i]['use_exact'] = '1';
+        } else {
+            $result[$i]['use_exact'] = '0';
+        }
         
         if (is_null($result[$i]['added_by']) || empty($result[$i]['added_by'])) {
             $result[$i]['added_by'] = '-1';

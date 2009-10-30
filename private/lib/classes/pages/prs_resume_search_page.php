@@ -4,6 +4,7 @@ require_once dirname(__FILE__). "/../../utilities.php";
 class PrsResumeSearchPage extends Page {
     private $employee = NULL;
     private $clearances = array();
+    private $criterias = array();
     
     function __construct($_session, $_criterias = '') {
         $this->employee = new Employee($_session['id'], $_session['sid']);
@@ -38,6 +39,12 @@ class PrsResumeSearchPage extends Page {
         echo 'var country_code = "'. $this->criterias['country_code']. '";'. "\n";
         echo 'var industry = "'. $this->criterias['industry']. '";'. "\n";
         echo 'var keywords = "'. $this->criterias['keywords']. '";'. "\n";
+        
+        if ($this->criterias['use_exact'] == '1') {
+            echo 'var use_exact = true;'. "\n";
+        } else {
+            echo 'var use_exact = false;'. "\n";
+        }
         
         $limit = (isset($this->criterias['limit'])) ? $this->criterias['limit'] : $GLOBALS['default_results_per_page'];
         echo 'var limit = "'. $limit. '";'. "\n";

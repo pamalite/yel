@@ -151,7 +151,7 @@ if ($_POST['action'] == 'send_email_to_list') {
     $subject = sanitize($_POST['subject']);
     
     $mysqli = Database::connect();
-    $query = "SELECT email_addr, CONCAT(firstname, lastname) AS employee 
+    $query = "SELECT email_addr, CONCAT(firstname, ' ', lastname) AS employee 
               FROM employees WHERE id = ". $_POST['employee']. " LIMIT 1";
     $result = $mysqli->query($query);
     $headers = 'From: '. $result[0]['employee']. ' <'. $result[0]['email_addr']. '>' . "\n";

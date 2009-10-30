@@ -817,6 +817,10 @@ function prs_verify_mini() {
 
 
 function set_mini_keywords() {
+    if (arguments.length > 0) {
+        return;
+    }
+    
     $('mini_keywords').addEvent('focus', function() {
        if ($('mini_keywords').value == 'Job title or keywords') { 
            $('mini_keywords').value = '';

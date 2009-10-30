@@ -221,6 +221,9 @@ function show_resumes() {
     var params = 'industry=' + industry;
     params = params + '&country_code=' + country_code;
     params = params + '&keywords=' + keywords;
+    if (use_exact) {
+        params = params + '&use_exact=1';
+    }
     params = params + '&offset=' + offset;
     params = params + '&limit=' + limit;
     params = params + '&order_by=' + order_by + ' ' + order;
@@ -230,6 +233,13 @@ function show_resumes() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            if (txt == 'ko1' || txt == '01') {
+                txt = txt.substr(0, (txt.length - 1));
+                $('use_exact').checked = true;
+            } else {
+                $('use_exact').checked = false;
+            }
+            
             if (txt == 'ko') {
                 set_status('An error occured while searching resumes.');
                 return false;
@@ -422,7 +432,7 @@ function show_email_add_form(_candidate_email) {
 function onDomReady() {
     set_root();
     list_available_industries(industry);
-    set_mini_keywords();
+    set_mini_keywords(true);
     
     if (!isEmpty(keywords)) {
         $('mini_keywords').value = keywords;

@@ -338,6 +338,7 @@ function add_new_candidate() {
         params = params + '&recommender_firstname=' + $('recommender_firstname').value;
         params = params + '&recommender_lastname=' + $('recommender_lastname').value;
         params = params + '&recommender_phone_num=' + $('recommender_phone_num').value;
+        params = params + '&recommender_remarks=' + $('recommender_remarks').value;
         
         var industries = '';
         for (var i=0; i < $('recommender_industries').options.length; i++) {

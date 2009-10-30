@@ -68,17 +68,20 @@ class PrsRecommendersPage extends Page {
         <div id="div_recommenders">
             <table class="buttons">
                 <tr>
+                    <td class="left"><a class="no_link" onClick="show_email_form();">Send message to selected Recommenders</a></td>
                     <td class="right"><input class="button" type="button" id="add_new_recommender" name="add_new_recommender" value="Add New Recommender" /></td>
                 </tr>
             </table>
             <table class="header">
                 <tr>
+                    <td class="checkbox">&nbsp;</td>
                     <td class="date"><span class="sort" id="sort_added_on">Added On</span></td>
                     <td class="recommender">
                         <span class="sort" id="sort_recommender">Recommender</span>
                         &nbsp;
                         <span style="font-size: 8pt;">[ Show <span id="recommender_filters_dropdown"></span> ]</span>
                     </td>
+                    <td class="recommender">Remarks</td>
                     <td class="actions">&nbsp;</td>
                 </tr>
             </table>
@@ -86,6 +89,7 @@ class PrsRecommendersPage extends Page {
             </div>
             <table class="buttons">
                 <tr>
+                    <td class="left"><a class="no_link" onClick="show_email_form();">Send message to selected Recommenders</a></td>
                     <td class="right"><input class="button" type="button" id="add_new_recommender_1" name="add_new_recommender_1" value="Add New Recommender" /></td>
                 </tr>
             </table>
@@ -127,6 +131,10 @@ class PrsRecommendersPage extends Page {
                     <tr>
                         <td class="label"><label for="profile.industries">Specializations:</label></td>
                         <td class="field"><?php echo $this->generateIndustries(); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="profile.remarks">Remarks:</label></td>
+                        <td class="field"><input type="text" class="field" id="profile.remarks" name="profile_remarks" /></td>
                     </tr>
                     <tr>
                         <td  class="buttons_bar" colspan="2"><input type="button" id="save" value="Save Profile" /></td>
@@ -183,9 +191,30 @@ class PrsRecommendersPage extends Page {
                     <td class="field"><?php echo $this->generateIndustries(true); ?></td>
                 </tr>
                 <tr>
+                    <td class="label"><label for="remarks">Remarks:</label></td>
+                    <td class="field"><input type="text" class="field" id="remarks" name="remarks" /></td>
+                </tr>
+                <tr>
                     <td  class="buttons_bar" colspan="2"><input type="button" id="add" value="Save &amp; Add Recommender" /></td>
                 </tr>
             </table>
+        </div>
+        
+        <div id="div_blanket"></div>
+        <div id="div_email_form">
+            <form onSubmit="retun false;">
+                <table class="email_form">
+                    <tr>
+                        <td class="label">Subject:</td>
+                        <td class="field"><input type="text" class="textfield" maxlength="50" id="email_subject" name="email_subject" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Message:</td>
+                        <td class="field"><textarea class="email_message" id="email_message" name="email_message"></textarea></td>
+                    </tr>
+                </table>
+                <p class="button"><input type="button" value="Cancel" onClick="close_email_form();" />&nbsp;<input type="button" value="Send Email" onClick="send_email_to_list();" /></p>
+            </form>
         </div>
         
         <?php

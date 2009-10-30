@@ -18,7 +18,7 @@ if (!isset($_POST['action'])) {
         $order_by = $_POST['order_by'];
     }
     
-    $query = "SELECT recommenders.email_addr, recommenders.phone_num, 
+    $query = "SELECT recommenders.email_addr, recommenders.phone_num, recommenders.remarks, 
               CONCAT(recommenders.firstname, ', ', recommenders.lastname) AS recommender_name, 
               DATE_FORMAT(recommenders.added_on, '%e %b, %Y') AS formatted_added_on 
               FROM recommenders ";
@@ -44,6 +44,7 @@ if (!isset($_POST['action'])) {
     
     foreach($result as $i=>$row) {
         $result[$i]['recommender_name'] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($row['recommender_name']))));
+        $result[$i]['remarks'] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($row['remarks']))));
     }
     
     $response = array('recommenders' => array('recommender' => $result));
@@ -53,7 +54,7 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'get_profile') {
-    $query = "SELECT email_addr, firstname, lastname, phone_num, 
+    $query = "SELECT email_addr, firstname, lastname, phone_num, remarks, 
               DATE_FORMAT(added_on, '%e %b, %Y') AS formatted_added_on 
               FROM recommenders 
               WHERE email_addr = '". $_POST['id']. "'";
@@ -95,6 +96,7 @@ if ($_POST['action'] == 'update_profile') {
     $data['firstname'] = sanitize($_POST['firstname']);
     $data['lastname'] = sanitize($_POST['lastname']);
     $data['phone_num'] = $_POST['phone_num'];
+    $data['remarks'] = sanitize($_POST['remarks']);
     
     if (!$recommender->update($data)) {
         echo '-1'; // failed to update new recommender
@@ -135,9 +137,10 @@ if ($_POST['action'] == 'add_new_recommender') {
     }
     
     $data = array();
-    $data['firstname'] = $_POST['firstname'];
-    $data['lastname'] = $_POST['lastname'];
+    $data['firstname'] = sanitize($_POST['firstname']);
+    $data['lastname'] = sanitize($_POST['lastname']);
     $data['phone_num'] = $_POST['phone_num'];
+    $data['remarks'] = sanitize($_POST['remarks']);
     $data['added_by'] = $_POST['id'];
     $data['added_on'] = $added_on;
     
@@ -230,5 +233,35 @@ if ($_POST['action'] == 'get_recommender_industries') {
     echo $xml_dom->get_xml_from_array(array('industries' => array('industry' => $industries)));
     exit();
     
+}
+
+if ($_POST['action'] == 'send_email_to_list') {
+    $message = sanitize($_POST['message']);
+    $subject = sanitize($_POST['subject']);
+    $recommender_email_addrs = explode(',', $_POST['emails']);
+    
+    $mysqli = Database::connect();
+    $query = "SELECT email_addr, CONCAT(firstname, ' ', lastname) AS employee 
+              FROM employees WHERE id = ". $_POST['id']. " LIMIT 1";
+    $result = $mysqli->query($query);
+    $headers = 'From: '. $result[0]['employee']. ' <'. $result[0]['email_addr']. '>' . "\n";
+    
+    foreach ($recommender_email_addrs as $recommender_email_addr) {
+        $recommender = new Recommender($recommender_email_addr);
+        
+        $message = str_replace('%recommender%', htmlspecialchars_decode(desanitize($recommender->get_name())), $message);
+        $message = str_replace('%recommender_email_address%', $recommender->id(), $message);
+        
+        mail($recommender->id(), $subject, $message, $headers);
+                    
+        // $handle = fopen('/tmp/email_to_'. $recommender->id(). '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, 'Header: '. $headers. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
+    }
+    
+    echo '0';
+    exit();
 }
 ?>

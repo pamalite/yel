@@ -299,6 +299,10 @@ class PrsPrivilegedResumesPage extends Page {
                                             <td class="label"><label for="recommender_industries">Specializations:</label></td>
                                             <td class="field"><?php echo $this->generateIndustries(); ?></td>
                                         </tr>
+                                        <tr>
+                                            <td class="label"><label for="recommender_remarks">Remarks:</label></td>
+                                            <td class="field"><input type="text" class="field" id="recommender_remarks" name="recommender_remarks" /></td>
+                                        </tr>
                                     </table>
                                 </td>
                             </tr>

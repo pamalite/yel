@@ -12,6 +12,7 @@ class ResumeSearch {
     private $total = 0;
     private $pages = 1;
     private $changed_country_code = false;
+    private $use_exact = false;
     
     function __construct() {
         $this->country_code = $GLOBALS['default_country_code'];
@@ -35,10 +36,15 @@ class ResumeSearch {
     
     private function make_query($with_limit = false) {
         $boolean_mode = '';
+        $keywords = $this->keywords;
         
         // check should we use BOOLEAN MODE
-        if (str_word_count($this->keywords) <= 3) {
+        if (str_word_count($this->keywords) <= 3 || $this->use_exact) {
             $boolean_mode = ' IN BOOLEAN MODE';
+        }
+        
+        if ($this->use_exact) {
+            $keywords = '"'. $this->keywords. '"';
         }
         
         $match_against = "MATCH (resume_index.cover_note, 
@@ -47,7 +53,7 @@ class ResumeSearch {
                                  resume_index.qualification, 
                                  resume_index.work_summary, 
                                  resume_index.file_text) 
-                          AGAINST ('". $this->keywords. "'". $boolean_mode. ")";
+                          AGAINST ('". $keywords. "'". $boolean_mode. ")";
         
         $filter_resume_status = "resumes.private = 'N'";
         
@@ -139,6 +145,8 @@ class ResumeSearch {
         if (array_key_exists('offset', $_criterias)) {
             $this->offset = $_criterias['offset'];
         }
+        
+        $this->use_exact = $_criterias['use_exact'];
         
         $query = $this->make_query();
         $mysqli = Database::connect();

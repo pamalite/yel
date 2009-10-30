@@ -124,6 +124,7 @@ if ($_POST['action'] == 'add_new_candidate') {
             $recommender_data['firstname'] = sanitize($_POST['recommender_firstname']);
             $recommender_data['lastname'] = sanitize($_POST['recommender_lastname']);
             $recommender_data['phone_num'] = $_POST['recommender_phone_num'];
+            $recommender_data['remarks'] = sanitize($_POST['recommender_remarks']);
             $recommender_data['added_by'] = $_POST['id'];
             $recommender_data['added_on'] = $joined_on;
             

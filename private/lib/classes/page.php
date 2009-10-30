@@ -259,6 +259,8 @@ class Page {
                                 <input type="text" name="keywords" id="mini_keywords">
                                 &nbsp;
                                 <input id="mini_search_button" type="submit" value="Search Resumes">
+                                &nbsp;
+                                <input type="checkbox" name="use_exact" id="use_exact" value="1" /><label for="use_exact">Exact</label>
                             </div>
                         </form>
                     </td>
