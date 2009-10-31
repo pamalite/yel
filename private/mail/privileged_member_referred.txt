@@ -1,0 +1,22 @@
+Congratulations!
+
+You have been referred by %member_name% (e-mail: %member_email_addr%) 
+to the following positions:
+
+%position%
+
+Since you are our privileged member, and you have given us your consent 
+to refer the resume we were provided to a potential position, we have 
+applied the job for you. You can track the job application in the 
+"Jobs Applied" section by signing in through the following URL:
+
+%protocol%://%root%/members/
+
+Job applications that had been submitted on behalf will only be buffered 
+until you have activated your account (as an act of consent) from the 
+activation email. So, if you have not activated your account, the job 
+application will only automatically be submitted once the account is 
+activated.
+
+Yellow Elevator
+Refer a job

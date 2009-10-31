@@ -120,7 +120,7 @@ class PrsResumesPage extends Page {
             <div id="div_profile">
                 <table class="profile">
                     <tr>
-                        <td class="added_on_date" colspan="2">Joinedd On: <span id="profile.joined_on">Loading...</span></td>
+                        <td class="added_on_date" colspan="2">Joined On: <span id="profile.joined_on">Loading...</span></td>
                     </tr>
                     <tr>
                         <td class="title" colspan="2">Specializations</td>

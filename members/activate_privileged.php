@@ -35,11 +35,11 @@ $query = "SELECT member
 $result = $mysqli->query($query);
 $email_addr = $result[0]['member'];
 
-// Check whether member is privileged
+// Check whether member is non-privileged
 $query = "SELECT recommender FROM members WHERE email_addr = '". $email_addr. "' LIMIT 1";
 $result = $mysqli->query($query);
-if (!is_null($result) && !empty($result)) {
-    redirect_to('https://'. $GLOBALS['root']. '/members/activtate_privileged.php?id='. $_GET['id']);
+if (is_null($result) || empty($result)) {
+    redirect_to('https://'. $GLOBALS['root']. '/members/activtate.php?id='. $_GET['id']);
     exit();
 }
 
@@ -70,6 +70,30 @@ $message = str_replace('%root%', $GLOBALS['root'], $message);
 $subject = "Welcome to YellowElevator.com";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
 mail($_POST['email_addr'], $subject, $message, $headers);
+
+// continue all bufferred referrals
+$query = "SELECT * FROM privileged_referral_buffers WHERE referee = '". $member->id(). "'";
+$result = $mysqli->query($query);
+if (!is_null($result) && !empty($result)) {
+    $query = '';
+    foreach ($result as $row) {
+        $query .= "INSERT INTO referrals SET 
+                   `member` = '". $row['member']. "',
+                   `referee` = '". $row['referee']. "',
+                   `job` = ". $row['job']. ",
+                   `resume` = ". $row['resume']. ",
+                   `referred_on` = '". $row['referred_on']. "',
+                   `referee_acknowledged_on` = '". $row['referee_acknowledged_on']. "',
+                   `member_confirmed_on` = '". $row['member_confirmed_on']. "',
+                   `member_read_resume_on` = '". $row['member_read_resume_on']. "',
+                   `testimony` = '". $row['testimony']. "';";
+    }
+    
+    if ($mysqli->transact($query)) {
+        $query = "DELETE FROM privileged_referral_buffers WHERE referee = '". $member->id(). "'";
+        $mysqli->execute($query);
+    }
+}
 
 redirect_to('login.php?signed_up=activated');
 ?>

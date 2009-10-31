@@ -75,9 +75,16 @@ if (!isset($_POST['action'])) {
         exit();
     }
     
+    $new_result = array();
     foreach($result as $i=>$row) {
         $result[$i]['member_name'] = htmlspecialchars_decode(html_entity_decode(stripslashes(desanitize($row['member_name']))));
+        
+        if (stripos($result[$i]['member_name'], 'yellow') === false && 
+            stripos($result[$i]['member_name'], 'elevator') === false) {
+            $new_result[] = $result[$i];
+        }
     }
+    $result = $new_result;
     
     $response = array('members' => array('member' => $result));
     header('Content-type: text/xml');

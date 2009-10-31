@@ -542,7 +542,7 @@ if ($_POST['action'] == 'refer_me') {
                                       WHERE id = ". $referee_id. "; 
                                       INSERT INTO member_referees SET 
                                       member = '". $branch_email. "', 
-                                      referee = '". $member->id() "', 
+                                      referee = '". $member->id(). "', 
                                       referred_on = NOW(), 
                                       approved = 'Y'";
                             $mysqli->transact($query);

@@ -10,7 +10,7 @@ $mysqli = Database::connect();
 log_activity('Getting the employers which joined more than a year ago.', 'yellowel_job_invoice_generator.log');
 $query = "SELECT id, joined_on, payment_terms_days, DATE_ADD(joined_on, INTERVAL 1 YEAR) AS invoice_start_date 
           FROM employers 
-          -- WHERE DATE_ADD(joined_on, INTERVAL 1 YEAR) <= '". $today. "'";
+          WHERE DATE_ADD(joined_on, INTERVAL 1 YEAR) <= '". $today. "'";
 $employers = $mysqli->query($query);
 
 if ($employers === false) {

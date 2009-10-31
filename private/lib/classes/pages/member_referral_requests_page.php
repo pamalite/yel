@@ -79,13 +79,13 @@ class MemberReferralRequestsPage extends Page {
                 <input type="hidden" id="request" name="request" value="1" />
                 <input type="hidden" id="resume" name="resume" value="" />
                 <input type="hidden" id="requested_on" name="requested_on" value="" />
-                <p>1. What experience and skill-sets do <span id="candidate_name" style="font-weight: bold;"></span> have that makes him/her suitable for the <span id="job_title" style="font-weight: bold;"></span> position? (<span id="word_count_q1">0</span>/50 words)</p>
+                <p>1. What experience and skill-sets do <span id="candidate_name" style="font-weight: bold;"></span> have that makes him/her suitable for the <span id="job_title" style="font-weight: bold;"></span> position? (<span id="word_count_q1">0</span>/200 words)</p>
                 <p><textarea class="field" id="testimony_answer_1"></textarea></p>
-                <p>2. Does <span id="candidate_name" style="font-weight: bold;"></span> meet all the requirements of the <span id="job_title" style="font-weight: bold;"></span> position?</p><div style="text-align: center;"><input type="radio" id="meet_req_yes" name="meet_req" value="yes" checked /><label for="meet_req_yes">Yes</label>&nbsp;&nbsp;&nbsp;<input type="radio" id="meet_req_no" name="meet_req" value="no" /><label for="meet_req_no">No</label></div><p>Briefly describe how they are met if you choose 'Yes'. (<span id="word_count_q2">0</span>/50 words)</p>
+                <p>2. Does <span id="candidate_name" style="font-weight: bold;"></span> meet all the requirements of the <span id="job_title" style="font-weight: bold;"></span> position?</p><div style="text-align: center;"><input type="radio" id="meet_req_yes" name="meet_req" value="yes" checked /><label for="meet_req_yes">Yes</label>&nbsp;&nbsp;&nbsp;<input type="radio" id="meet_req_no" name="meet_req" value="no" /><label for="meet_req_no">No</label></div><p>Briefly describe how they are met if you choose 'Yes'. (<span id="word_count_q2">0</span>/200 words)</p>
                 <p><textarea class="field" id="testimony_answer_2"></textarea></p>
-                <p>3. Briefly, describe <span id="candidate_name" style="font-weight: bold;"></span>'s personality and work attitude. (<span id="word_count_q3">0</span>/50 words)</p>
+                <p>3. Briefly, describe <span id="candidate_name" style="font-weight: bold;"></span>'s personality and work attitude. (<span id="word_count_q3">0</span>/200 words)</p>
                 <p><textarea class="field" id="testimony_answer_3"></textarea></p>
-                <p>4. Additional recommendations for <span id="candidate_name" style="font-weight: bold;"></span> (if any) ? (<span id="word_count_q4">0</span>/50 words)</p>
+                <p>4. Additional recommendations for <span id="candidate_name" style="font-weight: bold;"></span> (if any) ? (<span id="word_count_q4">0</span>/200 words)</p>
                 <p><textarea class="field" id="testimony_answer_4"></textarea></p>
                 <p class="button"><input type="button" value="Cancel" onClick="close_testimony_form();" />&nbsp;<input type="button" value="Refer Now" onClick="refer();" /></p>
             </form>
