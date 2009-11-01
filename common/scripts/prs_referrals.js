@@ -95,15 +95,87 @@ function show_buffers() {
                     
                     html = html + '<td class="title"><span style="font-weight: bold;">' + candidates[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + candidate_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                     
-                    html = html + '<td class="title"><a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<tr><td class="extras" colspan="5">';
+                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(\'' + candidate_emails[i].childNodes[0].nodeValue + '\', ' + job_ids[i].childNodes[0].nodeValue + ');">Testimony</a></td>' + "\n";
+                    html = html + '</td></tr>';
                     
-                    html = html + '<td class="testimony"><a class="no_link" onClick="show_testimony(\'' + candidate_emails[i].childNodes[0].nodeValue + '\', ' + job_ids[i].childNodes[0].nodeValue + ');">View</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
             }
             html = html + '</table>';
             
             $('div_buffer_list').set('html', html);
+            
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading buffered referrals...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function show_rejecteds() {
+    $('div_buffers').setStyle('display', 'none');
+    $('div_in_process').setStyle('display', 'none');
+    $('div_employeds').setStyle('display', 'none');
+    $('div_rejecteds').setStyle('display', 'block');
+    
+    $('li_buffer').setStyle('border', '1px solid #0000FF');
+    $('li_in_process').setStyle('border', '1px solid #0000FF');
+    $('li_employed').setStyle('border', '1px solid #0000FF');
+    $('li_rejected').setStyle('border', '1px solid #CCCCCC');
+    
+    var params = 'id=' + user_id + '&action=get_rejected&order_by=' + rejected_order_by + ' ' + rejected_order;
+    
+    var uri = root + "/prs/referrals_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            if (txt == 'ko') {
+                set_status('An error occured while loading rejected referrals.');
+                return false;
+            }
+            
+            var html = '<table id="list" class="list">';
+            if (txt == '0') {
+                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no rejected referrals at the moment.</div>';
+            } else {
+                var candidate_emails = xml.getElementsByTagName('candidate_email');
+                var phone_nums = xml.getElementsByTagName('phone_num');
+                var candidates = xml.getElementsByTagName('candidate');
+                var job_ids = xml.getElementsByTagName('job_id');
+                var job_titles = xml.getElementsByTagName('title');
+                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
+                var employers = xml.getElementsByTagName('employer');
+                var industries = xml.getElementsByTagName('industry');
+                var resumes = xml.getElementsByTagName('resume');
+                var resume_ids = xml.getElementsByTagName('resume_id');
+                var referral_ids = xml.getElementsByTagName('id');
+                
+                for (var i=0; i < candidate_emails.length; i++) {
+                    html = html + '<tr id="'+ i + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
+                    html = html + '<td class="date">' + referred_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="title">' + job_titles[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="title">' + industries[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    
+                    html = html + '<td class="title"><span style="font-weight: bold;">' + candidates[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + candidate_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
+                    
+                    html = html + '<tr><td class="extras" colspan="5">';
+                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(' + referral_ids[i].childNodes[0].nodeValue + ');">Testimony</a></td>' + "\n";
+                    html = html + '</td></tr>';
+                    
+                    html = html + '</tr>' + "\n";
+                }
+            }
+            html = html + '</table>';
+            
+            $('div_rejected_list').set('html', html);
             
             set_status('');
         },
@@ -172,9 +244,10 @@ function show_in_process() {
                     }
                     html = html + '<td class="date">' + resume_viewed_on + '</td>' + "\n";
                     
-                    html = html + '<td class="title"><a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<tr><td class="extras" colspan="6">';
+                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');"> ' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(' + referral_ids[i].childNodes[0].nodeValue + ');">Testimony</a></td>' + "\n";
+                    html = html + '</td></tr>';
                     
-                    html = html + '<td class="testimony"><a class="no_link" onClick="show_testimony(' + referral_ids[i].childNodes[0].nodeValue + ');">View</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
             }
@@ -328,7 +401,7 @@ function onDomReady() {
     $('li_buffer').addEvent('click', show_buffers);
     $('li_in_process').addEvent('click', show_in_process);
     // $('li_employed').addEvent('click', show_employeds);
-    // $('li_rejected').addEvent('click', show_rejecteds);
+    $('li_rejected').addEvent('click', show_rejecteds);
     
     // buffer sorters
     $('sort_referred_on').addEvent('click', function() {
@@ -452,37 +525,37 @@ function onDomReady() {
     //     employed_ascending_or_descending();
     //     show_employeds();
     // });
-    // 
-    // // rejected sorters
-    // $('sort_rejected_referred_on').addEvent('click', function() {
-    //     order_by = 'privileged_referral_buffers.referred_on';
-    //     ascending_or_descending();
-    //     show_rejecteds();
-    // });
-    // 
-    // $('sort_rejected_employer').addEvent('click', function() {
-    //     order_by = 'employer';
-    //     ascending_or_descending();
-    //     show_rejecteds();
-    // });
-    // 
-    // $('sort_rejected_title').addEvent('click', function() {
-    //     order_by = 'title';
-    //     ascending_or_descending();
-    //     show_rejecteds();
-    // });
-    // 
-    // $('sort_rejected_industry').addEvent('click', function() {
-    //     order_by = 'industry';
-    //     ascending_or_descending();
-    //     show_rejecteds();
-    // });
-    // 
-    // $('sort_rejected_candidate').addEvent('click', function() {
-    //     order_by = 'members.lastname';
-    //     ascending_or_descending();
-    //     show_rejecteds();
-    // });
+    
+    // rejected sorters
+    $('sort_rejected_referred_on').addEvent('click', function() {
+        order_by = 'referrals.referred_on';
+        rejected_ascending_or_descending();
+        show_rejecteds();
+    });
+    
+    $('sort_rejected_employer').addEvent('click', function() {
+        order_by = 'employer';
+        rejected_ascending_or_descending();
+        show_rejecteds();
+    });
+    
+    $('sort_rejected_title').addEvent('click', function() {
+        order_by = 'title';
+        rejected_ascending_or_descending();
+        show_rejecteds();
+    });
+    
+    $('sort_rejected_industry').addEvent('click', function() {
+        order_by = 'industry';
+        rejected_ascending_or_descending();
+        show_rejecteds();
+    });
+    
+    $('sort_rejected_candidate').addEvent('click', function() {
+        order_by = 'members.lastname';
+        rejected_ascending_or_descending();
+        show_rejecteds();
+    });
     
     show_buffers();
 }

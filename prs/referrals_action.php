@@ -179,19 +179,24 @@ if ($_POST['action'] == 'get_rejected') {
     $branch = $employee->get_branch();
     $member = 'team.'. strtolower($branch[0]['country_code']). '@yellowelevator.com';
     
-    $query = "SELECT referrals.id, employers.name AS employer, jobs.id AS job_id, jobs.title AS title, 
-              CONCAT(members.lastname, ', ', members.firstname) AS candidate,  
-              members.email_addr AS candidate_email, 
+    $query = "SELECT referrals.id, jobs.id AS job_id, jobs.title, employers.name AS employer, industries.industry, 
+              members.email_addr AS candidate_email, members.phone_num, 
+              resumes.name AS resume, referrals.resume AS resume_id, 
+              CONCAT(members.firstname, ', ', members.lastname) AS candidate, 
               DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job 
+              LEFT JOIN industries ON industries.id = jobs.industry 
               LEFT JOIN employers ON employers.id = jobs.employer 
               LEFT JOIN members ON members.email_addr = referrals.member 
+              LEFT JOIN resumes ON resumes.id = referrals.resume 
               WHERE ((referrals.employer_removed_on IS NOT NULL AND referrals.employer_removed_on <> '0000-00-00 00:00:00') OR 
               (referrals.referee_rejected_on IS NOT NULL AND referrals.referee_rejected_on <> '0000-00-00 00:00:00')) AND 
               (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
               referrals.member = '". $member. "' 
               ORDER BY ". $_POST['order_by'];
+    // echo $query;
+    // exit();
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
     if (count($result) <= 0 || is_null($result)) {

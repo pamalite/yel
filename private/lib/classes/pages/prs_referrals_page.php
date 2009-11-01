@@ -59,8 +59,6 @@ class PrsReferralsPage extends Page {
                     <td class="title"><span class="sort" id="sort_title">Job</span></td>
                     <td class="title"><span class="sort" id="sort_industry">Industry</span></td>
                     <td class="title"><span class="sort" id="sort_candidate">Candidate</span></td>
-                    <td class="title">Resume</td>
-                    <td class="testimony_title">Testimonial</td>
                 </tr>
             </table>
             <div id="div_buffer_list">
@@ -75,9 +73,7 @@ class PrsReferralsPage extends Page {
                     <td class="title"><span class="sort" id="sort_in_process_title">Job</span></td>
                     <td class="title"><span class="sort" id="sort_in_process_industry">Industry</span></td>
                     <td class="title"><span class="sort" id="sort_in_process_candidate">Candidate</span></td>
-                    <td class="date"><span class="sort" id="sort_in_process_employer_view_resume_on">Resume Viewed On</span></td>
-                    <td class="title">Resume</td>
-                    <td class="testimony_title">Testimonial</td>
+                    <td class="date"><span class="sort" id="sort_in_process_employer_view_resume_on">Employer Viewed On</span></td>
                 </tr>
             </table>
             <div id="div_in_process_list">
@@ -96,7 +92,6 @@ class PrsReferralsPage extends Page {
                     <td class="date"><span class="sort" id="sort_employed_employed_on">Employed On</span></td>
                     <td class="date"><span class="sort" id="sort_employed_invoice">Invoice/Receipt</span></td>
                     <td class="date"><span class="sort" id="sort_employed_guarantee_expire">Guarantee Expire In</span></td>
-                    <td class="testimony_title">Testimonial</td>
                     <td class="actions">&nbsp;</td>
                 </tr>
             </table>
@@ -112,7 +107,6 @@ class PrsReferralsPage extends Page {
                     <td class="title"><span class="sort" id="sort_rejected_title">Job</span></td>
                     <td class="title"><span class="sort" id="sort_rejected_industry">Industry</span></td>
                     <td class="title"><span class="sort" id="sort_rejected_candidate">Candidate</span></td>
-                    <td class="testimony_title">Testimonial</td>
                 </tr>
             </table>
             <div id="div_rejected_list">
