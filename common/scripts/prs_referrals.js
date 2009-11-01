@@ -48,6 +48,14 @@ function show_resume_page(resume_id) {
     }
 }
 
+function show_invoice_page(invoice_id) {
+    var popup = window.open('../employees/invoice.php?id=' + invoice_id, '', 'scrollbars');
+    
+    if (!popup) {
+        alert('Popup blocker was detected. Please allow pop-up windows for YellowElevator.com and try again.');
+    }
+}
+
 function show_buffers() {
     $('div_buffers').setStyle('display', 'block');
     $('div_in_process').setStyle('display', 'none');
@@ -95,11 +103,9 @@ function show_buffers() {
                     
                     html = html + '<td class="title"><span style="font-weight: bold;">' + candidates[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + candidate_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                     
-                    html = html + '<tr><td class="extras" colspan="5">';
-                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(\'' + candidate_emails[i].childNodes[0].nodeValue + '\', ' + job_ids[i].childNodes[0].nodeValue + ');">Testimony</a></td>' + "\n";
-                    html = html + '</td></tr>';
-                    
-                    html = html + '</tr>' + "\n";
+                    html = html + '</tr><tr><td class="extras" colspan="5">';
+                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(\'' + candidate_emails[i].childNodes[0].nodeValue + '\', ' + job_ids[i].childNodes[0].nodeValue + ');">Testimony</a>' + "\n";
+                    html = html + '</td></tr>' + "\n";
                 }
             }
             html = html + '</table>';
@@ -166,11 +172,9 @@ function show_rejecteds() {
                     
                     html = html + '<td class="title"><span style="font-weight: bold;">' + candidates[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + candidate_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                     
-                    html = html + '<tr><td class="extras" colspan="5">';
-                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(' + referral_ids[i].childNodes[0].nodeValue + ');">Testimony</a></td>' + "\n";
-                    html = html + '</td></tr>';
-                    
-                    html = html + '</tr>' + "\n";
+                    html = html + '</tr><tr><td class="extras" colspan="5">';
+                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(' + referral_ids[i].childNodes[0].nodeValue + ');">Testimony</a>' + "\n";
+                    html = html + '</td></tr>' + "\n";
                 }
             }
             html = html + '</table>';
@@ -244,11 +248,9 @@ function show_in_process() {
                     }
                     html = html + '<td class="date">' + resume_viewed_on + '</td>' + "\n";
                     
-                    html = html + '<tr><td class="extras" colspan="6">';
-                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');"> ' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(' + referral_ids[i].childNodes[0].nodeValue + ');">Testimony</a></td>' + "\n";
-                    html = html + '</td></tr>';
-                    
-                    html = html + '</tr>' + "\n";
+                    html = html + '</tr><tr><td class="extras" colspan="6">';
+                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');"> ' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(' + referral_ids[i].childNodes[0].nodeValue + ');">Testimony</a>' + "\n";
+                    html = html + '</td></tr>' + "\n";
                 }
             }
             html = html + '</table>';
@@ -259,6 +261,112 @@ function show_in_process() {
         },
         onRequest: function(instance) {
             set_status('Loading in process referrals...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function show_employeds() {
+    $('div_buffers').setStyle('display', 'none');
+    $('div_in_process').setStyle('display', 'none');
+    $('div_employeds').setStyle('display', 'block');
+    $('div_rejecteds').setStyle('display', 'none');
+    
+    $('li_buffer').setStyle('border', '1px solid #0000FF');
+    $('li_in_process').setStyle('border', '1px solid #0000FF');
+    $('li_employed').setStyle('border', '1px solid #CCCCCC');
+    $('li_rejected').setStyle('border', '1px solid #0000FF');
+    
+    var params = 'id=' + user_id + '&action=get_employed&order_by=' + employed_order_by + ' ' + employed_order;
+    
+    var uri = root + "/prs/referrals_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            if (txt == 'ko') {
+                set_status('An error occured while loading employed referrals.');
+                return false;
+            }
+            
+            var html = '<table id="list" class="list">';
+            if (txt == '0') {
+                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no employed referrals at the moment.</div>';
+            } else {
+                var candidate_emails = xml.getElementsByTagName('candidate_email');
+                var candidate_phone_nums = xml.getElementsByTagName('candidate_phone_num');
+                var candidates = xml.getElementsByTagName('candidate');
+                var recommender_emails = xml.getElementsByTagName('recommender_email');
+                var recommender_phone_nums = xml.getElementsByTagName('recommender_phone_num');
+                var recommenders = xml.getElementsByTagName('recommender');
+                var job_ids = xml.getElementsByTagName('job_id');
+                var job_titles = xml.getElementsByTagName('title');
+                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
+                var employers = xml.getElementsByTagName('employer');
+                var industries = xml.getElementsByTagName('industry');
+                var resumes = xml.getElementsByTagName('resume');
+                var resume_ids = xml.getElementsByTagName('resume_id');
+                var employed_ons = xml.getElementsByTagName('formatted_employed_on');
+                var referral_ids = xml.getElementsByTagName('referral_id');
+                var invoices = xml.getElementsByTagName('invoice');
+                var padded_invoices = xml.getElementsByTagName('padded_invoice');
+                var invoice_paid_ons = xml.getElementsByTagName('formatted_invoice_paid_on');
+                // var total_rewards = xml.getElementsByTagName('total_reward');
+                // var currencies = xml.getElementsByTagName('currency');
+                var guarantee_expire_ins = xml.getElementsByTagName('guarantee_expire_in');
+                
+                for (var i=0; i < referral_ids.length; i++) {
+                    html = html + '<tr id="'+ i + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
+                    html = html + '<td class="date">' + employed_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="title">' + job_titles[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    
+                    html = html + '<td class="title"><span style="font-weight: bold;">' + candidates[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + candidate_phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + candidate_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
+                    
+                    var recommender_phone_num = 'N/A';
+                    if (recommender_phone_nums[i].childNodes.length > 0) {
+                        recommender_phone_num = recommender_phone_nums[i].childNodes[0].nodeValue;
+                    }
+                    html = html + '<td class="title"><span style="font-weight: bold;">' + recommenders[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + recommender_phone_num + '<br/><strong>E-mail:</strong> ' + recommender_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
+                    
+                    html = html + '<td class="title"><a class="no_link" onClick="show_invoice_page(' + invoices[i].childNodes[0].nodeValue + ');">' + padded_invoices[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    
+                    html = html + '</tr><tr><td class="extras" colspan="6">';
+                    
+                    if (invoice_paid_ons[i].childNodes.length > 0) {
+                        html = html + '<a class="no_link" onClick="show_confirm_payment_form();">Confirm</a>';
+                    } else {
+                        html = html + 'Confirmed Payment';
+                    }
+                    html = html + '&nbsp;&bull;&nbsp;';
+                    
+                    var guarantee_expire_in = '0';
+                    if (guarantee_expire_ins[i].childNodes.length > 0) {
+                        guarantee_expire_in = guarantee_expire_ins[i].childNodes[0].nodeValue;
+                    }
+                    
+                    if (parseInt(guarantee_expire_in) <= 0) {
+                        html = html + 'Guarantee Expired';
+                    } else {
+                        html = html + 'Guarantee Expires in ' + guarantee_expire_in + ((parseInt(guarantee_expire_in) > 1) ? ' days' : 'day');
+                    }
+                    html = html + '&nbsp;&bull;&nbsp;';
+                    
+                    html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(' + referral_ids[i].childNodes[0].nodeValue + ');">Testimony</a>' + "\n";
+                    html = html + '</td></tr>' + "\n";
+                }
+            }
+            html = html + '</table>';
+            
+            $('div_employed_list').set('html', html);
+            
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading employed referrals...');
         }
     });
     
@@ -400,7 +508,7 @@ function onDomReady() {
     
     $('li_buffer').addEvent('click', show_buffers);
     $('li_in_process').addEvent('click', show_in_process);
-    // $('li_employed').addEvent('click', show_employeds);
+    $('li_employed').addEvent('click', show_employeds);
     $('li_rejected').addEvent('click', show_rejecteds);
     
     // buffer sorters
@@ -471,60 +579,42 @@ function onDomReady() {
         show_in_process();
     });
     
-    // // employed sorters
-    // $('sort_employed_referred_on').addEvent('click', function() {
-    //     order_by = 'referrals.referred_on';
-    //     employed_ascending_or_descending();
-    //     show_employeds();
-    // });
-    // 
-    // $('sort_employed_employer').addEvent('click', function() {
-    //     order_by = 'employer';
-    //     employed_ascending_or_descending();
-    //     show_employeds();
-    // });
-    // 
-    // $('sort_employed_title').addEvent('click', function() {
-    //     order_by = 'title';
-    //     employed_ascending_or_descending();
-    //     show_employeds();
-    // });
-    // 
-    // $('sort_employed_industry').addEvent('click', function() {
-    //     order_by = 'industry';
-    //     employed_ascending_or_descending();
-    //     show_employeds();
-    // });
-    // 
-    // $('sort_employed_candidate').addEvent('click', function() {
-    //     order_by = 'members.lastname';
-    //     employed_ascending_or_descending();
-    //     show_employeds();
-    // });
-    // 
-    // $('sort_employed_recommender').addEvent('click', function() {
-    //     order_by = 'recommenders.lastname';
-    //     employed_ascending_or_descending();
-    //     show_employeds();
-    // });
-    // 
-    // $('sort_employed_employed_on').addEvent('click', function() {
-    //     order_by = 'referrals.employed_on';
-    //     employed_ascending_or_descending();
-    //     show_employeds();
-    // });
-    // 
-    // $('sort_employed_invoice').addEvent('click', function() {
-    //     order_by = 'invoice';
-    //     employed_ascending_or_descending();
-    //     show_employeds();
-    // });
-    // 
-    // $('sort_employed_guarantee_expire').addEvent('click', function() {
-    //     order_by = 'guarantee_expire_in';
-    //     employed_ascending_or_descending();
-    //     show_employeds();
-    // });
+    // employed sorters
+    $('sort_employed_employer').addEvent('click', function() {
+        order_by = 'employer';
+        employed_ascending_or_descending();
+        show_employeds();
+    });
+    
+    $('sort_employed_title').addEvent('click', function() {
+        order_by = 'title';
+        employed_ascending_or_descending();
+        show_employeds();
+    });
+    
+    $('sort_employed_candidate').addEvent('click', function() {
+        order_by = 'members.lastname';
+        employed_ascending_or_descending();
+        show_employeds();
+    });
+    
+    $('sort_employed_recommender').addEvent('click', function() {
+        order_by = 'recommenders.lastname';
+        employed_ascending_or_descending();
+        show_employeds();
+    });
+    
+    $('sort_employed_employed_on').addEvent('click', function() {
+        order_by = 'referrals.employed_on';
+        employed_ascending_or_descending();
+        show_employeds();
+    });
+    
+    $('sort_employed_invoice').addEvent('click', function() {
+        order_by = 'invoice';
+        employed_ascending_or_descending();
+        show_employeds();
+    });
     
     // rejected sorters
     $('sort_rejected_referred_on').addEvent('click', function() {

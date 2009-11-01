@@ -119,11 +119,14 @@ if ($_POST['action'] == 'get_employed') {
     $branch = $employee->get_branch();
     $member = 'team.'. strtolower($branch[0]['country_code']). '@yellowelevator.com';
     
-    $query = "SELECT invoices.id AS invoice, referrals.id AS referral, currencies.symbol AS currency, 
+    $query = "SELECT invoices.id AS invoice, referrals.id AS referral_id, currencies.symbol AS currency, 
               referrals.total_reward, referrals.job AS job_id, jobs.title, employers.name AS employer, 
-              referrals.member AS member_id, referrals.employed_on, referrals.total_reward, 
+              referrals.member AS member_id, referrals.employed_on, industries.industry, 
               CONCAT(members.lastname, ', ', members.firstname) AS candidate, 
+              members.phone_num AS candidate_phone_num, members.email_addr AS candidate_email, 
+              resumes.name AS resume, referrals.resume AS resume_id, 
               CONCAT(recommenders.lastname, ', ', recommenders.firstname) AS recommender, 
+              recommenders.phone_num AS recommender_phone_num, recommenders.email_addr AS recommender_email, 
               DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
               DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
               DATE_FORMAT(invoices.paid_on, '%e %b, %Y') AS formatted_invoice_paid_on,
@@ -133,10 +136,12 @@ if ($_POST['action'] == 'get_employed') {
               LEFT JOIN invoices ON invoices.id = invoice_items.invoice 
               LEFT JOIN referral_rewards ON referral_rewards.referral = referrals.id 
               LEFT JOIN jobs ON jobs.id = referrals.job 
+              LEFT JOIN industries ON industries.id = jobs.industry 
               LEFT JOIN members ON members.email_addr = referrals.referee 
               LEFT JOIN employers ON employers.id = jobs.employer 
               LEFT JOIN currencies ON currencies.country_code = employers.country 
               LEFT JOIN recommenders ON recommenders.email_addr = members.recommender 
+              LEFT JOIN resumes ON resumes.id = referrals.resume 
               WHERE referrals.member = '". $member. "' AND 
               invoices.type = 'R' AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
@@ -158,8 +163,9 @@ if ($_POST['action'] == 'get_employed') {
     }
     
     foreach($result as $i=>$row) {
-        $result[$i]['recommender'] = htmlspecialchars_decode($row['recommender']);
-        $result[$i]['candidate'] = htmlspecialchars_decode($row['candidate']);
+        $result[$i]['padded_invoice'] = pad($row['invoice'], 11, '0');
+        $result[$i]['recommender'] = htmlspecialchars_decode(stripslashes(desanitize($row['recommender'])));
+        $result[$i]['candidate'] = htmlspecialchars_decode(stripslashes(desanitize($row['candidate'])));
     }
     
     $response = array('referrals' => array('referral' => $result));

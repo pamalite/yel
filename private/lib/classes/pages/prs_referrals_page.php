@@ -83,16 +83,12 @@ class PrsReferralsPage extends Page {
         <div id="div_employeds">
             <table class="header">
                 <tr>
-                    <td class="date"><span class="sort" id="sort_employed_referred_on">Referred On</span></td>
+                    <td class="date"><span class="sort" id="sort_employed_employed_on">Employed On</span></td>
                     <td class="employer"><span class="sort" id="sort_employed_employer">Employer</span></td>
                     <td class="title"><span class="sort" id="sort_employed_title">Job</span></td>
-                    <td class="title"><span class="sort" id="sort_employed_industry">Industry</span></td>
                     <td class="title"><span class="sort" id="sort_employed_candidate">Candidate</span></td>
                     <td class="title"><span class="sort" id="sort_employed_recommender">Recommender</span></td>
-                    <td class="date"><span class="sort" id="sort_employed_employed_on">Employed On</span></td>
-                    <td class="date"><span class="sort" id="sort_employed_invoice">Invoice/Receipt</span></td>
-                    <td class="date"><span class="sort" id="sort_employed_guarantee_expire">Guarantee Expire In</span></td>
-                    <td class="actions">&nbsp;</td>
+                    <td class="title"><span class="sort" id="sort_employed_invoice">Invoice/Receipt</span></td>
                 </tr>
             </table>
             <div id="div_employed_list">
