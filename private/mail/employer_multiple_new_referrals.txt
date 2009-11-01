@@ -1,0 +1,14 @@
+Hi %company%,
+
+You have received a new application(s) for the following positions:
+
+%positions%
+
+Please sign in to your account to view the candidate's resume;
+
+To sign in, go to the following web address:
+
+%protocol%://%root%/employers
+
+Yellow Elevator
+Refer a job

@@ -1,0 +1,113 @@
+#div_in_process, #div_employeds,
+#div_rejecteds {
+    display: none;
+}
+
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_buffer {
+    border: 1px solid #CCCCCC;
+}
+
+#li_in_process, #li_employed, #li_rejected {
+    border: 1px solid #0000FF;
+}
+
+td.id {
+    width: 35px;
+}
+
+td.confirm {
+    width: 120px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+td.employer, td.title {
+    width: 150px;
+}
+
+td.testimony_title {
+    width: 83px;
+}
+
+td.testimony {
+    width: 83px;
+    text-align: center;
+}
+
+td.date {
+    width: 100px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_testimony {
+    background-color: #FFFFFF;
+    display: none;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 640px;
+    height: 480px;
+}
+
+#div_testimony div.buttons {
+    background-color: #CCCCCC;
+    text-align: center;
+}
+
+#div_testimony div.testimony {
+    height: 445px;
+    margin: 5px 5px 5px 5px;
+    text-align: left;
+    font-size: 10pt;
+    overflow: auto;
+}
+

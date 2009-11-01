@@ -69,12 +69,18 @@ $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
 $message = str_replace('%root%', $GLOBALS['root'], $message);
 $subject = "Welcome to YellowElevator.com";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-mail($_POST['email_addr'], $subject, $message, $headers);
+mail($member->id(), $subject, $message, $headers);
+
+// $handle = fopen('/tmp/email_to_'. $member->id(). '.txt', 'w');
+// fwrite($handle, 'Subject: '. $subject. "\n\n");
+// fwrite($handle, $message);
+// fclose($handle);
 
 // continue all bufferred referrals
 $query = "SELECT * FROM privileged_referral_buffers WHERE referee = '". $member->id(). "'";
 $result = $mysqli->query($query);
 if (!is_null($result) && !empty($result)) {
+    $referrals = $result;
     $query = '';
     foreach ($result as $row) {
         $query .= "INSERT INTO referrals SET 
@@ -86,12 +92,77 @@ if (!is_null($result) && !empty($result)) {
                    `referee_acknowledged_on` = '". $row['referee_acknowledged_on']. "',
                    `member_confirmed_on` = '". $row['member_confirmed_on']. "',
                    `member_read_resume_on` = '". $row['member_read_resume_on']. "',
-                   `testimony` = '". $row['testimony']. "';";
+                   `testimony` = '". sanitize($row['testimony']). "';";
     }
     
     if ($mysqli->transact($query)) {
         $query = "DELETE FROM privileged_referral_buffers WHERE referee = '". $member->id(). "'";
         $mysqli->execute($query);
+        
+        // send email to employers
+        $query = "SELECT employers.email_addr, employers.name AS employer, 
+                  jobs.id AS job_id, jobs.title AS job_title 
+                  FROM jobs 
+                  LEFT JOIN employers ON employers.id = jobs.employer 
+                  WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() AND 
+                  employers.like_instant_notification = 1 AND 
+                  jobs.id IN (";
+        foreach ($referrals as $i=>$referral) {
+            if ($i == 0) {
+                $query .= $referral['job'];
+            } else {
+                $query .= ", ". $referral['job'];
+            }
+        }
+        $query .= ")";
+        
+        $result = $mysqli->query($query);
+        if (!is_null($result) && !empty($result)) {
+            $lines = file(dirname(__FILE__). '/../private/mail/employer_multiple_new_referrals.txt');
+            $subject = "Multiple new application for multiple positions";
+            $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+            
+            $employers = array();
+            foreach ($result as $row) {
+                if (array_key_exists($row['email_addr'], $employers)) {
+                    $employers[$row['email_addr']]['jobs'][$row['job_id']] = $row['job_title'];
+                } else {
+                    $employers[$row['email_addr']]['name'] = $row['employer'];
+                    $employers[$row['email_addr']]['jobs'][$row['job_id']] = $row['job_title'];
+                }
+            }
+            
+            foreach ($employers as $email_addr=>$employer) {
+                // gather the jobs
+                $positions = '';
+                $i = 0;
+                foreach ($employer['jobs'] as $id=>$job_title) {
+                    $positions .= '- ['. $id. '] '. $job_title;
+                    
+                    if ($i < count($employers['jobs'])-1) {
+                        $positions .= "\n";
+                    }
+                    $i++;
+                }
+                
+                // prepare and send email
+                $message = '';
+                foreach($lines as $line) {
+                    $message .= $line;
+                }
+
+                $message = str_replace('%company%', desanitize($employer['name']), $message);
+                $message = str_replace('%positions%', desanitize($positions), $message);
+                $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+                $message = str_replace('%root%', $GLOBALS['root'], $message);
+                mail($email_addr, $subject, $message, $headers);
+                
+                // $handle = fopen('/tmp/email_to_'. $email_addr. '.txt', 'w');
+                // fwrite($handle, 'Subject: '. $subject. "\n\n");
+                // fwrite($handle, $message);
+                // fclose($handle);
+            }
+        }
     }
 }
 

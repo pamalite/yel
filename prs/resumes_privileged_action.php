@@ -198,12 +198,12 @@ if ($_POST['action'] == 'add_new_candidate') {
                 $message = str_replace('%root%', $GLOBALS['root'], $message);
                 $subject = "Member Activation Required";
                 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-                mail($_POST['member_email_addr'], $subject, $message, $headers);
+                // mail($_POST['member_email_addr'], $subject, $message, $headers);
                             
-                // $handle = fopen('/tmp/email_to_'. $_POST['member_email_addr']. '_token.txt', 'w');
-                // fwrite($handle, 'Subject: '. $subject. "\n\n");
-                // fwrite($handle, $message);
-                // fclose($handle);
+                $handle = fopen('/tmp/email_to_'. $_POST['member_email_addr']. '_token.txt', 'w');
+                fwrite($handle, 'Subject: '. $subject. "\n\n");
+                fwrite($handle, $message);
+                fclose($handle);
                 
                 // add yellow elevator as default contact and pre-approve
                 $employee = new Employee($_POST['id']);
@@ -332,7 +332,7 @@ if ($_POST['action'] == 'make_referral') {
     $employee = new Employee($_POST['id']);
     $branch = $employee->get_branch();
     $member = 'team.'. strtolower($branch[0]['country_code']). '@yellowelevator.com';
-    $testimony = 'Yellow Elevator Contact:<br/>'. sanitize($employee->get_name()). ' ['. $employee->email_address(). ']<br/><br/>'. $testimony;
+    $testimony = sanitize('Yellow Elevator Contact:<br/>'. $employee->get_name(). ' ['. $employee->email_address(). ']<br/><br/>'. $testimony);
     
     $mysqli = Database::connect();
     $job = array();
@@ -353,18 +353,47 @@ if ($_POST['action'] == 'make_referral') {
         $job['employer_notify_now'] = ($result[0]['like_instant_notification'] == '1') ? true : false;
     }
     
+    // check whether are both the member and referee friend
+    $query = "SELECT COUNT(*) AS is_friend 
+              FROM member_referees 
+              WHERE (member = '". $employee->email_address(). "' AND 
+              referee = '". $_POST['referee']. "') OR 
+              (referee = '". $employee->email_address(). "' AND 
+              member = '". $_POST['referee']. "')";
+    $result = $mysqli->query($query);
+    if ($result[0]['is_friend'] <= 0) {
+        $query = "INSERT INTO member_referees SET 
+                  `member` = '". $_POST['referee']. "', 
+                  `referee` = 'team.". strtolower($branch[0]['country_code']). "@yellowelevator.com', 
+                  `referred_on` = NOW(), 
+                  `approved` = 'Y'; 
+                  INSERT INTO member_referees SET 
+                  `referee` = '". $_POST['referee']. "', 
+                  `member` = 'team.". strtolower($branch[0]['country_code']). "@yellowelevator.com', 
+                  `referred_on` = NOW(), 
+                  `approved` = 'Y'";
+        if (!$mysqli->transact($query)) {
+            echo '-1';
+            exit();
+        }
+    } else if ($result[0]['is_friend'] == 1) {
+        // candidate may want to do their own referral instead
+        echo '-2';
+        exit();
+    }
+    
     $today = now();
     $data = array();
     $data['member'] = $member;
     $data['job'] = $job_id;
-    $data['referred_on'] = today();
-    $data['member_confirmed_on'] = today();
+    $data['referred_on'] = $today;
+    $data['member_confirmed_on'] = $today;
     $data['member_rejected_on'] = 'NULL';
     $data['testimony'] = $testimony;
     $data['referee'] = $_POST['referee'];
     $data['resume'] = $_POST['resume'];
-    $data['member_read_resume_on'] = today();
-    $data['referee_acknowledged_on'] = today();
+    $data['member_read_resume_on'] = $today;
+    $data['referee_acknowledged_on'] = $today;
     
     // check whether do we have consent to refer now
     $query = "SELECT active FROM members WHERE email_addr = '". $_POST['referee']. "' LIMIT 1";
@@ -389,7 +418,7 @@ if ($_POST['action'] == 'make_referral') {
             $message = str_replace('%root%', $GLOBALS['root'], $message);
             $subject = "New application for ". desanitize($job['job']). " position";
             $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-//            mail($job['employer_email_addr'], $subject, $message, $headers);
+            // mail($job['employer_email_addr'], $subject, $message, $headers);
 
             $handle = fopen('/tmp/email_to_'. $job['employer_email_addr']. '.txt', 'w');
             fwrite($handle, 'Subject: '. $subject. "\n\n");
@@ -435,7 +464,7 @@ if ($_POST['action'] == 'make_referral') {
     $message = str_replace('%position%', $position, $message);
     $subject = htmlspecialchars_decode(desanitize($employee->get_name())). " has screened and submitted your resume for the ". htmlspecialchars_decode($job['job']). " position";
     $headers = 'From: '. str_replace(',', '', htmlspecialchars_decode(desanitize($employee->get_name()))). ' <'. $employee->email_address(). '>' . "\n";
-//    mail($_POST['referee'], $subject, $message, $headers);
+    // mail($_POST['referee'], $subject, $message, $headers);
     
     $handle = fopen('/tmp/ref_email_to_'. $_POST['referee']. '.txt', 'w');
     fwrite($handle, 'Subject: '. $subject. "\n\n");
