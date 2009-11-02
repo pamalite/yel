@@ -314,8 +314,6 @@ function show_employeds() {
                 var invoices = xml.getElementsByTagName('invoice');
                 var padded_invoices = xml.getElementsByTagName('padded_invoice');
                 var invoice_paid_ons = xml.getElementsByTagName('formatted_invoice_paid_on');
-                // var total_rewards = xml.getElementsByTagName('total_reward');
-                // var currencies = xml.getElementsByTagName('currency');
                 var guarantee_expire_ins = xml.getElementsByTagName('guarantee_expire_in');
                 
                 for (var i=0; i < referral_ids.length; i++) {
@@ -332,16 +330,14 @@ function show_employeds() {
                     }
                     html = html + '<td class="title"><span style="font-weight: bold;">' + recommenders[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + recommender_phone_num + '<br/><strong>E-mail:</strong> ' + recommender_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                     
-                    html = html + '<td class="title"><a class="no_link" onClick="show_invoice_page(' + invoices[i].childNodes[0].nodeValue + ');">' + padded_invoices[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    
-                    html = html + '</tr><tr><td class="extras" colspan="6">';
-                    
+                    var invoice_paid = '';
                     if (invoice_paid_ons[i].childNodes.length > 0) {
-                        html = html + '<a class="no_link" onClick="show_confirm_payment_form();">Confirm</a>';
-                    } else {
-                        html = html + 'Confirmed Payment';
+                        invoice_paid = '[Paid On: ' + invoice_paid_ons[i].childNodes[0].nodeValue + ']';
                     }
-                    html = html + '&nbsp;&bull;&nbsp;';
+                    html = html + '<td class="title"><a class="no_link" onClick="show_invoice_page(' + invoices[i].childNodes[0].nodeValue + ');">' + padded_invoices[i].childNodes[0].nodeValue + '</a><br/>' + invoice_paid + '</td>' + "\n";
+                    
+                    var colspan = 6;
+                    html = html + '</tr><tr><td class="extras" colspan="' + colspan + '">';
                     
                     var guarantee_expire_in = '0';
                     if (guarantee_expire_ins[i].childNodes.length > 0) {
@@ -351,12 +347,16 @@ function show_employeds() {
                     if (parseInt(guarantee_expire_in) <= 0) {
                         html = html + 'Guarantee Expired';
                     } else {
-                        html = html + 'Guarantee Expires in ' + guarantee_expire_in + ((parseInt(guarantee_expire_in) > 1) ? ' days' : 'day');
+                        html = html + 'Guarantee Expires in ' + guarantee_expire_in + ((parseInt(guarantee_expire_in) > 1) ? ' days' : ' day');
                     }
                     html = html + '&nbsp;&bull;&nbsp;';
                     
                     html = html + '<a class="no_link" onClick="show_resume_page(' + resume_ids[i].childNodes[0].nodeValue + ');">' + resumes[i].childNodes[0].nodeValue + '</a>&nbsp;&bull;&nbsp;<a class="no_link" onClick="show_testimony(' + referral_ids[i].childNodes[0].nodeValue + ');">Testimony</a>' + "\n";
                     html = html + '</td></tr>' + "\n";
+                    
+                    html = html + '<tr>' + "\n";
+                    html = html + '<td colspan="' + colspan + '"></td>' + "\n";
+                    html = html + '</tr>' + "\n";
                 }
             }
             html = html + '</table>';

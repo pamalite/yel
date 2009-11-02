@@ -142,7 +142,7 @@ if ($_POST['action'] == 'get_employed') {
               LEFT JOIN currencies ON currencies.country_code = employers.country 
               LEFT JOIN recommenders ON recommenders.email_addr = members.recommender 
               LEFT JOIN resumes ON resumes.id = referrals.resume 
-              WHERE referrals.member = '". $member. "' AND 
+              WHERE -- referrals.member = '". $member. "' AND 
               invoices.type = 'R' AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
               (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
