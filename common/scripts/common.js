@@ -612,11 +612,13 @@ function get_referrals_count() {
                 }
             }
             
-            if (isEmpty(counts)) {
-                $('referrals_count').setStyle('display', 'none');
-            } else {
-                $('referrals_count').setStyle('display', 'inline');
-                $('referrals_count').set('html', ' (' + counts + ')');
+            if ($('referrals_count') != null) {
+                if (isEmpty(counts)) {
+                    $('referrals_count').setStyle('display', 'none');
+                } else {
+                    $('referrals_count').setStyle('display', 'inline');
+                    $('referrals_count').set('html', ' (' + counts + ')');
+                }
             }
         }
     });
