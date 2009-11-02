@@ -127,9 +127,11 @@ if ($_POST['action'] == 'get_employed') {
               resumes.name AS resume, referrals.resume AS resume_id, 
               CONCAT(recommenders.lastname, ', ', recommenders.firstname) AS recommender, 
               recommenders.phone_num AS recommender_phone_num, recommenders.email_addr AS recommender_email, 
+              recommender_tokens.token AS recommender_token, 
               DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
               DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
-              DATE_FORMAT(invoices.paid_on, '%e %b, %Y') AS formatted_invoice_paid_on,
+              DATE_FORMAT(invoices.paid_on, '%e %b, %Y') AS formatted_invoice_paid_on, 
+              DATE_FORMAT(recommender_tokens.presented_on, '%e %b, %Y') AS formatted_token_presented_on, 
               DATEDIFF(referrals.guarantee_expire_on, NOW()) AS guarantee_expire_in  
               FROM referrals 
               LEFT JOIN invoice_items ON invoice_items.item = referrals.id 
@@ -142,6 +144,8 @@ if ($_POST['action'] == 'get_employed') {
               LEFT JOIN currencies ON currencies.country_code = employers.country 
               LEFT JOIN recommenders ON recommenders.email_addr = members.recommender 
               LEFT JOIN resumes ON resumes.id = referrals.resume 
+              LEFT JOIN recommender_tokens ON recommender_tokens.referral = referrals.id AND 
+              recommender_tokens.recommender = recommenders.email_addr 
               WHERE -- referrals.member = '". $member. "' AND 
               invoices.type = 'R' AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 

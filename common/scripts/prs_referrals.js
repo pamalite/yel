@@ -315,6 +315,8 @@ function show_employeds() {
                 var padded_invoices = xml.getElementsByTagName('padded_invoice');
                 var invoice_paid_ons = xml.getElementsByTagName('formatted_invoice_paid_on');
                 var guarantee_expire_ins = xml.getElementsByTagName('guarantee_expire_in');
+                var recommender_token_presented_ons = xml.getElementsByTagName('formatted_token_presented_on');
+                var recommender_tokens = xml.getElementsByTagName('recommender_token');
                 
                 for (var i=0; i < referral_ids.length; i++) {
                     html = html + '<tr id="'+ i + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
@@ -338,6 +340,21 @@ function show_employeds() {
                     
                     var colspan = 6;
                     html = html + '</tr><tr><td class="extras" colspan="' + colspan + '">';
+                    
+                    if (recommender_token_presented_ons[i].childNodes.length > 0) {
+                        var presented_on = recommender_token_presented_ons[i].childNodes[0].nodeValue;
+                        var token = '';
+                        if (recommender_tokens[i].childNodes.length > 0) {
+                            token = recommender_tokens[i].childNodes[0].nodeValue;
+                        }
+                        
+                        if (!isEmpty(token)) {
+                            html = html + '<span style="font-weight: bold;">' + token + '</span> was presented on ' + presented_on;
+                        }
+                    } else {
+                        html = html + '<a class="no_link" onClick="show_token_form(' + referral_ids[i].childNodes[0].nodeValue + ', \'' + recommender_emails[i].childNodes[0].nodeValue + '\');">Present Token</a>';
+                    }
+                    html = html + '&nbsp;&bull;&nbsp;';
                     
                     var guarantee_expire_in = '0';
                     if (guarantee_expire_ins[i].childNodes.length > 0) {
