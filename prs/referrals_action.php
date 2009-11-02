@@ -146,7 +146,7 @@ if ($_POST['action'] == 'get_employed') {
               LEFT JOIN resumes ON resumes.id = referrals.resume 
               LEFT JOIN recommender_tokens ON recommender_tokens.referral = referrals.id AND 
               recommender_tokens.recommender = recommenders.email_addr 
-              WHERE -- referrals.member = '". $member. "' AND 
+              WHERE referrals.member = '". $member. "' AND 
               invoices.type = 'R' AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
               (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
@@ -261,6 +261,28 @@ if ($_POST['action'] == 'get_testimony_from_buffer') {
     }
     
     echo "ko";
+    exit();
+}
+
+if ($_POST['action'] == 'get_recommender_name') {
+    $recommender = new Recommender($_POST['id']);
+    echo htmlspecialchars_decode(stripslashes(desanitize($recommender->get_name())));
+    exit();
+}
+
+if ($_POST['action'] == 'present_token') {
+    $mysqli = Database::connect();
+    $query = "INSERT INTO recommender_tokens SET 
+              `referral` = ". $_POST['referral']. ", 
+              `recommender` = '". $_POST['id']. "', 
+              `presented_on` = '". $_POST['date']. "', 
+              `token` = '". $_POST['token']. "'";
+    if (!$mysqli->execute($query)) {
+        echo 'ko';
+    } else {
+        echo 'ok';
+    }
+    
     exit();
 }
 ?>

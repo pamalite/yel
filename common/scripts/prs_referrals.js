@@ -390,6 +390,119 @@ function show_employeds() {
     request.send(params);
 }
 
+function close_token_form() {
+    $('div_token_form').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+}
+
+function show_token_form(_referral_id, _recommender_email) {
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_token_form').getStyle('height'));
+    var div_width = parseInt($('div_token_form').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_token_form').setStyle('top', ((window_height - div_height) / 2));
+    $('div_token_form').setStyle('left', ((window_width - div_width) / 2));
+    
+    $('recommender').value = _recommender_email;
+    $('referral').value = _referral_id;
+    
+    var params = 'id=' + _recommender_email + '&action=get_recommender_name';
+    var uri = root + "/prs/referrals_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            $('recommender_name').set('html', txt);
+            $('div_blanket').setStyle('display', 'block');
+            $('div_token_form').setStyle('display', 'block');
+        }
+    });
+
+    request.send(params);
+}
+
+function present_token() {
+    if (isEmpty($('token').value)) {
+        alert('Token field CANNOT be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('presented_on_day').value)) {
+        alert('The day field CANNOT be empty.');
+        return false;
+    }
+    
+    var year = $('presented_on_year').options[$('presented_on_year').selectedIndex].value;
+    var month = $('presented_on_month').options[$('presented_on_month').selectedIndex].value;
+    var day = $('presented_on_day').value;
+    if (month == '02') {
+        var _day = day;
+        if (day.length == 2) {
+            if (day.substr(0, 1) == '0') {
+                _day = day.substr(1);
+            }
+        }
+        
+        if (((parseInt(year) % 4 == 0) && (parseInt(year) % 100 != 0)) || 
+            (parseInt(year) % 400 == 0)) {
+            if (parseInt(_day) > 29) {
+                alert('The day field is invalid.');
+                return false;
+            }
+        } else {
+            if (parseInt(_day) >= 29) {
+                alert('The day field is invalid.');
+                return false;
+            }
+        }
+    }
+    
+    if (day.length == 1) {
+        if (parseInt(day) < 10) {
+            day = '0' + day;
+        }
+    }
+    
+    var params = 'id=' + $('recommender').value + '&action=present_token';
+    params = params + '&referral=' + $('referral').value;
+    params = params + '&date=' + year + '-' + month + '-' + day;
+    params = params + '&token=' + $('token').value;
+    
+    var uri = root + "/prs/referrals_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('Token cannot be saved.');
+            } else {
+                close_token_form();
+                show_employeds();
+            }
+            
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Saving token...');
+        }
+    });
+
+    request.send(params);
+}
+
 function close_testimony() {
     $('div_testimony').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');

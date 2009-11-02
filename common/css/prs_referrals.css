@@ -80,6 +80,16 @@ input.button {
     font-size: 10pt;
 }
 
+input.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+input.date {
+    width: 20px;
+    font-size: 10pt;
+}
+
 #div_blanket {
     display: none;
     background-color: #000000;
@@ -115,3 +125,40 @@ input.button {
     overflow: auto;
 }
 
+#div_token_form {
+    background-color: #FFFFFF;
+    display: none;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 640px;
+    height: 165px;
+}
+
+#div_token_form table.token_form {
+    margin: auto;
+    width: 100%;
+}
+
+#div_token_form table.token_form td {
+    padding: 3px 3px 3px 3px;
+    vertical-align: top;
+}
+
+#div_token_form table.token_form td.label {
+    color: #666666;
+    text-align: right;
+    width: 20%;
+}
+
+#div_token_form p.label {
+    text-align: center;
+    padding: 5px 5px 5px 5px;
+}
+
+#div_token_form p.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+    background-color: #CCCCCC;
+}

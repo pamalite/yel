@@ -38,6 +38,9 @@ class PrsReferralsPage extends Page {
         $this->top_prs($this->employee->get_name(). " - Referrals");
         $this->menu_prs($this->clearances, 'referrals');
         
+        $yyyy = date('Y');
+        $mm = date('m');
+        $dd = date('d');
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
@@ -116,6 +119,51 @@ class PrsReferralsPage extends Page {
                 <input type="button" onClick="close_testimony();" value="Close" />
             </div>
         </div>
+        
+        <div id="div_token_form">
+            <p class="label">
+                Please enter the token and date presented to <span id="recommender_name" style="font-weight: bold;"></span>
+            </p>
+            <form onSubmit="retun false;">
+                <input type="hidden" id="recommender" name="recommender" value="" />
+                <input type="hidden" id="referral" name="referral" value="" />
+                <table class="token_form">
+                    <tr>
+                        <td class="label"><label for="token">Token:</label></td>
+                        <td class="field"><input class="field" type="text" id="token" name="token" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="presented_on_day">Presented On:</label></td>
+                        <td class="field">
+                            <input class="date" type="text" id="presented_on_day" name="presented_on_day" value="<?php echo $dd; ?>" maxlength="2" />
+                            &nbsp;
+                            <select id="presented_on_month" name="presented_on_month">
+                                <option value="01" <?php echo ($mm == '01') ? 'selected' : ''; ?>>January</option>
+                                <option value="02" <?php echo ($mm == '02') ? 'selected' : ''; ?>>February</option>
+                                <option value="03" <?php echo ($mm == '03') ? 'selected' : ''; ?>>March</option>
+                                <option value="04" <?php echo ($mm == '04') ? 'selected' : ''; ?>>April</option>
+                                <option value="05" <?php echo ($mm == '05') ? 'selected' : ''; ?>>May</option>
+                                <option value="06" <?php echo ($mm == '06') ? 'selected' : ''; ?>>June</option>
+                                <option value="07" <?php echo ($mm == '07') ? 'selected' : ''; ?>>July</option>
+                                <option value="08" <?php echo ($mm == '08') ? 'selected' : ''; ?>>August</option>
+                                <option value="09" <?php echo ($mm == '09') ? 'selected' : ''; ?>>September</option>
+                                <option value="10" <?php echo ($mm == '10') ? 'selected' : ''; ?>>October</option>
+                                <option value="11" <?php echo ($mm == '11') ? 'selected' : ''; ?>>November</option>
+                                <option value="12" <?php echo ($mm == '12') ? 'selected' : ''; ?>>December</option>
+                            </select>
+                            &nbsp;
+                            <select id="presented_on_year" name="presented_on_year">
+                                <option value="<?php echo ($yyyy-1); ?>"><?php echo ($yyyy-1); ?></option>
+                                <option value="<?php echo $yyyy; ?>" selected><?php echo $yyyy; ?></option>
+                            </select>
+                            
+                        </td>
+                    </tr>
+                </table>
+                <p class="button"><input type="button" value="Cancel" onClick="close_token_form();" />&nbsp;<input type="button" value="Submit" onClick="present_token();" /></p>
+            </form>
+        </div>
+        
         <?php
     }
 }
