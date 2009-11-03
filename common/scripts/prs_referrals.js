@@ -326,11 +326,17 @@ function show_employeds() {
                     
                     html = html + '<td class="title"><span style="font-weight: bold;">' + candidates[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + candidate_phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + candidate_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                     
-                    var recommender_phone_num = 'N/A';
-                    if (recommender_phone_nums[i].childNodes.length > 0) {
-                        recommender_phone_num = recommender_phone_nums[i].childNodes[0].nodeValue;
+                    var is_privileged = false;
+                    var recommender_html = '<td class="title"><span style="font-size: 7pt; color: #CCCCCC;">N/A</span></td>' + "\n";
+                    if (recommenders[i].childNodes.length > 0) {
+                        var recommender_phone_num = 'N/A';
+                        if (recommender_phone_nums[i].childNodes.length > 0) {
+                            recommender_phone_num = recommender_phone_nums[i].childNodes[0].nodeValue;
+                        }
+                        recommender_html = '<td class="title"><span style="font-weight: bold;">' + recommenders[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + recommender_phone_num + '<br/><strong>E-mail:</strong> ' + recommender_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
+                        is_privileged = true;
                     }
-                    html = html + '<td class="title"><span style="font-weight: bold;">' + recommenders[i].childNodes[0].nodeValue + '</span><br/><div class="phone_num"><strong>Tel:</strong> ' + recommender_phone_num + '<br/><strong>E-mail:</strong> ' + recommender_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
+                    html = html + recommender_html;
                     
                     var invoice_paid = '';
                     if (invoice_paid_ons[i].childNodes.length > 0) {
@@ -341,20 +347,22 @@ function show_employeds() {
                     var colspan = 6;
                     html = html + '</tr><tr><td class="extras" colspan="' + colspan + '">';
                     
-                    if (recommender_token_presented_ons[i].childNodes.length > 0) {
-                        var presented_on = recommender_token_presented_ons[i].childNodes[0].nodeValue;
-                        var token = '';
-                        if (recommender_tokens[i].childNodes.length > 0) {
-                            token = recommender_tokens[i].childNodes[0].nodeValue;
+                    if (is_privileged) {
+                        if (recommender_token_presented_ons[i].childNodes.length > 0) {
+                            var presented_on = recommender_token_presented_ons[i].childNodes[0].nodeValue;
+                            var token = '';
+                            if (recommender_tokens[i].childNodes.length > 0) {
+                                token = recommender_tokens[i].childNodes[0].nodeValue;
+                            }
+
+                            if (!isEmpty(token)) {
+                                html = html + '<span style="font-weight: bold;">' + token + '</span> was presented on ' + presented_on;
+                            }
+                        } else {
+                            html = html + '<a class="no_link" onClick="show_token_form(' + referral_ids[i].childNodes[0].nodeValue + ', \'' + recommender_emails[i].childNodes[0].nodeValue + '\');">Present Token</a>';
                         }
-                        
-                        if (!isEmpty(token)) {
-                            html = html + '<span style="font-weight: bold;">' + token + '</span> was presented on ' + presented_on;
-                        }
-                    } else {
-                        html = html + '<a class="no_link" onClick="show_token_form(' + referral_ids[i].childNodes[0].nodeValue + ', \'' + recommender_emails[i].childNodes[0].nodeValue + '\');">Present Token</a>';
+                        html = html + '&nbsp;&bull;&nbsp;';
                     }
-                    html = html + '&nbsp;&bull;&nbsp;';
                     
                     var guarantee_expire_in = '0';
                     if (guarantee_expire_ins[i].childNodes.length > 0) {
@@ -448,17 +456,23 @@ function present_token() {
     var year = $('presented_on_year').options[$('presented_on_year').selectedIndex].value;
     var month = $('presented_on_month').options[$('presented_on_month').selectedIndex].value;
     var day = $('presented_on_day').value;
-    if (month == '02') {
-        var _day = day;
-        if (day.length == 2) {
-            if (day.substr(0, 1) == '0') {
-                _day = day.substr(1);
-            }
+    
+    var _day = day;
+    if (day.length == 2) {
+        if (day.substr(0, 1) == '0') {
+            _day = day.substr(1);
         }
-        
+    }
+    
+    if (parseInt(_day) <= 0) {
+        alert('The day field is invalid.');
+        return false;
+    }
+    
+    if (month == '02') {
         if (((parseInt(year) % 4 == 0) && (parseInt(year) % 100 != 0)) || 
             (parseInt(year) % 400 == 0)) {
-            if (parseInt(_day) > 29) {
+            if (parseInt(_day) >= 30) {
                 alert('The day field is invalid.');
                 return false;
             }
@@ -467,6 +481,28 @@ function present_token() {
                 alert('The day field is invalid.');
                 return false;
             }
+        }
+    } else {
+        switch (month) {
+            case '01':
+            case '03':
+            case '05':
+            case '07':
+            case '08':
+            case '10':
+            case '12':
+                if (parseInt(_day) > 31) {
+                    alert('The day field is invalid.');
+                    return false;
+                }
+            case '04':
+            case '06':
+            case '09':
+            case '11':
+                if (parseInt(_day) > 30) {
+                    alert('The day field is invalid.');
+                    return false;
+                }
         }
     }
     

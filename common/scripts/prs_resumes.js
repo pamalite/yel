@@ -10,6 +10,20 @@ var resumes_order = 'desc';
 var current_member_email_addr = '';
 var current_member_name = '';
 
+// Job class for easy storage
+function Job(_id, _title, _employer, _industry, _currency, _salary, _description) {
+    this.id = _id;
+    this.title = _title;
+    this.employer = _employer;
+    this.industry = _industry;
+    this.currency = _currency;
+    this.salary = _salary;
+    this.description = _description;
+}
+var available_jobs = new Array();
+var jobs_list = new ListBox('jobs', 'jobs_list', false);
+var jobs_filter_by = '0';
+
 function ascending_or_descending() {
     if (order == 'desc') {
         order = 'asc';
@@ -270,7 +284,7 @@ function show_resumes(_member_email_addr) {
                         html = html + '<td class="title"><a class="no_link" onClick="show_resume_page(\'' + resume_id.childNodes[0].nodeValue + '\')">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     }
                     
-                    html = html + '<td class="actions"><a class="no_link" onClick="show_refer_now_form(\'' + resume_id.childNodes[0].nodeValue + '\')">Refer Now</a></td>' + "\n";
+                    html = html + '<td class="actions"><a class="no_link" onClick="show_job_select_form(\'' + resume_id.childNodes[0].nodeValue + '\')">Refer Now</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
                 html = html + '</table>';
@@ -281,6 +295,259 @@ function show_resumes(_member_email_addr) {
         },
         onRequest: function(instance) {
             set_status('Loading resumes...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function clear_job_details() {
+    $('job_details.title').set('html', '&nbsp;');
+    $('job_details.industry').set('html', '&nbsp;');
+    $('job_details.currency').set('html', '&nbsp;');
+    $('job_details.salary').set('html', '&nbsp;');
+    $('job_details.description').set('html', '&nbsp;');
+}
+
+function show_job_details() {
+    $('instructions').setStyle('display', 'none');
+    $('job_details').setStyle('display', 'block');
+    
+    clear_job_details();
+    
+    if (isEmpty(jobs_list.selected_value)) {
+        $('instructions').setStyle('display', 'block');
+        $('job_details').setStyle('display', 'none');
+        set_status('');
+        return;
+    }
+    
+    for (var i=0; i < available_jobs.length; i++) {
+        if (available_jobs[i].id == jobs_list.selected_value) {
+            $('job_details.title').set('html', available_jobs[i].title);
+            $('job_details.industry').set('html', available_jobs[i].industry);
+            $('job_details.currency').set('html', available_jobs[i].currency);
+            $('job_details.salary').set('html', available_jobs[i].salary);
+            $('job_details.description').set('html', available_jobs[i].description);
+            break;
+        }
+    }
+}
+
+function show_available_jobs() {
+    $('jobs').set('html', '');
+    $('instructions').setStyle('display', 'block');
+    $('job_details').setStyle('display', 'none');
+    
+    var params = 'id=' + id + '&action=get_jobs';
+    params = params + '&filter_by=' + jobs_filter_by;
+    
+    var uri = root + "/prs/resumes_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == '0') {
+                alert('No jobs available for referral at the moment.');
+                return false;
+            }
+            
+            available_jobs = new Array();
+            jobs_list.clear();
+            
+            var ids = xml.getElementsByTagName('id');
+            var titles = xml.getElementsByTagName('title');
+            var descriptions = xml.getElementsByTagName('description');
+            var job_industries = xml.getElementsByTagName('industry');
+            var employers = xml.getElementsByTagName('employer');
+            var salaries = xml.getElementsByTagName('salary');
+            var currencies = xml.getElementsByTagName('currency');
+            
+            for (var i=0; i < ids.length; i++) {
+                var job = new Job(ids[i].childNodes[0].nodeValue, titles[i].childNodes[0].nodeValue, employers[i].childNodes[0].nodeValue, job_industries[i].childNodes[0].nodeValue, currencies[i].childNodes[0].nodeValue, salaries[i].childNodes[0].nodeValue, descriptions[i].childNodes[0].nodeValue);
+                available_jobs[i] = job;
+                jobs_list.add_item('<span style="font-weight: bold;">' + job.title + '</span><br/><span style="font-size: 7pt;">' + job.employer + '</span>', job.id);
+            }
+            
+            jobs_list.show();
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading jobs...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_job_select_form() {
+    $('div_job_select_form').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+}
+
+function show_job_select_form(_resume_id) {
+    $('div_blanket').setStyle('display', 'block');
+    
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_job_select_form').getStyle('height'));
+    var div_width = parseInt($('div_job_select_form').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_job_select_form').setStyle('top', ((window_height - div_height) / 2));
+    $('div_job_select_form').setStyle('left', ((window_width - div_width) / 2));
+    
+    $('job_select_form.candidate_name').set('html', current_member_name);
+    $('job_select_form.resume_id').value = _resume_id;
+    
+    $('div_job_select_form').setStyle('display', 'block');
+    show_available_jobs();
+}
+
+function set_filter() {
+    jobs_filter_by = $('job_industry_filter').options[$('job_industry_filter').selectedIndex].value;
+    show_available_jobs();
+}
+
+function close_testimony_form() {
+    $('div_testimony_form').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+    $('job_select_form.resume_id').value = '0';
+}
+
+function show_testimony_form() {
+    if (isEmpty(jobs_list.selected_value)) {
+        alert('You need to select a job.');
+        return;
+    }
+    
+    close_job_select_form();
+    
+    var job_title = '';
+    for (var i=0; i < available_jobs.length; i++) {
+        if (available_jobs[i].id == jobs_list.selected_value) {
+            job_title = available_jobs[i].title;
+            break;
+        }
+    }
+    
+    $('div_blanket').setStyle('display', 'block');
+    
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_testimony_form').getStyle('height'));
+    var div_width = parseInt($('div_testimony_form').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_testimony_form').setStyle('top', ((window_height - div_height) / 2));
+    $('div_testimony_form').setStyle('left', ((window_width - div_width) / 2));
+    
+    var testimony_form = $('div_testimony_form');
+    var spans = testimony_form.getElementsByTagName('span');
+    
+    for (var i=0; i < spans.length; i++) {
+        if (spans[i].id == 'testimony.candidate_name') {
+            spans[i].innerHTML = current_member_name;
+        }
+        
+        if (spans[i].id == 'testimony.job_title') {
+            spans[i].innerHTML = job_title;
+        } 
+    }
+    
+    $('div_testimony_form').setStyle('display', 'block');
+}
+
+function refer() {
+    var answer_1 = $('testimony_answer_1').value;
+    var answer_2 = $('testimony_answer_2').value;
+    var answer_3 = $('testimony_answer_3').value;
+    var answer_4 = $('testimony_answer_4').value;
+    var meet_requirements = ($('meet_req_yes').checked) ? 'Yes' : 'No';
+    
+    if (isEmpty(answer_1) || (meet_requirements == 'Yes' && isEmpty(answer_2)) || isEmpty(answer_3)) {
+        alert('Please briefly answer all questions.');
+        return false;
+    } else if (answer_1.split(' ').length > 200 || answer_2.split(' ').length > 200 || 
+               answer_3.split(' ').length > 200 || answer_4.split(' ').length > 200) {
+        if (answer_1.split(' ').length > 200) {
+            alert('Please keep your 1st answer below 200 words.');
+        } else if (answer_2.split(' ').length > 200) {
+            alert('Please keep your 2nd answer below 200 words.');
+        } else if (answer_3.split(' ').length > 200) {
+            alert('Please keep your 3rd answer below 200 words.');
+        } else if (answer_4.split(' ').length > 200) {
+            alert('Please keep your 4th and final answer below 200 words.');
+        }
+        return false;
+    }
+    
+    var testimony = 'Experiences and Skillsets:<br/>' + answer_1 + '<br/><br/>';
+    testimony = testimony + 'Meet Requirements: ' + meet_requirements + '<br/>Additional Comments:<br/>' + answer_2 + '<br/><br/>';
+    testimony = testimony + 'Personaliy/Work Attitude:<br/>' + answer_3 + '<br/><br/>';
+    testimony = testimony + 'Additional Recommendations: ' + ((isEmpty(answer_4)) ? 'None provided' : answer_4);
+    
+    var agreed = confirm('By clicking "OK", you confirm that you have screened the candidate\'s resume and have also assessed the candidate\'s suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding the candidate, and you agree to provide any other necessary information requested by the employer.\n\nOtherwise, you may click the "Cancel" button.');
+    
+    if (!agreed) {
+        set_status('');
+        close_testimony_form();
+        return false;
+    }
+    
+    var params = 'id=' + user_id + '&action=make_referral';
+    params = params + '&referee=' + current_member_email_addr;
+    params = params + '&job=' + jobs_list.selected_value;
+    params = params + '&testimony=' + testimony;
+    params = params + '&resume=' + $('job_select_form.resume_id').value;
+    
+    var uri = root + "/prs/resumes_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('You have already referred this contact to the job. Please refer another contact.');
+                close_testimony_form();
+                set_status('');
+                return false;
+            } else if (txt == '-1') {
+                alert('An error occurred when adding and approving contacts. Please contact system administrator.');
+                close_testimony_form();
+                set_status('');
+            } else if (txt == '-2') {
+                alert('The candidate has removed Yellow Elevator as a contact. Please contact candidate for clarification.');
+                close_testimony_form();
+                set_status('');
+            }
+            
+            close_testimony_form();
+            set_status('Referral successfully made.');
+        },
+        onRequest: function(instance) {
+            set_status('Making referral...');
         }
     });
     
@@ -339,6 +606,24 @@ function onDomReady() {
     $('li_back').addEvent('click', show_candidates);
     $('li_profile').addEvent('click', show_current_candidate_profile);
     $('li_resumes').addEvent('click', show_current_candidate_resumes);
+    
+    $('jobs').addEvent('click', show_job_details);
+    
+    $('testimony_answer_1').addEvent('keypress', function() {
+       update_word_count_of('word_count_q1', 'testimony_answer_1') 
+    });
+
+    $('testimony_answer_2').addEvent('keypress', function() {
+       update_word_count_of('word_count_q2', 'testimony_answer_2') 
+    });
+    
+    $('testimony_answer_3').addEvent('keypress', function() {
+       update_word_count_of('word_count_q3', 'testimony_answer_3') 
+    });
+    
+    $('testimony_answer_4').addEvent('keypress', function() {
+       update_word_count_of('word_count_q4', 'testimony_answer_4') 
+    });
     
     $('sort_joined_on').addEvent('click', function() {
         order_by = 'members.joined_on';

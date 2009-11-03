@@ -78,9 +78,9 @@ if ($_POST['action'] == 'get_in_process') {
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN industries ON industries.id = jobs.industry 
               LEFT JOIN employers ON employers.id = jobs.employer 
-              LEFT JOIN members ON members.email_addr = referrals.member 
+              LEFT JOIN members ON members.email_addr = referrals.referee 
               LEFT JOIN resumes ON resumes.id = referrals.resume 
-              WHERE ((referrals.referee_confirmed_hired_on IS NOT NULL AND referrals.referee_confirmed_hired_on <> '0000-00-00 00:00:00') OR 
+              WHERE ((referrals.referee_confirmed_hired_on IS NULL OR referrals.referee_confirmed_hired_on = '0000-00-00 00:00:00') OR 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00')) AND
               (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
@@ -198,7 +198,7 @@ if ($_POST['action'] == 'get_rejected') {
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN industries ON industries.id = jobs.industry 
               LEFT JOIN employers ON employers.id = jobs.employer 
-              LEFT JOIN members ON members.email_addr = referrals.member 
+              LEFT JOIN members ON members.email_addr = referrals.referee 
               LEFT JOIN resumes ON resumes.id = referrals.resume 
               WHERE ((referrals.employer_removed_on IS NOT NULL AND referrals.employer_removed_on <> '0000-00-00 00:00:00') OR 
               (referrals.referee_rejected_on IS NOT NULL AND referrals.referee_rejected_on <> '0000-00-00 00:00:00')) AND 

@@ -17,12 +17,14 @@ class PrsResumesPage extends Page {
     public function insert_prs_resumes_css() {
         $this->insert_css();
         
+        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/list_box.css">'. "\n";
         echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/prs_resumes.css">'. "\n";
     }
     
     public function insert_prs_resumes_scripts() {
         $this->insert_scripts();
         
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/list_box.js"></script>'. "\n";
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/prs_resumes.js"></script>'. "\n";
     }
     
@@ -67,6 +69,26 @@ class PrsResumesPage extends Page {
         
         foreach ($result as $row) {
             echo '<option value="'. $row['zip']. '">'. $row['zip']. '</option>'. "\n";
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
+    private function generateJobIndustries() {
+        $mysqli = Database::connect();
+        $query = "SELECT DISTINCT industries.id, industries.industry 
+                  FROM industries 
+                  LEFT JOIN jobs ON industries.id = jobs.industry 
+                  WHERE jobs.closed = 'N' -- AND jobs.expire_on >= NOW() 
+                  ORDER BY industries.industry";
+        $result = $mysqli->query($query);
+        
+        echo '<select id="job_industry_filter" name="job_industry_filter" onChange="set_filter();">'. "\n";
+        echo '<option value="0" selected>all industries</option>'. "\n";
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        
+        foreach ($result as $row) {
+            echo '<option value="'. $row['id']. '">'. $row['industry']. '</option>'. "\n";
         }
         
         echo '</select>'. "\n";
@@ -182,6 +204,67 @@ class PrsResumesPage extends Page {
                 </div>
             </div>
         </div>
+        
+        <div id="div_blanket"></div>
+        <div id="div_job_select_form">
+            <form onSubmit="retun false;">
+                <input type="hidden" id="job_select_form.resume_id" name="job_select_form.resume_id" value="0" />
+                <table class="job_select_form">
+                    <tr>
+                    <td colspan="3"><p>Please select a job to refer <span id="job_select_form.candidate_name" style="font-weight: bold;"></span>...</p></td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            <span class="filter">[ Show jobs from <?php $this->generateJobIndustries(); ?> ]</span><br/>
+                            <div class="jobs" id="jobs" name="jobs"></div>
+                        </td>
+                        <td class="separator"></td>
+                        <td class="right">
+                            <div id="instructions">&lt;- Select a job to see description.</div>
+                            <table id="job_details" class="job_details">
+                                <tr>
+                                    <td colspan="2" class="title"><span id="job_details.title">&nbsp;</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Industry:</td>
+                                    <td class="field"><span id="job_details.industry"></span></td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Salary:</td>
+                                    <td class="field"><span id="job_details.currency"></span>&nbsp;<span id="job_details.salary"></span></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="title">Description</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="field">
+                                        <div style="width: 100%; height: 230px; overflow: auto;">
+                                            <span id="job_details.description"></span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <p class="button"><input type="button" value="Cancel" onClick="close_job_select_form();" />&nbsp;<input type="button" value="Refer Now" onClick="show_testimony_form();" /></p>
+            </form>
+        </div>
+        
+        <div id="div_testimony_form">
+            <form onSubmit="retun false;">
+                <p>1. What experience and skill-sets do <span id="testimony.candidate_name" style="font-weight: bold;"></span> have that makes him/her suitable for the <span id="testimony.job_title" style="font-weight: bold;"></span> position? (<span id="word_count_q1">0</span>/200 words)</p>
+                <p><textarea class="field" id="testimony_answer_1"></textarea></p>
+                <p>2. Does <span id="testimony.candidate_name" style="font-weight: bold;"></span> meet all the requirements of the <span id="testimony.job_title" style="font-weight: bold;"></span> position?</p><div style="text-align: center;"><input type="radio" id="meet_req_yes" name="meet_req" value="yes" checked /><label for="meet_req_yes">Yes</label>&nbsp;&nbsp;&nbsp;<input type="radio" id="meet_req_no" name="meet_req" value="no" /><label for="meet_req_no">No</label></div><p>Briefly describe how they are met if you choose 'Yes'. (<span id="word_count_q2">0</span>/200 words)</p>
+                <p><textarea class="field" id="testimony_answer_2"></textarea></p>
+                <p>3. Briefly, describe <span id="testimony.candidate_name" style="font-weight: bold;"></span>'s personality and work attitude. (<span id="word_count_q3">0</span>/200 words)</p>
+                <p><textarea class="field" id="testimony_answer_3"></textarea></p>
+                <p>4. Additional recommendations for <span id="testimony.candidate_name" style="font-weight: bold;"></span> (if any) ? (<span id="word_count_q4">0</span>/200 words)</p>
+                <p><textarea class="field" id="testimony_answer_4"></textarea></p>
+                <p class="button"><input type="button" value="Cancel" onClick="close_testimony_form();" />&nbsp;<input type="button" value="Refer Now" onClick="refer();" /></p>
+            </form>
+        </div>
+        
         <?php
     }
 }
