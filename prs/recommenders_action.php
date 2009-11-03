@@ -21,12 +21,13 @@ if (!isset($_POST['action'])) {
     $query = "SELECT recommenders.email_addr, recommenders.phone_num, recommenders.remarks, 
               CONCAT(recommenders.firstname, ', ', recommenders.lastname) AS recommender_name, 
               DATE_FORMAT(recommenders.added_on, '%e %b, %Y') AS formatted_added_on 
-              FROM recommenders ";
+              FROM recommenders 
+              LEFT JOIN employees ON employees.id = recommenders.added_by ";
     if ($_POST['filter_by'] == '0') {
-        $query .= "WHERE recommenders.added_by = '". $_POST['id']. "'";
+        $query .= "WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id'];
     } else {
         $query .= "LEFT JOIN recommender_industries ON recommender_industries.recommender = recommenders.email_addr 
-                   WHERE recommenders.added_by = '". $_POST['id']. "' AND 
+                   WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " AND 
                    recommender_industries.industry = ". $_POST['filter_by'];
     }
     $query .= " ORDER BY ". $_POST['order_by'];

@@ -25,6 +25,7 @@ if (!isset($_POST['action'])) {
               FROM candidates_mailing_lists 
               LEFT JOIN employees ON employees.id = candidates_mailing_lists.created_by  
               LEFT JOIN candidate_email_manifests ON candidate_email_manifests.mailing_list = candidates_mailing_lists.id 
+              WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " 
               GROUP BY candidates_mailing_lists.id
               ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
