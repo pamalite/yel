@@ -347,6 +347,7 @@ class Page {
         ?>
                 <li <?php echo ($page == 'rewards') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/rewards.php">Rewards</a><span style="color: #FF0000; font-size: 7pt; font-weight: bold;" id="rewards_count"></span></li>
                 <li <?php echo ($page == 'tokens') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/token_rewards.php">Bonuses</a><span style="color: #FF0000; font-size: 7pt; font-weight: bold;" id="tokens_count"></span></li>
+                <li <?php echo ($page == 'recommender_tokens') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/recommender_tokens.php">Tokens</a><span style="color: #FF0000; font-size: 7pt; font-weight: bold;" id="tokens_count"></span></li>
         <?php
         }
         ?>

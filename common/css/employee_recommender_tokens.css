@@ -1,0 +1,24 @@
+td.token, td.recommender{
+    width: 250px;
+}
+
+td.date {
+    width: 100px;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
