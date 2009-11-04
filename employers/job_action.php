@@ -107,8 +107,17 @@ if ($_POST['action'] == 'publish') {
         }
     }
     
+    $tmp = explode('/', $GLOBALS['root']);
+    $is_test_site = false;
+    foreach ($tmp as $t) {
+        if ($t == 'yel') {
+            $is_test_site = true;
+            break;
+        }
+    }
+    
     // Tweet about this job, if it is new
-    if ($new_id > 0) {
+    if ($new_id > 0 && !$is_test_site) {
         $query = "SELECT name FROM employers WHERE id = '". $_POST['employer']. "' LIMIT 1";
         $mysqli = Database::connect();
         $result = $mysqli->query($query);
