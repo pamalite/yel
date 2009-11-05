@@ -510,7 +510,7 @@ if ($_POST['action'] == 'get_completeness_status') {
     $query = "SELECT members.checked_profile, bank.has_bank, cv.has_resume, photo.has_photo 
               FROM members, 
               (SELECT COUNT(*) AS has_bank FROM member_banks WHERE member = '". $_POST['id']. "') bank, 
-              (SELECT COUNT(*) AS has_resume FROM resumes WHERE member = '". $_POST['id']. "') cv, 
+              (SELECT COUNT(*) AS has_resume FROM resumes WHERE member = '". $_POST['id']. "' AND deleted = 'N') cv, 
               (SELECT COUNT(*) AS has_photo FROM member_photos WHERE member = '". $_POST['id']. "') photo 
               WHERE members.email_addr = '". $_POST['id']. "'";
     $result = $mysqli->query($query);
