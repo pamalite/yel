@@ -40,7 +40,7 @@ class MemberHomePage extends Page {
         if (!$result) {
             echo 'Sorry, you need to create at least a public viewable resume to proceed.';
             echo '<input type="hidden" name="resume" value="0" />';
-            exit();
+            return;
         }
         
         echo '<select class="field" id="resume" name="resume">'. "\n";
