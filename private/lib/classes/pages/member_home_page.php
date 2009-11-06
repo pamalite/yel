@@ -62,6 +62,17 @@ class MemberHomePage extends Page {
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
+        <div id="div_completeness">
+            <div style="padding-bottom: 3px; font-size: 9pt; text-align: center; width: 100%;">
+                Your account details are <span id="progress_percent" style="font-weight: bold;"></span> complete.
+            </div>
+            <div id="progress">
+                <div id="progress_bar"></div>
+            </div>
+            <div class="progress_details">
+                <span id="details"></span>
+            </div>
+        </div><br/>
         <div class="banner" id="div_banner">
             <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guides</a>
             <br/><br/><br/>
@@ -99,17 +110,6 @@ class MemberHomePage extends Page {
                     </td>
                 </tr>
             </table>
-        </div>
-        <div id="div_completeness">
-            <div style="padding-bottom: 3px; font-size: 9pt; text-align: center; width: 100%;">
-                You are <span id="progress_percent" style="font-weight: bold;"></span> ready to be rewarded or elevated to a new job.
-            </div>
-            <div id="progress">
-                <div id="progress_bar"></div>
-            </div>
-            <div class="progress_details">
-                <span id="details"></span>
-            </div>
         </div>
         <div id="div_tabs">
             <ul>

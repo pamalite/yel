@@ -50,11 +50,12 @@ div.banner, div.rewards, div.job_count {
 }
 
 #div_completeness {
-    width: 100%;
+    width: 440px;
     margin: auto;
     text-align: center;
     padding-top: 5px;
     padding-bottom: 5px;
+    background-color: #F8E9CF;
 }
 
 #progress_bar {

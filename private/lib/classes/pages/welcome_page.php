@@ -231,6 +231,12 @@ class WelcomePage extends Page {
             </div>
         </div>
         
+        <div style="width: 100%; margin:auto; text-align: center; padding-top: 30px;">
+            <a href="http://twitter.com/yellowelevator" target="_new">
+                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/twitter_button.jpg" />
+            </a>
+        </div>
+        
         <div id="div_blanket"></div>
         <div id="div_contact_drop_form">
             <form method="post" id="contact_drop_form" onSubmit="return false;">
