@@ -17,6 +17,7 @@ if (!isset($_POST['action'])) {
     $data = array();
     $data['primary_industry'] = $_POST['primary_industry'];
     $data['secondary_industry'] = $_POST['secondary_industry'];
+    $data['tertiary_industry'] = $_POST['tertiary_industry'];
     $data['forget_password_question'] = $_POST['forget_password_question'];
     $data['forget_password_answer'] = $_POST['forget_password_answer'];
     $data['phone_num'] = $_POST['phone_num'];

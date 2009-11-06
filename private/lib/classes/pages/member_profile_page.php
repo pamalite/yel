@@ -132,13 +132,21 @@ class MemberProfilePage extends Page {
                     <tr>
                         <td class="label"><label for="secondary_industry">Secondary/Minoring Specialization:</label></td>
                         <td class="field">
+                            <?php $this->generate_industries('secondary_industry', $profile[0]['secondary_industry']); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="tertiary_industry">Tertiary/Minoring Specialization:</label></td>
+                        <td class="field">
                             <?php 
-                                $this->generate_industries('secondary_industry', $profile[0]['secondary_industry']); 
+                                $this->generate_industries('tertiary_industry', $profile[0]['tertiary_industry']); 
                                 
                                 if (empty($profile[0]['primary_industry']) ||
                                     is_null($profile[0]['primary_industry']) ||
                                     empty($profile[0]['secondary_industry']) ||
-                                    is_null($profile[0]['secondary_industry'])) {
+                                    is_null($profile[0]['secondary_industry']) || 
+                                    empty($profile[0]['tertiary_industry']) ||
+                                    is_null($profile[0]['tertiary_industry'])) {
                                     ?>
                             <p id="note" style="font-style: italic; color: #666666; font-size: 9pt;">Please choose your primary and secondary industrial sector. If you are a fresh graduate, just choose the industry that is closest to your majoring. If you consider yourself to be an expert in only one industry, select the same industry for both. We collect these information is to better understand the needs of our members.</p>
                                     <?php

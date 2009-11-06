@@ -43,7 +43,7 @@ input, table.profile_form td.field {
     font-size: 10pt;
 }
 
-input.field, #primary_industry, #secondary_industry  {
+input.field, #primary_industry, #secondary_industry, #tertiary_industry  {
     width: 98%;
     font-size: 10pt;
 }

@@ -192,6 +192,12 @@ class MemberSignUpPage extends Page {
                         <td class="label"><label for="secondary_industry">* Secondary/Minoring Specialization:</label></td>
                         <td class="field">
                             <?php $this->generate_industries('secondary_industry', $_session['secondary_industry']); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="tertiary_industry">* Tertiary/Minoring Specialization:</label></td>
+                        <td class="field">
+                            <?php $this->generate_industries('tertiary_industry', $_session['tertiary_industry']); ?>
                             <p class="note">Please choose your primary and secondary specializations. If you consider yourself to be an expert only in one specialization, select the same specialization as both your primary and secondary ones. The purpose of this information is for us to understand your needs better. If you are a fresh graduate, simply choose the specialization that is the closest to your major.</p>
                         </td>
                     </tr>

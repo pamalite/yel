@@ -29,6 +29,16 @@ function validate() {
         field.style.borderStyle = '';
     }
     
+    if ($('tertiary_industry').options[$('tertiary_industry').selectedIndex].value == 0) {
+        alert('You must at least choose a tertiary industry.');
+        $('tertiary_industry').setStyle('border', '2px solid #FF0000');
+        return false;
+    } else {
+        var field = $('tertiary_industry');
+        field.style.borderColor = '';
+        field.style.borderStyle = '';
+    }
+    
     if ($('forget_password_answer').value == '') {
         alert('Forgot password answer cannot be empty');
         return false;
@@ -87,6 +97,7 @@ function save() {
     var params = 'email_addr=' + email_addr;
     params = params + '&primary_industry=' + $('primary_industry').value;
     params = params + '&secondary_industry=' + $('secondary_industry').value;
+    params = params + '&tertiary_industry=' + $('tertiary_industry').value;
     params = params + '&forget_password_question=' + $('forget_password_question').value;
     params = params + '&forget_password_answer=' + $('forget_password_answer').value;
     params = params + '&phone_num=' + $('phone_num').value;

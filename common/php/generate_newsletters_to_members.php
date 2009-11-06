@@ -16,7 +16,7 @@ log_activity('Initializing Member Newsletters Generator...', 'yellowel_member_ne
 $mysqli = Database::connect();
 
 log_activity('Getting the members who are active and wants newsletter...', 'yellowel_member_newsletter_generator.log');
-$query = "SELECT email_addr, firstname, lastname, filter_jobs, primary_industry, secondary_industry 
+$query = "SELECT email_addr, firstname, lastname, filter_jobs, primary_industry, secondary_industry, tertiary_industry 
           FROM members 
           WHERE active = 'Y' AND like_newsletter = 'Y'";
 $members = $mysqli->query($query);
@@ -43,7 +43,8 @@ if (is_null($members) || count($members) <= 0) {
                       LEFT JOIN currencies ON currencies.country_code = employers.country 
                       WHERE closed = 'N' AND expire_on >= NOW() AND 
                       jobs.industry = ". $member['primary_industry']. " OR 
-                      jobs.industry = ". $member['secondary_industry']. " 
+                      jobs.industry = ". $member['secondary_industry']. " OR 
+                      jobs.industry = ". $member['tertiary_industry']. "
                       ORDER BY created_on DESC 
                       LIMIT 20";
         } else {

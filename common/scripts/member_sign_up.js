@@ -39,6 +39,16 @@ function validate() {
         field.style.borderStyle = '';
     }
     
+    if ($('tertiary_industry').options[$('tertiary_industry').selectedIndex].value == 0) {
+        alert('You must at least choose a tertiary industry.');
+        $('tertiary_industry').setStyle('border', '2px solid #FF0000');
+        return false;
+    } else {
+        var field = $('tertiary_industry');
+        field.style.borderColor = '';
+        field.style.borderStyle = '';
+    }
+    
     if (!isEmail($('email_addr').value)) {
         alert('The e-mail address provided is not valid.');
         $('email_addr').setStyle('border', '2px solid #FF0000');
