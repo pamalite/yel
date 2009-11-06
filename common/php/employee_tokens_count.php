@@ -8,13 +8,11 @@ $counts = array();
 
 $query = "SELECT referrals.id AS referral 
           FROM referrals 
-          LEFT JOIN invoice_items ON invoice_items.item = referrals.id 
-          LEFT JOIN invoices ON invoices.id = invoice_items.invoice 
+          LEFT JOIN referral_token_rewards ON referral_token_rewards.referral = referrals.id 
           LEFT JOIN jobs ON jobs.id = referrals.job 
           LEFT JOIN employers ON employers.id = jobs.employer 
           LEFT JOIN employees ON employers.registered_by = employees.id 
-          WHERE invoices.type = 'R' AND 
-          (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
+          WHERE (referral_token_rewards.paid_on IS NULL OR referral_token_rewards.paid_on = '0000-00-00 00:00:00') AND 
           (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
           (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
           (referrals.total_token_reward IS NOT NULL AND referrals.total_token_reward > 0) AND 

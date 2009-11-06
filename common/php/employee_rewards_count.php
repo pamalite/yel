@@ -16,6 +16,7 @@ $query = "SELECT invoices.id
           LEFT JOIN employees ON employers.registered_by = employees.id 
           WHERE invoices.type = 'R' AND 
           (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
+          (referral_rewards.paid_on IS NULL OR referral_rewards.paid_on = '0000-00-00 00:00:00') AND 
           (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
           (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
           (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 

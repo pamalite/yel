@@ -146,7 +146,7 @@ if ($_POST['action'] == 'get_employed') {
               LEFT JOIN resumes ON resumes.id = referrals.resume 
               LEFT JOIN recommender_tokens ON recommender_tokens.referral = referrals.id AND 
               recommender_tokens.recommender = recommenders.email_addr 
-              WHERE referrals.member = '". $member. "' AND 
+              WHERE -- referrals.member = '". $member. "' AND 
               invoices.type = 'R' AND 
               (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
               (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
