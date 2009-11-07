@@ -6,7 +6,12 @@ require_once dirname(__FILE__). "/../../private/lib/utilities.php";
 <head>
 <script type="text/javascript">
 function show_signup() {
-    window.opener.location.replace('<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/members/sign_up.php');
+    if (window.opener == null) {
+        window.open('<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/members/sign_up.php');
+    } else {
+        window.opener.location.replace('<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/members/sign_up.php');
+    }
+    
     window.close();
 }
 </script>

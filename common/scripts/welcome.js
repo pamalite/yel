@@ -94,6 +94,8 @@ function show_contact_drop_form() {
     
     $('div_blanket').setStyle('display', 'block');
     $('div_contact_drop_form').setStyle('display', 'block');
+    
+    return true;
 }
 
 function set_employers_mouse_events() {
