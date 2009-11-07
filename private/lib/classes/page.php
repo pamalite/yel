@@ -386,6 +386,14 @@ class Page {
         ?>
         
         <?php
+        if (Employee::has_clearances_for('admin_employers', $_clearances)) {
+        ?>
+                <li <?php echo ($page == 'jobs') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/jobs.php">Jobs</a></li>
+        <?php
+        }
+        ?>
+        
+        <?php
         //if (Employee::has_clearances_for('refer_requests', $_clearances)) {
         ?>
                 <!--li <?php echo ($page == 'refer_requests') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/refer_requests.php">Refer Requests</a></li-->
