@@ -108,6 +108,30 @@ function validate_new_candidate_form() {
     return true;
 }
 
+function save_remark() {
+    var params = 'id=' + current_member_email_addr + '&action=save_remark';
+    var params = params + '&remark=' + $('profile.remarks').value;
+    
+    var uri = root + "/prs/resumes_privileged_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('Error occured while saving remark.');
+                return false;
+            }
+            
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Saving remark...');
+        }
+    });
+    
+    request.send(params);
+}
+
 function clear_job_details() {
     $('job_details.title').set('html', '&nbsp;');
     $('job_details.industry').set('html', '&nbsp;');
@@ -217,6 +241,7 @@ function show_candidates() {
                 var candidate_phone_nums = xml.getElementsByTagName('member_phone_num');
                 var recommender_phone_nums = xml.getElementsByTagName('recommender_phone_num');
                 var joined_ons = xml.getElementsByTagName('formatted_joined_on');
+                var remarks = xml.getElementsByTagName('remarks');
                 
                 for (var i=0; i < member_emails.length; i++) {
                     var id = member_emails[i].childNodes[0].nodeValue;
@@ -232,6 +257,14 @@ function show_candidates() {
                     }
                     html = html + '<td class="candidate"><a href="mailto: ' + recommender_emails[i].childNodes[0].nodeValue + '">' + recommenders[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_num + '<br/><strong>E-mail:</strong> ' + recommender_emails[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                     html = html + '<td class="actions"><a class="no_link" onClick="show_profile(\'' + id + '\');">View Profile &amp; Resumes</a></td>' + "\n";
+                    html = html + '</tr>' + "\n";
+                    
+                    var remark = '';
+                    if (remarks[i].childNodes.length > 0) {
+                        remark = 'Remarks: ' + remarks[i].childNodes[0].nodeValue;
+                    }
+                    html = html + '<tr>' + "\n";
+                    html = html + '<td colspan="5" style="text-align: right; font-style: italic;">' + remark + '</td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
             }
@@ -297,6 +330,7 @@ function show_profile(_member_email_addr) {
             var recommender_phone_num = xml.getElementsByTagName('recommender_phone_num');
             var member_joined_on = xml.getElementsByTagName('formatted_joined_on');
             var member_checked_profile = xml.getElementsByTagName('checked_profile');
+            var member_remarks = xml.getElementsByTagName('remarks');
             
             $('profile.joined_on').set('html', member_joined_on[0].childNodes[0].nodeValue);
             
@@ -313,6 +347,12 @@ function show_profile(_member_email_addr) {
             $('profile.email_addr').set('html', current_member_email_addr);
             $('profile.phone_num').set('html', member_phone_num[0].childNodes[0].nodeValue);
             $('profile.country').set('html', country[0].childNodes[0].nodeValue);
+            
+            var remark = '';
+            if (member_remarks[0].childNodes.length > 0) {
+                remark = member_remarks[0].childNodes[0].nodeValue;
+            }
+            $('profile.remarks').value = remark;
             
             var zip_code = 'N/A';
             if (zip[0].childNodes.length > 0) {
@@ -428,6 +468,7 @@ function add_new_candidate() {
     params = params + '&member_phone_num=' + $('member_phone_num').value;
     params = params + '&member_country=' + $('country').options[$('country').selectedIndex].value;
     params = params + '&member_zip=' + $('zip').value;
+    params = params + '&member_remarks=' + $('member_remarks').value;
     
     if ($('recommender_from_list').checked) {
         params = params + '&recommender_from=list';
@@ -439,6 +480,7 @@ function add_new_candidate() {
         params = params + '&recommender_lastname=' + $('recommender_lastname').value;
         params = params + '&recommender_phone_num=' + $('recommender_phone_num').value;
         params = params + '&recommender_remarks=' + $('recommender_remarks').value;
+        params = params + '&recommender_region=' + $('recommender_region').value;
         
         var industries = '';
         for (var i=0; i < $('recommender_industries').options.length; i++) {

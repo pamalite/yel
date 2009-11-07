@@ -102,8 +102,12 @@ table.profile td.buttons_bar {
     background-color: #CCCCCC;
 }
 
-td.date {
+td.region {
     width: 100px;
+}
+
+td.date {
+    width: 70px;
 }
 
 td.checkbox {

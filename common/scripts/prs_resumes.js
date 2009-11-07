@@ -78,6 +78,30 @@ function update_filter() {
     request.send(params);
 }
 
+function save_remark() {
+    var params = 'id=' + current_member_email_addr + '&action=save_remark';
+    var params = params + '&remark=' + $('profile.remarks').value;
+    
+    var uri = root + "/prs/resumes_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('Error occured while saving remark.');
+                return false;
+            }
+            
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Saving remark...');
+        }
+    });
+    
+    request.send(params);
+}
+
 function refresh_candidates() {
     filter = $('candidate_filter').options[$('candidate_filter').selectedIndex].value;
     filter_country = $('country_filter').options[$('country_filter').selectedIndex].value;
@@ -116,6 +140,7 @@ function show_candidates() {
                 var joined_ons = xml.getElementsByTagName('formatted_joined_on');
                 var countries = xml.getElementsByTagName('country');
                 var zips = xml.getElementsByTagName('zip');
+                var remarks = xml.getElementsByTagName('remarks');
                 
                 for (var i=0; i < email_addrs.length; i++) {
                     var id = email_addrs[i].childNodes[0].nodeValue;
@@ -126,6 +151,14 @@ function show_candidates() {
                     html = html + '<td class="country">' + countries[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="zip">' + zips[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="actions"><a class="no_link" onClick="show_profile(\'' + id + '\');">View Profile &amp; Resumes</a></td>' + "\n";
+                    html = html + '</tr>' + "\n";
+                    
+                    var remark = '';
+                    if (remarks[i].childNodes.length > 0) {
+                        remark = 'Remarks: ' + remarks[i].childNodes[0].nodeValue;
+                    }
+                    html = html + '<tr>' + "\n";
+                    html = html + '<td colspan="5" style="text-align: right; font-style: italic;">' + remark + '</td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
             }
@@ -186,6 +219,8 @@ function show_profile(_member_email_addr) {
             var joined_on = xml.getElementsByTagName('formatted_joined_on');
             var primary_industry = xml.getElementsByTagName('first_industry');
             var secondary_industry = xml.getElementsByTagName('second_industry');
+            var tertiary_industry = xml.getElementsByTagName('tertiary_industry');
+            var remarks = xml.getElementsByTagName('remarks');
             
             $('profile.joined_on').set('html', joined_on[0].childNodes[0].nodeValue);
             $('profile.firstname').set('html', firstname[0].childNodes[0].nodeValue);
@@ -211,6 +246,16 @@ function show_profile(_member_email_addr) {
             if (secondary_industry[0].childNodes.length > 0) {
                 specializations = specializations + '<span class="specialization">' + secondary_industry[0].childNodes[0].nodeValue + '</span>'
             }
+            
+            if (tertiary_industry[0].childNodes.length > 0) {
+                specializations = specializations + '<span class="specialization">' + tertiary_industry[0].childNodes[0].nodeValue + '</span>'
+            }
+            
+            var remark = '';
+            if (remarks[0].childNodes.length > 0) {
+                remark = remarks[0].childNodes[0].nodeValue;
+            }
+            $('profile.remarks').value = remark;
             
             $('profile.specializations').set('html', specializations);
             set_status('');

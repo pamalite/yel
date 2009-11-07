@@ -184,6 +184,12 @@ class PrsResumesPage extends Page {
                         <td class="label">Postal/Zip Code:</td>
                         <td class="field"><span id="profile.zip">Loading...</span></td>
                     </tr>
+                    <tr>
+                        <td class="title" colspan="2">Remarks</td>
+                    </tr>
+                    <tr>
+                        <td class="field" colspan="2" style="text-align: center;"><input type="text" class="remarks_field" name="profile.remarks" id="profile.remarks" value="" />&nbsp;<input type="button" value="Save" onClick="save_remark();" /></td>
+                    </tr>
                 </table>
             </div>
             

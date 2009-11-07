@@ -100,7 +100,7 @@ class Page {
                 <div class="topmenu">
                     <table border="0" cellspacing="0" cellpadding="0">
                         <tr>
-                            <td class="tour" valign="bottom"><a href="tour.php"><strong>TAKE A TOUR |</strong></a></td>
+                            <td class="tour" valign="bottom"><a href="#" onClick="show_tour();"><strong>TAKE A TOUR |</strong></a></td>
                             <td class="topmenudivider"><strong> | </strong></td>
                             <td class="aboutus" valign="bottom"><a href="about.php"><strong>ABOUT US</strong></a></td>
                             <td class="topmenudivider"><strong> | </strong></td>

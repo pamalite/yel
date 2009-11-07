@@ -104,6 +104,10 @@ input.mini_button {
     font-size: 9pt;
 }
 
+input.remarks_field {
+    width: 75%;
+}
+
 input.field, #div_new_member_form select.field {
     width: 98%;
     font-size: 10pt;

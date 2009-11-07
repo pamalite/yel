@@ -39,19 +39,20 @@ if (!isset($_POST['action'])) {
         }
     }
     
-    $query = "SELECT DISTINCT members.email_addr AS email_addr, members.phone_num AS phone_num, 
+    $query = "SELECT DISTINCT members.email_addr AS email_addr, members.phone_num AS phone_num, members.remarks, 
               members.zip, countries.country, 
               CONCAT(members.firstname, ', ', members.lastname) AS member_name, 
               DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on 
               FROM members
               LEFT JOIN industries AS primary_industries ON primary_industries.id = members.primary_industry 
               LEFT JOIN industries AS secondary_industries ON secondary_industries.id = members.secondary_industry 
+              LEFT JOIN industries AS tertiary_industries ON tertiary_industries.id = members.tertiary_industry 
               LEFT JOIN countries ON countries.country_code = members.country 
               WHERE (members.added_by IS NULL OR members.added_by = '') AND 
               (members.zip IS NOT NULL AND members.zip <> '') ";
     
     if (!empty($filter)) {
-        $query .= "AND (members.primary_industry = ". $filter. " OR members.secondary_industry = ". $filter. ") ";
+        $query .= "AND (members.primary_industry = ". $filter. " OR members.secondary_industry = ". $filter. " OR members.tertiary_industry = ". $filter. ") ";
     }
     
     if (!empty($filter_country)) {
@@ -65,7 +66,7 @@ if (!isset($_POST['action'])) {
     $query .= "ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
-    if (count($result) <= 0 || is_null($result)) {
+    if (count($result) <= 0 || is_null($result) || empty($result)) {
         echo '0';
         exit();
     }
@@ -85,6 +86,10 @@ if (!isset($_POST['action'])) {
         }
     }
     $result = $new_result;
+    if (count($result) <= 0 || is_null($result) || empty($result)) {
+        echo '0';
+        exit();
+    }
     
     $response = array('members' => array('member' => $result));
     header('Content-type: text/xml');
@@ -93,16 +98,18 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'get_profile') {
-    $query = "SELECT members.email_addr AS email_addr, members.phone_num AS phone_num, 
+    $query = "SELECT members.email_addr AS email_addr, members.phone_num AS phone_num, members.remarks, 
               members.firstname, members.lastname, 
               DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
               primary_industries.industry AS first_industry, 
               secondary_industries.industry AS second_industry, 
+              tertiary_industries.industry AS tertiary_industry, 
               countries.country, members.zip 
               FROM members 
               LEFT JOIN countries ON countries.country_code = members.country 
               LEFT JOIN industries AS primary_industries ON primary_industries.id = members.primary_industry 
               LEFT JOIN industries AS secondary_industries ON secondary_industries.id = members.secondary_industry 
+              LEFT JOIN industries AS tertiary_industries ON tertiary_industries.id = members.tertiary_industry 
               WHERE members.email_addr = '". $_POST['id']. "'";
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
@@ -326,4 +333,16 @@ if ($_POST['action'] == 'make_referral') {
     exit();
 }
 
+if ($_POST['action'] == 'save_remark') {
+    $member = new Member($_POST['id']);
+    $data = array();
+    $data['remarks'] = sanitize($_POST['remark']);
+    if ($member->update($data)) {
+        echo 'ok';
+    } else {
+        echo 'ko';
+    }
+    
+    exit();
+}
 ?>

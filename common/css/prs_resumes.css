@@ -114,6 +114,10 @@ table.profile td.buttons_bar {
     background-color: #CCCCCC;
 }
 
+input.remarks_field {
+    width: 75%;
+}
+
 td.date {
     width: 100px;
 }

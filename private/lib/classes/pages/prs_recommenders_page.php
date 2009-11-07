@@ -76,6 +76,7 @@ class PrsRecommendersPage extends Page {
                 <tr>
                     <td class="checkbox">&nbsp;</td>
                     <td class="date"><span class="sort" id="sort_added_on">Added On</span></td>
+                    <td class="region"><span class="sort" id="sort_region">Region</span></td>
                     <td class="recommender">
                         <span class="sort" id="sort_recommender">Recommender</span>
                         &nbsp;
@@ -127,6 +128,10 @@ class PrsRecommendersPage extends Page {
                     <tr>
                         <td class="label"><label for="profile.phone_num">Telephone:</label></td>
                         <td class="field"><input type="text" class="field" id="profile.phone_num" name="profile_phone_num" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="profile.region">Region:</label></td>
+                        <td class="field"><input type="text" class="field" id="profile.region" name="profile_region" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="profile.industries">Specializations:</label></td>
@@ -185,6 +190,10 @@ class PrsRecommendersPage extends Page {
                 <tr>
                     <td class="label"><label for="phone_num">Telephone:</label></td>
                     <td class="field"><input type="text" class="field" id="phone_num" name="phone_num" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="region">Region:</label></td>
+                    <td class="field"><input type="text" class="field" id="region" name="region" /></td>
                 </tr>
                 <tr>
                     <td class="label"><label for="industries">Specializations:</label></td>

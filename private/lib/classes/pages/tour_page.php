@@ -28,8 +28,7 @@ class TourPage extends Page {
         $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Take a Tour</span>");
         ?>
         <div class="content">
-            <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/out_of_order.jpg" /><br/><br/>
-            Sorry, the touring elevator will be back soon.
+            <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/tour/main.jpg" />
         </div>
         <?php
     }

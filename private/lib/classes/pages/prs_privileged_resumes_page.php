@@ -216,6 +216,12 @@ class PrsPrivilegedResumesPage extends Page {
                         <td class="label">Telephone:</td>
                         <td class="field"><span id="profile.recommender.phone_num">Loading...</span></td>
                     </tr>
+                    <tr>
+                        <td class="title" colspan="2">Remarks</td>
+                    </tr>
+                    <tr>
+                        <td class="field" colspan="2" style="text-align: center;"><input type="text" class="remarks_field" name="profile.remarks" id="profile.remarks" value="" />&nbsp;<input type="button" value="Save" onClick="save_remark();" /></td>
+                    </tr>
                 </table>
             </div>
             
@@ -286,6 +292,12 @@ class PrsPrivilegedResumesPage extends Page {
                     <td class="field"><input type="text" class="field" id="zip" name="zip" /></td>
                 </tr>
                 <tr>
+                    <td class="title" colspan="2">Remarks</td>
+                </tr>
+                <tr>
+                    <td class="field" colspan="2" style="text-align: center;"><input type="text" class="field" name="member_remarks" id="member_remarks" value="" /></td>
+                </tr>
+                <tr>
                     <td class="title" colspan="2">Recommender</td>
                 </tr>
                 <tr>
@@ -320,6 +332,11 @@ class PrsPrivilegedResumesPage extends Page {
                                             <td class="label"><label for="recommender_phone_num">Telephone:</label></td>
                                             <td class="field"><input type="text" class="field" id="recommender_phone_num" name="recommender_phone_num" /></td>
                                         </tr>
+                                        <tr>
+                                            <td class="label"><label for="recommender_region">Region:</label></td>
+                                            <td class="field"><input type="text" class="field" id="recommender_region" name="recommender_region" /></td>
+                                        </tr>
+                                        
                                         <tr>
                                             <td class="label"><label for="recommender_industries">Specializations:</label></td>
                                             <td class="field"><?php echo $this->generateIndustries(); ?></td>

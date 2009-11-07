@@ -18,7 +18,7 @@ if (!isset($_POST['action'])) {
         $order_by = $_POST['order_by'];
     }
     
-    $query = "SELECT recommenders.email_addr, recommenders.phone_num, recommenders.remarks, 
+    $query = "SELECT recommenders.email_addr, recommenders.phone_num, recommenders.remarks, recommenders.region, 
               CONCAT(recommenders.firstname, ', ', recommenders.lastname) AS recommender_name, 
               DATE_FORMAT(recommenders.added_on, '%e %b, %Y') AS formatted_added_on 
               FROM recommenders 
@@ -55,7 +55,7 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'get_profile') {
-    $query = "SELECT email_addr, firstname, lastname, phone_num, remarks, 
+    $query = "SELECT email_addr, firstname, lastname, phone_num, remarks, region, 
               DATE_FORMAT(added_on, '%e %b, %Y') AS formatted_added_on 
               FROM recommenders 
               WHERE email_addr = '". $_POST['id']. "'";
@@ -98,6 +98,7 @@ if ($_POST['action'] == 'update_profile') {
     $data['lastname'] = sanitize($_POST['lastname']);
     $data['phone_num'] = $_POST['phone_num'];
     $data['remarks'] = sanitize($_POST['remarks']);
+    $data['region'] = sanitize($_POST['region']);
     
     if (!$recommender->update($data)) {
         echo '-1'; // failed to update new recommender
@@ -142,6 +143,7 @@ if ($_POST['action'] == 'add_new_recommender') {
     $data['lastname'] = sanitize($_POST['lastname']);
     $data['phone_num'] = $_POST['phone_num'];
     $data['remarks'] = sanitize($_POST['remarks']);
+    $data['region'] = sanitize($_POST['region']);
     $data['added_by'] = $_POST['id'];
     $data['added_on'] = $added_on;
     

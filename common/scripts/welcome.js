@@ -159,6 +159,13 @@ function set_employers_mouse_events() {
     });*/
 }
 
+function show_tour() {
+    var popup = window.open('tour/index.php', '', 'width=500, height=400, scrollbars');
+    if (!popup) {
+        alert('Popup blocker was detected. Please allow pop-up windows for YellowElevator.com and try again.');
+    }
+}
+
 function onDomReady() {
     set_root();
     get_employers();

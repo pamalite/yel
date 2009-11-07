@@ -130,6 +130,7 @@ function show_recommenders() {
                 var phone_nums = xml.getElementsByTagName('phone_num');
                 var added_ons = xml.getElementsByTagName('formatted_added_on');
                 var remarks = xml.getElementsByTagName('remarks');
+                var regions = xml.getElementsByTagName('region');
                 
                 for (var i=0; i < email_addrs.length; i++) {
                     var id = email_addrs[i].childNodes[0].nodeValue;
@@ -137,6 +138,12 @@ function show_recommenders() {
                     html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                     html = html + '<td class="checkbox"><input type="checkbox" onClick="sync_mailing_list(\'' + id + '\');" /></td>' + "\n";
                     html = html + '<td class="date">' + added_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    
+                    var region = '';
+                    if (regions[i].childNodes.length > 0) {
+                        region = regions[i].childNodes[0].nodeValue;
+                    }
+                    html = html + '<td class="region">' + region + '</td>' + "\n";
                     
                     var phone_num = 'N/A';
                     if (phone_nums[i].childNodes.length > 0) {
@@ -205,6 +212,7 @@ function show_profile(_recommender_email_addr) {
             var lastname = xml.getElementsByTagName('lastname');
             var phone_num = xml.getElementsByTagName('phone_num');
             var remarks = xml.getElementsByTagName('remarks');
+            var regions = xml.getElementsByTagName('region');
             var added_on = xml.getElementsByTagName('formatted_added_on');
             var industries = xml.getElementsByTagName('industry');
             
@@ -235,6 +243,11 @@ function show_profile(_recommender_email_addr) {
             $('profile.remarks').value = '';
             if (remarks[0].childNodes.length > 0) {
                 $('profile.remarks').value = remarks[0].childNodes[0].nodeValue;
+            }
+            
+            $('profile.region').value = '';
+            if (regions[0].childNodes.length > 0) {
+                $('profile.region').value = regions[0].childNodes[0].nodeValue;
             }
             
             set_status('');
@@ -277,6 +290,7 @@ function save_profile() {
     params = params + '&lastname=' + $('profile.lastname').value;
     params = params + '&phone_num=' + $('profile.phone_num').value;
     params = params + '&remarks=' + $('profile.remarks').value;
+    params = params + '&region=' + $('profile.region').value;
     
     if (selected_count <= 0) {
         params = params + '&industries=0';
@@ -441,6 +455,7 @@ function add_new_recommender() {
     params = params + '&lastname=' + $('lastname').value;
     params = params + '&phone_num=' + $('phone_num').value;
     params = params + '&remarks=' + $('remarks').value;
+    params = params + '&region=' + $('region').value;
         
     var industries = '';
     for (var i=0; i < $('industries').options.length; i++) {
@@ -664,6 +679,12 @@ function onDomReady() {
     
     $('sort_added_on').addEvent('click', function() {
         order_by = 'recommenders.added_on';
+        ascending_or_descending();
+        show_recommenders();
+    });
+    
+    $('sort_region').addEvent('click', function() {
+        order_by = 'recommenders.region';
         ascending_or_descending();
         show_recommenders();
     });

@@ -18,7 +18,7 @@ if (!isset($_POST['action'])) {
         $order_by = $_POST['order_by'];
     }
     
-    $query = "SELECT members.email_addr AS member_email_addr, members.phone_num AS member_phone_num, 
+    $query = "SELECT members.email_addr AS member_email_addr, members.phone_num AS member_phone_num, members.remarks, 
               CONCAT(employees.firstname, ', ', employees.lastname) AS employee, 
               CONCAT(members.firstname, ', ', members.lastname) AS candidate_name, 
               DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
@@ -55,7 +55,7 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'get_profile') {
-    $query = "SELECT members.firstname AS member_firstname, members.lastname AS member_lastname, 
+    $query = "SELECT members.firstname AS member_firstname, members.lastname AS member_lastname, members.remarks, 
               members.phone_num AS member_phone_num, countries.country, members.zip, members.checked_profile, 
               recommenders.email_addr AS recommender_email_addr, 
               recommenders.firstname AS recommender_firstname, recommenders.lastname AS recommender_lastname, 
@@ -81,6 +81,19 @@ if ($_POST['action'] == 'get_profile') {
 
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
+if ($_POST['action'] == 'save_remark') {
+    $member = new Member($_POST['id']);
+    $data = array();
+    $data['remarks'] = sanitize($_POST['remark']);
+    if ($member->update($data)) {
+        echo 'ok';
+    } else {
+        echo 'ko';
+    }
+    
     exit();
 }
 
@@ -126,6 +139,7 @@ if ($_POST['action'] == 'add_new_candidate') {
             $recommender_data['lastname'] = sanitize($_POST['recommender_lastname']);
             $recommender_data['phone_num'] = $_POST['recommender_phone_num'];
             $recommender_data['remarks'] = sanitize($_POST['recommender_remarks']);
+            $recommender_data['region'] = sanitize($_POST['recommender_region']);
             $recommender_data['added_by'] = $_POST['id'];
             $recommender_data['added_on'] = $joined_on;
             
@@ -167,6 +181,7 @@ if ($_POST['action'] == 'add_new_candidate') {
         $member_data['joined_on'] = $joined_on;
         $member_data['active'] = 'N';
         $member_data['invites_available'] = '10';
+        $member_data['remarks'] = sanitize($_POST['member_remarks']);
         
         if ($member_data['like_newsletter'] == 'Y') {
             $member_data['filte_jobs'] = 'Y';
