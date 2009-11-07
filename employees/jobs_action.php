@@ -34,6 +34,8 @@ if (!isset($_POST['action'])) {
                jobs.employer = employers.id 
               ) AS num_expired 
               FROM employers 
+              LEFT JOIN employees ON employees.id = employers.registered_by 
+              WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " 
               GROUP BY employers.id 
               ORDER BY ". $order_by;
     $mysqli = Database::connect();
