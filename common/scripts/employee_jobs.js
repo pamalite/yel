@@ -145,6 +145,62 @@ function show_employers() {
     request.send(params);
 }
 
+function save_job() {
+    // Must do this because the FreeRTE do not have a getValue() method to update the value
+    rteModeType('rte_preview_mode');
+    rteModeType('rte_design_mode');
+    
+    if (!validate()) {
+        return false;
+    }
+    
+    var salary_negotiable = 'N';
+    if ($('salary_negotiable').checked) {
+        salary_negotiable = 'Y';
+    }
+    
+    var params = 'id=' + $('job_id').value;
+    params = params + '&action=save';
+    params = params + '&employer=' + selected_employer_id;
+    params = params + '&title=' + encodeURIComponent($('title').value);
+    params = params + '&industry=' + $('industry').value;
+    params = params + '&country=' + $('country').value;
+    params = params + '&state=' + $('state').value;
+    params = params + '&currency=' + $('currency').value;
+    params = params + '&salary=' + $('salary').value;
+    params = params + '&salary_end=' + $('salary_end').value;
+    params = params + '&salary_negotiable=' + salary_negotiable;
+    //params = params + '&description=' + encodeURIComponent($('description').value);
+    // params = params + '&description=' + encodeURIComponent(editor.getValue());
+    params = params + '&description=' + encodeURIComponent(document.getElementById(rteFormName).value);
+    params = params + '&resume_type=' + $('acceptable_resume_type').options[$('acceptable_resume_type').selectedIndex].value;
+    
+    var uri = root + "/employees/jobs_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ok') {
+                set_status('New job successfully saved.');
+            } else if (txt == '-1') {
+                alert('The account is not set up yet');
+                return false;
+            } else {
+                alert('Sorry! We are not able to save the job at the moment. Please try again later.');
+                return false;
+            }
+            
+            $('div_tabs').setStyle('display', 'block');
+            show_open_jobs_with_selected_employer();
+        },
+        onRequest: function(instance) {
+            set_status('Saving and updating...');
+        }
+    });
+    
+    request.send(params);
+}
+
 function publish_job() {
     // Must do this because the FreeRTE do not have a getValue() method to update the value
     rteModeType('rte_preview_mode');
@@ -192,10 +248,10 @@ function publish_job() {
             if (txt == 'ok') {
                 set_status('New job successfully published.');
             } else if (txt == '-1') {
-                set_status('The account is not set up yet');
+                alert('The account is not set up yet');
                 return false;
             } else {
-                set_status('Sorry! We are not able to publish the new job at the moment. Please try again later.');
+                alert('Sorry! We are not able to publish the new job at the moment. Please try again later.');
                 return false;
             }
             
@@ -208,6 +264,99 @@ function publish_job() {
     });
     
     request.send(params);
+}
+
+function show_update_job(job_id) {    
+    var params = 'id=' + job_id + '&action=get_job';
+    
+    var uri = root + "/employees/jobs_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                set_status('An error occured while loading job.');
+                return false;
+            } 
+            
+            var industries = $('industry').options;
+            var countries = $('country').options;
+            var resume_types = $('acceptable_resume_type').options;
+            //var currencies = $('currency').options;
+            
+            var title = xml.getElementsByTagName('title');
+            var industry = xml.getElementsByTagName('industry');
+            var country = xml.getElementsByTagName('country');
+            var state = xml.getElementsByTagName('state');
+            //var currency = xml.getElementsByTagName('currency');
+            var salary = xml.getElementsByTagName('salary');
+            var salary_end = xml.getElementsByTagName('salary_end');
+            var salary_negotiable = xml.getElementsByTagName('salary_negotiable');
+            var description = xml.getElementsByTagName('description');
+            var acceptable_resume_types = xml.getElementsByTagName('acceptable_resume_type');
+            
+            $('title').value = title[0].childNodes[0].nodeValue;
+            $('job.industry').set('html', industry[0].childNodes[0].nodeValue);
+            $('job.country').set('html', country[0].childNodes[0].nodeValue);
+            $('state').value = '';
+            if (state[0].childNodes.length > 0) {
+                $('state').value = state[0].childNodes[0].nodeValue;
+            }
+            //$('job.currency').set('html', currency[0].childNodes[0].nodeValue);
+            $('salary').value = salary[0].childNodes[0].nodeValue;
+            
+            if (salary[0].childNodes.length > 0) {
+                $('salary_end').value = salary_end[0].childNodes[0].nodeValue;
+            } else {
+                $('salary_end').value = '';
+            }
+            
+            //$('description').value = description[0].childNodes[0].nodeValue.replace(/<br\/>/g, "\n");
+            // editor.setValue(description[0].childNodes[0].nodeValue);
+            startRTE(description[0].childNodes[0].nodeValue);
+            
+            if (salary_negotiable[0].childNodes[0].nodeValue == 'Y') {
+                $('salary_negotiable').checked = true;
+            } else {
+                $('salary_negotiable').checked = false;
+            }
+            
+            for (var i=0; i < industries.length; i++) {
+                if (industries[i].value == industry[0].childNodes[0].nodeValue) {
+                    industries[i].selected = true;
+                }
+            }
+            
+            for (var i=0; i < countries.length; i++) {
+                if (countries[i].value == country[0].childNodes[0].nodeValue) {
+                    countries[i].selected = true;
+                }
+            }
+            
+            for (var i=0; i < resume_types.length; i++) {
+                if (resume_types[i].value == acceptable_resume_types[0].childNodes[0].nodeValue) {
+                    resume_types[i].selected = true;
+                }
+            }
+            
+            /*for (i=0; i < currencies.length; i++) {
+                if (currencies[i].value == currency[0].childNodes[0].nodeValue) {
+                    currencies[i].selected = true;
+                }
+            }*/
+            
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading job...');
+        }
+    });
+    
+    request.send(params);
+    
+    add_new_job();
+    $('job_id').value = job_id;
+    $('form_title').set('html', 'Update an Unpublished Job');
 }
 
 function show_job(job_id) {
@@ -638,7 +787,13 @@ function show_open_jobs(_employer_id) {
                         html = html + '<td class="date">' + expire_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     }
                     
-                    html = html + '<td class="new_from"><input type="button" class="mini_button" value="New From This Job" onClick="new_from_job(\'' + job_id.childNodes[0].nodeValue + '\')" /></td>' + "\n";
+                    var closed = closeds[i].childNodes[0].nodeValue;
+                    if (closed == 'N') {
+                        html = html + '<td class="new_from"><input type="button" class="mini_button" value="New From This Job" onClick="new_from_job(\'' + job_id.childNodes[0].nodeValue + '\')" /></td>' + "\n";
+                    } else {
+                        html = html + '<td class="new_from"><input type="button" class="mini_button" value="Update" onClick="show_update_job(\'' + job_id.childNodes[0].nodeValue + '\')" /></td>' + "\n";
+                    }
+                    // html = html + '<td class="new_from"><input type="button" class="mini_button" value="New From This Job" onClick="new_from_job(\'' + job_id.childNodes[0].nodeValue + '\')" /></td>' + "\n";
                     html = html + '</tr>' + "\n";
 
                     if (odd) {
@@ -954,6 +1109,7 @@ function onDomReady() {
     show_employers();
     
     $('publish_job').addEvent('click', publish_job);
+    $('save_job').addEvent('click', save_job);
     $('cancel_job').addEvent('click', function() {
         $('div_job_form').setStyle('display', 'none');
         $('div_tabs').setStyle('display', 'block');

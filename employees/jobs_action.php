@@ -163,7 +163,7 @@ if ($_POST['action'] == 'get_job') {
 }
 
 if ($_POST['action'] == 'publish') {
-    $id = $_POST['job'];
+    $id = $_POST['id'];
     $job = '';
     
     if ($id <= 0) {
@@ -253,6 +253,62 @@ if ($_POST['action'] == 'publish') {
         //}
 
         curl_close($curl);
+    }
+    
+    echo "ok";
+    exit();
+}
+
+if ($_POST['action'] == 'save') {
+    $id = $_POST['id'];
+    $job = '';
+    
+    if ($id <= 0) {
+        $job = new Job();
+    } else {
+        $job = new Job($id);
+    }
+    
+    $data = array();
+    $data['employer'] = $_POST['employer'];
+    $data['industry'] = $_POST['industry'];
+    $data['country'] = $_POST['country'];
+    $data['state'] = $_POST['state'];
+    $data['currency'] = $_POST['currency'];
+    $data['salary'] = $_POST['salary'];
+    $data['salary_end'] = $_POST['salary_end'];
+    $data['salary_negotiable'] = $_POST['salary_negotiable'];
+    $data['created_on'] = now();
+    $data['expire_on'] = sql_date_add($data['created_on'], 30, 'day');
+    $data['title'] = $_POST['title'];
+    //$data['description'] = str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['description']);
+    $data['description'] = $_POST['description'];
+    $data['acceptable_resume_type'] = $_POST['resume_type'];
+    $data['closed'] = 'S';
+    
+    $salary_end = $_POST['salary_end'];
+    if ($salary_end <= 0) {
+        $salary_end = $_POST['salary'];
+        $data['salary_end'] = 'NULL';
+    }
+    $data['potential_reward'] = Job::calculate_potential_reward_from($salary_end, $_POST['employer']);
+    
+    // Check whether employer's account is ready.
+    if ($data['potential_reward'] <= 0) {
+        echo '-1';
+        exit();
+    }
+    
+    if ($id <= 0) {
+        if ($job->create($data) == false) {
+            echo "ko";
+            exit();
+        }
+    } else {
+        if ($job->update($data) == false) {
+            echo "ko";
+            exit();
+        }
     }
     
     echo "ok";

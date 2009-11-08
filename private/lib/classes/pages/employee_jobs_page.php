@@ -233,7 +233,7 @@ class EmployeeJobsPage extends Page {
                         </tr>
                         <tr>
                             <td class="buttons_left"><input class="button" type="button" id="cancel_job" name="cancel_job" value="Cancel" /></td>
-                            <td class="buttons_right"><input class="button" type="button" id="publish_job" name="publish_job" value="Publish" /></td>
+                            <td class="buttons_right"><input class="button" type="button" id="save_job" name="save_job" value="Save" />&nbsp;<input class="button" type="button" id="publish_job" name="publish_job" value="Publish" /></td>
                         </tr>    
                     </table>
                 </form>
