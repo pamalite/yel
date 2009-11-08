@@ -114,14 +114,22 @@ function show_employers() {
                 var ids = xml.getElementsByTagName('id');
                 var employers = xml.getElementsByTagName('name');
                 var expired_jobs = xml.getElementsByTagName('num_expired');
+                var saved_jobs = xml.getElementsByTagName('num_saved');
+                var open_jobs = xml.getElementsByTagName('num_open');
+                var closed_jobs = xml.getElementsByTagName('num_closed');
+                var total_jobs = xml.getElementsByTagName('total_jobs');
                 
                 for (i=0; i < ids.length; i++) {
                     var id = ids[i].childNodes[0].nodeValue;
                     
                     html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                     
-                    html = html + '<td class="employer"><a class="no_link" onClick="show_open_jobs(\'' + id + '\');">' + employers[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="count"><a class="no_link" onClick="show_closed_jobs(\'' + id + '\');">' + expired_jobs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="count"><a class="no_link" onClick="show_open_jobs(\'' + id + '\');">' + open_jobs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="count"><a class="no_link" onClick="show_closed_jobs(\'' + id + '\');">' + closed_jobs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="count">' + expired_jobs[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="count">' + saved_jobs[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="count">' + total_jobs[i].childNodes[0].nodeValue + '</td>' + "\n";
                 }
                 html = html + '</table>';
             }
@@ -601,6 +609,7 @@ function show_open_jobs(_employer_id) {
             var titles = xml.getElementsByTagName('title');
             var created_ons = xml.getElementsByTagName('created_on');
             var expire_ons = xml.getElementsByTagName('expire_on');
+            var expired_days = xml.getElementsByTagName('expired_days');
             var closeds = xml.getElementsByTagName('closed');
             
             var html = '<table id="list" class="list">';
@@ -623,7 +632,12 @@ function show_open_jobs(_employer_id) {
                     html = html + '<td class="title"><a href="#" onClick="show_job(\'' + job_id.childNodes[0].nodeValue + '\')">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="date">' + created_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     
-                    html = html + '<td class="date">' + expire_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    if (parseInt(expired_days[i].childNodes[0].nodeValue) > 0) {
+                        html = html + '<td class="date"><span style="font-weight: bold; color: #FF0000;">' + expire_ons[i].childNodes[0].nodeValue + '</span></td>' + "\n";
+                    } else {
+                        html = html + '<td class="date">' + expire_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    }
+                    
                     html = html + '<td class="new_from"><input type="button" class="mini_button" value="New From This Job" onClick="new_from_job(\'' + job_id.childNodes[0].nodeValue + '\')" /></td>' + "\n";
                     html = html + '</tr>' + "\n";
 
@@ -842,7 +856,31 @@ function onDomReady() {
     });
     
     $('sort_expired').addEvent('click', function() {
-        order_by = 'num_expired';
+        employers_order_by = 'num_expired';
+        employers_ascending_or_descending();
+        show_employers();
+    });
+    
+    $('sort_closed').addEvent('click', function() {
+        employers_order_by = 'num_closed';
+        employers_ascending_or_descending();
+        show_employers();
+    });
+    
+    $('sort_open').addEvent('click', function() {
+        employers_order_by = 'num_open';
+        employers_ascending_or_descending();
+        show_employers();
+    });
+    
+    $('sort_saved').addEvent('click', function() {
+        employers_order_by = 'num_saved';
+        employers_ascending_or_descending();
+        show_employers();
+    });
+    
+    $('sort_total').addEvent('click', function() {
+        employers_order_by = 'total_jobs';
         employers_ascending_or_descending();
         show_employers();
     });

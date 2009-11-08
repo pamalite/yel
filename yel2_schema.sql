@@ -16,6 +16,56 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `Members`
+--
+
+DROP TABLE IF EXISTS `Members`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Members` (
+  `email_addr` varchar(100) NOT NULL,
+  `password` char(32) NOT NULL,
+  `forget_password_question` int(11) NOT NULL,
+  `forget_password_answer` mediumtext NOT NULL,
+  `phone_num` varchar(20) NOT NULL,
+  `firstname` varchar(50) NOT NULL,
+  `lastname` varchar(50) NOT NULL,
+  `address` varchar(100) DEFAULT NULL,
+  `state` varchar(50) DEFAULT NULL,
+  `zip` varchar(20) NOT NULL,
+  `country` char(2) NOT NULL,
+  `premium` enum('Y','N') DEFAULT 'N',
+  `active` enum('Y','N','S') DEFAULT 'N',
+  `like_newsletter` enum('Y','N') DEFAULT 'Y',
+  `filter_jobs` enum('Y','N') DEFAULT 'N',
+  `invites_available` int(10) unsigned DEFAULT '0',
+  `primary_industry` int(10) unsigned DEFAULT NULL,
+  `secondary_industry` int(10) unsigned DEFAULT NULL,
+  `tertiary_industry` int(10) unsigned DEFAULT NULL,
+  `joined_on` date DEFAULT NULL,
+  `recommender` varchar(100) DEFAULT NULL,
+  `added_by` int(11) DEFAULT NULL,
+  `checked_profile` enum('Y','N') DEFAULT 'N',
+  `remarks` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`email_addr`),
+  KEY `firstname` (`firstname`,`lastname`),
+  KEY `lastname` (`lastname`),
+  KEY `members_ibfk_1` (`country`),
+  KEY `primary_industry` (`primary_industry`),
+  KEY `secondary_industry` (`secondary_industry`),
+  KEY `recommender` (`recommender`),
+  KEY `added_by` (`added_by`),
+  KEY `tertiary_industry` (`tertiary_industry`),
+  CONSTRAINT `members_ibfk_1` FOREIGN KEY (`country`) REFERENCES `countries` (`country_code`) ON UPDATE CASCADE,
+  CONSTRAINT `members_ibfk_2` FOREIGN KEY (`primary_industry`) REFERENCES `industries` (`id`),
+  CONSTRAINT `members_ibfk_3` FOREIGN KEY (`secondary_industry`) REFERENCES `industries` (`id`),
+  CONSTRAINT `members_ibfk_4` FOREIGN KEY (`recommender`) REFERENCES `recommenders` (`email_addr`) ON UPDATE CASCADE,
+  CONSTRAINT `members_ibfk_5` FOREIGN KEY (`added_by`) REFERENCES `employees` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `members_ibfk_6` FOREIGN KEY (`tertiary_industry`) REFERENCES `industries` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `branches`
 --
 
@@ -59,6 +109,41 @@ CREATE TABLE `business_groups` (
   CONSTRAINT `business_groups_ibfk_1` FOREIGN KEY (`security_clearance`) REFERENCES `security_clearances` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `business_groups_ibfk_2` FOREIGN KEY (`branch`) REFERENCES `branches` (`id`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `candidate_email_manifests`
+--
+
+DROP TABLE IF EXISTS `candidate_email_manifests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `candidate_email_manifests` (
+  `mailing_list` int(10) unsigned DEFAULT NULL,
+  `email_addr` varchar(100) DEFAULT NULL,
+  KEY `email_addr` (`email_addr`),
+  KEY `mailing_list` (`mailing_list`),
+  CONSTRAINT `candidate_email_manifests_ibfk_1` FOREIGN KEY (`email_addr`) REFERENCES `members` (`email_addr`) ON UPDATE CASCADE,
+  CONSTRAINT `candidate_email_manifests_ibfk_2` FOREIGN KEY (`mailing_list`) REFERENCES `candidates_mailing_lists` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `candidates_mailing_lists`
+--
+
+DROP TABLE IF EXISTS `candidates_mailing_lists`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `candidates_mailing_lists` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `label` varchar(255) DEFAULT NULL,
+  `created_on` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `created_by` (`created_by`),
+  CONSTRAINT `candidates_mailing_lists_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `employees` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -397,10 +482,11 @@ CREATE TABLE `job_extensions` (
   `previously_created_on` datetime DEFAULT NULL,
   `previously_expired_on` datetime DEFAULT NULL,
   `for_replacement` enum('Y','N') DEFAULT 'N',
+  `invoiced` enum('Y','N') DEFAULT 'N',
   PRIMARY KEY (`id`),
   KEY `job_extensions` (`job`),
   CONSTRAINT `job_extensions` FOREIGN KEY (`job`) REFERENCES `jobs` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -423,7 +509,7 @@ CREATE TABLE `job_index` (
   FULLTEXT KEY `title` (`title`),
   FULLTEXT KEY `state` (`state`),
   FULLTEXT KEY `criteria_match` (`description`,`title`,`state`)
-) ENGINE=MyISAM AUTO_INCREMENT=111 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=115 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -453,6 +539,7 @@ CREATE TABLE `jobs` (
   `invoiced` enum('Y','N') DEFAULT 'N',
   `acceptable_resume_type` enum('A','O','F') DEFAULT 'A',
   `views_count` int(10) unsigned DEFAULT '0',
+  `for_replacement` enum('Y','N') DEFAULT 'N',
   PRIMARY KEY (`id`),
   KEY `jobs_ibfk_1` (`employer`),
   KEY `jobs_ibfk_2` (`industry`),
@@ -462,7 +549,7 @@ CREATE TABLE `jobs` (
   CONSTRAINT `jobs_ibfk_2` FOREIGN KEY (`industry`) REFERENCES `industries` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `jobs_ibfk_3` FOREIGN KEY (`country`) REFERENCES `countries` (`country_code`) ON UPDATE CASCADE,
   CONSTRAINT `jobs_ibfk_4` FOREIGN KEY (`currency`) REFERENCES `currencies` (`symbol`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=137 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=141 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -593,7 +680,7 @@ CREATE TABLE `member_photos` (
   PRIMARY KEY (`id`),
   KEY `member_photos_ibfk_1` (`member`),
   CONSTRAINT `member_photos_ibfk_1` FOREIGN KEY (`member`) REFERENCES `members` (`email_addr`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -616,7 +703,7 @@ CREATE TABLE `member_referees` (
   KEY `member_referees_ibfk_2` (`referee`),
   CONSTRAINT `member_referees_ibfk_1` FOREIGN KEY (`member`) REFERENCES `members` (`email_addr`) ON UPDATE CASCADE,
   CONSTRAINT `member_referees_ibfk_2` FOREIGN KEY (`referee`) REFERENCES `members` (`email_addr`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=108 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -671,51 +758,6 @@ CREATE TABLE `member_unsubscribes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `members`
---
-
-DROP TABLE IF EXISTS `members`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `members` (
-  `email_addr` varchar(100) NOT NULL,
-  `password` char(32) NOT NULL,
-  `forget_password_question` int(11) NOT NULL,
-  `forget_password_answer` mediumtext NOT NULL,
-  `phone_num` varchar(20) NOT NULL,
-  `firstname` varchar(50) NOT NULL,
-  `lastname` varchar(50) NOT NULL,
-  `address` varchar(100) DEFAULT NULL,
-  `state` varchar(50) DEFAULT NULL,
-  `zip` varchar(20) NOT NULL,
-  `country` char(2) NOT NULL,
-  `premium` enum('Y','N') DEFAULT 'N',
-  `active` enum('Y','N','S') DEFAULT 'N',
-  `like_newsletter` enum('Y','N') DEFAULT 'Y',
-  `filter_jobs` enum('Y','N') DEFAULT 'N',
-  `invites_available` int(10) unsigned DEFAULT '0',
-  `primary_industry` int(10) unsigned DEFAULT NULL,
-  `secondary_industry` int(10) unsigned DEFAULT NULL,
-  `joined_on` date DEFAULT NULL,
-  `recommender` varchar(100) DEFAULT NULL,
-  `added_by` int(11) DEFAULT NULL,
-  PRIMARY KEY (`email_addr`),
-  KEY `firstname` (`firstname`,`lastname`),
-  KEY `lastname` (`lastname`),
-  KEY `members_ibfk_1` (`country`),
-  KEY `primary_industry` (`primary_industry`),
-  KEY `secondary_industry` (`secondary_industry`),
-  KEY `recommender` (`recommender`),
-  KEY `added_by` (`added_by`),
-  CONSTRAINT `members_ibfk_1` FOREIGN KEY (`country`) REFERENCES `countries` (`country_code`) ON UPDATE CASCADE,
-  CONSTRAINT `members_ibfk_2` FOREIGN KEY (`primary_industry`) REFERENCES `industries` (`id`),
-  CONSTRAINT `members_ibfk_3` FOREIGN KEY (`secondary_industry`) REFERENCES `industries` (`id`),
-  CONSTRAINT `members_ibfk_4` FOREIGN KEY (`recommender`) REFERENCES `recommenders` (`email_addr`) ON UPDATE CASCADE,
-  CONSTRAINT `members_ibfk_5` FOREIGN KEY (`added_by`) REFERENCES `employees` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `password_reset_questions`
 --
 
@@ -727,6 +769,34 @@ CREATE TABLE `password_reset_questions` (
   `question` mediumtext NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `privileged_referral_buffers`
+--
+
+DROP TABLE IF EXISTS `privileged_referral_buffers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `privileged_referral_buffers` (
+  `member` varchar(100) NOT NULL,
+  `referee` varchar(100) NOT NULL,
+  `job` int(11) NOT NULL,
+  `resume` int(11) NOT NULL,
+  `referred_on` datetime DEFAULT NULL,
+  `referee_acknowledged_on` datetime DEFAULT NULL,
+  `member_confirmed_on` datetime DEFAULT NULL,
+  `member_read_resume_on` datetime DEFAULT NULL,
+  `testimony` mediumtext,
+  PRIMARY KEY (`member`,`referee`,`job`),
+  KEY `referee` (`referee`),
+  KEY `job` (`job`),
+  KEY `resume` (`resume`),
+  CONSTRAINT `privileged_referral_buffers_ibfk_1` FOREIGN KEY (`member`) REFERENCES `members` (`email_addr`) ON UPDATE CASCADE,
+  CONSTRAINT `privileged_referral_buffers_ibfk_2` FOREIGN KEY (`referee`) REFERENCES `members` (`email_addr`) ON UPDATE CASCADE,
+  CONSTRAINT `privileged_referral_buffers_ibfk_3` FOREIGN KEY (`job`) REFERENCES `jobs` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `privileged_referral_buffers_ibfk_4` FOREIGN KEY (`resume`) REFERENCES `resumes` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -747,6 +817,25 @@ CREATE TABLE `recommender_industries` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `recommender_tokens`
+--
+
+DROP TABLE IF EXISTS `recommender_tokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `recommender_tokens` (
+  `referral` int(11) NOT NULL,
+  `recommender` varchar(100) NOT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `presented_on` datetime NOT NULL,
+  PRIMARY KEY (`referral`,`recommender`),
+  KEY `recommender` (`recommender`),
+  CONSTRAINT `recommender_tokens_ibfk_1` FOREIGN KEY (`referral`) REFERENCES `referrals` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `recommender_tokens_ibfk_2` FOREIGN KEY (`recommender`) REFERENCES `recommenders` (`email_addr`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `recommenders`
 --
 
@@ -758,7 +847,8 @@ CREATE TABLE `recommenders` (
   `phone_num` varchar(20) DEFAULT NULL,
   `firstname` varchar(50) NOT NULL,
   `lastname` varchar(50) NOT NULL,
-  `title` varchar(10) DEFAULT NULL,
+  `remarks` varchar(255) DEFAULT NULL,
+  `region` varchar(255) DEFAULT NULL,
   `added_by` int(11) NOT NULL,
   `added_on` datetime DEFAULT NULL,
   PRIMARY KEY (`email_addr`),
@@ -1074,7 +1164,7 @@ CREATE TABLE `resumes` (
   PRIMARY KEY (`id`),
   KEY `resumes_ibfk_1` (`member`),
   CONSTRAINT `resumes_ibfk_1` FOREIGN KEY (`member`) REFERENCES `members` (`email_addr`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1155,6 +1245,10 @@ CREATE TABLE `security_clearances` (
   `prs_referrals_remove` tinyint(1) DEFAULT '0',
   `prs_referrals_update` tinyint(1) DEFAULT '0',
   `prs_referrals_view` tinyint(1) DEFAULT '0',
+  `prs_mailing_lists_create` tinyint(1) DEFAULT '0',
+  `prs_mailing_lists_remove` tinyint(1) DEFAULT '0',
+  `prs_mailing_lists_update` tinyint(1) DEFAULT '0',
+  `prs_mailing_lists_view` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1170,7 +1264,7 @@ CREATE TABLE `seeds` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `seed` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=647 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=801 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1202,4 +1296,4 @@ CREATE TABLE `visitors` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-10-11 12:06:44
+-- Dump completed on 2009-11-08  8:28:35

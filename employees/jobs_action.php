@@ -12,6 +12,14 @@ function replace_characters($_description) {
     return $_description;
 }
 
+function compare_total_jobs($a, $b) {
+    if ($a['total_jobs'] == $b['total_jobs']) {
+        return 0;
+    }
+    
+    return ($a['total_jobs'] < $b['total_jobs']) ? -1 : 1;
+}
+
 session_start();
 
 if (!isset($_POST['id'])) {
@@ -23,16 +31,33 @@ if (!isset($_POST['id'])) {
 $xml_dom = new XMLDOM();
 
 if (!isset($_POST['action'])) {
+    $use_sort = false;
     $order_by = 'num_expired desc';
     if (isset($_POST['order_by'])) {
-        $order_by = $_POST['order_by'];
+        if (stripos($_POST['order_by'], 'total_jobs') === false) {
+            $order_by = $_POST['order_by'];
+        } else {
+            $use_sort = true;
+        }
     }
     
     $query = "SELECT employers.id, employers.name, 
               (SELECT COUNT(jobs.id) FROM jobs 
-               WHERE (jobs.expire_on < CURDATE()) AND 
+               WHERE (jobs.expire_on < CURDATE() AND jobs.closed = 'N') AND 
                jobs.employer = employers.id 
-              ) AS num_expired 
+              ) AS num_expired, 
+              (SELECT COUNT(jobs.id) FROM jobs 
+               WHERE (jobs.closed = 'Y') AND 
+               jobs.employer = employers.id 
+              ) AS num_closed, 
+              (SELECT COUNT(jobs.id) FROM jobs 
+               WHERE (jobs.expire_on >= CURDATE() AND jobs.closed = 'N') AND 
+               jobs.employer = employers.id 
+              ) AS num_open,
+              (SELECT COUNT(jobs.id) FROM jobs 
+               WHERE (jobs.closed = 'S') AND 
+               jobs.employer = employers.id 
+              ) AS num_saved 
               FROM employers 
               LEFT JOIN employees ON employees.id = employers.registered_by 
               WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " 
@@ -48,6 +73,18 @@ if (!isset($_POST['action'])) {
     
     foreach ($result as $i=>$row) {
         $result[$i]['name'] = htmlspecialchars_decode(desanitize($row['name']));
+        $result[$i]['total_jobs'] = $row['num_expired'] + $row['num_closed'] + $row['num_open'] + $row['num_saved'];
+    }
+    
+    if ($use_sort) {
+        $sort_req = explode(' ', $_POST['order_by']);
+        $is_asc = ($sort_req[1] == 'asc') ? true : false;
+        
+        usort($result, "compare_total_jobs");
+        
+        if (!$is_asc) {
+            $result = array_reverse($result);
+        }
     }
     
     $xml_dom = new XMLDOM();
@@ -74,7 +111,8 @@ if ($_POST['action'] == 'get_jobs') {
     $criteria = array(
         'columns' => 'jobs.id, industries.industry AS industry, jobs.title, jobs.closed, 
                       DATE_FORMAT(jobs.created_on, \'%e %b, %Y\') AS created_on, 
-                      DATE_FORMAT(jobs.expire_on, \'%e %b, %Y\') AS expire_on',
+                      DATE_FORMAT(jobs.expire_on, \'%e %b, %Y\') AS expire_on, 
+                      DATEDIFF(CURDATE(), jobs.expire_on) AS expired_days',
         'joins' => 'industries ON industries.id = jobs.industry', 
         'order' => $order_by,
         'match' => $closed. ' AND jobs.employer = \''. $_POST['id']. '\''

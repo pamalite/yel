@@ -108,7 +108,11 @@ class EmployeeJobsPage extends Page {
             <table class="header">
                 <tr>
                     <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
+                    <td class="count"><span class="sort" id="sort_open">Open Jobs</span></td>
+                    <td class="count"><span class="sort" id="sort_closed">Closed Jobs</span></td>
                     <td class="count"><span class="sort" id="sort_expired">Expired Jobs</span></td>
+                    <td class="count"><span class="sort" id="sort_saved">Saved Jobs</span></td>
+                    <td class="count"><span class="sort" id="sort_total">Total Jobs</span></td>
                 </tr>
             </table>
             <div id="div_employers_list">

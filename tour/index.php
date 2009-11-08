@@ -3,6 +3,11 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 ?>
 
 <html>
+<style>
+img {
+    border: none;
+}
+</style>
 <body style="margin: 0px 0px 0px 0px;">
 <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/tour/main.jpg" usemap="#buttons"/>
 

@@ -3,6 +3,11 @@ require_once dirname(__FILE__). "/../../private/lib/utilities.php";
 ?>
 
 <html>
+<style>
+img {
+    border: none;
+}
+</style>
 <script type="text/javascript">
 function show_contact_us() {
     if (window.opener == null) {
