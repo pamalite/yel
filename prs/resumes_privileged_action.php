@@ -213,12 +213,12 @@ if ($_POST['action'] == 'add_new_candidate') {
                 $message = str_replace('%root%', $GLOBALS['root'], $message);
                 $subject = "Member Activation Required";
                 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-                // mail($_POST['member_email_addr'], $subject, $message, $headers);
+                mail($_POST['member_email_addr'], $subject, $message, $headers);
                             
-                $handle = fopen('/tmp/email_to_'. $_POST['member_email_addr']. '_token.txt', 'w');
-                fwrite($handle, 'Subject: '. $subject. "\n\n");
-                fwrite($handle, $message);
-                fclose($handle);
+                // $handle = fopen('/tmp/email_to_'. $_POST['member_email_addr']. '_token.txt', 'w');
+                // fwrite($handle, 'Subject: '. $subject. "\n\n");
+                // fwrite($handle, $message);
+                // fclose($handle);
                 
                 // add yellow elevator as default contact and pre-approve
                 $employee = new Employee($_POST['id']);
@@ -433,12 +433,12 @@ if ($_POST['action'] == 'make_referral') {
             $message = str_replace('%root%', $GLOBALS['root'], $message);
             $subject = "New application for ". desanitize($job['job']). " position";
             $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-            // mail($job['employer_email_addr'], $subject, $message, $headers);
+            mail($job['employer_email_addr'], $subject, $message, $headers);
 
-            $handle = fopen('/tmp/email_to_'. $job['employer_email_addr']. '.txt', 'w');
-            fwrite($handle, 'Subject: '. $subject. "\n\n");
-            fwrite($handle, $message);
-            fclose($handle);
+            // $handle = fopen('/tmp/email_to_'. $job['employer_email_addr']. '.txt', 'w');
+            // fwrite($handle, 'Subject: '. $subject. "\n\n");
+            // fwrite($handle, $message);
+            // fclose($handle);
         }
     } else {
         // no consent - buffer it
@@ -479,12 +479,12 @@ if ($_POST['action'] == 'make_referral') {
     $message = str_replace('%position%', $position, $message);
     $subject = htmlspecialchars_decode(desanitize($employee->get_name())). " has screened and submitted your resume for the ". htmlspecialchars_decode($job['job']). " position";
     $headers = 'From: '. str_replace(',', '', htmlspecialchars_decode(desanitize($employee->get_name()))). ' <'. $employee->email_address(). '>' . "\n";
-    // mail($_POST['referee'], $subject, $message, $headers);
+    mail($_POST['referee'], $subject, $message, $headers);
     
-    $handle = fopen('/tmp/ref_email_to_'. $_POST['referee']. '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);
+    // $handle = fopen('/tmp/ref_email_to_'. $_POST['referee']. '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     echo '0';
     exit();
