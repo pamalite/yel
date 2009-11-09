@@ -136,7 +136,12 @@ class WelcomePage extends Page {
                 </form>
             </div>
             <div class="intro" style="font-size: 8pt;"> While you search for mid-high level job opportunities for yourself, you can also refer jobs to your contacts and earn rewards for every successful referral. Furthermore, we will contact you directly whenever there are job opportunities that match your resume. So sign up and upload your resume today!</div>
-            <a href="members/sign_up.php" class="takeatour"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/sign_up_upload_resume.gif" /></a>
+            <a href="#" class="takeatour" onClick="show_tour();">
+                <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/take_a_tour.gif" />
+            </a>
+            <a href="members/sign_up.php" class="signup">
+                <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/sign_up_upload_resume.gif" />
+            </a>
         </div>
         <div id="action_buttons_jasmine">
             <div class="box employer">

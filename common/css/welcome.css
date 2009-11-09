@@ -208,7 +208,13 @@ body {
 #search_info a.takeatour {
     position: absolute;
     margin-top:238px;
-    margin-left:464px;
+    margin-left:290px;
+}
+
+#search_info a.signup {
+    position: absolute;
+    margin-top:238px;
+    margin-left:510px;
 }
 
 #action_buttons_jasmine {
