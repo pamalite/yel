@@ -31,8 +31,8 @@ class WelcomePage extends Page {
                   LEFT JOIN job_index ON job_index.job = jobs.id 
                   LEFT JOIN employers ON employers.id = jobs.employer 
                   LEFT JOIN currencies ON currencies.country_code = employers.country 
-                  WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() AND 
-                  jobs.id NOT IN (SELECT DISTINCT job FROM job_extensions) 
+                  WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() 
+                  -- AND jobs.id NOT IN (SELECT DISTINCT job FROM job_extensions) 
                   ORDER BY jobs.salary DESC LIMIT 10";
         $mysql = Database::connect();
         $result = $mysql->query($query);
