@@ -119,7 +119,7 @@ class MemberReferPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_testimony_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <p>1. How long have you known and how do you know <span id="candidate_name" style="font-weight: bold;"></span>?  (<span id="word_count_q1">0</span>/50 words)</p>
                 <p><textarea class="field" id="testimony_answer_1"></textarea></p>
                 <p>2. What makes <span id="candidate_name" style="font-weight: bold;"></span> suitable for the job <span id="job_title" style="font-weight: bold;"></span> (<span id="word_count_q2">0</span>/50 words)</p>

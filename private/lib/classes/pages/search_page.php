@@ -166,7 +166,7 @@ class SearchPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_refer_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <table class="refer_form">
                     <tr>
                         <td class="left">

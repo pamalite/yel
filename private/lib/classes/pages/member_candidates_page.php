@@ -350,7 +350,7 @@ class MemberCandidatesPage extends Page {
                             </tr>
                         </table>
                     </form>
-                    <iframe id="upload_target" name="upload_target" src="#" style="width:0px;height:0px;border:none;"></iframe>
+                    <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:0px;height:0px;border:none;"></iframe>
                 </div>
                 
                 <div id="send_vcard_invites_form">

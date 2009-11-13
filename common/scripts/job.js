@@ -27,6 +27,55 @@ function duplicated(emails, email) {
     return false;
 }
 
+function validate_quick_refer_form() {
+    if (isEmpty($('qr_my_file').value)) {
+        alert('You need to provide the candidate\'s file resume.');
+        return false;
+    }
+    
+    if ((!isEmail($('qr_candidate_email').value) && 
+        $('qr_candidate_email_from_list').options[$('qr_candidate_email_from_list').selectedIndex].value == '0') || 
+        (isEmail($('qr_candidate_email').value) &&
+         $('qr_candidate_email_from_list').options[$('qr_candidate_email_from_list').selectedIndex].value != '0')) {
+        alert('You need to either select candidate from your Contacts, or provide a new one by filling up the form.');
+        return false;
+    }
+    
+    var answer_1 = $('testimony_answer_1').value;
+    var answer_2 = $('testimony_answer_2').value;
+    var answer_3 = $('testimony_answer_3').value;
+    var answer_4 = $('testimony_answer_4').value;
+    var meet_requirements = ($('meet_req_yes').checked) ? 'Yes' : 'No';
+    
+    if (isEmpty(answer_1) || (meet_requirements == 'Yes' && isEmpty(answer_2)) || isEmpty(answer_3)) {
+        alert('Please briefly answer all questions.');
+        return false;
+    } else if (answer_1.split(' ').length > 200 || answer_2.split(' ').length > 200 || 
+               answer_3.split(' ').length > 200 || answer_4.split(' ').length > 200) {
+        if (answer_1.split(' ').length > 200) {
+            alert('Please keep your 1st answer below 200 words.');
+        } else if (answer_2.split(' ').length > 200) {
+            alert('Please keep your 2nd answer below 200 words.');
+        } else if (answer_3.split(' ').length > 200) {
+            alert('Please keep your 3rd answer below 200 words.');
+        } else if (answer_4.split(' ').length > 200) {
+            alert('Please keep your 4th and final answer below 200 words.');
+        }
+        return false;
+    }
+    
+    var agreed = confirm('By clicking "OK", you confirm that you have screened the candidate\'s resume and have also assessed the candidate\'s suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding the candidate, and you agree to provide any other necessary information requested by the employer.\n\nOtherwise, you may click the "Cancel" button.');
+    
+    if (!agreed) {
+        set_status('');
+        close_quick_refer_form();
+        return false;
+    }
+    
+    start_upload();
+    return true;
+}
+
 function show_candidates() {
     $('candidates').set('html', '');
     
@@ -101,7 +150,6 @@ function show_referrers() {
     
     request.send(params);
 }
-
 
 function save_job() {
     if (id <= 0) {
@@ -517,45 +565,77 @@ function refer_me() {
     request.send(params);
 }
 
+function start_upload() {
+    $('qr_upload_progress').setStyle('display', 'block');
+    $('table_quick_refer_form').setStyle('display', 'none');
+    return true;
+}
+
+function stop_upload(_error) {
+    $('qr_upload_progress').setStyle('display', 'none');
+    $('table_quick_refer_form').setStyle('display', 'block');
+    set_status('');
+    
+    switch (_error) {
+        case '0':
+            close_quick_refer_form();
+            set_status('The resume was successfully referred!');
+            break;
+        case '-1':
+            alert('The file size has exceeded the allowable limit.' + "\n" + 'Please makesure the file does not exceed 2MB.');
+            break;
+        case '-2':
+            alert('The file type is invalid.' + "\n" + 'Please makesure the file provided is one of the allowed types.');
+            break;
+        default:
+            alert('An error occurred while referring the resume to the job. Please try again later.');
+            break;
+    }
+}
+
 function close_quick_refer_form() {
     $('div_quick_refer_form').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');
 }
 
 function show_quick_refer_form() {
-    alert('This feature is coming soon...');
+    if (id <= 0) {
+        window.location = root + '/members?job=' + $('job_id').value;
+        navigator.reload();
+    }
     
-    // if (id <= 0) {
-    //     window.location = root + '/members?job=' + $('job_id').value;
-    //     navigator.reload();
-    // }
+    $('div_blanket').setStyle('display', 'block');
     
-    // $('div_blanket').setStyle('display', 'block');
-    // 
-    // var window_height = 0;
-    // var window_width = 0;
-    // var div_height = parseInt($('div_refer_form').getStyle('height'));
-    // var div_width = parseInt($('div_refer_form').getStyle('width'));
-    // 
-    // if (typeof window.innerHeight != 'undefined') {
-    //     window_height = window.innerHeight;
-    // } else {
-    //     window_height = document.documentElement.clientHeight;
-    // }
-    // 
-    // if (typeof window.innerWidth != 'undefined') {
-    //     window_width = window.innerWidth;
-    // } else {
-    //     window_width = document.documentElement.clientWidth;
-    // }
-    // 
-    // $('div_refer_form').setStyle('top', ((window_height - div_height) / 2));
-    // $('div_refer_form').setStyle('left', ((window_width - div_width) / 2));
-    // 
-    // $('job_title').set('html', $('job.title').get('html'));
-    // 
-    // $('div_refer_form').setStyle('display', 'block');
-    // show_candidates();
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_quick_refer_form').getStyle('height'));
+    var div_width = parseInt($('div_quick_refer_form').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_quick_refer_form').setStyle('top', ((window_height - div_height) / 2));
+    $('div_quick_refer_form').setStyle('left', ((window_width - div_width) / 2));
+    
+    var quick_refer_form = $('div_quick_refer_form');
+    var spans = quick_refer_form.getElementsByTagName('span');
+    
+    for (var i=0; i < spans.length; i++) {
+        if (spans[i].id == 'qr_job_title') {
+            spans[i].innerHTML = $('job.title').get('html');
+        } 
+    }
+    
+    $('div_quick_refer_form').setStyle('display', 'block');
 }
 
 function close_upload_resume_form() {
@@ -632,6 +712,10 @@ function onDomReady() {
     
     $('testimony_answer_3').addEvent('keypress', function() {
        update_word_count_of('word_count_q3', 'testimony_answer_3') 
+    });
+    
+    $('testimony_answer_4').addEvent('keypress', function() {
+       update_word_count_of('word_count_q4', 'testimony_answer_4') 
     });
     
     var suggest_url = root + '/common/php/search_suggest.php';

@@ -213,7 +213,7 @@ class PrsResumesPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_job_select_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <input type="hidden" id="job_select_form.resume_id" name="job_select_form.resume_id" value="0" />
                 <table class="job_select_form">
                     <tr>
@@ -258,7 +258,7 @@ class PrsResumesPage extends Page {
         </div>
         
         <div id="div_testimony_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <p>1. What experience and skill-sets do <span id="testimony.candidate_name" style="font-weight: bold;"></span> have that makes him/her suitable for the <span id="testimony.job_title" style="font-weight: bold;"></span> position? (<span id="word_count_q1">0</span>/200 words)</p>
                 <p><textarea class="field" id="testimony_answer_1"></textarea></p>
                 <p>2. Does <span id="testimony.candidate_name" style="font-weight: bold;"></span> meet all the requirements of the <span id="testimony.job_title" style="font-weight: bold;"></span> position?</p><div style="text-align: center;"><input type="radio" id="meet_req_yes" name="meet_req" value="yes" checked /><label for="meet_req_yes">Yes</label>&nbsp;&nbsp;&nbsp;<input type="radio" id="meet_req_no" name="meet_req" value="no" /><label for="meet_req_no">No</label></div><p>Briefly describe how they are met if you choose 'Yes'. (<span id="word_count_q2">0</span>/200 words)</p>

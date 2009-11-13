@@ -75,7 +75,7 @@ class MemberReferralRequestsPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_testimony_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <input type="hidden" id="request" name="request" value="1" />
                 <input type="hidden" id="resume" name="resume" value="" />
                 <input type="hidden" id="requested_on" name="requested_on" value="" />

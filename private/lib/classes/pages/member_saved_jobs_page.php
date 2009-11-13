@@ -117,7 +117,7 @@ class MemberSavedJobsPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_refer_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <table class="refer_form">
                     <tr>
                     <td colspan="3"><p>You are about to refer the job position,&nbsp;<span id="job_title" style="font-weight: bold;"></span>&nbsp;to your contacts. Please select...</p></td>
@@ -166,7 +166,7 @@ class MemberSavedJobsPage extends Page {
         </div>
         
         <div id="div_acknowledge_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <p>
                     You are about to make a request for a referral to the <span id="acknowledge_form_job_title" style="font-weight: bold;"><?php echo $job['title']; ?></span> position.
                 </p>

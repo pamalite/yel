@@ -92,7 +92,7 @@ class PrsResumeSearchPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_email_add_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <table class="email_add_form">
                     <tr>
                     <td colspan="3"><p style="text-align: center;">Add&nbsp;<span id="candidate_email" style="font-weight: bold;"></span>&nbsp;to...</p></td>

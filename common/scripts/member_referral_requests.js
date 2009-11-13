@@ -281,13 +281,13 @@ function refer() {
     } else if (answer_1.split(' ').length > 200 || answer_2.split(' ').length > 200 || 
                answer_3.split(' ').length > 200 || answer_4.split(' ').length > 200) {
         if (answer_1.split(' ').length > 200) {
-            alert('Please keep your 1st answer below 50 words.');
+            alert('Please keep your 1st answer below 200 words.');
         } else if (answer_2.split(' ').length > 200) {
-            alert('Please keep your 2nd answer below 50 words.');
+            alert('Please keep your 2nd answer below 200 words.');
         } else if (answer_3.split(' ').length > 200) {
-            alert('Please keep your 3rd answer below 50 words.');
+            alert('Please keep your 3rd answer below 200 words.');
         } else if (answer_4.split(' ').length > 200) {
-            alert('Please keep your 4th and final answer below 50 words.');
+            alert('Please keep your 4th and final answer below 200 words.');
         }
         return false;
     }

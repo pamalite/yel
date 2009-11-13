@@ -142,7 +142,7 @@ class MemberResumesPage extends Page {
                     </table>
                 </p>
              </form>
-             <iframe id="upload_target" name="upload_target" src="#" style="width:0px;height:0px;border:none;"></iframe>
+             <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:0px;height:0px;border:none;"></iframe>
         </div>
         
         <div id="div_resume_form">

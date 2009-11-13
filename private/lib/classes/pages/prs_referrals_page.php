@@ -124,7 +124,7 @@ class PrsReferralsPage extends Page {
             <p class="label">
                 Please enter the token and date presented to <span id="recommender_name" style="font-weight: bold;"></span>
             </p>
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <input type="hidden" id="recommender" name="recommender" value="" />
                 <input type="hidden" id="referral" name="referral" value="" />
                 <table class="token_form">

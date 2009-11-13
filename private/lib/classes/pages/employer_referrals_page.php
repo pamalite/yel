@@ -211,7 +211,7 @@ class EmployerReferralsPage extends Page {
         </div>
         
         <div id="div_employ_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <p>
                     Please fill-up <span id="candidate_name" style="font-weight: bold;"></span>'s employment details for the <span id="employ_job_title" style="font-weight: bold;"></span>&nbsp;position:
                 </p>

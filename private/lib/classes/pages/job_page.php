@@ -129,6 +129,38 @@ class JobPage extends Page {
         $job->add_view_count();
     }
     
+    private function generateContactsDropdown() {
+        if (!is_null($this->member)) {
+            $contacts = $this->member->get_referees("referee_name ASC");
+            
+            echo '<select class="mini_field" id="qr_candidate_email_from_list" name="qr_candidate_email_from_list">'. "\n";
+            echo '<option value="0" selected>Contacts</option>'. "\n";
+            echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+            
+            foreach ($contacts as $contact) {
+                echo '<option value="'. $contacts['referee']. '">'. $contact['referee_name']. '</option>'. "\n";
+            }
+            
+            echo '</select>'. "\n";
+        }
+    }
+    
+    private function generateCountriesDropdown() {
+        if (!is_null($this->member)) {
+            $countries = Country::get_all();
+            
+            echo '<select class="mini_field" id="qr_candidate_country" name="qr_candidate_country">'. "\n";
+            echo '<option value="0" selected>Candidate\'s country of residence</option>'. "\n";
+            echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+            
+            foreach ($countries as $country) {
+                echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
+            }
+            
+            echo '</select>'. "\n";
+        }
+    }
+    
     private function generate_resumes_list() {
         if (!is_null($this->member)) {
             $query = "SELECT id, name FROM resumes 
@@ -172,11 +204,11 @@ class JobPage extends Page {
             $error_message = 'An error occured while loading the job details.';
         } 
         
-        if (!$this->is_employee_viewing) {
-            if ($job['expired'] > 0 || $job['closed'] == 'Y') {
-                $error_message = 'The job that you are looking for is no longer available.';
-            }
-        }
+        // if (!$this->is_employee_viewing) {
+        //     if ($job['expired'] > 0 || $job['closed'] == 'Y') {
+        //         $error_message = 'The job that you are looking for is no longer available.';
+        //     }
+        // }
         
         ?>
         <div id="div_status" class="status">
@@ -307,7 +339,7 @@ class JobPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_refer_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <table class="refer_form">
                     <tr>
                     <td colspan="3"><p>You are about to refer the job position,&nbsp;<span id="job_title" style="font-weight: bold;"></span>&nbsp;to your contacts. Please select...</p></td>
@@ -356,7 +388,7 @@ class JobPage extends Page {
         </div>
         
         <div id="div_acknowledge_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <p>
                     You are about to make a request for a referral to the <span id="acknowledge_form_job_title" style="font-weight: bold;"><?php echo $job['title']; ?></span> position.
                 </p>
@@ -393,41 +425,63 @@ class JobPage extends Page {
         </div>
         
         <div id="div_quick_refer_form">
-            <form onSubmit="retun false;">
-                <table class="quick_refer_form">
+            <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_refer_form();">
+                <input type="hidden" name="qr_job_id" id="qr_job_id" value="<?php echo $this->job_id; ?>" />
+                <input type="hidden" name="action" value="quick_refer" />
+                <p id="qr_upload_progress" style="text-align: center;">
+                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
+                </p>
+                <table id="table_quick_refer_form" class="quick_refer_form">
                     <tr>
-                        <td colspan="3"><p>You are about to quickly refer the job position,&nbsp;<span id="qr_job_title" style="font-weight: bold;"></span>&nbsp;to one of your contacts. Please select...</p></td>
+                        <td colspan="3">
+                            <p style="text-align: center;">
+                                You are about to quickly refer the job position,&nbsp;<span id="qr_job_title" style="font-weight: bold;"></span>&nbsp;to one of your contacts. Please attached the candidate's resume:
+                                <br/><br/>
+                                <input class="field" id="qr_my_file" name="qr_my_file" type="file" />
+                                <br/><br/>
+                                <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
                     </tr>
                     <tr>
                         <td class="left">
-                            <table class="candidate_form">
-                                <tr>
-                                    <td class="radio"><input type="radio" id="from_list" name="candidate_from" value="list" checked /></td>
-                                    <td>
-                                        <label for="from_list">from your Contacts</label><br/>
-                                        <span class="filter">[ Show candidates from <?php (!is_null($this->member)) ? $this->generate_networks_list() : ''; ?> ]</span><br/>
-                                        <div class="candidates" id="candidates" name="candidates"></div>
-                                    </td>
-                                </tr>
-                            </table>
+                            <div style="border-bottom: 1px dashed #666666; padding-bottom: 15px;">
+                                <label for="qr_candidate_email_from_list">Please select a candidate from one of your Contacts:</label><br/>
+                                <?php $this->generateContactsDropdown(); ?>
+                            </div>
+                            <div style="padding-top: 15px;">
+                                <label for="qr_candidate_email">Or, you can enter the candidate's email address:</label><br/>
+                                <input class="mini_field" type="text" id="qr_candidate_email" name="qr_candidate_email" />
+                            </div>
+                            <div style="padding-top: 15px; font-style: italic;">
+                                <ul>
+                                    <li>Your testimonial for this candidate can only be viewed by the employer.</li>
+                                    <li>You should already have an agreement with the candidate about referring him/her to this job.</li>
+                                    <li>You need to provide your testimony as truthful and honest as possible.</li>
+                                </ul>
+                            </div>
                         </td>
                         <td class="separator"></td>
                         <td class="right">
-                            <p>1. How long have you known and how do you know <span id="candidate_name" style="font-weight: bold;">this contact</span>? (<span id="word_count_q1">0</span>/50 words)</p>
-                            <p><textarea class="mini_field" id="testimony_answer_1"></textarea></p>
-                            <p>2. What makes <span id="candidate_name" style="font-weight: bold;">this contact</span> suitable for <span id="job_title" style="font-weight: bold;">the job</span>?  (<span id="word_count_q2">0</span>/50 words)</p>
-                            <p><textarea class="mini_field" id="testimony_answer_2"></textarea></p>
-                            <p>3. Briefly, what are the areas of improvements for <span id="candidate_name" style="font-weight: bold;">this contact</span>?  (<span id="word_count_q3">0</span>/50 words)</p>
-                            <p><textarea class="mini_field" id="testimony_answer_3"></textarea></p>
+                            <p>1. What experience and skill-sets do <span id="candidate_name" style="font-weight: bold;"></span> have that makes him/her suitable for the <span id="qr_job_title" style="font-weight: bold;"></span> position? (<span id="word_count_q1">0</span>/200 words)</p>
+                            <p><textarea class="mini_field" id="testimony_answer_1" name="testimony_answer_1"></textarea></p>
+                            <p>2. Does <span style="font-weight: bold;">the candidate</span> meet all the requirements of the <span id="qr_job_title" style="font-weight: bold;"></span> position?</p><div style="text-align: center;"><input type="radio" id="meet_req_yes" name="meet_req" value="yes" checked /><label for="meet_req_yes">Yes</label>&nbsp;&nbsp;&nbsp;<input type="radio" id="meet_req_no" name="meet_req" value="no" /><label for="meet_req_no">No</label></div><p>Briefly describe how they are met if you choose 'Yes'. (<span id="word_count_q2">0</span>/200 words)</p>
+                            <p><textarea class="mini_field" id="testimony_answer_2" name="testimony_answer_2"></textarea></p>
+                            <p>3. Briefly, describe <span style="font-weight: bold;">the candidate</span>'s personality and work attitude. (<span id="word_count_q3">0</span>/200 words)</p>
+                            <p><textarea class="mini_field" id="testimony_answer_3" name="testimony_answer_3"></textarea></p>
+                            <p>4. Additional recommendations for <span style="font-weight: bold;">the candidate</span> (if any) ? (<span id="word_count_q4">0</span>/200 words)</p>
+                            <p><textarea class="mini_field" id="testimony_answer_4" name="testimony_answer_4"></textarea></p>
                         </td>
                     </tr>
                 </table>
-                <div style="padding: 2px 2px 2px 2px; text-align: center; font-style: italic;">
-                    Your testimonial for this contact can only be viewed by the employer.
-                </div>
-                <p class="button"><input type="button" value="Cancel" onClick="close_refer_form();" />&nbsp;<input type="button" value="Refer Now" onClick="refer();" /></p>
+                <p class="button"><input type="button" value="Cancel" onClick="close_quick_refer_form();" />&nbsp;<input type="submit" value="Refer Now" /></p>
             </form>
         </div>
+        
+        <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:0px;height:0px;border:none;"></iframe>
         <?php
     }
 }

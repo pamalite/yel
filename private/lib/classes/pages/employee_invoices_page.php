@@ -93,7 +93,7 @@ class EmployeeInvoicesPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_confirm_payment_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <input type="hidden" id="invoice_id" name="invoice_id" value="0" />
                 <p>
                     Please fill-up the following payment details for invoice <span id="invoice" style="font-weight: bold;"></span>:

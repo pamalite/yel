@@ -260,7 +260,7 @@ class MemberHomePage extends Page {
         </div>
         
         <div id="div_acknowledge_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <p>
                     Please select a resume for&nbsp;<span id="job_title" style="font-weight: bold;"></span>&nbsp;position:
                 </p>

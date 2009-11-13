@@ -89,40 +89,53 @@ table.job_info div.job_description {
 }
 
 #div_refer_form table.refer_form, 
-#div_acknowledge_form table.request_form {
+#div_acknowledge_form table.request_form, 
+#div_quick_refer_form table.quick_refer_form  {
     width: 95%;
     margin: auto;
 }
 
 #div_refer_form table.refer_form td.separator, 
-#div_acknowledge_form table.request_form td.separator {
+#div_acknowledge_form table.request_form td.separator, 
+#div_quick_refer_form table.quick_refer_form td.separator  {
     width: 1px;
     border-left: 1px solid #CCCCCC;
     /*background-color: #CCCCCC;*/
 }
 
 #div_refer_form table.refer_form td,
-#div_acknowledge_form table.request_form td {
+#div_acknowledge_form table.request_form td, 
+#div_quick_refer_form table.quick_refer_form td {
     vertical-align: top;
     font-size: 10pt;
 }
 
-#div_refer_form table.refer_form td.right {
+#div_refer_form table.refer_form td.right,
+#div_quick_refer_form table.quick_refer_form td.right {
     width: 50%;
 }
 
-#div_refer_form textarea.mini_field {
+#div_refer_form textarea.mini_field, 
+#div_quick_refer_form textarea.mini_field {
     width: 99%;
     height: 100px;
 }
 
-#div_refer_form input.mini_field {
+#div_refer_form input.mini_field,
+#div_quick_refer_form input.mini_field, 
+#div_quick_refer_form select.mini_field {
     width: 99%;
 }
 
-#div_refer_form table.candidate_form {
+#div_refer_form table.candidate_form, 
+#div_quick_refer_form table.qr_candidate_form {
     width: 95%;
     margin: auto;
+}
+
+#div_quick_refer_form table.qr_candidate_form td.label {
+    width: 20%;
+    text-align: right;
 }
 
 #div_refer_form div.candidates, 
@@ -133,12 +146,14 @@ table.job_info div.job_description {
     border: 1px solid #CCCCCC;
 }
 
-#div_refer_form p {
+#div_refer_form p, 
+#div_quick_refer_form p {
     font-size: 10pt;
     margin: 3px 3px 3px 3px;
 }
 
-#div_refer_form p.button {
+#div_refer_form p.button, 
+#div_quick_refer_form p.button {
     padding-top: 3px;
     padding-bottom: 3px;
     text-align: center;
@@ -199,7 +214,19 @@ table.job_info div.job_description {
     position: fixed;
     border: 3px solid #0000FF;
     text-align: center;
-    width: 675px;
-    height: 430px;
+    width: 875px;
+    height: 530px;
     overflow: auto;
+}
+
+#div_quick_refer_form div.upload_note {
+    width: 75%;
+    margin: auto;
+    text-align: center;
+    font-style: italic;
+    font-size: 9pt;
+}
+
+#div_quick_refer_form #qr_upload_progress {
+    display: none;
 }

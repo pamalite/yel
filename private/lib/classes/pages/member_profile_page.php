@@ -271,7 +271,7 @@ class MemberProfilePage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_unsubscribe_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <p><label for="reason">Please tell us briefly why do you decide to unsubscribe from Yellow Elevator?</label></p>
                 <p><textarea id="reason" name="reason"></textarea></p>
                 <p class="button"><input type="button" value="Cancel" onClick="close_unsubscribe_form();" />&nbsp;<input type="button" value="Unsubscribe" onClick="unsubscribe();" /></p>

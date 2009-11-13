@@ -136,7 +136,7 @@ class MemberLoginPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_get_password_hint_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <table class="get_password_hint_form">
                     <tr>
                         <td class="label"><label for="email_addr">Email:</label></td>
@@ -148,7 +148,7 @@ class MemberLoginPage extends Page {
         </div>
         
         <div id="div_reset_password_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <input type="hidden" id="hint_id" name="hint_id" />
                 <table class="reset_password_form">
                     <tr>

@@ -580,4 +580,139 @@ if ($_POST['action'] == 'refer_me') {
     echo (count($has_errors) > 0) ? 'ko' : 'ok';
     exit();
 }
+
+if ($_POST['action'] == 'quick_refer') {
+    $is_from_contacts = ($_POST['qr_candidate_email_from_list'] != '0') ? true : false;
+    
+    $candidate_email = ($is_from_contacts) ? $_POST['qr_candidate_email_from_list'] : $_POST['qr_candidate_email'];
+    $candidate_email = sanitize($candidate_email);
+    
+    // upload the file to a temporary buffer
+    $resume_file['type'] = $_FILES['qr_my_file']['type'];
+    $resume_file['size'] = $_FILES['qr_my_file']['size'];
+    $resume_file['name'] = $_FILES['qr_my_file']['name'];
+    $resume_file['tmp_name'] = $_FILES['qr_my_file']['tmp_name'];
+    
+    if ($resume_file['size'] > $GLOBALS['resume_size_limit'] || $size <= 0) {
+        ?><script type="text/javascript">top.stop_upload('-1');</script><?php
+        exit();
+    }
+    
+    $is_allowed_type = false;
+    foreach ($GLOBALS['allowable_resume_types'] as $mime_type) {
+        if ($resume_file['type'] == $mime_type) {
+            $is_allowed_type = true;
+            break;
+        }
+    }
+    
+    if (!$is_allowed_type) {
+        ?><script type="text/javascript">top.stop_upload('-2');</script><?php
+        exit();
+    }
+    
+    $new_filename = generate_random_string_of(6). '.'. $resume_file['name'];
+    if (move_uploaded_file($resume_file['temp'], $GLOBALS['buffered_resume_dir']. "/". $new_filename) === false){
+        ?><script type="text/javascript">top.stop_upload('-5');</script><?php
+        exit();
+    }
+    
+    $member = new Member($_POST['id'], $_SESSION['yel']['member']['sid']);
+    $query = "SELECT jobs.title, employers.name 
+              FROM jobs 
+              LEFT JOIN employers ON employers.id = jobs.employer 
+              WHERE jobs.id = ". $_POST['qr_job_id']. " LIMIT 1";
+    $mysqli = Database::connect();
+    $result = $mysqli->query($query);
+    $job = 'Unknown Job';
+    $employer = 'Unknown Employer';
+    if (count($result) > 0 && !is_null($result)) {
+        $job = $result[0]['title'];
+        $employer = $result[0]['name'];
+    }
+    
+    $testimony = 'Experiences and Skillsets:<br/>'. sanitize($_POST['testimony_answer_1']). '<br/><br/>';
+    $testimony .= 'Meet Requirements: '. $_POST['meet_req']. '<br/>Additional Comments:<br/>' + sanitize($_POST['testimony_answer_2']). '<br/><br/>';
+    $testimony .= 'Personaliy/Work Attitude:<br/>'. sanitize($_POST['testimony_answer_3']). '<br/><br/>';
+    $testimony .= 'Additional Recommendations: '. ((isEmpty($_POST['testimony_answer_4'])) ? 'None provided' : sanitize($_POST['testimony_answer_4']));
+    
+    // check candidate_email
+    $query = "SELECT COUNT(*) AS is_referee 
+              FROM member_referees 
+              WHERE member = '". $member->id(). "' AND
+              referee = '". $candidate_email. "'";
+    $mysqli = Database::connect();
+    $result = $mysqli->query($query);
+    if ($result[0]['is_referee'] <= 0) {
+        $query = "SELECT COUNT(*) AS is_member 
+                  FROM members 
+                  WHERE email_addr = '". $candidate_email. "'";
+        $result = $mysqli->query($query);
+        if ($result[0]['is_member'] >= 1) {
+            // The given email is a member, but not in the member's candidates list.
+            // - Pre-approve both as friends.
+            $query = "INSERT INTO member_referees SET 
+                      `member` = '". $member->id(). "', 
+                      `referee` = '". $candidate_email. "', 
+                      `referred_on` = NOW(), 
+                      `approved` = 'Y'; 
+                      INSERT INTO member_referees SET 
+                      `referee` = '". $member->id(). "', 
+                      `member` = '". $candidate_email. "',
+                      `referred_on` = NOW(), 
+                      `approved` = 'Y'";
+            if (!$mysqli->transact($query)) {
+                ?><script type="text/javascript">top.stop_upload('-3');</script><?php
+                exit();
+            }
+            
+            $is_from_contacts = true; // now they are friends
+        } else {
+            // Just create the invite and wait for the member to sign-up.
+            $query = "INSERT INTO member_quick_refer_invites SET 
+                      referee_email = '". $candidate_email. "', 
+                      member = '". $member->id(). "', 
+                      invited_on = NOW(), 
+                      referred_job = ". $_POST['qr_job_id']. ", 
+                      testimony = '". $testimony. "', 
+                      resume_file = '". $new_filename. "'";
+            if (!$mysqli->execute($query)) {
+                ?><script type="text/javascript">top.stop_upload('-4');</script><?php
+                exit();
+            }
+
+            $lines = file(dirname(__FILE__). '/private/mail/member_referred_new.txt');
+            $message = '';
+            foreach($lines as $line) {
+                $message .= $line;
+            }
+            
+            $position = '- '. htmlspecialchars_decode($job). ' by '. htmlspecialchars_decode($employer);
+            $message = str_replace('%member_name%', htmlspecialchars_decode($member->get_name()), $message);
+            $message = str_replace('%member_email_addr%', $member->id(), $message);
+            $message = str_replace('%referee_email_addr%', $referee, $message);
+            $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+            $message = str_replace('%root%', $GLOBALS['root'], $message);
+            $message = str_replace('%positions%', $position, $message);
+            $subject = "You Have Been Referred";
+            $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+            // mail($candidate_email, $subject, $message, $headers);
+            
+            $handle = fopen('/tmp/email_to_'. $candidate_email. '.txt', 'w');
+            fwrite($handle, 'Subject: '. $subject. "\n\n");
+            fwrite($handle, $message);
+            fclose($handle);
+            
+            ?><script type="text/javascript">top.stop_upload('1');</script><?php
+            exit();
+        }
+    }
+    
+    if ($is_from_contacts) {
+        // create resume and approve it straightaway
+    } 
+    
+    ?><script type="text/javascript">top.stop_upload('0');</script><?php
+    exit();
+}
 ?>

@@ -91,7 +91,7 @@ class PrsMailingListsPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_email_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <input type="hidden" id="mailing_list_id" name="mailing_list_id" value="0" />
                 <table class="email_form">
                     <tr>

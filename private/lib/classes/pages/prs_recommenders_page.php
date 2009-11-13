@@ -211,7 +211,7 @@ class PrsRecommendersPage extends Page {
         
         <div id="div_blanket"></div>
         <div id="div_email_form">
-            <form onSubmit="retun false;">
+            <form onSubmit="return false;">
                 <table class="email_form">
                     <tr>
                         <td class="label">Subject:</td>
