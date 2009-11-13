@@ -41,6 +41,34 @@ function validate_quick_refer_form() {
         return false;
     }
     
+    if (isEmail($('qr_candidate_email').value) && 
+        $('qr_candidate_email_from_list').options[$('qr_candidate_email_from_list').selectedIndex].value == '0') {
+        if (isEmpty($('qr_candidate_phone').value)) {
+            alert('Candidate\'s telephone number must be provided.');
+            return false;
+        }
+        
+        if (isEmpty($('qr_candidate_firstname').value)) {
+            alert('Candidate\'s firstname must be provided.');
+            return false;
+        }
+        
+        if (isEmpty($('qr_candidate_lastname').value)) {
+            alert('Candidate\'s lastname must be provided.');
+            return false;
+        }
+        
+        if (isEmpty($('qr_candidate_zip').value)) {
+            alert('Candidate\'s current residential postcode/zip must be provided.');
+            return false;
+        }
+        
+        if ($('qr_candidate_country').options[$('qr_candidate_country').selectedIndex].value == '0') {
+            alert('Candidate\'s current residential country must be provided.');
+            return false;
+        }
+    }
+    
     var answer_1 = $('testimony_answer_1').value;
     var answer_2 = $('testimony_answer_2').value;
     var answer_3 = $('testimony_answer_3').value;
@@ -586,6 +614,19 @@ function stop_upload(_error) {
             break;
         case '-2':
             alert('The file type is invalid.' + "\n" + 'Please makesure the file provided is one of the allowed types.');
+            break;
+        case '-3':
+            alert('Unable to add candidate to Contacts. Please try again later.');
+            break;
+        case '-4':
+            alert('Unable to add candidate\'s resume to the database. Please try again later.');
+            break;
+        case '-5':
+            alert('Unable to upload candidate\'s resume. Please try again later.');
+            break;
+        case '1':
+            close_quick_refer_form();
+            set_status('The resume was successfully referred!<br/>However, the referral can only be completed when the new candidate signs up.');
             break;
         default:
             alert('An error occurred while referring the resume to the job. Please try again later.');

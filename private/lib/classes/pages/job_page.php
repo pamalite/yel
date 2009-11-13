@@ -454,15 +454,41 @@ class JobPage extends Page {
                             </div>
                             <div style="padding-top: 15px;">
                                 <label for="qr_candidate_email">Or, you can enter the candidate's email address:</label><br/>
-                                <input class="mini_field" type="text" id="qr_candidate_email" name="qr_candidate_email" />
+                                <input class="mini_field" type="text" id="qr_candidate_email" name="qr_candidate_email" /><br/><br/>
+                                and complete the following form on the candidate's behalf:
                             </div>
-                            <div style="padding-top: 15px; font-style: italic;">
-                                <ul>
-                                    <li>Your testimonial for this candidate can only be viewed by the employer.</li>
-                                    <li>You should already have an agreement with the candidate about referring him/her to this job.</li>
-                                    <li>You need to provide your testimony as truthful and honest as possible.</li>
-                                </ul>
-                            </div>
+                            <table class="qr_candidate_form">
+                                <tr>
+                                    <td class="label"><label for="qr_candidate_phone">Telephone:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qr_candidate_phone" name="qr_candidate_phone" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qr_candidate_firstname">Firstname:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qr_candidate_firstname" name="qr_candidate_firstname" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qr_candidate_lastname">Lastname:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qr_candidate_lastname" name="qr_candidate_lastname" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qr_candidate_zip">Postcode/Zip:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qr_candidate_zip" name="qr_candidate_zip" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qr_candidate_country">Country:</label></td>
+                                    <td class="field">
+                                        <?php $this->generateCountriesDropdown(); ?>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                         <td class="separator"></td>
                         <td class="right">
@@ -477,6 +503,11 @@ class JobPage extends Page {
                         </td>
                     </tr>
                 </table>
+                <div style="text-align: center; font-size: 9pt; padding-top: 5px; font-style: italic;">
+                    Your testimonial for this candidate can only be viewed by the employer.<br/>
+                    You should already have an agreement with the candidate about referring him/her to this job.<br/>
+                    You need to provide your testimony as truthful and honest as possible.<br/>
+                </div>
                 <p class="button"><input type="button" value="Cancel" onClick="close_quick_refer_form();" />&nbsp;<input type="submit" value="Refer Now" /></p>
             </form>
         </div>

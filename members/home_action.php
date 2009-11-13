@@ -19,6 +19,7 @@ if ($_POST['action'] == 'get_recent_referred_jobs') {
     }
     
     $query = "SELECT referrals.id, industries.industry, jobs.id AS job_id, jobs.title, 
+              resumes.id AS resume_id, resumes.name AS resume_label, resumes.file_hash, 
               CONCAT(members.lastname, ', ', members.firstname) AS referrer, 
               DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
               employers.name AS employer 
@@ -29,6 +30,7 @@ if ($_POST['action'] == 'get_recent_referred_jobs') {
               LEFT JOIN members ON members.email_addr = referrals.member 
               LEFT JOIN member_referees ON member_referees.member = referrals.member AND 
               member_referees.referee = referrals.referee 
+              LEFT JOIN resumes ON resumes.id = referrals.resume 
               WHERE referrals.referee = '". $_POST['id']. "' AND 
               member_referees.approved = 'Y' AND 
               (referrals.referee_acknowledged_on IS NULL OR referrals.referee_acknowledged_on = '0000-00-00 00:00:00') AND 

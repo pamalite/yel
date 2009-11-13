@@ -365,7 +365,8 @@ function approve_contact(referee_id, contact_email) {
             }
             
             set_status('');
-            show_approvals();
+            // show_approvals();
+            count_items_and_show_tab();
         },
         onRequest: function(instance) {
             set_status('Approving contact...');

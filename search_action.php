@@ -586,38 +586,9 @@ if ($_POST['action'] == 'quick_refer') {
     
     $candidate_email = ($is_from_contacts) ? $_POST['qr_candidate_email_from_list'] : $_POST['qr_candidate_email'];
     $candidate_email = sanitize($candidate_email);
-    
-    // upload the file to a temporary buffer
-    $resume_file['type'] = $_FILES['qr_my_file']['type'];
-    $resume_file['size'] = $_FILES['qr_my_file']['size'];
-    $resume_file['name'] = $_FILES['qr_my_file']['name'];
-    $resume_file['tmp_name'] = $_FILES['qr_my_file']['tmp_name'];
-    
-    if ($resume_file['size'] > $GLOBALS['resume_size_limit'] || $size <= 0) {
-        ?><script type="text/javascript">top.stop_upload('-1');</script><?php
-        exit();
-    }
-    
-    $is_allowed_type = false;
-    foreach ($GLOBALS['allowable_resume_types'] as $mime_type) {
-        if ($resume_file['type'] == $mime_type) {
-            $is_allowed_type = true;
-            break;
-        }
-    }
-    
-    if (!$is_allowed_type) {
-        ?><script type="text/javascript">top.stop_upload('-2');</script><?php
-        exit();
-    }
-    
-    $new_filename = generate_random_string_of(6). '.'. $resume_file['name'];
-    if (move_uploaded_file($resume_file['temp'], $GLOBALS['buffered_resume_dir']. "/". $new_filename) === false){
-        ?><script type="text/javascript">top.stop_upload('-5');</script><?php
-        exit();
-    }
-    
     $member = new Member($_POST['id'], $_SESSION['yel']['member']['sid']);
+    
+    // 1. get the job details for email purposes
     $query = "SELECT jobs.title, employers.name 
               FROM jobs 
               LEFT JOIN employers ON employers.id = jobs.employer 
@@ -631,12 +602,13 @@ if ($_POST['action'] == 'quick_refer') {
         $employer = $result[0]['name'];
     }
     
+    // 2. construct testimony
     $testimony = 'Experiences and Skillsets:<br/>'. sanitize($_POST['testimony_answer_1']). '<br/><br/>';
     $testimony .= 'Meet Requirements: '. $_POST['meet_req']. '<br/>Additional Comments:<br/>' + sanitize($_POST['testimony_answer_2']). '<br/><br/>';
     $testimony .= 'Personaliy/Work Attitude:<br/>'. sanitize($_POST['testimony_answer_3']). '<br/><br/>';
     $testimony .= 'Additional Recommendations: '. ((isEmpty($_POST['testimony_answer_4'])) ? 'None provided' : sanitize($_POST['testimony_answer_4']));
     
-    // check candidate_email
+    // 3. check whether candidate email is already in the system
     $query = "SELECT COUNT(*) AS is_referee 
               FROM member_referees 
               WHERE member = '". $member->id(). "' AND
@@ -644,33 +616,53 @@ if ($_POST['action'] == 'quick_refer') {
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
     if ($result[0]['is_referee'] <= 0) {
+        // not a friend
         $query = "SELECT COUNT(*) AS is_member 
                   FROM members 
                   WHERE email_addr = '". $candidate_email. "'";
         $result = $mysqli->query($query);
         if ($result[0]['is_member'] >= 1) {
             // The given email is a member, but not in the member's candidates list.
-            // - Pre-approve both as friends.
-            $query = "INSERT INTO member_referees SET 
-                      `member` = '". $member->id(). "', 
-                      `referee` = '". $candidate_email. "', 
-                      `referred_on` = NOW(), 
-                      `approved` = 'Y'; 
-                      INSERT INTO member_referees SET 
-                      `referee` = '". $member->id(). "', 
-                      `member` = '". $candidate_email. "',
-                      `referred_on` = NOW(), 
-                      `approved` = 'Y'";
-            if (!$mysqli->transact($query)) {
+            // - Will need to wait for approval before the referral can be viewed.
+            if (!$member->create_referee($candidate_email)) {
                 ?><script type="text/javascript">top.stop_upload('-3');</script><?php
                 exit();
             }
             
-            $is_from_contacts = true; // now they are friends
+            // TODO: 1. create and upload resume; 2. create referral with pre-approval from the referrer's side
+            
         } else {
             // Just create the invite and wait for the member to sign-up.
+            // 1. upload the file and add 6 characters hash to the front.
+            $resume_file['type'] = $_FILES['qr_my_file']['type'];
+            $resume_file['size'] = $_FILES['qr_my_file']['size'];
+            $resume_file['name'] = $_FILES['qr_my_file']['name'];
+            $resume_file['tmp_name'] = $_FILES['qr_my_file']['tmp_name'];
+
+            if ($resume_file['size'] > $GLOBALS['resume_size_limit'] || $size <= 0) {
+                ?><script type="text/javascript">top.stop_upload('-1');</script><?php
+                exit();
+            }
+            
+            if (!in_array($resume_file['type'], $GLOBALS['allowable_resume_types'])) {
+                ?><script type="text/javascript">top.stop_upload('-2');</script><?php
+                exit();
+            }
+
+            $new_filename = generate_random_string_of(6). '.'. $resume_file['name'];
+            if (move_uploaded_file($resume_file['temp'], $GLOBALS['buffered_resume_dir']. "/". $new_filename) === false){
+                ?><script type="text/javascript">top.stop_upload('-5');</script><?php
+                exit();
+            }
+            
+            // 2. buffer the candidate details provided
             $query = "INSERT INTO member_quick_refer_invites SET 
                       referee_email = '". $candidate_email. "', 
+                      referee_firstname = '". sanitize($_POST['qr_candidate_firstname']). "', 
+                      referee_lastname = '". sanitize($_POST['qr_candidate_lastname']). "', 
+                      referee_phone = '". sanitize($_POST['qr_candidate_phone']). "', 
+                      referee_zip = '". sanitize($_POST['qr_candidate_zip']). "', 
+                      referee_country = '". sanitize($_POST['qr_candidate_country']). "', 
                       member = '". $member->id(). "', 
                       invited_on = NOW(), 
                       referred_job = ". $_POST['qr_job_id']. ", 
@@ -678,9 +670,11 @@ if ($_POST['action'] == 'quick_refer') {
                       resume_file = '". $new_filename. "'";
             if (!$mysqli->execute($query)) {
                 ?><script type="text/javascript">top.stop_upload('-4');</script><?php
+                unlink( $GLOBALS['buffered_resume_dir']. "/". $new_filename);
                 exit();
             }
-
+            
+            // 3. send invitation to candidate
             $lines = file(dirname(__FILE__). '/private/mail/member_referred_new.txt');
             $message = '';
             foreach($lines as $line) {
@@ -708,9 +702,8 @@ if ($_POST['action'] == 'quick_refer') {
         }
     }
     
-    if ($is_from_contacts) {
-        // create resume and approve it straightaway
-    } 
+    // both are friends
+    // TODO: 1. create and upload resume; 2. create referral with pre-approvals from the referrer's side
     
     ?><script type="text/javascript">top.stop_upload('0');</script><?php
     exit();
