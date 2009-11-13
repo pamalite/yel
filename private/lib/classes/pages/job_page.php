@@ -290,14 +290,16 @@ class JobPage extends Page {
                     <?php
                     if (!is_null($this->member)) {
                         ?>
-                        <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />
+                        <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />&nbsp;<input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" />
                         <?php
                     } else {
                         ?>
-                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" /> or <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />
+                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" /> or <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" /> or <input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" />
                         <?php
                     }
                     ?>
+                        <br/>
+                        Or, you can <input class="button" type="button" id="upload_resume" name="upload_resume" value="Upload" onClick="show_upload_resume_form();" /> your friend's resume to us, and we will do the rest.
                     </td>
                 </tr>
             </table>
@@ -387,6 +389,43 @@ class JobPage extends Page {
                     </table>
                 </p>
                 <p class="button"><input type="button" value="Cancel" onClick="close_refer_me();" />&nbsp;<input type="button" value="Submit Request" onClick="refer_me();" /></p>
+            </form>
+        </div>
+        
+        <div id="div_quick_refer_form">
+            <form onSubmit="retun false;">
+                <table class="quick_refer_form">
+                    <tr>
+                        <td colspan="3"><p>You are about to quickly refer the job position,&nbsp;<span id="qr_job_title" style="font-weight: bold;"></span>&nbsp;to one of your contacts. Please select...</p></td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            <table class="candidate_form">
+                                <tr>
+                                    <td class="radio"><input type="radio" id="from_list" name="candidate_from" value="list" checked /></td>
+                                    <td>
+                                        <label for="from_list">from your Contacts</label><br/>
+                                        <span class="filter">[ Show candidates from <?php (!is_null($this->member)) ? $this->generate_networks_list() : ''; ?> ]</span><br/>
+                                        <div class="candidates" id="candidates" name="candidates"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="separator"></td>
+                        <td class="right">
+                            <p>1. How long have you known and how do you know <span id="candidate_name" style="font-weight: bold;">this contact</span>? (<span id="word_count_q1">0</span>/50 words)</p>
+                            <p><textarea class="mini_field" id="testimony_answer_1"></textarea></p>
+                            <p>2. What makes <span id="candidate_name" style="font-weight: bold;">this contact</span> suitable for <span id="job_title" style="font-weight: bold;">the job</span>?  (<span id="word_count_q2">0</span>/50 words)</p>
+                            <p><textarea class="mini_field" id="testimony_answer_2"></textarea></p>
+                            <p>3. Briefly, what are the areas of improvements for <span id="candidate_name" style="font-weight: bold;">this contact</span>?  (<span id="word_count_q3">0</span>/50 words)</p>
+                            <p><textarea class="mini_field" id="testimony_answer_3"></textarea></p>
+                        </td>
+                    </tr>
+                </table>
+                <div style="padding: 2px 2px 2px 2px; text-align: center; font-style: italic;">
+                    Your testimonial for this contact can only be viewed by the employer.
+                </div>
+                <p class="button"><input type="button" value="Cancel" onClick="close_refer_form();" />&nbsp;<input type="button" value="Refer Now" onClick="refer();" /></p>
             </form>
         </div>
         <?php

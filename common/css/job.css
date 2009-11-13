@@ -192,3 +192,14 @@ table.job_info div.job_description {
     width: 98%;
     height: 290px;
 }
+
+#div_quick_refer_form {
+    display: none;
+    background-color: #FFFFFF;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 675px;
+    height: 430px;
+    overflow: auto;
+}

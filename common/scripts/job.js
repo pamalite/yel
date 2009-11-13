@@ -517,6 +517,89 @@ function refer_me() {
     request.send(params);
 }
 
+function close_quick_refer_form() {
+    $('div_quick_refer_form').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+}
+
+function show_quick_refer_form() {
+    alert('This feature is coming soon...');
+    
+    // if (id <= 0) {
+    //     window.location = root + '/members?job=' + $('job_id').value;
+    //     navigator.reload();
+    // }
+    
+    // $('div_blanket').setStyle('display', 'block');
+    // 
+    // var window_height = 0;
+    // var window_width = 0;
+    // var div_height = parseInt($('div_refer_form').getStyle('height'));
+    // var div_width = parseInt($('div_refer_form').getStyle('width'));
+    // 
+    // if (typeof window.innerHeight != 'undefined') {
+    //     window_height = window.innerHeight;
+    // } else {
+    //     window_height = document.documentElement.clientHeight;
+    // }
+    // 
+    // if (typeof window.innerWidth != 'undefined') {
+    //     window_width = window.innerWidth;
+    // } else {
+    //     window_width = document.documentElement.clientWidth;
+    // }
+    // 
+    // $('div_refer_form').setStyle('top', ((window_height - div_height) / 2));
+    // $('div_refer_form').setStyle('left', ((window_width - div_width) / 2));
+    // 
+    // $('job_title').set('html', $('job.title').get('html'));
+    // 
+    // $('div_refer_form').setStyle('display', 'block');
+    // show_candidates();
+}
+
+function close_upload_resume_form() {
+    $('div_upload_resume_form').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+}
+
+function show_upload_resume_form() {
+    alert('This feature is coming soon...');
+    
+    // if (id <= 0) {
+    //     window.location = root + '/members?job=' + $('job_id').value;
+    //     navigator.reload();
+    // }
+    
+    // $('div_blanket').setStyle('display', 'block');
+    // 
+    // var window_height = 0;
+    // var window_width = 0;
+    // var div_height = parseInt($('div_refer_form').getStyle('height'));
+    // var div_width = parseInt($('div_refer_form').getStyle('width'));
+    // 
+    // if (typeof window.innerHeight != 'undefined') {
+    //     window_height = window.innerHeight;
+    // } else {
+    //     window_height = document.documentElement.clientHeight;
+    // }
+    // 
+    // if (typeof window.innerWidth != 'undefined') {
+    //     window_width = window.innerWidth;
+    // } else {
+    //     window_width = document.documentElement.clientWidth;
+    // }
+    // 
+    // $('div_refer_form').setStyle('top', ((window_height - div_height) / 2));
+    // $('div_refer_form').setStyle('left', ((window_width - div_width) / 2));
+    // 
+    // $('job_title').set('html', $('job.title').get('html'));
+    // 
+    // $('div_refer_form').setStyle('display', 'block');
+    // show_candidates();
+}
+
+
 function onDomReady() {
     set_root();
     get_employers_for_mini();
@@ -539,17 +622,17 @@ function onDomReady() {
         $('mini_keywords').value = keywords;
     }
     
-    // $('testimony_answer_1').addEvent('keypress', function() {
-    //    update_word_count_of('word_count_q1', 'testimony_answer_1') 
-    // });
-    // 
-    // $('testimony_answer_2').addEvent('keypress', function() {
-    //    update_word_count_of('word_count_q2', 'testimony_answer_2') 
-    // });
-    // 
-    // $('testimony_answer_3').addEvent('keypress', function() {
-    //    update_word_count_of('word_count_q3', 'testimony_answer_3') 
-    // });
+    $('testimony_answer_1').addEvent('keypress', function() {
+       update_word_count_of('word_count_q1', 'testimony_answer_1') 
+    });
+    
+    $('testimony_answer_2').addEvent('keypress', function() {
+       update_word_count_of('word_count_q2', 'testimony_answer_2') 
+    });
+    
+    $('testimony_answer_3').addEvent('keypress', function() {
+       update_word_count_of('word_count_q3', 'testimony_answer_3') 
+    });
     
     var suggest_url = root + '/common/php/search_suggest.php';
     new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
