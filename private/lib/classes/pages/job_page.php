@@ -146,21 +146,19 @@ class JobPage extends Page {
     }
     
     private function generateCountriesDropdown($_for_quick_upload = false, $_for_referrer = false) {
-        if (!is_null($this->member)) {
-            $countries = Country::get_all();
-            
-            $prefix = ($_for_quick_upload) ? 'qu' : 'qr';
-            $prefix .= ($_for_referrer) ? '_referrer' : '_candidate';
-            echo '<select class="mini_field" id="'. $prefix. '_country" name="'. $prefix. '_country">'. "\n";
-            echo '<option value="0" selected>Country of residence</option>'. "\n";
-            echo '<option value="0" disabled>&nbsp;</option>'. "\n";
-            
-            foreach ($countries as $country) {
-                echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
-            }
-            
-            echo '</select>'. "\n";
+        $countries = Country::get_all();
+        
+        $prefix = ($_for_quick_upload) ? 'qu' : 'qr';
+        $prefix .= ($_for_referrer) ? '_referrer' : '_candidate';
+        echo '<select class="mini_field" id="'. $prefix. '_country" name="'. $prefix. '_country">'. "\n";
+        echo '<option value="0" selected>Country of residence</option>'. "\n";
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        
+        foreach ($countries as $country) {
+            echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
         }
+        
+        echo '</select>'. "\n";
     }
     
     private function generate_resumes_list() {
@@ -428,7 +426,7 @@ class JobPage extends Page {
         
         <div id="div_quick_refer_form">
             <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_refer_form();">
-                <input type="hidden" name="id" id="id" value="<?php echo $this->member->id(); ?>" />
+                <input type="hidden" name="id" id="id" value="<?php echo (is_null($this->member)) ? '' : $this->member->id(); ?>" />
                 <input type="hidden" name="qr_job_id" id="qr_job_id" value="<?php echo $this->job_id; ?>" />
                 <input type="hidden" name="action" value="quick_refer" />
                 <p id="qr_upload_progress" style="text-align: center;">

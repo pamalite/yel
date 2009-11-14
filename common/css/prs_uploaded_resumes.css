@@ -1,0 +1,158 @@
+#div_candidates {
+    padding-top: 10px;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+input.mini_button {
+    font-size: 9pt;
+}
+
+input.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+td.date {
+    width: 10%;
+}
+
+td.candidate {
+    width: 20%;
+}
+
+td.job, td.resume {
+    width: 20%;
+}
+
+td.actions {
+    text-align: center;
+    /*width: 50px;*/
+}
+
+td.private {
+   width: 60px;
+   text-align: center;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+span.specialization {
+    font-size: 9pt;
+    color: #0000FF;
+    background-color: #FFFF99;
+    border: none;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
+#upload_progress {
+    display: none;
+}
+
+table.upload_form {
+    width: 65%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.upload_form td {
+    vertical-align: top;
+}
+
+table.upload_form td.label {
+    width: 25%;
+    text-align: right;
+    padding-right: 20px;
+    vertical-align: top;
+}
+
+table.upload_form td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+
+table.upload_form input.field {
+    width: 98%;
+    font-size: 10pt;
+}
+
+td.buttons_left, td.buttons_right {
+    background-color: #CCCCCC;
+}
+
+td.buttons_right {
+    text-align: right;
+}
+
+span.upload_note {
+    font-style: italic;
+    font-size: 9pt;
+}
+
+span.reupload {
+    border: none;
+    font-size: 8pt;
+    background-color: #FFFF99;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_add_to_privileged_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 385px;
+    overflow: auto;
+}

@@ -5,7 +5,11 @@ session_start();
 
 if ($GLOBALS['protocol'] == 'https') {
     if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') {
-        redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?id='. $_GET['id']);
+        if (isset($GET['id'])) {
+            redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?id='. $_GET['id']);
+        } else {
+            redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?job_id='. $_GET['job_id']. '&candidate_email='. $_GET['candidate_email']. '&referrer_email='. $_GET['referrer_email']);
+        }
         exit();
     }
 }
@@ -18,6 +22,31 @@ if (!isset($_SESSION['yel']['employee']) ||
     exit();
 }
 
+if (!isset($_GET['id'])) {
+    $query = "SELECT file_name, file_hash, file_size, file_type 
+              FROM users_contributed_resumes 
+              WHERE job_id = ". $_GET['job_id']. " AND 
+              candidate_email_addr = '". $_GET['candidate_email']. "' AND 
+              referrer_email_addr = '". $_GET['referrer_email']. "' LIMIT 1";
+    $mysqli = Database::connect();
+    $result = $mysqli->query($query);
+    if (is_null($result[0]['file_name'])) {
+        echo 'The resume is corrupted.';
+        exit();
+    }
+    
+    header('Content-type: '. $result[0]['file_type']);
+    header('Content-Disposition: attachment; filename="'. $result[0]['file_name'].'"');
+    header('Content-Transfer-Encoding: binary');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+    header('Pragma: public');
+    header('Content-length: '. $result[0]['file_size']);
+    ob_clean();
+    flush();
+    readfile($GLOBALS['buffered_resume_dir']. "/". $result[0]['file_hash']);
+    exit();
+}
 
 $resume = new Resume(0, $_GET['id']);
 $cover = $resume->get();

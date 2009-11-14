@@ -440,6 +440,14 @@ class Page {
         ?>
         
         <?php
+        if (Employee::has_clearances_for('prs_resumes', $_clearances)) {
+        ?>
+                <li <?php echo ($page == 'resumes_uploaded') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/resumes_uploaded.php">Uploaded Resumes</a></li>
+        <?php
+        }
+        ?>
+        
+        <?php
         if (Employee::has_clearances_for('prs_referrals', $_clearances)) {
         ?>
                 <li <?php echo ($page == 'referrals') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/prs/referrals.php">Referrals</a></li>
