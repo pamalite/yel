@@ -145,12 +145,14 @@ class JobPage extends Page {
         }
     }
     
-    private function generateCountriesDropdown() {
+    private function generateCountriesDropdown($_for_quick_upload = false, $_for_referrer = false) {
         if (!is_null($this->member)) {
             $countries = Country::get_all();
             
-            echo '<select class="mini_field" id="qr_candidate_country" name="qr_candidate_country">'. "\n";
-            echo '<option value="0" selected>Candidate\'s country of residence</option>'. "\n";
+            $prefix = ($_for_quick_upload) ? 'qu' : 'qr';
+            $prefix .= ($_for_referrer) ? '_referrer' : '_candidate';
+            echo '<select class="mini_field" id="'. $prefix. '_country" name="'. $prefix. '_country">'. "\n";
+            echo '<option value="0" selected>Country of residence</option>'. "\n";
             echo '<option value="0" disabled>&nbsp;</option>'. "\n";
             
             foreach ($countries as $country) {
@@ -331,7 +333,7 @@ class JobPage extends Page {
                     }
                     ?>
                         <br/>
-                        Or, you can <input class="button" type="button" id="upload_resume" name="upload_resume" value="Upload" onClick="show_upload_resume_form();" /> your friend's resume to us, and we will do the rest.
+                        Or, you can <input class="button" type="button" id="upload_resume" name="upload_resume" value="Upload" onClick="show_quick_upload_form();" /> your friend's resume to us, and we will do the rest.
                     </td>
                 </tr>
             </table>
@@ -426,6 +428,7 @@ class JobPage extends Page {
         
         <div id="div_quick_refer_form">
             <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_refer_form();">
+                <input type="hidden" name="id" id="id" value="<?php echo $this->member->id(); ?>" />
                 <input type="hidden" name="qr_job_id" id="qr_job_id" value="<?php echo $this->job_id; ?>" />
                 <input type="hidden" name="action" value="quick_refer" />
                 <p id="qr_upload_progress" style="text-align: center;">
@@ -509,6 +512,118 @@ class JobPage extends Page {
                     You need to provide your testimony as truthful and honest as possible.<br/>
                 </div>
                 <p class="button"><input type="button" value="Cancel" onClick="close_quick_refer_form();" />&nbsp;<input type="submit" value="Refer Now" /></p>
+            </form>
+        </div>
+        
+        <div id="div_quick_upload_form">
+            <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_upload_form();">
+                <input type="hidden" name="qu_job_id" id="qu_job_id" value="<?php echo $this->job_id; ?>" />
+                <input type="hidden" name="action" value="quick_upload" />
+                <p id="qu_upload_progress" style="text-align: center;">
+                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
+                </p>
+                <table id="table_quick_upload_form" class="quick_upload_form">
+                    <tr>
+                        <td colspan="3">
+                            <p style="text-align: center;">
+                                You are about to quickly refer the job position,&nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp;to someone you know. Please attached the candidate's resume:
+                                <br/><br/>
+                                <input class="field" id="qu_my_file" name="qu_my_file" type="file" />
+                                <br/><br/>
+                                <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="left">
+                            <div style="font-size: 12pt; font-weight: bold; padding-bottom: 15px;">Candidate's Details</div>
+                            <table class="qu_candidate_form">
+                                <tr>
+                                    <td class="label"><label for="qu_candidate_email">Email:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_candidate_email" name="qu_candidate_email" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_candidate_phone">Telephone:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_candidate_phone" name="qu_candidate_phone" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_candidate_firstname">Firstname:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_candidate_firstname" name="qu_candidate_firstname" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_candidate_lastname">Lastname:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_candidate_lastname" name="qu_candidate_lastname" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_candidate_zip">Postcode/Zip:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_candidate_zip" name="qu_candidate_zip" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_candidate_country">Country:</label></td>
+                                    <td class="field">
+                                        <?php $this->generateCountriesDropdown(true); ?>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="separator"></td>
+                        <td class="right">
+                            <div style="font-size: 12pt; font-weight: bold; padding-bottom: 15px;">Your's Details</div>
+                            <table class="qu_candidate_form">
+                                <tr>
+                                    <td class="label"><label for="qu_referrer_email">Email:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_referrer_email" name="qu_referrer_email" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_referrer_phone">Telephone:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_referrer_phone" name="qu_referrer_phone" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_referrer_firstname">Firstname:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_referrer_firstname" name="qu_referrer_firstname" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_referrer_lastname">Lastname:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_referrer_lastname" name="qu_referrer_lastname" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_referrer_zip">Postcode/Zip:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_referrer_zip" name="qu_referrer_zip" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_referrer_country">Country:</label></td>
+                                    <td class="field">
+                                        <?php $this->generateCountriesDropdown(true, true); ?>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <p class="button"><input type="button" value="Cancel" onClick="close_quick_upload_form();" />&nbsp;<input type="submit" value="Refer" /></p>
             </form>
         </div>
         

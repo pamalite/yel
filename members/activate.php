@@ -38,8 +38,8 @@ $email_addr = $result[0]['member'];
 // Check whether member is privileged
 $query = "SELECT recommender FROM members WHERE email_addr = '". $email_addr. "' LIMIT 1";
 $result = $mysqli->query($query);
-if (!is_null($result) && !empty($result)) {
-    redirect_to('https://'. $GLOBALS['root']. '/members/activtate_privileged.php?id='. $_GET['id']);
+if (!is_null($result[0]['recommender']) && !empty($result[0]['recommender'])) {
+    redirect_to('https://'. $GLOBALS['root']. '/members/activate_privileged.php?id='. $_GET['id']);
     exit();
 }
 

@@ -104,6 +104,90 @@ function validate_quick_refer_form() {
     return true;
 }
 
+function validate_quick_upload_form() {
+    if (isEmpty($('qu_my_file').value)) {
+        alert('You need to provide the candidate\'s file resume.');
+        return false;
+    }
+    
+    if (!isEmail($('qu_candidate_email').value)) {
+        alert('You need to provide a valid candidate email.');
+        return false;
+    }
+    
+    if (isEmpty($('qu_candidate_phone').value)) {
+        alert('Candidate\'s telephone number must be provided.');
+        return false;
+    }
+    
+    if (isEmpty($('qu_candidate_firstname').value)) {
+        alert('Candidate\'s firstname must be provided.');
+        return false;
+    }
+    
+    if (isEmpty($('qu_candidate_lastname').value)) {
+        alert('Candidate\'s lastname must be provided.');
+        return false;
+    }
+    
+    if (isEmpty($('qu_candidate_zip').value)) {
+        alert('Candidate\'s current residential postcode/zip must be provided.');
+        return false;
+    }
+    
+    if ($('qu_candidate_country').options[$('qu_candidate_country').selectedIndex].value == '0') {
+        alert('Candidate\'s current residential country must be provided.');
+        return false;
+    }
+    
+    if (!isEmail($('qu_referrer_email').value)) {
+        alert('You need to provide a valid email.');
+        return false;
+    }
+    
+    if (isEmpty($('qu_referrer_phone').value)) {
+        alert('Your telephone number must be provided.');
+        return false;
+    }
+    
+    if (isEmpty($('qu_referrer_firstname').value)) {
+        alert('Your firstname must be provided.');
+        return false;
+    }
+    
+    if (isEmpty($('qu_referrer_lastname').value)) {
+        alert('Your lastname must be provided.');
+        return false;
+    }
+    
+    if (isEmpty($('qu_referrer_zip').value)) {
+        alert('Your current residential postcode/zip must be provided.');
+        return false;
+    }
+    
+    if ($('qu_referrer_country').options[$('qu_referrer_country').selectedIndex].value == '0') {
+        alert('Your current residential country must be provided.');
+        return false;
+    }
+    
+    if (($('qu_candidate_email').value == $('qu_referrer_email').value) || 
+        ($('qu_candidate_phone').value == $('qu_referrer_phone').value)) {
+        alert('You CANNOT apply for this job without a referral!' + "\n\n" + 'You will need to sign up and press the "Refer Me" button to refer yourself.');
+        return false;
+    }
+    
+    var agreed = confirm('By clicking "OK", you confirm that you have screened the candidate\'s resume and have also assessed the candidate\'s suitability for this job position. Also, you acknowledge that Yellow Elevator may contact you for further references regarding the candidate, and you agree to provide any other necessary information requested by Yellow Elevator.\n\nOtherwise, you may click the "Cancel" button.');
+    
+    if (!agreed) {
+        set_status('');
+        close_quick_upload_form();
+        return false;
+    }
+    
+    start_quick_upload();
+    return true;
+}
+
 function show_candidates() {
     $('candidates').set('html', '');
     
@@ -593,40 +677,46 @@ function refer_me() {
     request.send(params);
 }
 
-function start_upload() {
+function start_quick_upload() {
     $('qr_upload_progress').setStyle('display', 'block');
     $('table_quick_refer_form').setStyle('display', 'none');
     return true;
 }
 
-function stop_upload(_error) {
+function stop_quick_upload(_error) {
     $('qr_upload_progress').setStyle('display', 'none');
     $('table_quick_refer_form').setStyle('display', 'block');
     set_status('');
     
     switch (_error) {
+        case '1':
+            close_quick_refer_form();
+            set_status('The resume was successfully referred!<br/>However, the referral can only be completed when the new candidate signs up.');
+            break;
         case '0':
             close_quick_refer_form();
             set_status('The resume was successfully referred!');
             break;
         case '-1':
-            alert('The file size has exceeded the allowable limit.' + "\n" + 'Please makesure the file does not exceed 2MB.');
+            alert('You CANNOT refer yourself!');
             break;
         case '-2':
-            alert('The file type is invalid.' + "\n" + 'Please makesure the file provided is one of the allowed types.');
-            break;
-        case '-3':
             alert('Unable to add candidate to Contacts. Please try again later.');
             break;
+        case '-3':
+            alert('Unable to create membership on-behalf. Please try again later.');
+            break;
         case '-4':
-            alert('Unable to add candidate\'s resume to the database. Please try again later.');
+            alert('Unable to create membership activation token. Please try again later.');
             break;
         case '-5':
-            alert('Unable to upload candidate\'s resume. Please try again later.');
+            alert('Unable to create resume record. Please try again later.');
             break;
-        case '1':
-            close_quick_refer_form();
-            set_status('The resume was successfully referred!<br/>However, the referral can only be completed when the new candidate signs up.');
+        case '-6':
+            alert('An error occurred while reading uploaded file. Please ensure the resume file meet the requirements stated.');
+            break;
+        case '-7':
+            alert('Unable to make the referral. Please try again later.');
             break;
         default:
             alert('An error occurred while referring the resume to the job. Please try again later.');
@@ -679,47 +769,69 @@ function show_quick_refer_form() {
     $('div_quick_refer_form').setStyle('display', 'block');
 }
 
-function close_upload_resume_form() {
-    $('div_upload_resume_form').setStyle('display', 'none');
+function close_quick_upload_form() {
+    $('div_quick_upload_form').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');
 }
 
-function show_upload_resume_form() {
-    alert('This feature is coming soon...');
+function show_quick_upload_form() {
+    $('div_blanket').setStyle('display', 'block');
     
-    // if (id <= 0) {
-    //     window.location = root + '/members?job=' + $('job_id').value;
-    //     navigator.reload();
-    // }
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_quick_upload_form').getStyle('height'));
+    var div_width = parseInt($('div_quick_upload_form').getStyle('width'));
     
-    // $('div_blanket').setStyle('display', 'block');
-    // 
-    // var window_height = 0;
-    // var window_width = 0;
-    // var div_height = parseInt($('div_refer_form').getStyle('height'));
-    // var div_width = parseInt($('div_refer_form').getStyle('width'));
-    // 
-    // if (typeof window.innerHeight != 'undefined') {
-    //     window_height = window.innerHeight;
-    // } else {
-    //     window_height = document.documentElement.clientHeight;
-    // }
-    // 
-    // if (typeof window.innerWidth != 'undefined') {
-    //     window_width = window.innerWidth;
-    // } else {
-    //     window_width = document.documentElement.clientWidth;
-    // }
-    // 
-    // $('div_refer_form').setStyle('top', ((window_height - div_height) / 2));
-    // $('div_refer_form').setStyle('left', ((window_width - div_width) / 2));
-    // 
-    // $('job_title').set('html', $('job.title').get('html'));
-    // 
-    // $('div_refer_form').setStyle('display', 'block');
-    // show_candidates();
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_quick_upload_form').setStyle('top', ((window_height - div_height) / 2));
+    $('div_quick_upload_form').setStyle('left', ((window_width - div_width) / 2));
+    
+    $('qu_job_title').set('html', $('job.title').get('html'));
+    
+    $('div_quick_upload_form').setStyle('display', 'block');
 }
 
+function start_quick_upload() {
+    $('qu_upload_progress').setStyle('display', 'block');
+    $('table_quick_upload_form').setStyle('display', 'none');
+    return true;
+}
+
+function stop_quick_upload(_error) {
+    $('qu_upload_progress').setStyle('display', 'none');
+    $('table_quick_upload_form').setStyle('display', 'block');
+    set_status('');
+    
+    switch (_error) {
+        case '0':
+            close_quick_upload_form();
+            set_status('Thanks for submitting the resume to us!<br/>We will contact you shortly when we found a suitable position for your candidate.');
+            break;
+        case '-1':
+            alert('The file provided is NOT readable. Please makesure the file meet the requirements as stated.');
+            break;
+        case '-2':
+            alert('Unable to buffer the upload. Please try again.');
+            break;
+        case '-3':
+            alert('Unable to update system. Please try again.');
+            break;
+        default:
+            alert('An error occurred while uploading resume. Please try again.');
+            break;
+    }
+}
 
 function onDomReady() {
     set_root();

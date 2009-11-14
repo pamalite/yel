@@ -61,6 +61,14 @@ function show_guide_page(_guide_page) {
     }
 }
 
+function show_resume_page(resume_id) {
+    var popup = window.open('../members/resume.php?id=' + resume_id, '', 'scrollbars');
+    
+    if (!popup) {
+        alert('Popup blocker was detected. Please allow pop-up windows for YellowElevator.com and try again.');
+    }
+}
+
 function close_job_info() {
     $('div_job_info').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');
@@ -163,8 +171,9 @@ function close_acknowledge_form() {
     referral = 0;
 }
 
-function show_acknowledge_form(referral_id, job_title) {
+function show_acknowledge_form(referral_id, job_title, _resume_id) {
     referral = referral_id;
+    $('resume').disabled = false;
     
     var window_height = 0;
     var window_width = 0;
@@ -204,6 +213,17 @@ function show_acknowledge_form(referral_id, job_title) {
             $('job_title').set('html', job_title);
             $('div_blanket').setStyle('display', 'block');
             $('div_acknowledge_form').setStyle('display', 'block');
+            
+            if (_resume_id > 0) {
+                var options = $('resume').options;
+                for (var i=0; i < options.length; i++) {
+                    if (options[i].value == _resume_id) {
+                        $('resume').options[i].selected = true;
+                        $('resume').disabled = true;
+                        break;
+                    }
+                }
+            }
         },
         onRequest: function(instance) {
             set_status('Checking resumes...');
@@ -221,6 +241,10 @@ function acknowledge() {
     
     var params = 'id=' + referral + '&resume=' + $('resume').options[$('resume').selectedIndex].value;
     params = params + '&action=acknowledge_job';
+    
+    if ($('resume').disabled) {
+        params = params + '&resume_attached=1';
+    }
     
     var uri = root + "/members/home_action.php";
     var request = new Request({
@@ -319,6 +343,9 @@ function show_referred_jobs() {
                 var referrers = xml.getElementsByTagName('referrer');
                 var referred_ons = xml.getElementsByTagName('formatted_referred_on');
                 var employers = xml.getElementsByTagName('employer');
+                var resume_ids = xml.getElementsByTagName('resume_id');
+                var resume_labels = xml.getElementsByTagName('resume_label');
+                var resume_file_hashes = xml.getElementsByTagName('file_hash');
                 
                 for (var i=0; i < ids.length; i++) {
                     var referral_id = ids[i].childNodes[0].nodeValue;
@@ -331,7 +358,16 @@ function show_referred_jobs() {
                     html = html + '<td class="title"><a class="no_link" onClick="show_job_info(\'' + job_id + '\');">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="title">' + referrers[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="date">' + referred_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="acknowledge"><a class="no_link" onClick="show_acknowledge_form(\'' + referral_id + '\', \'' + titles[i].childNodes[0].nodeValue + '\');">Accept</a>&nbsp;|&nbsp;<a class="no_link" onClick="reject_job(\'' + referral_id + '\', \'' + titles[i].childNodes[0].nodeValue + '\');">Ignore</a></td>' + "\n";
+                    
+                    var resume_id = 0;
+                    if (resume_file_hashes[i].childNodes.length > 0) {
+                        resume_id = resume_ids[i].childNodes[0].nodeValue;
+                        html = html + '<td><a class="no_link" onClick="show_resume_page(' + resume_id + ')">' + resume_labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    } else {
+                        html = html + '<td><span style="font-size: 7pt; color: #CCCCCC;">N/A</span></td>' + "\n";
+                    }
+                    
+                    html = html + '<td class="acknowledge"><a class="no_link" onClick="show_acknowledge_form(\'' + referral_id + '\', \'' + titles[i].childNodes[0].nodeValue + '\', ' + resume_id + ');">Accept</a>&nbsp;|&nbsp;<a class="no_link" onClick="reject_job(\'' + referral_id + '\', \'' + titles[i].childNodes[0].nodeValue + '\');">Ignore</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
                 html = html + '</table>';
@@ -668,7 +704,12 @@ function get_completeness_status() {
             
             var total = parseInt(checked_profiles[0].childNodes[0].nodeValue) + parseInt(has_banks[0].childNodes[0].nodeValue) + parseInt(has_resumes[0].childNodes[0].nodeValue) + parseInt(has_photos[0].childNodes[0].nodeValue);
             var completeness = (total / 4) * 100;
-            $('progress_bar').setStyle('width', (completeness - 1) + '%');
+            if (completeness <= 0) {
+                $('progress_bar').setStyle('display', 'none');
+            } else {
+                $('progress_bar').setStyle('width', (completeness - 1) + '%');
+            }
+            
             $('progress_percent').set('html', completeness + '%');
             
             var progress_details = '';

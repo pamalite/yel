@@ -140,6 +140,7 @@ class MemberHomePage extends Page {
                     <td class="title"><span class="sort" id="sort_jobs_title">Job</span></td>
                     <td class="title"><span class="sort" id="sort_jobs_referrer">Referrer</span></td>
                     <td class="date"><span class="sort" id="sort_jobs_referred_on">Referred On</span></td>
+                    <td>Resume</td>
                     <td class="acknowledge">&nbsp;</td>
                 </tr>
             </table>

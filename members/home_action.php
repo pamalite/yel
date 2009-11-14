@@ -101,26 +101,28 @@ if ($_POST['action'] == 'has_resumes') {
 if ($_POST['action'] == 'acknowledge_job') {
     $mysqli = Database::connect();
     
-    $query = "SELECT jobs.acceptable_resume_type 
-              FROM referrals 
-              LEFT JOIN jobs ON jobs.id = referrals.job 
-              WHERE referrals.id = ". $_POST['id']. " LIMIT 1";
-    $result = $mysqli->query($query);
-    $acceptable_resume_type = $result[0]['acceptable_resume_type'];
-    
-    $query = "SELECT file_hash FROM resumes WHERE id = ". $_POST['resume']. " LIMIT 1";
-    $result = $mysqli->query($query);
-    $file_hash = $result[0]['file_hash'];
-    
-    if ($acceptable_resume_type != 'A') {
-        if ($acceptable_resume_type == 'O' && !is_null($file_hash)) {
-            // online resume only
-            echo '-1';
-            exit();
-        } else if ($acceptable_resume_type == 'F' && is_null($file_hash)) {
-            // online resume only
-            echo '-2';
-            exit();
+    if (!isset($_POST['resume_attached'])) {
+        $query = "SELECT jobs.acceptable_resume_type 
+                  FROM referrals 
+                  LEFT JOIN jobs ON jobs.id = referrals.job 
+                  WHERE referrals.id = ". $_POST['id']. " LIMIT 1";
+        $result = $mysqli->query($query);
+        $acceptable_resume_type = $result[0]['acceptable_resume_type'];
+
+        $query = "SELECT file_hash FROM resumes WHERE id = ". $_POST['resume']. " LIMIT 1";
+        $result = $mysqli->query($query);
+        $file_hash = $result[0]['file_hash'];
+
+        if ($acceptable_resume_type != 'A') {
+            if ($acceptable_resume_type == 'O' && !is_null($file_hash)) {
+                // online resume only
+                echo '-1';
+                exit();
+            } else if ($acceptable_resume_type == 'F' && is_null($file_hash)) {
+                // online resume only
+                echo '-2';
+                exit();
+            }
         }
     }
     
@@ -206,10 +208,10 @@ if ($_POST['action'] == 'acknowledge_job') {
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     mail($member_email, $subject, $message, $headers);
 
-    /*$handle = fopen('/tmp/email_to_'. $member_email. '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);*/
+    // $handle = fopen('/tmp/email_to_'. $member_email. '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     echo 'ok';
     exit();

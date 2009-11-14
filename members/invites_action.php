@@ -145,14 +145,14 @@ if ($_POST['action'] == 'smart_send_invites') {
 
 if ($_POST['action'] == 'get_contacts_from_vcard') {
     if (!isset($_FILES['my_file'])) {
-        ?><script type="text/javascript">window.top.window.stop_upload();</script><?php
+        ?><script type="text/javascript">top.stop_upload();</script><?php
         exit();
     }
     
     $vcard_file = $_FILES['my_file']['tmp_name'];
     $lines = file($vcard_file);
     if (!$lines) {
-        ?><script type="text/javascript">window.top.window.stop_upload();</script><?php
+        ?><script type="text/javascript">top.stop_upload();</script><?php
         exit();
     }
 
@@ -162,7 +162,7 @@ if ($_POST['action'] == 'get_contacts_from_vcard') {
     while ($card->parse($lines)) {
         $property = $card->getProperty('N');
         if (!$property) {
-            ?><script type="text/javascript">window.top.window.stop_upload();</script><?php
+            ?><script type="text/javascript">top.stop_upload();</script><?php
             exit();
         }
         $n = $property->getComponents();

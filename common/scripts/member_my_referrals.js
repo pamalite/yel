@@ -196,7 +196,7 @@ function show_referrals() {
                     html = html + '</tr>' + "\n";
 
                     html = html + '<tr onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td colspan="7"><div class="description" id="desc_' + referral_id + '"></div></td>' + "\n";
+                    html = html + '<td colspan="8"><div class="description" id="desc_' + referral_id + '"></div></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
                 html = html + '</table>';

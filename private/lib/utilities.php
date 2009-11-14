@@ -96,10 +96,10 @@ function pad($string, $maxlength, $pad_character) {
 function generate_random_string_of($length) {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     
-    list($usec, $sec) = explode(" ", microtime());
-    $seed = ((float) $sec + (float) $usec);
-    mt_srand($seed);
-    $out = "";
+    // list($usec, $sec) = explode(" ", microtime());
+    // $seed = ((float) $sec + (float) $usec);
+    // mt_srand($seed);
+    $out = NULL;
     
     for ($i=0; $i < $length; $i++) {
         $index = mt_rand(0, (strlen($characters)-1));

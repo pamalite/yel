@@ -1,0 +1,31 @@
+Congratulations!
+
+You have been referred by %member_name% (e-mail: %member_email_addr%) 
+to the following position(s):
+
+%positions%
+
+However, our system indicates that you have yet to become a member of YellowElevator.com. 
+In order to accept this job referral, you need to be a member of YellowElevator.com. 
+
+Thus, %member_name% has created a member account for you on your behalf with the following 
+login details:
+
+E-mail: %referee_email_addr%
+Password: %password%
+
+Before you can sign in, you will need to activate your account through the following URL:
+
+%protocol%://%root%/members/activate.php?id=%activation_id%
+
+Once you have activated your account, you can sign in to your account and decide whether to
+accept the job referred from the "Jobs Referred To Me" tab. Also, please change the password
+after you have signed in. 
+
+Yellow Elevator allows you to (1) refer jobs to your contacts and earn rewards for every successful 
+job referral, and (2) get referred to better job opportunities. 
+
+We look forward to having you on board!
+
+Yellow Elevator
+Refer a Job

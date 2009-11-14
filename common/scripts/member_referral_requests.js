@@ -294,7 +294,7 @@ function refer() {
     
     var testimony = 'Experiences and Skillsets:<br/>' + answer_1 + '<br/><br/>';
     testimony = testimony + 'Meet Requirements: ' + meet_requirements + '<br/>Additional Comments:<br/>' + answer_2 + '<br/><br/>';
-    testimony = testimony + 'Personaliy/Work Attitude:<br/>' + answer_3 + '<br/><br/>';
+    testimony = testimony + 'Personality/Work Attitude:<br/>' + answer_3 + '<br/><br/>';
     testimony = testimony + 'Additional Recommendations: ' + ((isEmpty(answer_4)) ? 'None provided' : answer_4);
     
     var agreed = confirm('By clicking "OK", you confirm that you have screened the candidate\'s resume and have also assessed the candidate\'s suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding the candidate, and you agree to provide any other necessary information requested by the employer.\n\nOtherwise, you may click the "Cancel" button.');

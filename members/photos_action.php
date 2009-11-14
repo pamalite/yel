@@ -48,11 +48,11 @@ if ($_POST['action'] == 'upload') {
     $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
 
     if (!$member->create_photo($data)) {
-        ?><script type="text/javascript">window.top.window.stop_upload(<?php echo "0"; ?>);</script><?php
+        ?><script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script><?php
         exit();
     }
     
-    ?><script type="text/javascript">window.top.window.stop_upload(<?php echo "1"; ?>);</script><?php
+    ?><script type="text/javascript">top.stop_upload(<?php echo "1"; ?>);</script><?php
     exit();
 }
 
