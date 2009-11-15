@@ -33,6 +33,43 @@ class PrsUploadedResumesPage extends Page {
         echo '</script>'. "\n";
     }
     
+    private function generateRecommenderIndustries() {
+        $mysqli = Database::connect();
+        $query = "SELECT id, industry, parent_id FROM industries";
+        $result = $mysqli->query($query);
+        
+        echo '<select class="mini_field" style="height: 200px;" id="recommender_industries" name="recommender_industries" multiple>'. "\n";
+        
+        foreach ($result as $row) {
+            if (empty($row['parent_id']) || is_null($row['parent_id'])) {
+                echo '<option value="'. $row['id']. '" style="font-weight: bold;">'. $row['industry']. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $row['id']. '">&nbsp;&nbsp;&nbsp;'. $row['industry']. '</option>'. "\n";
+            }
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
+    private function generateMemberIndustries($_id) {
+        $mysqli = Database::connect();
+        $query = "SELECT id, industry, parent_id FROM industries";
+        $result = $mysqli->query($query);
+        
+        echo '<select class="mini_field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+        echo '<option value="0" selected>Select a specialization</option>'. "\n";
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        foreach ($result as $row) {
+            if (empty($row['parent_id']) || is_null($row['parent_id'])) {
+                echo '<option value="'. $row['id']. '" style="font-weight: bold;">'. $row['industry']. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $row['id']. '">&nbsp;&nbsp;&nbsp;'. $row['industry']. '</option>'. "\n";
+            }
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
     public function show() {
         $this->begin();
         $this->top_prs($this->employee->get_name(). " - Uploaded Resumes");
@@ -61,7 +98,64 @@ class PrsUploadedResumesPage extends Page {
         <div id="div_blanket"></div>
         <div id="div_add_to_privileged_form">
             <form onSubmit="return false;">
-                
+                <table class="add_to_privileged_form">
+                    <tr>
+                        <td class="left">
+                            <div style="font-size: 12pt; font-weight: bold; padding-bottom: 15px;">Recommender</div>
+                            <table class="candidate_form">
+                                <tr>
+                                    <td class="label"><label for="recommender_region">Region:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="recommender_region" name="recommender_region" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="recommender_remark">Remark:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="recommender_remark" name="recommender_remark" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="recommender_industries">Specializations:</label></td>
+                                    <td class="field">
+                                        <?php $this->generateRecommenderIndustries(); ?>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="separator"></td>
+                        <td class="right">
+                            <div style="font-size: 12pt; font-weight: bold; padding-bottom: 15px;">Candidate</div>
+                            <table class="candidate_form">
+                                <tr>
+                                    <td class="label"><label for="candidate_remark">Remark:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="candidate_remark" name="candidate_remark" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="candidate_primary_industry">Primary Industry:</label></td>
+                                    <td class="field">
+                                        <?php $this->generateMemberIndustries('candidate_primary_industry'); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="candidate_secondary_industry">Secondary Industry:</label></td>
+                                    <td class="field">
+                                        <?php $this->generateMemberIndustries('candidate_secondary_industry'); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="candidate_tertiary_industry">Tertiary Industry:</label></td>
+                                    <td class="field">
+                                        <?php $this->generateMemberIndustries('candidate_tertiary_industry'); ?>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <p class="button"><input type="button" value="Cancel" onClick="close_add_to_privileged_form();" />&nbsp;<input type="button" value="OK" onClick="add_to_privileged();" /></p>
             </form>
         </div>
         

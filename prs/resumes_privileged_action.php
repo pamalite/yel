@@ -145,8 +145,10 @@ if ($_POST['action'] == 'add_new_candidate') {
             
             if ($recommender->create($recommender_data)) {
                 $industries = explode(',', $_POST['recommender_industries']);
-                if (!$recommender->add_to_industries($industries)) {
-                    $recommender_industries_adding_error = true;
+                if (!empty($industries)) {
+                    if (!$recommender->add_to_industries($industries)) {
+                        $recommender_industries_adding_error = true;
+                    }
                 }
             } else {
                 echo '-1'; // failed to create new recommender
@@ -182,11 +184,8 @@ if ($_POST['action'] == 'add_new_candidate') {
         $member_data['active'] = 'N';
         $member_data['invites_available'] = '10';
         $member_data['remarks'] = sanitize($_POST['member_remarks']);
-        
-        if ($member_data['like_newsletter'] == 'Y') {
-            $member_data['filte_jobs'] = 'Y';
-        }
-        
+        $member_data['like_newsletter'] = 'Y';
+        $member_data['filte_jobs'] = 'Y';
         $member_data['added_by'] = $_POST['id'];
         $member_data['recommender'] = $_POST['recommender_email_addr'];
         
