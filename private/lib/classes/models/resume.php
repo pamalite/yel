@@ -227,7 +227,7 @@ class Resume {
         return false;
     }
     
-    private function get_text_from_rtf($_file) {
+    public function get_text_from_rtf($_file) {
         $content = file_get_contents($_file);
         $text = '';
         $is_tag = false;
@@ -251,7 +251,7 @@ class Resume {
         return $text;
     }
     
-    private function get_text_from_msword($userDoc) {
+    public function get_text_from_msword($userDoc) {
         $fileHandle = fopen($userDoc, "r");
         $line = @fread($fileHandle, filesize($userDoc));   
         $lines = explode(chr(0x0D),$line);

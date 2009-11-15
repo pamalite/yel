@@ -87,7 +87,7 @@ function show_uploaded_resumes() {
 }
 
 function add_to_privileged() {
-    var params = 'id=' + id + '&action=add_to_privileged';
+    var params = 'id=' + id + '&user_id=' + user_id + '&action=add_to_privileged';
     params = params + '&recommender_email=' + current_referrer_email;
     params = params + '&candidate_email=' + current_candidate_email;
     params = params + '&job_id=' + current_job_id;
@@ -149,7 +149,13 @@ function add_to_privileged() {
                 alert('Everything was created successfully, except for recommender\'s industries are not added into the system.\n\nPlease update through the Recommenders section.');
             } else if (txt == '-8') {
                 alert('Everything was created successfully, except for default contact was not added into the system.\n\nPlease report this to system administrator');
-            } 
+            } else if (txt == '-9') {
+                alert('Unable to create resume record. Please report this to system administrator.');
+                return false;
+            } else if (txt == '-10') {
+                alert('Unable to copy resume. Please report this to system administrator.');
+                return false;
+            }
             
             close_add_to_privileged_form();
             set_status('');

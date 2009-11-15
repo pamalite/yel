@@ -880,7 +880,7 @@ if ($_POST['action'] == 'quick_upload') {
     }
     
     $data = array();
-    $data['file_name'] = $resume_file['name'];
+    $data['file_name'] = basename($resume_file['name']);
     $data['file_hash'] = generate_random_string_of(3). '.'. generate_random_string_of(6);
     $data['file_type'] = $resume_file['type'];
     $data['file_size'] = $resume_file['size'];

@@ -135,9 +135,12 @@ if ($_POST['action'] == 'add_to_privileged') {
         $member_data['invites_available'] = '10';
         $member_data['remarks'] = sanitize($_POST['candidate_remarks']);
         $member_data['like_newsletter'] = 'Y';
-        $member_data['filte_jobs'] = 'Y';
+        $member_data['filter_jobs'] = 'Y';
         $member_data['added_by'] = $_POST['id'];
         $member_data['recommender'] = $_POST['recommender_email'];
+        $member_data['primary_industry'] = $_POST['candidate_primary_industry'];
+        $member_data['secondary_industry'] = $_POST['candidate_secondary_industry'];
+        $member_data['tertiary_industry'] = $_POST['candidate_tertiary_industry'];
         
         if ($member->create($member_data)) {
             // Create activation token and email
@@ -162,26 +165,26 @@ if ($_POST['action'] == 'add_to_privileged') {
                 $message = str_replace('%root%', $GLOBALS['root'], $message);
                 $subject = "Member Activation Required";
                 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-                // mail($buffer['candidate_email'], $subject, $message, $headers);
+                mail($buffer['candidate_email_addr'], $subject, $message, $headers);
                             
-                $handle = fopen('/tmp/email_to_'. $buffer['candidate_email']. '_token.txt', 'w');
-                fwrite($handle, 'Subject: '. $subject. "\n\n");
-                fwrite($handle, $message);
-                fclose($handle);
+                // $handle = fopen('/tmp/email_to_'. $buffer['candidate_email_addr']. '_token.txt', 'w');
+                // fwrite($handle, 'Subject: '. $subject. "\n\n");
+                // fwrite($handle, $message);
+                // fclose($handle);
                 
                 // add yellow elevator as default contact and pre-approve
-                $employee = new Employee($_POST['id']);
+                $employee = new Employee($_POST['user_id']);
                 $branch = $employee->get_branch();
                 
                 $query = "INSERT INTO member_referees SET 
                           `member` = '". $member->id(). "', 
                           `referee` = 'team.". strtolower($branch[0]['country_code']). "@yellowelevator.com', 
-                          `referred_on` = NOW(), 
+                          `referred_on` = '". $joined_on. "', 
                           `approved` = 'Y'; 
                           INSERT INTO member_referees SET 
                           `referee` = '". $member->id(). "', 
                           `member` = 'team.". strtolower($branch[0]['country_code']). "@yellowelevator.com', 
-                          `referred_on` = NOW(), 
+                          `referred_on` = '". $joined_on. "', 
                           `approved` = 'Y'";
                 if (!$mysqli->transact($query)) {
                     $default_contact_adding_error = true;
@@ -213,14 +216,73 @@ if ($_POST['action'] == 'add_to_privileged') {
     $file_hash = generate_random_string_of(6);
     $new_name = $resume->id(). '.'. $file_hash;
     if (rename($GLOBALS['buffered_resume_dir']. '/'. $buffer['file_hash'], $GLOBALS['resume_dir']. '/'. $new_name)) {
-        $data = array();
-        $data['file_hash'] = $file_hash;
-        $data['file_name'] = $buffer['file_name'];
-        $data['file_type'] = $buffer['file_type'];
-        $data['file_size'] = $buffer['file_size'];
-        if (!$resume->update($data)) {
+        $query = "UPDATE resumes SET 
+                  file_name = '". $buffer['file_name']."', 
+                  file_hash = '". $file_hash."', 
+                  file_size = '". $buffer['file_size']."',
+                  file_type = '". $buffer['file_type']."' 
+                  WHERE id = ". $resume->id();
+        if (!$mysqli->execute($query)) {
             echo '-10';
             exit();
+        }
+        
+        $resume_text = '';
+        switch ($buffer['file_type']) {
+            case 'text/plain':
+                $tmp = file_get_contents($GLOBALS['resume_dir']. "/". $new_name);
+                $resume_text = sanitize($tmp);
+                break;
+            case 'text/html':
+                $tmp = file_get_contents($GLOBALS['resume_dir']. "/". $new_name);
+                $resume_text = sanitize(strip_tags($tmp));
+                break;
+            case 'application/pdf':
+                $cmd = "/usr/local/bin/pdftotext ". $GLOBALS['resume_dir']. "/". $new_name. " /tmp/". $new_name;
+                shell_exec($cmd);
+                $tmp = file_get_contents('/tmp/'. $new_name);
+                $resume_text = sanitize($tmp);
+                
+                if (!empty($tmp)) {
+                    unlink('/tmp/'. $new_name);
+                }
+                break;
+            case 'application/msword':
+                $tmp = $resume->get_text_from_msword($GLOBALS['resume_dir']. "/". $new_name);
+                $resume_text = sanitize($tmp);
+                break;
+            case 'application/rtf':
+                $tmp = $resume->get_text_from_rtf($GLOBALS['resume_dir']. "/". $new_name);
+                $resume_text = sanitize($tmp);
+                break;
+        }
+        
+        if (!empty($resume_text)) {
+            $keywords = preg_split("/[\s,]+/", $resume_text);
+            $resume_text = '';
+            foreach ($keywords as $i=>$keyword) {
+                $resume_text .= $keyword;
+                
+                if ($i < count($keywords)-1) {
+                    $resume_text .= ' ';
+                }
+            }
+            
+            $query = "SELECT COUNT(*) AS is_exists FROM resume_index 
+                      WHERE resume = ". $resume->id(). " AND member = '". $_POST['candidate_email']. "'";
+            $result = $mysqli->query($query);
+            if ($result[0]['is_exists'] == '0') {
+                $query = "INSERT INTO resume_index SET 
+                          resume = ". $resume->id(). ", 
+                          member = '". $_POST['candidate_email']. "', 
+                          file_text = '". $resume_text. "'";
+            } else {
+                $query = "UPDATE resume_index SET file_text = '". $resume_text. "' 
+                          WHERE resume = ". $resume->id(). " AND 
+                          member = '". $_POST['candidate_email']. "'";
+            }
+            
+            $mysqli->execute($query);
         }
         
         $query = "DELETE FROM users_contributed_resumes WHERE 
