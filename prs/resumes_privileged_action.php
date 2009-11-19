@@ -185,7 +185,7 @@ if ($_POST['action'] == 'add_new_candidate') {
         $member_data['invites_available'] = '10';
         $member_data['remarks'] = sanitize($_POST['member_remarks']);
         $member_data['like_newsletter'] = 'Y';
-        $member_data['filte_jobs'] = 'Y';
+        $member_data['filter_jobs'] = 'Y';
         $member_data['added_by'] = $_POST['id'];
         $member_data['recommender'] = $_POST['recommender_email_addr'];
         
@@ -212,15 +212,15 @@ if ($_POST['action'] == 'add_new_candidate') {
                 $message = str_replace('%root%', $GLOBALS['root'], $message);
                 $subject = "Member Activation Required";
                 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-                mail($_POST['member_email_addr'], $subject, $message, $headers);
+                // mail($_POST['member_email_addr'], $subject, $message, $headers);
                             
-                // $handle = fopen('/tmp/email_to_'. $_POST['member_email_addr']. '_token.txt', 'w');
-                // fwrite($handle, 'Subject: '. $subject. "\n\n");
-                // fwrite($handle, $message);
-                // fclose($handle);
+                $handle = fopen('/tmp/email_to_'. $_POST['member_email_addr']. '_token.txt', 'w');
+                fwrite($handle, 'Subject: '. $subject. "\n\n");
+                fwrite($handle, $message);
+                fclose($handle);
                 
                 // add yellow elevator as default contact and pre-approve
-                $employee = new Employee($_POST['id']);
+                $employee = new Employee($_POST['user_id']);
                 $branch = $employee->get_branch();
                 
                 $query = "INSERT INTO member_referees SET 

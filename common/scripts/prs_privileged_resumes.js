@@ -461,7 +461,7 @@ function add_new_candidate() {
         return false;
     }
     
-    var params = 'id=' + id + '&action=add_new_candidate';
+    var params = 'id=' + id + '&user_id=' + user_id + '&action=add_new_candidate';
     params = params + '&member_email_addr=' + $('member_email_addr').value;
     params = params + '&member_firstname=' + $('member_firstname').value;
     params = params + '&member_lastname=' + $('member_lastname').value;
