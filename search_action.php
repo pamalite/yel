@@ -556,6 +556,7 @@ if ($_POST['action'] == 'refer_me') {
 
                         $message = str_replace('%member_name%', htmlspecialchars_decode(desanitize($member->get_name())), $message);
                         $message = str_replace('%member_email_addr%', $member->id(), $message);
+                        $message = str_replace('%branch_email_addr%', $branch_email, $message);
                         $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
                         $message = str_replace('%root%', $GLOBALS['root'], $message);
                         $message = str_replace('%job%', htmlspecialchars_decode($job_title), $message);

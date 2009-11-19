@@ -3,7 +3,7 @@ Hi,
 This candidate %member_name% (e-mail: %member_email_addr%) would like to be 
 referred to %job% by %employer%.
 
-Please sign into 'initial@yellowelevator.com' member account, and click on 
+Please sign into '%branch_email_addr%' member account, and click on 
 Referral Requests to view the resume.
 
 To sign in, go to:
