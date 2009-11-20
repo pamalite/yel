@@ -722,11 +722,11 @@ function get_completeness_status() {
             }
             
             if (has_resumes[0].childNodes[0].nodeValue == '0') {
-                    progress_details = progress_details + 'Please <a href="' + root + '/members/resumes.php">create or upload</a> at least a resume allow your Contacts to refer you to a job.<br/>';
+                    progress_details = progress_details + 'Please <a href="' + root + '/members/resumes.php">create/upload</a> your resume.<br/>';
             }
             
             if (has_photos[0].childNodes[0].nodeValue == '0') {
-                    progress_details = progress_details + 'Please <a href="' + root + '/members/photos.php">upload</a> a photo if yourself.<br/>';
+                    progress_details = progress_details + 'Please <a href="' + root + '/members/photos.php">upload</a> a photo of yourself.<br/>';
             }
             
             if (!isEmpty(progress_details)) {

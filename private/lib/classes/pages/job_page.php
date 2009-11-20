@@ -579,7 +579,7 @@ class JobPage extends Page {
                         </td>
                         <td class="separator"></td>
                         <td class="right">
-                            <div style="font-size: 12pt; font-weight: bold; padding-bottom: 15px;">Your's Details</div>
+                            <div style="font-size: 12pt; font-weight: bold; padding-bottom: 15px;">Your Details</div>
                             <table class="qu_candidate_form">
                                 <tr>
                                     <td class="label"><label for="qu_referrer_email">Email:</label></td>
