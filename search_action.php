@@ -257,7 +257,7 @@ if ($_POST['action'] == 'make_referral') {
                     $position = '- '. htmlspecialchars_decode($job). ' by '. htmlspecialchars_decode($employer);
                     $message = str_replace('%member_name%', htmlspecialchars_decode($member->get_name()), $message);
                     $message = str_replace('%member_email_addr%', $member->id(), $message);
-                    $message = str_replace('%referee_email_addr%', $referee, $message);
+                    $message = str_replace('%referee_email_addr%', $referee['email_addr'], $message);
                     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
                     $message = str_replace('%root%', $GLOBALS['root'], $message);
                     $message = str_replace('%positions%', $position, $message);

@@ -1,10 +1,10 @@
 Hi %referrer_name%,
 
-%candidate_name% (e-mail: %candidate_email_addr%) had just acknowledged to the position 
-%job% at %employer%.
+%candidate_name% (e-mail: %candidate_email_addr%) is interested in the %job% position 
+at %employer%, and has requested you to refer him/her to the position.
 
-You can view %candidate_name%'s submitted resume by signing into your Members account 
-to refer this request under "Referral Requests".
+Please sign in and go to "Referral Requests" to screen %candidate_name%'s resume and 
+write a testimony for him/her in order to complete this referral.
 
 To sign in, go to:
 

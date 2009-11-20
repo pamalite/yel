@@ -199,7 +199,7 @@ if ($_POST['action'] == 'acknowledge_job') {
     
     $message = str_replace('%referrer_name%', htmlspecialchars_decode($member), $message);
     $message = str_replace('%candidate_name%', htmlspecialchars_decode($candidate), $message);
-    $message = str_replace('%candidate_email_addrr%', $candidate_email, $message);
+    $message = str_replace('%candidate_email_addr%', $candidate_email, $message);
     $message = str_replace('%employer%', htmlspecialchars_decode($employer), $message);
     $message = str_replace('%job%', htmlspecialchars_decode($job), $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
