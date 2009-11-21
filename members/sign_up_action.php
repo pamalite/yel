@@ -107,7 +107,7 @@ $query = "SELECT DISTINCT member, invited_on FROM member_invites
           WHERE referee_email = '". $_POST['email_addr']. "' AND 
           (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
 $result = $mysqli->query($query);
-if (count($result) > 0 && !is_null($result)) {
+if (!empty($result)) {
     foreach ($result as $row) {
         $queries = "INSERT INTO member_referees SET 
                     member = '". $row['member']. "', 
@@ -130,7 +130,7 @@ if (count($result) > 0 && !is_null($result)) {
               WHERE referee_email = '". $_POST['email_addr']. "' AND 
               (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
     $result = $mysqli->query($query);
-    if (!$result) {
+    if (empty($result)) {
         redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
         //echo $query;
         //exit();
@@ -172,7 +172,7 @@ $query = "SELECT DISTINCT member, invited_on FROM referrer_invites
           WHERE referrer_email = '". $_POST['email_addr']. "' AND 
           (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
 $result = $mysqli->query($query);
-if (count($result) > 0 && !is_null($result)) {
+if (!empty($result)) {
     foreach ($result as $row) {
         $query = "SELECT COUNT(*) AS connections FROM member_referees 
                   WHERE ((member = '". $row['member']. "' AND referee = '". $_POST['email_addr']. "') OR 
@@ -204,7 +204,7 @@ if (count($result) > 0 && !is_null($result)) {
               WHERE referrer_email = '". $_POST['email_addr']. "' AND 
               (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
     $result = $mysqli->query($query);
-    if (!$result) {
+    if (empty($result)) {
         redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
         //echo $query;
         //exit();

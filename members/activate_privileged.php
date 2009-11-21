@@ -79,7 +79,7 @@ mail($member->id(), $subject, $message, $headers);
 // continue all bufferred referrals
 $query = "SELECT * FROM privileged_referral_buffers WHERE referee = '". $member->id(). "'";
 $result = $mysqli->query($query);
-if (!is_null($result) && !empty($result)) {
+if (!empty($result)) {
     $referrals = $result;
     $query = '';
     foreach ($result as $row) {
@@ -117,7 +117,7 @@ if (!is_null($result) && !empty($result)) {
         $query .= ")";
         
         $result = $mysqli->query($query);
-        if (!is_null($result) && !empty($result)) {
+        if (!empty($result)) {
             $lines = file(dirname(__FILE__). '/../private/mail/employer_multiple_new_referrals.txt');
             $subject = "Multiple new application for multiple positions";
             $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
