@@ -227,6 +227,9 @@ function show_job(job_id) {
             var expired = xml.getElementsByTagName('expired');
             var closed = xml.getElementsByTagName('closed');
             var acceptable_resume_types = xml.getElementsByTagName('acceptable_resume_type');
+            var contact_ccs = xml.getElementsByTagName('contact_carbon_copy');
+            var contact_names = xml.getElementsByTagName('contact_person');
+            var contact_email_addrs = xml.getElementsByTagName('email_addr');
             
             if (closed[0].childNodes[0].nodeValue != 'Y') {
                 $('open_back_arrow').setStyle('display', 'inline');
@@ -249,6 +252,13 @@ function show_job(job_id) {
                 $('job.salary_end').set('html', '-&nbsp;' + salary_end[0].childNodes[0].nodeValue);
             } else {
                 $('job.salary_end').set('html', '');
+            }
+            
+            $('job.contact').set('html', contact_names[0].childNodes[0].nodeValue + ' (' + contact_email_addrs[0].childNodes[0].nodeValue + ')');
+            
+            $('job.contact_carbon_copy').set('html', '');
+            if (contact_ccs[0].childNodes.length > 0) {
+                $('job.contact_carbon_copy').set('html', contact_ccs[0].childNodes[0].nodeValue);
             }
             
             $('job.description').set('html', description[0].childNodes[0].nodeValue);
@@ -405,6 +415,22 @@ function add_new_job() {
     $('div_open').setStyle('display', 'none');
     $('div_closed').setStyle('display', 'none');
     $('div_tabs').setStyle('display', 'none');
+    $('contact').set('html', '');
+    
+    var params = 'job=0&id=' + id + '&action=get_contact_person';
+    var uri = root + "/employers/job_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            var contact_names = xml.getElementsByTagName('contact_person');
+            var email_addrs = xml.getElementsByTagName('email_addr');
+            
+            $('contact').set('html', contact_names[0].childNodes[0].nodeValue + ' (' + email_addrs[0].childNodes[0].nodeValue + ')');
+        }
+    });
+    
+    request.send(params);
     
     startRTE('');
 }
@@ -437,6 +463,9 @@ function new_from_job(job_id) {
             var salary_negotiable = xml.getElementsByTagName('salary_negotiable');
             var description = xml.getElementsByTagName('description');
             var acceptable_resume_types = xml.getElementsByTagName('acceptable_resume_type');
+            var contact_ccs = xml.getElementsByTagName('contact_carbon_copy');
+            var contact_names = xml.getElementsByTagName('contact_person');
+            var contact_email_addrs = xml.getElementsByTagName('email_addr');
             
             $('title').value = title[0].childNodes[0].nodeValue;
             $('job.industry').set('html', industry[0].childNodes[0].nodeValue);
@@ -453,6 +482,13 @@ function new_from_job(job_id) {
                 $('salary_end').value = salary_end[0].childNodes[0].nodeValue;
             } else {
                 $('salary_end').value = '';
+            }
+            
+            $('contact').set('html', contact_names[0].childNodes[0].nodeValue + ' (' + contact_email_addrs[0].childNodes[0].nodeValue + ')');
+            
+            $('contact_carbon_copy').value = '';
+            if (contact_ccs[0].childNodes.length > 0) {
+                $('contact_carbon_copy').value = contact_ccs[0].childNodes[0].nodeValue;
             }
             
             //$('description').value = description[0].childNodes[0].nodeValue.replace(/<br\/>/g, "\n");
@@ -531,6 +567,9 @@ function show_update_job(job_id) {
             var salary_negotiable = xml.getElementsByTagName('salary_negotiable');
             var description = xml.getElementsByTagName('description');
             var acceptable_resume_types = xml.getElementsByTagName('acceptable_resume_type');
+            var contact_ccs = xml.getElementsByTagName('contact_carbon_copy');
+            var contact_names = xml.getElementsByTagName('contact_person');
+            var contact_email_addrs = xml.getElementsByTagName('email_addr');
             
             $('title').value = title[0].childNodes[0].nodeValue;
             $('job.industry').set('html', industry[0].childNodes[0].nodeValue);
@@ -546,6 +585,13 @@ function show_update_job(job_id) {
                 $('salary_end').value = salary_end[0].childNodes[0].nodeValue;
             } else {
                 $('salary_end').value = '';
+            }
+            
+            $('contact').set('html', contact_names[0].childNodes[0].nodeValue + ' (' + contact_email_addrs[0].childNodes[0].nodeValue + ')');
+            
+            $('contact_carbon_copy').value = '';
+            if (contact_ccs[0].childNodes.length > 0) {
+                $('contact_carbon_copy').value = contact_ccs[0].childNodes[0].nodeValue;
             }
             
             //$('description').value = description[0].childNodes[0].nodeValue.replace(/<br\/>/g, "\n");

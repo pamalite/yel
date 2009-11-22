@@ -192,6 +192,13 @@ class EmployerJobsPage extends Page {
                         </td>
                     </tr>
                     <tr>
+                        <td class="label">Send Alert:</td>
+                        <td class="field">
+                            To: <span id="contact">Loading</span><br/>
+                            Cc: <input type="text" class="carbon_copy" id="contact_carbon_copy" name="contact_carbon_copy" />
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="label"><label for="description">Description:</label></td>
                         <!--td class="field"><textarea id="description" name="description"></textarea></td-->
                         <!--td class="field">
@@ -243,6 +250,13 @@ class EmployerJobsPage extends Page {
                 <tr>
                     <td class="label">Monthly Salary:</td>
                     <td class="field"><?php echo $currency; ?>$ <span id="job.salary">Loading</span>&nbsp;<span id="job.salary_end">Loading</span>&nbsp;[<span id="job.salary_negotiable">Loading</span>]</td>
+                </tr>
+                <tr>
+                    <td class="label">Send Alert:</td>
+                    <td class="field">
+                        To: <span id="job.contact">Loading</span><br/>
+                        Cc: <span id="job.contact_carbon_copy">Loading</span>
+                    </td>
                 </tr>
                 <tr>
                     <td class="label">Description:</td>

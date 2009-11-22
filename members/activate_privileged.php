@@ -101,7 +101,8 @@ if (!empty($result)) {
         
         // send email to employers
         $query = "SELECT employers.email_addr, employers.name AS employer, 
-                  jobs.id AS job_id, jobs.title AS job_title 
+                  jobs.id AS job_id, jobs.title AS job_title, 
+                  jobs.contact_carbon_copy 
                   FROM jobs 
                   LEFT JOIN employers ON employers.id = jobs.employer 
                   WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() AND 
@@ -120,7 +121,6 @@ if (!empty($result)) {
         if (!empty($result)) {
             $lines = file(dirname(__FILE__). '/../private/mail/employer_multiple_new_referrals.txt');
             $subject = "Multiple new application for multiple positions";
-            $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
             
             $employers = array();
             foreach ($result as $row) {
@@ -129,6 +129,9 @@ if (!empty($result)) {
                 } else {
                     $employers[$row['email_addr']]['name'] = $row['employer'];
                     $employers[$row['email_addr']]['jobs'][$row['job_id']] = $row['job_title'];
+                    if (!empty($row['contact_carbon_copy']) && !is_null($row['contact_carbon_copy'])) {
+                        $employers[$row['email_addr']]['contact_carbon_copy'] = $row['contact_carbon_copy'];
+                    }
                 }
             }
             
@@ -146,6 +149,10 @@ if (!empty($result)) {
                 }
                 
                 // prepare and send email
+                $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+                if (array_key_exists('contact_carbon_copy', $employer)) {
+                    $headers .= 'Cc: '. $employer['contact_carbon_copy']. "\n";
+                }
                 $message = '';
                 foreach($lines as $line) {
                     $message .= $line;

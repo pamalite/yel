@@ -30,11 +30,11 @@ class ViewResumeHireGuidePage extends Page {
             How to View Resumes &amp; Hire Candidates?
         </div>
         <div class="step">
-            <div style="text-align: center; font-weight: bold;">Step 1: Go to <a class="no_link" onClick="window.opener.location.replace('../../employers/referrals.php');">Referrals</a></div><br/>
+            <div style="text-align: center; font-weight: bold;">Step 1: Go to <a class="no_link" onClick="window.opener.location.replace('../../employers/referrals.php');">Resumes</a></div><br/>
         </div>
         <div class="flow_arrow"><img style="height: 25px;" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/flow_arrow.jpg" /></div>
         <div class="step">
-            <div style="text-align: center; font-weight: bold;">Step 2: Click on the number under the "Referrals" column.</div><br/>
+            <div style="text-align: center; font-weight: bold;">Step 2: Click on the number under the "Resumes" column.</div><br/>
         </div>
         <div class="flow_arrow"><img style="height: 25px;" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/common/images/flow_arrow.jpg" /></div>
         <div class="step">

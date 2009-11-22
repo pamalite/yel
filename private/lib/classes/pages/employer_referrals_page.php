@@ -51,7 +51,7 @@ class EmployerReferralsPage extends Page {
     public function show() {
         $this->begin();
         $this->support();
-        $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Referrals</span>");
+        $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Resumes</span>");
         $this->menu('employer', 'referrals');
         
         $query = "SELECT currencies.symbol FROM currencies 
@@ -75,7 +75,7 @@ class EmployerReferralsPage extends Page {
                     <td class="title"><span class="sort" id="sort_title">Job</span></td>
                     <td class="date"><span class="sort" id="sort_created_on">Created On</span></td>
                     <td class="date"><span class="sort" id="sort_expire_on">Expire On</span></td>
-                    <td class="referrals"><span class="sort" id="sort_referrals">Referrals</span></td>
+                    <td class="referrals"><span class="sort" id="sort_referrals">Resumes</span></td>
                 </tr>
             </table>
             <div id="div_list">

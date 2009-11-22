@@ -280,7 +280,7 @@ class Page {
                     <li <?php echo ($page == 'home') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/home.php">Home</a></li>
                     <li <?php echo ($page == 'profile') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/profile.php">Profile</a></li>
                     <li <?php echo ($page == 'jobs') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/jobs.php">Job Ads</a></li>
-                    <li <?php echo ($page == 'referrals') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/referrals.php">Referrals</a><span style="color: #666666; font-size: 9pt; font-weight: bold;" id="emp_referrals_count"></span></li>
+                    <li <?php echo ($page == 'referrals') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/referrals.php">Resumes</a><span style="color: #666666; font-size: 9pt; font-weight: bold;" id="emp_referrals_count"></span></li>
                     <li <?php echo ($page == 'employments') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/employments.php">Employment Records</a></li>
                     <li <?php echo ($page == 'invoices') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/invoices.php">Invoices &amp; Receipts</a></li>
                     <li><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/logout.php">Logout</a></li>

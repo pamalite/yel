@@ -128,6 +128,11 @@ option.main_industry {
     font-size: 10pt;
 }
 
+#div_job_form input.carbon_copy {
+    width: 93%;
+    font-size: 10pt;
+}
+
 #div_job_form input.salary {
     width: 43%;
     font-size: 10pt;

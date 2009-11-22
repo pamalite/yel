@@ -350,7 +350,8 @@ if ($_POST['action'] == 'make_referral') {
     
     $mysqli = Database::connect();
     $job = array();
-    $query = "SELECT jobs.title, employers.name, employers.email_addr, employers.like_instant_notification 
+    $query = "SELECT jobs.title, employers.name, employers.email_addr, employers.like_instant_notification, 
+              jobs.contact_carbon_copy 
               FROM jobs 
               LEFT JOIN employers ON employers.id = jobs.employer 
               WHERE jobs.id = ". $job_id. " LIMIT 1";
@@ -365,6 +366,9 @@ if ($_POST['action'] == 'make_referral') {
         $job['employer'] = $result[0]['name'];
         $job['employer_email_addr'] = $result[0]['email_addr'];
         $job['employer_notify_now'] = ($result[0]['like_instant_notification'] == '1') ? true : false;
+        if (!empty($result[0]['contact_carbon_copy']) && !is_null($result[0]['contact_carbon_copy'])) {
+            $job['contact_carbon_copy'] = $result[0]['contact_carbon_copy'];
+        }
     }
     
     // check whether are both the member and referee friend
@@ -432,6 +436,9 @@ if ($_POST['action'] == 'make_referral') {
             $message = str_replace('%root%', $GLOBALS['root'], $message);
             $subject = "New application for ". desanitize($job['job']). " position";
             $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+            if (array_key_exists('contact_carbon_copy', $job)) {
+                $headers .= 'Cc: '. $job['contact_carbon_copy']. "\n";
+            }
             mail($job['employer_email_addr'], $subject, $message, $headers);
 
             // $handle = fopen('/tmp/email_to_'. $job['employer_email_addr']. '.txt', 'w');

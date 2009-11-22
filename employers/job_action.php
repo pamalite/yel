@@ -25,11 +25,13 @@ $xml_dom = new XMLDOM();
 if (!isset($_POST['action'])) {
     $criteria = array(
         'columns' => 'jobs.*, countries.country AS country_name, industries.industry AS full_industry, 
+                      employers.contact_person, employers.email_addr, 
                       DATE_FORMAT(jobs.created_on, \'%e %b, %Y %k:%i:%s\') AS formatted_created_on, 
                       DATE_FORMAT(jobs.expire_on, \'%e %b, %Y %k:%i:%s\') AS formatted_expire_on, 
                       DATEDIFF(NOW(), jobs.expire_on) AS expired',
         'joins' => 'industries ON industries.id = jobs.industry, 
-                    countries ON countries.country_code = jobs.country', 
+                    countries ON countries.country_code = jobs.country, 
+                    employers ON employers.id = jobs.employer', 
         'match' => 'jobs.id = \''. $_POST['job']. '\''
     );
 
@@ -269,6 +271,17 @@ if ($_POST['action'] == 'extend') {
     }
     
     echo "ok";
+    exit();
+}
+
+if ($_POST['action'] == 'get_contact_person') {
+    $query = "SELECT contact_person, email_addr FROM employers WHERE id = '". $_POST['id']. "' LIMIT 1";
+    $mysqli = Database::connect();
+    $result = $mysqli->query($query);
+    
+    $response =  array('contact' => $result[0]);
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
     exit();
 }
 ?>
