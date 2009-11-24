@@ -342,6 +342,7 @@ if ($_POST['action'] == 'make_referral') {
 
             /*$handle = fopen('/tmp/email_to_'. $result[0]['email_addr']. '.txt', 'w');
             fwrite($handle, 'Subject: '. $subject. "\n\n");
+            fwrite($handle, 'Headers: '. $headers. "\n\n");
             fwrite($handle, $message);
             fclose($handle);*/
         }
