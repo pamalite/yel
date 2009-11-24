@@ -25,6 +25,10 @@ p.note {
     border: 1px solid #CCCCCC;
 }
 
+#div_tabs_1 {
+    padding-bottom: 5px;
+}
+
 #li_closed, #li_back_arrow {
     border: 1px solid #0000FF;
 }

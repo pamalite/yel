@@ -90,6 +90,10 @@ if ($_POST['action'] == 'publish') {
     }
     $data['potential_reward'] = Job::calculate_potential_reward_from($salary_end, $_POST['employer']);
     
+    if (!empty($_POST['cc'])) {
+        $data['contact_carbon_copy'] = $_POST['cc'];
+    }
+    
     // Check whether employer's account is ready.
     if ($data['potential_reward'] <= 0) {
         echo '-1';
@@ -179,6 +183,10 @@ if ($_POST['action'] == 'save') {
     $data['description'] = $_POST['description'];
     $data['acceptable_resume_type'] = $_POST['resume_type'];
     $data['closed'] = 'S';
+    
+    if (!empty($_POST['cc'])) {
+        $data['contact_carbon_copy'] = $_POST['cc'];
+    }
     
     $salary_end = $_POST['salary_end'];
     if ($salary_end <= 0) {

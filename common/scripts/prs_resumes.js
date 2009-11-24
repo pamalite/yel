@@ -582,10 +582,12 @@ function refer() {
                 alert('An error occurred when adding and approving contacts. Please contact system administrator.');
                 close_testimony_form();
                 set_status('');
+                return false;
             } else if (txt == '-2') {
                 alert('The candidate has removed Yellow Elevator as a contact. Please contact candidate for clarification.');
                 close_testimony_form();
                 set_status('');
+                return false;
             }
             
             close_testimony_form();

@@ -246,20 +246,20 @@ if ($_POST['action'] == 'make_referral') {
     // check whether are both the member and referee friend
     $query = "SELECT COUNT(*) AS is_friend 
               FROM member_referees 
-              WHERE (member = '". $employee->email_address(). "' AND 
+              WHERE (member = '". $member. "' AND 
               referee = '". $_POST['referee']. "') OR 
-              (referee = '". $employee->email_address(). "' AND 
+              (referee = '". $member. "' AND 
               member = '". $_POST['referee']. "')";
     $result = $mysqli->query($query);
     if ($result[0]['is_friend'] <= 0) {
         $query = "INSERT INTO member_referees SET 
                   `member` = '". $_POST['referee']. "', 
-                  `referee` = 'team.". strtolower($branch[0]['country_code']). "@yellowelevator.com', 
+                  `referee` = '". $member. "', 
                   `referred_on` = NOW(), 
                   `approved` = 'Y'; 
                   INSERT INTO member_referees SET 
                   `referee` = '". $_POST['referee']. "', 
-                  `member` = 'team.". strtolower($branch[0]['country_code']). "@yellowelevator.com', 
+                  `member` = '". $member. "', 
                   `referred_on` = NOW(), 
                   `approved` = 'Y'";
         if (!$mysqli->transact($query)) {

@@ -254,8 +254,16 @@ class EmployerJobsPage extends Page {
                 <tr>
                     <td class="label">Send Alert:</td>
                     <td class="field">
-                        To: <span id="job.contact">Loading</span><br/>
-                        Cc: <span id="job.contact_carbon_copy">Loading</span>
+                        <table style="width: 100%; border: none; margin:auto;">
+                            <tr>
+                                <td style="width: 25px;">To:</td>
+                                <td><span id="job.contact">Loading</span></td>
+                            </tr>
+                            <tr>
+                                <td style="vertical-align: top;">Cc:</td>
+                                <td><span id="job.contact_carbon_copy">Loading</span></td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
                 <tr>

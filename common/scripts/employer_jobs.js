@@ -2,6 +2,7 @@ var selected_tab = 'li_open';
 var order_by = 'jobs.created_on';
 var order = 'desc';
 
+var cc_emails = new Array();
 // var editor = new Editor();
 
 function ascending_or_descending() {
@@ -70,6 +71,19 @@ function validate() {
         return false;        
     }
     
+    if (!isEmpty($('contact_carbon_copy').value)) {
+        var emails = $('contact_carbon_copy').value.split(',');
+        for (var i=0; i < emails.length; i++) {
+            emails[i] = trim(emails[i]);
+            if (!isEmail(emails[i])) {
+                set_status('One of the Send Alert Cc email address is invalid.<br/>You have to separate the email addresses by commas.');
+                return false;
+            }
+        }
+        
+        cc_emails = emails;
+    }
+    
     set_status('');
     return true;
 }
@@ -103,6 +117,17 @@ function save_job() {
     // params = params + '&description=' + encodeURIComponent(editor.getValue());
     params = params + '&description=' + encodeURIComponent(document.getElementById(rteFormName).value);
     params = params + '&resume_type=' + $('acceptable_resume_type').options[$('acceptable_resume_type').selectedIndex].value;
+    
+    params = params + '&cc=';
+    if (cc_emails.length > 0) {
+        for (var i=0; i < cc_emails.length; i++) {
+            params = params + cc_emails[i];
+            
+            if (i < (cc_emails.length - 1)) {
+                params = params + ', ';
+            }
+        }
+    }
     
     var uri = root + "/employers/job_action.php";
     var request = new Request({
@@ -168,6 +193,17 @@ function publish_job() {
     // params = params + '&description=' + encodeURIComponent(editor.getValue());
     params = params + '&description=' + encodeURIComponent($(rteFormName).value);
     params = params + '&resume_type=' + $('acceptable_resume_type').options[$('acceptable_resume_type').selectedIndex].value;
+    
+    params = params + '&cc=';
+    if (cc_emails.length > 0) {
+        for (var i=0; i < cc_emails.length; i++) {
+            params = params + cc_emails[i];
+            
+            if (i < (cc_emails.length - 1)) {
+                params = params + ', ';
+            }
+        }
+    }
     
     var uri = root + "/employers/job_action.php";
     var request = new Request({
