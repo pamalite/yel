@@ -204,11 +204,11 @@ class JobPage extends Page {
             $error_message = 'An error occured while loading the job details.';
         } 
         
-        // if (!$this->is_employee_viewing) {
-        //     if ($job['expired'] > 0 || $job['closed'] == 'Y') {
-        //         $error_message = 'The job that you are looking for is no longer available.';
-        //     }
-        // }
+        if (!$this->is_employee_viewing) {
+            if ($job['expired'] > 0 || $job['closed'] == 'Y') {
+                $error_message = 'The job that you are looking for is no longer available.';
+            }
+        }
         
         ?>
         <div id="div_status" class="status">

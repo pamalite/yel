@@ -730,9 +730,6 @@ function close_quick_refer_form() {
 }
 
 function show_quick_refer_form() {
-    alert('This feature is coming soon...');
-    return;
-    
     if (id <= 0) {
         window.location = root + '/members?job=' + $('job_id').value;
         navigator.reload();
@@ -778,9 +775,6 @@ function close_quick_upload_form() {
 }
 
 function show_quick_upload_form() {
-    alert('This feature is coming soon...');
-    return;
-    
     $('div_blanket').setStyle('display', 'block');
     
     var window_height = 0;
