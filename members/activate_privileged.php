@@ -92,7 +92,7 @@ if (!empty($result)) {
                    `referee_acknowledged_on` = '". $row['referee_acknowledged_on']. "',
                    `member_confirmed_on` = '". $row['member_confirmed_on']. "',
                    `member_read_resume_on` = '". $row['member_read_resume_on']. "',
-                   `testimony` = '". sanitize($row['testimony']). "';";
+                   `testimony` = '". $row['testimony']. "';";
     }
     
     if ($mysqli->transact($query)) {

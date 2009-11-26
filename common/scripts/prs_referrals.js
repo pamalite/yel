@@ -594,7 +594,8 @@ function show_testimony() {
             var testimonies = xml.getElementsByTagName('testimony');
             var html = 'No testimony found.';
             if (testimonies[0].childNodes.length > 0) {
-                html = testimonies[0].childNodes[0].nodeValue.replace(/\n/g, '<br/>');
+                // html = testimonies[0].childNodes[0].nodeValue.replace(/\n/g, '<br/>');
+                html = testimonies[0].childNodes[0].nodeValue;
             }
             $('testimony').set('html', html);
             $('div_blanket').setStyle('display', 'block');

@@ -725,7 +725,7 @@ function refer() {
     var params = 'id=' + user_id + '&action=make_referral';
     params = params + '&referee=' + current_member_email_addr;
     params = params + '&job=' + jobs_list.selected_value;
-    params = params + '&testimony=' + testimony;
+    params = params + '&testimony=' + encodeURIComponent(testimony);
     params = params + '&resume=' + $('job_select_form.resume_id').value;
     
     var uri = root + "/prs/resumes_privileged_action.php";
@@ -733,6 +733,7 @@ function refer() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            
             if (txt == 'ko') {
                 alert('You have already referred this contact to the job. Please refer another contact.');
                 close_testimony_form();

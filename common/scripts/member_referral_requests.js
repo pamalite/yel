@@ -309,7 +309,7 @@ function refer() {
     params = params + '&request_id=' + request_id;
     params = params + '&referee=' + selected_candidate_id;
     params = params + '&job=' + selected_job_id;
-    params = params + '&testimony=' + testimony;
+    params = params + '&testimony=' + encodeURIComponent(testimony);
     params = params + '&from=list';
     params = params + '&request=1';
     params = params + '&resume=' + $('resume').value;
