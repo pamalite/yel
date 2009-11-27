@@ -1,0 +1,73 @@
+#div_jobs, #div_referrals {
+    display: none;
+}
+
+td.employer {
+    width: 50%;
+}
+
+td.count {
+    width: 10%;
+    text-align: center;
+}
+
+td.industry {
+   width: 15%;
+}
+
+td.date {
+    width: 10%;
+}
+
+td.candidate, td.referrer, td.title {
+    width: 20%;
+}
+
+td.links {
+    text-align: center;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_testimony {
+    background-color: #FFFFFF;
+    display: none;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 640px;
+    height: 480px;
+}
+
+#div_testimony div.buttons {
+    background-color: #CCCCCC;
+    text-align: center;
+}
+
+#div_testimony div.testimony {
+    height: 445px;
+    margin: 5px 5px 5px 5px;
+    text-align: left;
+    font-size: 10pt;
+    overflow: auto;
+}

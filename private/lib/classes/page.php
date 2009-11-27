@@ -389,6 +389,7 @@ class Page {
         if (Employee::has_clearances_for('admin_employers', $_clearances)) {
         ?>
                 <li <?php echo ($page == 'jobs') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/jobs.php">Jobs</a></li>
+                <li <?php echo ($page == 'applications') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/applications.php">Applications</a></li>
         <?php
         }
         ?>
