@@ -71,7 +71,7 @@ class ResumeSearch {
         $query = "SELECT DISTINCT members.email_addr, members.zip, members.phone_num, members.added_by, 
                   primary_industries.industry AS prime_industry, secondary_industries.industry AS second_industry, 
                   countries.country, resumes.id AS resume_id, resumes.name AS resume_label, 
-                  resumes.file_hash, resumes.file_name, 
+                  resumes.file_hash, resumes.file_name, members.active, 
                   CONCAT(members.firstname, ', ', members.lastname) AS member, 
                   DATE_FORMAT(members.joined_on, '%e %b %Y') AS formatted_joined_on ";
         
@@ -99,7 +99,7 @@ class ResumeSearch {
        $query .= $filter_resume_status. " 
                   AND (". $filter_industry. ") 
                   AND (". $filter_country. ") 
-                  AND members.active = 'Y' ";
+                  AND members.active <> 'S' ";
        
        if ($with_limit) {
            $query .= "ORDER BY ". $this->order_by. " 
