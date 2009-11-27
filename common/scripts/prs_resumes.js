@@ -141,13 +141,25 @@ function show_candidates() {
                 var countries = xml.getElementsByTagName('country');
                 var zips = xml.getElementsByTagName('zip');
                 var remarks = xml.getElementsByTagName('remarks');
+                var actives = xml.getElementsByTagName('active');
+                var has_resumes = xml.getElementsByTagName('has_resumes');
                 
                 for (var i=0; i < email_addrs.length; i++) {
                     var id = email_addrs[i].childNodes[0].nodeValue;
                     
                     html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                     html = html + '<td class="date">' + joined_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="candidate"><a href="mailto: ' + id + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + id + '</div></td>' + "\n";
+                    
+                    var status = '';
+                    if (actives[i].childNodes[0].nodeValue != 'Y') {
+                        status = '[&bull;&bull;]&nbsp;';
+                    } else {
+                        if (has_resumes[i].childNodes[0].nodeValue == '0') {
+                            status = '[&bull;]&nbsp;';
+                        }
+                    }
+                    
+                    html = html + '<td class="candidate">' + status + '<a href="mailto: ' + id + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + id + '</div></td>' + "\n";
                     html = html + '<td class="country">' + countries[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="zip">' + zips[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="actions"><a class="no_link" onClick="show_profile(\'' + id + '\');">View Profile &amp; Resumes</a></td>' + "\n";
