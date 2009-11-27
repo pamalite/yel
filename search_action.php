@@ -841,6 +841,7 @@ if ($_POST['action'] == 'quick_upload') {
     $data['candidate_lastname'] = sanitize($_POST['qu_candidate_lastname']);
     $data['candidate_zip'] = sanitize($_POST['qu_candidate_zip']);
     $data['candidate_country'] = sanitize($_POST['qu_candidate_country']);
+    $data['added_on'] = $today;
     
     $i = 0;
     $query = "INSERT INTO users_contributed_resumes SET ";
