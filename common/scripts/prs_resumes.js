@@ -565,7 +565,7 @@ function refer() {
     var params = 'id=' + user_id + '&action=make_referral';
     params = params + '&referee=' + current_member_email_addr;
     params = params + '&job=' + jobs_list.selected_value;
-    params = params + '&testimony=' + testimony;
+    params = params + '&testimony=' + encodeURIComponent(testimony);
     params = params + '&resume=' + $('job_select_form.resume_id').value;
     
     var uri = root + "/prs/resumes_action.php";
