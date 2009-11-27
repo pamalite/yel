@@ -138,7 +138,7 @@ if ($_POST['action'] == 'acknowledge_job') {
     }
     
     $query = "SELECT employers.like_instant_notification, employers.email_addr, 
-              employers.name, jobs.title 
+              employers.name, jobs.title, jobs.contact_carbon_copy 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
@@ -160,6 +160,9 @@ if ($_POST['action'] == 'acknowledge_job') {
         $message = str_replace('%root%', $GLOBALS['root'], $message);
         $subject = "New application for ". desanitize($job). " position";
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+        if (!empty($result[0]['contact_carbon_copy']) && !is_null($result[0]['contact_carbon_copy'])) {
+            $headers .= 'Cc: '. $result[0]['contact_carbon_copy']. "\n";
+        }
         mail($result[0]['email_addr'], $subject, $message, $headers);
 
         // $handle = fopen('/tmp/email_to_'. $result[0]['email_addr']. '.txt', 'w');
