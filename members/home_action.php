@@ -137,7 +137,7 @@ if ($_POST['action'] == 'acknowledge_job') {
         exit();
     }
     
-    /*$query = "SELECT employers.like_instant_notification, employers.email_addr, 
+    $query = "SELECT employers.like_instant_notification, employers.email_addr, 
               employers.name, jobs.title 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job 
@@ -166,7 +166,7 @@ if ($_POST['action'] == 'acknowledge_job') {
         // fwrite($handle, 'Subject: '. $subject. "\n\n");
         // fwrite($handle, $message);
         // fclose($handle);
-    }*/
+    }
     
     if (!Referral::close_similar_referrals_with_id($_POST['id'])) {
         echo 'ko';
