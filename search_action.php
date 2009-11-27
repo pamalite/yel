@@ -588,7 +588,7 @@ if ($_POST['action'] == 'quick_refer') {
     $candidate_email = sanitize($candidate_email);
     
     if (strtoupper($candidate_email) == strtoupper($_POST['id'])) {
-        ?><script type="text/javascript">top.stop_upload('-1');</script><?php
+        ?><script type="text/javascript">top.stop_quick_refer_upload('-1');</script><?php
         exit();
     }
     
@@ -634,7 +634,7 @@ if ($_POST['action'] == 'quick_refer') {
             // The given email is a member, but not in the member's candidates list.
             // - Will need to wait for approval before the referral can be viewed.
             if (!$member->create_referee($candidate_email)) {
-                ?><script type="text/javascript">top.stop_upload('-2');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-2');</script><?php
                 exit();
             }
         } else {
@@ -659,7 +659,7 @@ if ($_POST['action'] == 'quick_refer') {
             $data['filter_jobs'] = 'N';
             
             if (!$new_member->create($data)) {
-                ?><script type="text/javascript">top.stop_upload('-3');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-3');</script><?php
                 exit();
             }
             
@@ -669,7 +669,7 @@ if ($_POST['action'] == 'quick_refer') {
                       member = '". $candidate_email. "', 
                       joined_on = '". $today. "'";
             if (!$mysqli->execute($query)) {
-                ?><script type="text/javascript">top.stop_upload('-4');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-4');</script><?php
                 exit();
             }
             
@@ -680,7 +680,7 @@ if ($_POST['action'] == 'quick_refer') {
             $data['private'] = 'N';
             $resume = new Resume($candidate_email);
             if (!$resume->create($data)) {
-                ?><script type="text/javascript">top.stop_upload('-5');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-5');</script><?php
                 exit();
             }
             
@@ -695,13 +695,13 @@ if ($_POST['action'] == 'quick_refer') {
                 $query = "DELETE FROM resume_index WHERE resume = ". $resume->id(). ";
                           DELETE FROM resumes WHERE id = ". $resume->id();
                 $mysqli->transact($query);
-                ?><script type="text/javascript">top.stop_upload('-6');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-6');</script><?php
                 exit();
             }
             
             // 3. add candidate to contact
             if (!$member->create_referee($candidate_email)) {
-                ?><script type="text/javascript">top.stop_upload('-2');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-2');</script><?php
                 exit();
             }
             
@@ -717,7 +717,7 @@ if ($_POST['action'] == 'quick_refer') {
             $data['resume'] = $resume->id();
 
             if (!Referral::create($data)) {
-                ?><script type="text/javascript">top.stop_upload('-7');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-7');</script><?php
                 exit();
             }
             
@@ -746,7 +746,7 @@ if ($_POST['action'] == 'quick_refer') {
             // fwrite($handle, $message);
             // fclose($handle);
             
-            ?><script type="text/javascript">top.stop_upload('1');</script><?php
+            ?><script type="text/javascript">top.stop_quick_refer_upload('1');</script><?php
             exit();
         }
     }
@@ -759,7 +759,7 @@ if ($_POST['action'] == 'quick_refer') {
     $data['private'] = 'N';
     $resume = new Resume($candidate_email);
     if (!$resume->create($data)) {
-        ?><script type="text/javascript">top.stop_upload('-5');</script><?php
+        ?><script type="text/javascript">top.stop_quick_refer_upload('-5');</script><?php
         exit();
     }
     
@@ -774,7 +774,7 @@ if ($_POST['action'] == 'quick_refer') {
         $query = "DELETE FROM resume_index WHERE resume = ". $resume->id(). ";
                   DELETE FROM resumes WHERE id = ". $resume->id();
         $mysqli->transact($query);
-        ?><script type="text/javascript">top.stop_upload('-6');</script><?php
+        ?><script type="text/javascript">top.stop_quick_refer_upload('-6');</script><?php
         exit();
     }
     
@@ -790,7 +790,7 @@ if ($_POST['action'] == 'quick_refer') {
     $data['resume'] = $resume->id();
     
     if (!Referral::create($data)) {
-        ?><script type="text/javascript">top.stop_upload('-7');</script><?php
+        ?><script type="text/javascript">top.stop_quick_refer_upload('-7');</script><?php
         exit();
     }
     
@@ -818,7 +818,7 @@ if ($_POST['action'] == 'quick_refer') {
     // fwrite($handle, $message);
     // fclose($handle);
     
-    ?><script type="text/javascript">top.stop_upload('0');</script><?php
+    ?><script type="text/javascript">top.stop_quick_refer_upload('0');</script><?php
     exit();
 }
 

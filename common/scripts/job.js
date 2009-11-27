@@ -100,7 +100,7 @@ function validate_quick_refer_form() {
         return false;
     }
     
-    start_upload();
+    start_quick_refer_upload();
     return true;
 }
 
@@ -677,13 +677,13 @@ function refer_me() {
     request.send(params);
 }
 
-function start_quick_upload() {
+function start_quick_refer_upload() {
     $('qr_upload_progress').setStyle('display', 'block');
     $('table_quick_refer_form').setStyle('display', 'none');
     return true;
 }
 
-function stop_quick_upload(_error) {
+function stop_quick_refer_upload(_error) {
     $('qr_upload_progress').setStyle('display', 'none');
     $('table_quick_refer_form').setStyle('display', 'block');
     set_status('');
