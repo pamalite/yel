@@ -132,13 +132,12 @@ class JobPage extends Page {
     private function generateContactsDropdown() {
         if (!is_null($this->member)) {
             $contacts = $this->member->get_referees("referee_name ASC");
-            
             echo '<select class="mini_field" id="qr_candidate_email_from_list" name="qr_candidate_email_from_list">'. "\n";
             echo '<option value="0" selected>Contacts</option>'. "\n";
             echo '<option value="0" disabled>&nbsp;</option>'. "\n";
             
             foreach ($contacts as $contact) {
-                echo '<option value="'. $contacts['referee']. '">'. $contact['referee_name']. '</option>'. "\n";
+                echo '<option value="'. $contact['referee']. '">'. $contact['referee_name']. '</option>'. "\n";
             }
             
             echo '</select>'. "\n";
