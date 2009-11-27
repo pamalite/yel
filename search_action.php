@@ -862,53 +862,54 @@ if ($_POST['action'] == 'quick_upload') {
     
     // 2. upload file
     $resume_file = $_FILES['qu_my_file'];
-    
-    if ($resume_file['size'] > $GLOBALS['resume_size_limit']) {
-        ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
-        exit();
-    }
-    
-    $is_allowed_type = false;
-    foreach ($GLOBALS['allowable_resume_types'] as $mime_type) {
-        if ($resume_file['type'] == $mime_type) {
-            $is_allowed_type = true;
-            break;
+    if (!empty($resume_file['size']) && !is_null($resume_file['size'])) {
+        if ($resume_file['size'] > $GLOBALS['resume_size_limit']) {
+            ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
+            exit();
         }
-    }
-    
-    if (!$is_allowed_type) {
-        ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
-        exit();
-    }
-    
-    $data = array();
-    $data['file_name'] = basename($resume_file['name']);
-    $data['file_hash'] = generate_random_string_of(3). '.'. generate_random_string_of(6);
-    $data['file_type'] = $resume_file['type'];
-    $data['file_size'] = $resume_file['size'];
-    $resume_file['new_name'] = $data['file_hash'];
-    if (move_uploaded_file($resume_file['tmp_name'], $GLOBALS['buffered_resume_dir']. '/'. $resume_file['new_name']) === false) {
-        ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
-        exit();
-    }
-    
-    $i = 0;
-    $query = "UPDATE users_contributed_resumes SET ";
-    foreach ($data as $key => $value) {
-        $query .= "`". $key. "` = '". $value. "'";
-        
-        if ($i < count($data)-1) {
-            $query .= ", ";
+
+        $is_allowed_type = false;
+        foreach ($GLOBALS['allowable_resume_types'] as $mime_type) {
+            if ($resume_file['type'] == $mime_type) {
+                $is_allowed_type = true;
+                break;
+            }
         }
-        
-        $i++;
-    }
-    $query .= " WHERE job_id = ". $_POST['qu_job_id']. " AND 
-               referrer_email_addr = '". sanitize($_POST['qu_referrer_email']). "' AND 
-               candidate_email_addr = '". sanitize($_POST['qu_candidate_email']). "'";
-    if (!$mysqli->execute($query)) {
-        ?><script type="text/javascript">top.stop_quick_upload('-3');</script><?php
-        exit();
+
+        if (!$is_allowed_type) {
+            ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
+            exit();
+        }
+
+        $data = array();
+        $data['file_name'] = basename($resume_file['name']);
+        $data['file_hash'] = generate_random_string_of(3). '.'. generate_random_string_of(6);
+        $data['file_type'] = $resume_file['type'];
+        $data['file_size'] = $resume_file['size'];
+        $resume_file['new_name'] = $data['file_hash'];
+        if (move_uploaded_file($resume_file['tmp_name'], $GLOBALS['buffered_resume_dir']. '/'. $resume_file['new_name']) === false) {
+            ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
+            exit();
+        }
+
+        $i = 0;
+        $query = "UPDATE users_contributed_resumes SET ";
+        foreach ($data as $key => $value) {
+            $query .= "`". $key. "` = '". $value. "'";
+
+            if ($i < count($data)-1) {
+                $query .= ", ";
+            }
+
+            $i++;
+        }
+        $query .= " WHERE job_id = ". $_POST['qu_job_id']. " AND 
+                   referrer_email_addr = '". sanitize($_POST['qu_referrer_email']). "' AND 
+                   candidate_email_addr = '". sanitize($_POST['qu_candidate_email']). "'";
+        if (!$mysqli->execute($query)) {
+            ?><script type="text/javascript">top.stop_quick_upload('-3');</script><?php
+            exit();
+        }
     }
     
     ?><script type="text/javascript">top.stop_quick_upload('0');</script><?php

@@ -105,10 +105,10 @@ function validate_quick_refer_form() {
 }
 
 function validate_quick_upload_form() {
-    if (isEmpty($('qu_my_file').value)) {
-        alert('You need to provide the candidate\'s file resume.');
-        return false;
-    }
+    // if (isEmpty($('qu_my_file').value)) {
+    //     alert('You need to provide the candidate\'s file resume.');
+    //     return false;
+    // }
     
     if (!isEmail($('qu_candidate_email').value)) {
         alert('You need to provide a valid candidate email.');
@@ -131,12 +131,12 @@ function validate_quick_upload_form() {
     }
     
     if (isEmpty($('qu_candidate_zip').value)) {
-        alert('Candidate\'s current residential postcode/zip must be provided.');
+        alert('Candidate\'s current residential postcode/zip must be provided.' + "\nHowever, you can put your own postcode/zip if you do not know the candidate\'s.");
         return false;
     }
     
     if ($('qu_candidate_country').options[$('qu_candidate_country').selectedIndex].value == '0') {
-        alert('Candidate\'s current residential country must be provided.');
+        alert('Candidate\'s current residential country must be provided.' + "\nHowever, you can put your own country if you do not know the candidate\'s.");
         return false;
     }
     
