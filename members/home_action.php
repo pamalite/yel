@@ -137,38 +137,42 @@ if ($_POST['action'] == 'acknowledge_job') {
         exit();
     }
     
-    $query = "SELECT employers.like_instant_notification, employers.email_addr, 
-              employers.name, jobs.title, jobs.contact_carbon_copy 
-              FROM referrals 
-              LEFT JOIN jobs ON jobs.id = referrals.job 
-              LEFT JOIN employers ON employers.id = jobs.employer 
-              WHERE referrals.id = ". $data['id']. " LIMIT 1";
+    $query = "SELECT member_confirmed_on FROM referrals WHERE id = ". $data['id']. " LIMIT 1";
     $result = $mysqli->query($query);
-    if ($result[0]['like_instant_notification'] == '1') {
-        $employer = $result[0]['name'];
-        $job = $result[0]['title'];
-        
-        $lines = file(dirname(__FILE__). '/../private/mail/employer_new_referral.txt');
-        $message = '';
-        foreach($lines as $line) {
-            $message .= $line;
-        }
-        
-        $message = str_replace('%company%', desanitize($employer), $message);
-        $message = str_replace('%job%', desanitize($job), $message);
-        $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
-        $message = str_replace('%root%', $GLOBALS['root'], $message);
-        $subject = "New application for ". desanitize($job). " position";
-        $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-        if (!empty($result[0]['contact_carbon_copy']) && !is_null($result[0]['contact_carbon_copy'])) {
-            $headers .= 'Cc: '. $result[0]['contact_carbon_copy']. "\n";
-        }
-        mail($result[0]['email_addr'], $subject, $message, $headers);
+    if (!is_null($result[0]['member_confirmed_on']) && !empty($result[0]['member_confirmed_on'])) {
+        $query = "SELECT employers.like_instant_notification, employers.email_addr, 
+                  employers.name, jobs.title, jobs.contact_carbon_copy 
+                  FROM referrals 
+                  LEFT JOIN jobs ON jobs.id = referrals.job 
+                  LEFT JOIN employers ON employers.id = jobs.employer 
+                  WHERE referrals.id = ". $data['id']. " LIMIT 1";
+        $result = $mysqli->query($query);
+        if ($result[0]['like_instant_notification'] == '1') {
+            $employer = $result[0]['name'];
+            $job = $result[0]['title'];
 
-        // $handle = fopen('/tmp/email_to_'. $result[0]['email_addr']. '.txt', 'w');
-        // fwrite($handle, 'Subject: '. $subject. "\n\n");
-        // fwrite($handle, $message);
-        // fclose($handle);
+            $lines = file(dirname(__FILE__). '/../private/mail/employer_new_referral.txt');
+            $message = '';
+            foreach($lines as $line) {
+                $message .= $line;
+            }
+
+            $message = str_replace('%company%', desanitize($employer), $message);
+            $message = str_replace('%job%', desanitize($job), $message);
+            $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+            $message = str_replace('%root%', $GLOBALS['root'], $message);
+            $subject = "New application for ". desanitize($job). " position";
+            $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+            if (!empty($result[0]['contact_carbon_copy']) && !is_null($result[0]['contact_carbon_copy'])) {
+                $headers .= 'Cc: '. $result[0]['contact_carbon_copy']. "\n";
+            }
+            mail($result[0]['email_addr'], $subject, $message, $headers);
+
+            // $handle = fopen('/tmp/email_to_'. $result[0]['email_addr']. '.txt', 'w');
+            // fwrite($handle, 'Subject: '. $subject. "\n\n");
+            // fwrite($handle, $message);
+            // fclose($handle);
+        }
     }
     
     if (!Referral::close_similar_referrals_with_id($_POST['id'])) {
