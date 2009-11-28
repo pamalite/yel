@@ -2,6 +2,27 @@
     display: none;
 }
 
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_back, #li_back_1 {
+    border: 1px solid #0000FF;
+}
+
 td.employer {
     width: 50%;
 }

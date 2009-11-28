@@ -34,38 +34,31 @@ if (!isset($_POST['action'])) {
     $use_sort = false;
     $order_by = 'num_referred desc';
     if (isset($_POST['order_by'])) {
-        if (stripos($_POST['order_by'], 'total_jobs') === false) {
-            $order_by = $_POST['order_by'];
-        } else {
-            $use_sort = true;
-        }
+        $order_by = $_POST['order_by'];
     }
     
     $query = "SELECT employers.id, employers.name, 
-              (SELECT COUNT(jobs.id) FROM jobs 
-              WHERE (jobs.expire_on >= CURDATE() AND jobs.closed = 'N') AND 
-              jobs.employer = employers.id 
-              ) AS num_open,
+              COUNT(jobs.id) AS num_open, 
               (SELECT COUNT(referrals.id) 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job
               WHERE (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND
               (referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00 00:00:00') AND
-              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
-              (referrals.member_read_resume_on IS NOT NULL AND referrals.member_read_resume_on <> '0000-00-00 00:00:00') AND  
+              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND
+              -- (referrals.member_read_resume_on IS NOT NULL AND referrals.member_read_resume_on <> '0000-00-00 00:00:00') AND  
               jobs.employer = employers.id
               ) AS num_referred, 
               (SELECT COUNT(referrals.id) 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job
               WHERE (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND
-              (referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00 00:00:00') AND
-              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
-              (referrals.member_read_resume_on IS NOT NULL AND referrals.member_read_resume_on <> '0000-00-00 00:00:00') AND  
+              (referrals.employer_agreed_terms_on IS NOT NULL AND referrals.employer_agreed_terms_on <> '0000-00-00 00:00:00') AND  
               jobs.employer = employers.id
-              ) AS num_kiv 
+              ) AS num_kiv  
               FROM employers 
               LEFT JOIN employees ON employees.id = employers.registered_by 
+              LEFT JOIN jobs ON jobs.employer = employers.id AND 
+              (jobs.expire_on >= CURDATE() AND jobs.closed = 'N') 
               WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " 
               GROUP BY employers.id 
               ORDER BY ". $order_by;
@@ -97,13 +90,17 @@ if ($_POST['action'] == 'get_jobs') {
     $query = "SELECT jobs.id, industries.industry AS industry, jobs.title, jobs.closed, 
               DATE_FORMAT(jobs.created_on, '%e %b, %Y') AS created_on, 
               DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS expire_on, 
-              COUNT(referrals.id) AS num_referred 
+              COUNT(referrals.id) AS num_referred, 
+              COUNT(kivs.id) AS num_kiv 
               FROM jobs 
               LEFT JOIN referrals ON referrals.job = jobs.id AND 
               (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND
               (referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00 00:00:00') AND
-              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
-              (referrals.member_read_resume_on IS NOT NULL AND referrals.member_read_resume_on <> '0000-00-00 00:00:00') 
+              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') 
+              -- AND (referrals.member_read_resume_on IS NOT NULL AND referrals.member_read_resume_on <> '0000-00-00 00:00:00')
+              LEFT JOIN referrals AS kivs ON kivs.job = jobs.id AND 
+              (kivs.employed_on IS NULL OR kivs.employed_on = '0000-00-00 00:00:00') AND
+              (kivs.employer_agreed_terms_on IS NOT NULL AND kivs.employer_agreed_terms_on <> '0000-00-00 00:00:00')
               LEFT JOIN industries ON industries.id = jobs.industry 
               WHERE jobs.employer = '". $_POST['id']. "' AND jobs.closed = 'N' 
               GROUP BY jobs.id 
@@ -128,7 +125,8 @@ if ($_POST['action'] == 'get_referrals') {
         $order_by = $_POST['order_by'];
     }
     
-    $query = "SELECT members.email_addr AS candidate_email_addr, 
+    $query = "SELECT referrals.id, resumes.file_hash, resumes.name AS resume_name, referrals.resume AS resume_id, 
+              members.email_addr AS candidate_email_addr, 
               members.phone_num AS candidate_phone_num, 
               CONCAT(members.lastname, ', ', members.firstname) AS candidate_name, 
               referrers.email_addr AS referrer_email_addr, 
@@ -137,6 +135,7 @@ if ($_POST['action'] == 'get_referrals') {
               DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
               DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_viewed_on 
               FROM referrals 
+              LEFT JOIN resumes ON resumes.id = referrals.resume 
               LEFT JOIN members ON members.email_addr = referrals.referee 
               LEFT JOIN members AS referrers ON referrers.email_addr = referrals.member 
               WHERE referrals.job = ". $_POST['id']. " AND 
@@ -153,6 +152,17 @@ if ($_POST['action'] == 'get_referrals') {
     $xml_dom = new XMLDOM();
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
+if ($_POST['action'] == 'get_job_description') {
+    $query = "SELECT description FROM jobs WHERE id = ". $_POST['id']. " LIMIT 1";
+    $mysqli = Database::connect();
+    $result = $mysqli->query($query);
+    
+    $xml_dom = new XMLDOM();
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('job' => array('description' => $result[0]['description'])));
     exit();
 }
 ?>

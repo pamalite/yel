@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
 
-class EmployeeJobsPage extends Page {
+class EmployeeApplicationsPage extends Page {
     private $employee = NULL;
     private $clearances = array();
     
@@ -56,6 +56,11 @@ class EmployeeJobsPage extends Page {
         </div>
         
         <div id="div_jobs">
+            <div id="div_tabs">
+                <ul>
+                    <li id="li_back">&lt;&lt; Back to Employers</li>
+                </ul>
+            </div>
             <div style="text-align: center;">
                 Jobs listing of <span id="employer_name" style="font-weight: bold;"></span>.
             </div>
@@ -74,6 +79,11 @@ class EmployeeJobsPage extends Page {
         </div>
         
         <div id="div_referrals">
+            <div id="div_tabs">
+                <ul>
+                    <li id="li_back_1">&lt;&lt; Back to Job Ads</li>
+                </ul>
+            </div>
             <div style="text-align: center;">
                 Referrals listing of <span id="job_title" style="font-weight: bold;"></span>.
             </div>

@@ -19,7 +19,7 @@ if (!isset($_SESSION['yel']['employee']) ||
     redirect_to('login.php');
 }
 
-$home = new EmployeeJobsPage($_SESSION['yel']['employee']);
+$home = new EmployeeApplicationsPage($_SESSION['yel']['employee']);
 $home->header(array('root_dir' => '../', 
                     'title' => 'Applications'));
 $home->insert_employee_applications_css();
