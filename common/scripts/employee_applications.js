@@ -6,7 +6,6 @@ var referrals_order_by = 'referrals.referred_on';
 var referrals_order = 'desc';
 
 var selected_employer_id = '';
-var selected_employer_currency = 'MYR';
 var selected_job_id = '';
 var selected_job_title = '';
 
@@ -48,7 +47,6 @@ function show_employers() {
     $('div_employers').setStyle('display', 'block');
     
     selected_employer_id = '';
-    selected_employer_currency = '';
     
     var params = 'id=0';
     params = params + '&order_by=' + employers_order_by + ' ' + employers_order;
@@ -80,8 +78,8 @@ function show_employers() {
                     
                     html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="count"><a class="no_link" onClick="show_jobs(\'' + id + '\');">' + open_jobs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="count"><a class="no_link" onClick="show_referrals(\'' + id + '\', false);">' + num_referreds[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="count"><a class="no_link" onClick="show_referrals(\'' + id + '\', true);">' + num_kivs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="count">' + num_referreds[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="count">' + num_kivs[i].childNodes[0].nodeValue + '</td>' + "\n";
                 }
                 html = html + '</table>';
             }
@@ -97,54 +95,40 @@ function show_employers() {
     request.send(params);
 }
 
-function get_employer_currency() {
-    var params = 'id=' + selected_employer_id + '&action=get_currency';
+function show_jobs_with_selected_employer() {
+    show_jobs(selected_employer_id);
+}
+
+function set_employer_name() {
+    var params = 'id=' + selected_employer_id + '&action=get_employer_name';
     
-    var uri = root + "/employees/jobs_action.php";
+    var uri = root + "/employees/applications_action.php";
+    
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            selected_employer_currency = txt;
-            
-            $('currency').value = selected_employer_currency;
-            $('employer.currency').set('html', selected_employer_currency);
-            $('employer.currency_1').set('html', selected_employer_currency);
+            var name = xml.getElementsByTagName('name');
+            $('employer_name').set('html', name[0].childNodes[0].nodeValue);
         }
     });
     
     request.send(params);
 }
 
-function show_jobs_with_selected_employer() {
-    show_jobs(selected_employer_id);
-}
-
 function show_jobs(_employer_id) {
     selected_employer_id = _employer_id;
     
-    if (isEmpty(selected_employer_currency)) {
-        get_employer_currency();
-    }
-    
     $('div_jobs').setStyle('display', 'block');
+    $('div_referrals').setStyle('display', 'none');
     $('div_employers').setStyle('display', 'none');
     
-    selected_tab = 'li_open';
-    $(selected_tab).setStyle('border', '1px solid #CCCCCC');
-    $('li_closed').setStyle('border', '1px solid #0000FF');
-    $('div_open').setStyle('display', 'block');
-    $('div_closed').setStyle('display', 'none');
-    $('div_job_info').setStyle('display', 'none');
-    $('div_job_form').setStyle('display', 'none');
-    $('open_back_arrow').setStyle('display', 'none');
-    $('closed_back_arrow').setStyle('display', 'none');
+    set_employer_name();
     
     var params = 'id=' + selected_employer_id + '&action=get_jobs';
     params = params + '&order_by=' + order_by + ' ' + order;
-    params = params + '&closed=N';
     
-    var uri = root + "/employees/jobs_action.php";
+    var uri = root + "/employees/applications_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
@@ -159,57 +143,31 @@ function show_jobs(_employer_id) {
             var titles = xml.getElementsByTagName('title');
             var created_ons = xml.getElementsByTagName('created_on');
             var expire_ons = xml.getElementsByTagName('expire_on');
-            var expired_days = xml.getElementsByTagName('expired_days');
-            var closeds = xml.getElementsByTagName('closed');
+            var num_referreds = xml.getElementsByTagName('num_referred');
+            var num_kivs = xml.getElementsByTagName('num_kiv');
             
             var html = '<table id="list" class="list">';
             if (ids.length <= 0) {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">Please click on the \"Add New Job Ad\" button to get started.</div>';
-                
-                $('close_jobs').disabled = true;
-                $('close_jobs_1').disabled = true;
+                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">No jobs added at the moment.</div>';
             } else {
-                var odd = true;
                 for (i=0; i < ids.length; i++) {
                     var job_id = ids[i];
                     
                     html = html + '<tr id="'+ job_id.childNodes[0].nodeValue + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                     
-                    html = html + '<td class="checkbox"><input type="checkbox" id="'+ job_id.childNodes[0].nodeValue + '" /></td>' + "\n";
-                    //html = html + '<td class="id">' + job_id.childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="industry">' + industries[i].childNodes[0].nodeValue + '</td>' + "\n";
                     
-                    html = html + '<td class="title"><a href="#" onClick="show_job(\'' + job_id.childNodes[0].nodeValue + '\')">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="title"><a href="../job/' + job_id.childNodes[0].nodeValue + '" target="_new">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="date">' + created_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    
-                    if (parseInt(expired_days[i].childNodes[0].nodeValue) > 0) {
-                        html = html + '<td class="date"><span style="font-weight: bold; color: #FF0000;">' + expire_ons[i].childNodes[0].nodeValue + '</span></td>' + "\n";
-                    } else {
-                        html = html + '<td class="date">' + expire_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    }
-                    
-                    var closed = closeds[i].childNodes[0].nodeValue;
-                    if (closed == 'N') {
-                        html = html + '<td class="new_from"><input type="button" class="mini_button" value="New From This Job" onClick="new_from_job(\'' + job_id.childNodes[0].nodeValue + '\')" /></td>' + "\n";
-                    } else {
-                        html = html + '<td class="new_from"><input type="button" class="mini_button" value="Update" onClick="show_update_job(\'' + job_id.childNodes[0].nodeValue + '\')" /></td>' + "\n";
-                    }
-                    // html = html + '<td class="new_from"><input type="button" class="mini_button" value="New From This Job" onClick="new_from_job(\'' + job_id.childNodes[0].nodeValue + '\')" /></td>' + "\n";
+                    html = html + '<td class="date">' + expire_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="count"><a class="no_link" onClick="show_referrals(\'' + job_id.childNodes[0].nodeValue + '\', false);">' + num_referreds[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="count"><a class="no_link" onClick="show_referrals(\'' + job_id.childNodes[0].nodeValue + '\', true);">' + num_kivs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
-
-                    if (odd) {
-                        odd = false;
-                    } else {
-                        odd = true;
-                    }
                 }
                 html = html + '</table>';
-                
-                $('close_jobs').disabled = false;
-                $('close_jobs_1').disabled = false;
             }
             
-            $('div_list').set('html', html);
+            $('div_jobs_list').set('html', html);
             set_status('');
         },
         onRequest: function(instance) {
@@ -372,7 +330,7 @@ function onDomReady() {
     $('sort_industry').addEvent('click', function() {
         order_by = 'industries.industry';
         ascending_or_descending();
-        show_jobswith_selected_employer();
+        show_jobs_with_selected_employer();
     });
     
     $('sort_title').addEvent('click', function() {
@@ -390,7 +348,7 @@ function onDomReady() {
     $('sort_expire_on').addEvent('click', function() {
         order_by = 'jobs.expire_on';
         ascending_or_descending();
-        show_open_jobs_with_selected_employer();
+        show_jobs_with_selected_employer();
     });
     
     $('sort_jobs_referred').addEvent('click', function() {
@@ -402,7 +360,7 @@ function onDomReady() {
     $('sort_jobs_viewed').addEvent('click', function() {
         order_by = 'num_kiv';
         ascending_or_descending();
-        show_open_jobs_with_selected_employer();
+        show_jobs_with_selected_employer();
     });
     // --- end jobs ---
     

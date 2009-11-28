@@ -87,7 +87,7 @@ if ($_POST['action'] == 'get_jobs') {
         $order_by = $_POST['order_by'];
     }
     
-    $query = "SELECT jobs.id, industries.industry AS industry, jobs.title, jobs.closed, 
+    $query = "SELECT jobs.id, industries.industry AS industry, jobs.title, 
               DATE_FORMAT(jobs.created_on, '%e %b, %Y') AS created_on, 
               DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS expire_on, 
               COUNT(referrals.id) AS num_referred, 
@@ -140,7 +140,8 @@ if ($_POST['action'] == 'get_referrals') {
               LEFT JOIN members AS referrers ON referrers.email_addr = referrals.member 
               WHERE referrals.job = ". $_POST['id']. " AND 
               (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00')
+              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') 
+              -- AND (referrals.member_read_resume_on IS NOT NULL AND referrals.member_read_resume_on <> '0000-00-00 00:00:00') 
               ORDER BY ". $order_by;
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
@@ -153,6 +154,18 @@ if ($_POST['action'] == 'get_referrals') {
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
     exit();
+}
+
+if ($_POST['action'] == 'get_employer_name') {
+    $query = "SELECT name FROM employers WHERE id = '". $_POST['id']. "' LIMIT 1";
+    $mysqli = Database::connect();
+    $result = $mysqli->query($query);
+    
+    $xml_dom = new XMLDOM();
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('employer' => array('name' => $result[0]['name'])));
+    exit();
+    
 }
 
 if ($_POST['action'] == 'get_job_description') {

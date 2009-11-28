@@ -61,7 +61,7 @@ class EmployeeApplicationsPage extends Page {
                     <li id="li_back">&lt;&lt; Back to Employers</li>
                 </ul>
             </div>
-            <div style="text-align: center;">
+            <div style="text-align: center; padding-top: 15px; padding-bottom: 15px;">
                 Jobs listing of <span id="employer_name" style="font-weight: bold;"></span>.
             </div>
             <table class="header">
@@ -84,7 +84,7 @@ class EmployeeApplicationsPage extends Page {
                     <li id="li_back_1">&lt;&lt; Back to Job Ads</li>
                 </ul>
             </div>
-            <div style="text-align: center;">
+            <div style="text-align: center; padding-top: 15px; padding-bottom: 15px;">
                 Referrals listing of <span id="job_title" style="font-weight: bold;"></span>.
             </div>
             <table class="header">
