@@ -192,7 +192,7 @@ function set_job_title() {
         method: 'post',
         onSuccess: function(txt, xml) {
             var title = xml.getElementsByTagName('title');
-            $('job_title').set('html', title[0].childNodes[0].nodeValue);
+            $('job_title').set('html', '<a href="../job/' + selected_job_id + '" target="_new">' + title[0].childNodes[0].nodeValue + '</a>');
         }
     });
     
@@ -215,7 +215,7 @@ function show_referrals(_job_id, _show_kiv_first) {
     var params = 'id=' + selected_job_id + '&action=get_referrals';
     
     if (_show_kiv_first) {
-        referrals_order_by = 'num_kiv';
+        referrals_order_by = 'referrals.employer_agreed_terms_on';
         referrals_order = 'desc';
         params = params + '&order_by=' + referrals_order_by + ' ' + referrals_order;
     } else {
