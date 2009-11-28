@@ -39,8 +39,7 @@ if (!isset($_POST['action'])) {
     
     $query = "SELECT employers.id, employers.name, 
               (SELECT COUNT(id) FROM jobs 
-              WHERE employer = employers.id AND 
-              expire_on >= CURDATE() AND closed = 'N'
+              WHERE employer = employers.id AND closed = 'N'
               ) AS num_open, 
               (SELECT COUNT(referrals.id) 
               FROM referrals 
