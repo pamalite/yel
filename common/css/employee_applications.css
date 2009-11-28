@@ -23,6 +23,13 @@
     border: 1px solid #0000FF;
 }
 
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
 td.employer {
     width: 50%;
 }
