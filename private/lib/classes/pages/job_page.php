@@ -132,13 +132,12 @@ class JobPage extends Page {
     private function generateContactsDropdown() {
         if (!is_null($this->member)) {
             $contacts = $this->member->get_referees("referee_name ASC");
-            
-            echo '<select class="mini_field" id="qr_candidate_email_from_list" name="qr_candidate_email_from_list">'. "\n";
+            echo '<select class="mini_field" id="qr_candidate_email_from_list" name="qr_candidate_email_from_list" onChange="toggle_new_contact_form();">'. "\n";
             echo '<option value="0" selected>Contacts</option>'. "\n";
             echo '<option value="0" disabled>&nbsp;</option>'. "\n";
             
             foreach ($contacts as $contact) {
-                echo '<option value="'. $contacts['referee']. '">'. $contact['referee_name']. '</option>'. "\n";
+                echo '<option value="'. $contact['referee']. '">'. $contact['referee_name']. '</option>'. "\n";
             }
             
             echo '</select>'. "\n";
@@ -521,19 +520,10 @@ class JobPage extends Page {
                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
                 </p>
                 <table id="table_quick_upload_form" class="quick_upload_form">
-                    <tr>
-                        <td colspan="3">
-                            <p style="text-align: center;">
-                                You are about to quickly refer the job position,&nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp;to someone you know. Please attached the candidate's resume:
-                                <br/><br/>
-                                <input class="field" id="qu_my_file" name="qu_my_file" type="file" />
-                                <br/><br/>
-                                <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">&nbsp;</td>
+                    <tr colspan="3">
+                        <div style="text-align: center; margin: auto; width: 95%;">
+                            You are about to quickly drop us your contact for the job position,&nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp;. Please tell us more about him/her by filling up <span style="text-decoration: underline;">all</span> the following fields:
+                        </div>
                     </tr>
                     <tr>
                         <td class="left">
@@ -618,6 +608,20 @@ class JobPage extends Page {
                                     </td>
                                 </tr>
                             </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <p style="text-align: center;">
+                                You can also upload your contact's resume, if you have it with you, for our perusal. If not, you can skip the following part and click the 'Refer' button:
+                                <br/><br/>
+                                <input class="field" id="qu_my_file" name="qu_my_file" type="file" />
+                                <br/><br/>
+                                <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
+                            </p>
                         </td>
                     </tr>
                 </table>

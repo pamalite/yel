@@ -40,9 +40,10 @@ if (!isset($_POST['action'])) {
     }
     
     $query = "SELECT DISTINCT members.email_addr AS email_addr, members.phone_num AS phone_num, members.remarks, 
-              members.zip, countries.country, 
+              members.zip, countries.country, members.active, 
               CONCAT(members.firstname, ', ', members.lastname) AS member_name, 
-              DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on 
+              DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
+              (SELECT COUNT(id) FROM resumes WHERE member = members.email_addr) AS has_resumes 
               FROM members
               LEFT JOIN industries AS primary_industries ON primary_industries.id = members.primary_industry 
               LEFT JOIN industries AS secondary_industries ON secondary_industries.id = members.secondary_industry 

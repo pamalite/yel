@@ -246,7 +246,7 @@ function show_resumes() {
             }
             
             if (txt == '0') {
-                set_status('No job resume with the criteria.');
+                set_status('No resume with the criteria.');
                 $('div_list').set('html', '');
                 $('current_page').set('html', '0');
                 $('total_page').set('html', '0');
@@ -273,6 +273,7 @@ function show_resumes() {
             var total_results = xml.getElementsByTagName('total_results');
             var current_pages = xml.getElementsByTagName('current_page');
             var changed_country_code = xml.getElementsByTagName('changed_country_code');
+            var actives = xml.getElementsByTagName('active');
             
             var total = total_results[0].childNodes[0].nodeValue;
             total_pages = Math.ceil(total / limit);
@@ -298,11 +299,16 @@ function show_resumes() {
                 html = html + '<td class="match_percentage"><img src="' + root + '/common/images/match_bar.jpg" style="height: 4px; width: ' + Math.floor(matches[i].childNodes[0].nodeValue / 100 * 50) + 'px; vertical-align: middle;" /></td>' + "\n";
                 html = html + '<td class="date">' + joined_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                 
+                var active = '';
+                if (actives[i].childNodes[0].nodeValue == 'N') {
+                    active = '[&bull;]&nbsp;';
+                }
+                
                 var link = 'resumes_privileged.php?candidate=' + email_addrs[i].childNodes[0].nodeValue;
                 if (added_bys[i].childNodes[0].nodeValue == '-1') {
                     link = 'resumes.php?candidate=' + email_addrs[i].childNodes[0].nodeValue;
                 }
-                html = html + '<td class="member"><a href="' + link + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + email_addrs[i].childNodes[0].nodeValue + '</div></td>' + "\n";
+                html = html + '<td class="member">' + active + '<a href="' + link + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + email_addrs[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                 html = html + '<td class="industry">' + primary_industries[i].childNodes[0].nodeValue + '</td>' + "\n";
                 html = html + '<td class="industry">' + secondary_industries[i].childNodes[0].nodeValue + '</td>' + "\n";
                 

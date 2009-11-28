@@ -203,88 +203,95 @@ if ($_POST['action'] == 'add_to_privileged') {
     }
     
     // create resume 
-    $resume = new Resume($_POST['candidate_email']);
-    $data = array();
-    $data['modified_on'] = $buffer['added_on'];
-    $data['name'] = $buffer['file_name'];
-    $data['private'] = 'N';
-    if (!$resume->create($data)) {
-        echo '-9';
-        exit();
-    }
-    
-    $file_hash = generate_random_string_of(6);
-    $new_name = $resume->id(). '.'. $file_hash;
-    if (rename($GLOBALS['buffered_resume_dir']. '/'. $buffer['file_hash'], $GLOBALS['resume_dir']. '/'. $new_name)) {
-        $query = "UPDATE resumes SET 
-                  file_name = '". $buffer['file_name']."', 
-                  file_hash = '". $file_hash."', 
-                  file_size = '". $buffer['file_size']."',
-                  file_type = '". $buffer['file_type']."' 
-                  WHERE id = ". $resume->id();
-        if (!$mysqli->execute($query)) {
-            echo '-10';
+    $has_error = false;
+    if (!empty($buffer['file_name']) && !is_null($buffer['file_name'])) {
+        $resume = new Resume($_POST['candidate_email']);
+        $data = array();
+        $data['modified_on'] = $buffer['added_on'];
+        $data['name'] = $buffer['file_name'];
+        $data['private'] = 'N';
+        if (!$resume->create($data)) {
+            echo '-9';
             exit();
         }
-        
-        $resume_text = '';
-        switch ($buffer['file_type']) {
-            case 'text/plain':
-                $tmp = file_get_contents($GLOBALS['resume_dir']. "/". $new_name);
-                $resume_text = sanitize($tmp);
-                break;
-            case 'text/html':
-                $tmp = file_get_contents($GLOBALS['resume_dir']. "/". $new_name);
-                $resume_text = sanitize(strip_tags($tmp));
-                break;
-            case 'application/pdf':
-                $cmd = "/usr/local/bin/pdftotext ". $GLOBALS['resume_dir']. "/". $new_name. " /tmp/". $new_name;
-                shell_exec($cmd);
-                $tmp = file_get_contents('/tmp/'. $new_name);
-                $resume_text = sanitize($tmp);
-                
-                if (!empty($tmp)) {
-                    unlink('/tmp/'. $new_name);
-                }
-                break;
-            case 'application/msword':
-                $tmp = $resume->get_text_from_msword($GLOBALS['resume_dir']. "/". $new_name);
-                $resume_text = sanitize($tmp);
-                break;
-            case 'application/rtf':
-                $tmp = $resume->get_text_from_rtf($GLOBALS['resume_dir']. "/". $new_name);
-                $resume_text = sanitize($tmp);
-                break;
-        }
-        
-        if (!empty($resume_text)) {
-            $keywords = preg_split("/[\s,]+/", $resume_text);
+
+        $file_hash = generate_random_string_of(6);
+        $new_name = $resume->id(). '.'. $file_hash;
+        if (rename($GLOBALS['buffered_resume_dir']. '/'. $buffer['file_hash'], $GLOBALS['resume_dir']. '/'. $new_name)) {
+            $query = "UPDATE resumes SET 
+                      file_name = '". $buffer['file_name']."', 
+                      file_hash = '". $file_hash."', 
+                      file_size = '". $buffer['file_size']."',
+                      file_type = '". $buffer['file_type']."' 
+                      WHERE id = ". $resume->id();
+            if (!$mysqli->execute($query)) {
+                echo '-10';
+                exit();
+            }
+
             $resume_text = '';
-            foreach ($keywords as $i=>$keyword) {
-                $resume_text .= $keyword;
-                
-                if ($i < count($keywords)-1) {
-                    $resume_text .= ' ';
+            switch ($buffer['file_type']) {
+                case 'text/plain':
+                    $tmp = file_get_contents($GLOBALS['resume_dir']. "/". $new_name);
+                    $resume_text = sanitize($tmp);
+                    break;
+                case 'text/html':
+                    $tmp = file_get_contents($GLOBALS['resume_dir']. "/". $new_name);
+                    $resume_text = sanitize(strip_tags($tmp));
+                    break;
+                case 'application/pdf':
+                    $cmd = "/usr/local/bin/pdftotext ". $GLOBALS['resume_dir']. "/". $new_name. " /tmp/". $new_name;
+                    shell_exec($cmd);
+                    $tmp = file_get_contents('/tmp/'. $new_name);
+                    $resume_text = sanitize($tmp);
+
+                    if (!empty($tmp)) {
+                        unlink('/tmp/'. $new_name);
+                    }
+                    break;
+                case 'application/msword':
+                    $tmp = $resume->get_text_from_msword($GLOBALS['resume_dir']. "/". $new_name);
+                    $resume_text = sanitize($tmp);
+                    break;
+                case 'application/rtf':
+                    $tmp = $resume->get_text_from_rtf($GLOBALS['resume_dir']. "/". $new_name);
+                    $resume_text = sanitize($tmp);
+                    break;
+            }
+
+            if (!empty($resume_text)) {
+                $keywords = preg_split("/[\s,]+/", $resume_text);
+                $resume_text = '';
+                foreach ($keywords as $i=>$keyword) {
+                    $resume_text .= $keyword;
+
+                    if ($i < count($keywords)-1) {
+                        $resume_text .= ' ';
+                    }
+                }
+
+                $query = "SELECT COUNT(*) AS is_exists FROM resume_index 
+                          WHERE resume = ". $resume->id(). " AND member = '". $_POST['candidate_email']. "'";
+                $result = $mysqli->query($query);
+                if ($result[0]['is_exists'] == '0') {
+                    $query = "INSERT INTO resume_index SET 
+                              resume = ". $resume->id(). ", 
+                              member = '". $_POST['candidate_email']. "', 
+                              file_text = '". $resume_text. "'";
+                } else {
+                    $query = "UPDATE resume_index SET file_text = '". $resume_text. "' 
+                              WHERE resume = ". $resume->id(). " AND 
+                              member = '". $_POST['candidate_email']. "'";
+                }
+
+                if (!$mysqli->execute($query)) {
+                    $has_error = true;
                 }
             }
-            
-            $query = "SELECT COUNT(*) AS is_exists FROM resume_index 
-                      WHERE resume = ". $resume->id(). " AND member = '". $_POST['candidate_email']. "'";
-            $result = $mysqli->query($query);
-            if ($result[0]['is_exists'] == '0') {
-                $query = "INSERT INTO resume_index SET 
-                          resume = ". $resume->id(). ", 
-                          member = '". $_POST['candidate_email']. "', 
-                          file_text = '". $resume_text. "'";
-            } else {
-                $query = "UPDATE resume_index SET file_text = '". $resume_text. "' 
-                          WHERE resume = ". $resume->id(). " AND 
-                          member = '". $_POST['candidate_email']. "'";
-            }
-            
-            $mysqli->execute($query);
         }
-        
+    }
+    
+    if (!$has_error) {
         $query = "DELETE FROM users_contributed_resumes WHERE 
                   job_id = ". $_POST['job_id']. " AND 
                   candidate_email_addr = '". $_POST['candidate_email']. "' AND 

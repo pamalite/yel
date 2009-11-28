@@ -100,15 +100,15 @@ function validate_quick_refer_form() {
         return false;
     }
     
-    start_upload();
+    start_quick_refer_upload();
     return true;
 }
 
 function validate_quick_upload_form() {
-    if (isEmpty($('qu_my_file').value)) {
-        alert('You need to provide the candidate\'s file resume.');
-        return false;
-    }
+    // if (isEmpty($('qu_my_file').value)) {
+    //     alert('You need to provide the candidate\'s file resume.');
+    //     return false;
+    // }
     
     if (!isEmail($('qu_candidate_email').value)) {
         alert('You need to provide a valid candidate email.');
@@ -131,12 +131,12 @@ function validate_quick_upload_form() {
     }
     
     if (isEmpty($('qu_candidate_zip').value)) {
-        alert('Candidate\'s current residential postcode/zip must be provided.');
+        alert('Candidate\'s current residential postcode/zip must be provided.' + "\nHowever, you can put your own postcode/zip if you do not know the candidate\'s.");
         return false;
     }
     
     if ($('qu_candidate_country').options[$('qu_candidate_country').selectedIndex].value == '0') {
-        alert('Candidate\'s current residential country must be provided.');
+        alert('Candidate\'s current residential country must be provided.' + "\nHowever, you can put your own country if you do not know the candidate\'s.");
         return false;
     }
     
@@ -186,6 +186,24 @@ function validate_quick_upload_form() {
     
     start_quick_upload();
     return true;
+}
+
+function toggle_new_contact_form() {
+    if ($('qr_candidate_email_from_list').options[$('qr_candidate_email_from_list').selectedIndex].value == '0') {
+        $('qr_candidate_email').disabled = false;
+        $('qr_candidate_phone').disabled = false;
+        $('qr_candidate_firstname').disabled = false;
+        $('qr_candidate_lastname').disabled = false;
+        $('qr_candidate_zip').disabled = false;
+        $('qr_candidate_country').disabled = false;
+    } else {
+        $('qr_candidate_email').disabled = true;
+        $('qr_candidate_phone').disabled = true;
+        $('qr_candidate_firstname').disabled = true;
+        $('qr_candidate_lastname').disabled = true;
+        $('qr_candidate_zip').disabled = true;
+        $('qr_candidate_country').disabled = true;
+    }
 }
 
 function show_candidates() {
@@ -677,13 +695,13 @@ function refer_me() {
     request.send(params);
 }
 
-function start_quick_upload() {
+function start_quick_refer_upload() {
     $('qr_upload_progress').setStyle('display', 'block');
     $('table_quick_refer_form').setStyle('display', 'none');
     return true;
 }
 
-function stop_quick_upload(_error) {
+function stop_quick_refer_upload(_error) {
     $('qr_upload_progress').setStyle('display', 'none');
     $('table_quick_refer_form').setStyle('display', 'block');
     set_status('');

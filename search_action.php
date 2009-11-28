@@ -588,7 +588,7 @@ if ($_POST['action'] == 'quick_refer') {
     $candidate_email = sanitize($candidate_email);
     
     if (strtoupper($candidate_email) == strtoupper($_POST['id'])) {
-        ?><script type="text/javascript">top.stop_upload('-1');</script><?php
+        ?><script type="text/javascript">top.stop_quick_refer_upload('-1');</script><?php
         exit();
     }
     
@@ -634,7 +634,7 @@ if ($_POST['action'] == 'quick_refer') {
             // The given email is a member, but not in the member's candidates list.
             // - Will need to wait for approval before the referral can be viewed.
             if (!$member->create_referee($candidate_email)) {
-                ?><script type="text/javascript">top.stop_upload('-2');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-2');</script><?php
                 exit();
             }
         } else {
@@ -659,7 +659,7 @@ if ($_POST['action'] == 'quick_refer') {
             $data['filter_jobs'] = 'N';
             
             if (!$new_member->create($data)) {
-                ?><script type="text/javascript">top.stop_upload('-3');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-3');</script><?php
                 exit();
             }
             
@@ -669,7 +669,7 @@ if ($_POST['action'] == 'quick_refer') {
                       member = '". $candidate_email. "', 
                       joined_on = '". $today. "'";
             if (!$mysqli->execute($query)) {
-                ?><script type="text/javascript">top.stop_upload('-4');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-4');</script><?php
                 exit();
             }
             
@@ -680,7 +680,7 @@ if ($_POST['action'] == 'quick_refer') {
             $data['private'] = 'N';
             $resume = new Resume($candidate_email);
             if (!$resume->create($data)) {
-                ?><script type="text/javascript">top.stop_upload('-5');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-5');</script><?php
                 exit();
             }
             
@@ -695,13 +695,13 @@ if ($_POST['action'] == 'quick_refer') {
                 $query = "DELETE FROM resume_index WHERE resume = ". $resume->id(). ";
                           DELETE FROM resumes WHERE id = ". $resume->id();
                 $mysqli->transact($query);
-                ?><script type="text/javascript">top.stop_upload('-6');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-6');</script><?php
                 exit();
             }
             
             // 3. add candidate to contact
             if (!$member->create_referee($candidate_email)) {
-                ?><script type="text/javascript">top.stop_upload('-2');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-2');</script><?php
                 exit();
             }
             
@@ -717,7 +717,7 @@ if ($_POST['action'] == 'quick_refer') {
             $data['resume'] = $resume->id();
 
             if (!Referral::create($data)) {
-                ?><script type="text/javascript">top.stop_upload('-7');</script><?php
+                ?><script type="text/javascript">top.stop_quick_refer_upload('-7');</script><?php
                 exit();
             }
             
@@ -746,7 +746,7 @@ if ($_POST['action'] == 'quick_refer') {
             // fwrite($handle, $message);
             // fclose($handle);
             
-            ?><script type="text/javascript">top.stop_upload('1');</script><?php
+            ?><script type="text/javascript">top.stop_quick_refer_upload('1');</script><?php
             exit();
         }
     }
@@ -759,7 +759,7 @@ if ($_POST['action'] == 'quick_refer') {
     $data['private'] = 'N';
     $resume = new Resume($candidate_email);
     if (!$resume->create($data)) {
-        ?><script type="text/javascript">top.stop_upload('-5');</script><?php
+        ?><script type="text/javascript">top.stop_quick_refer_upload('-5');</script><?php
         exit();
     }
     
@@ -774,7 +774,7 @@ if ($_POST['action'] == 'quick_refer') {
         $query = "DELETE FROM resume_index WHERE resume = ". $resume->id(). ";
                   DELETE FROM resumes WHERE id = ". $resume->id();
         $mysqli->transact($query);
-        ?><script type="text/javascript">top.stop_upload('-6');</script><?php
+        ?><script type="text/javascript">top.stop_quick_refer_upload('-6');</script><?php
         exit();
     }
     
@@ -790,7 +790,7 @@ if ($_POST['action'] == 'quick_refer') {
     $data['resume'] = $resume->id();
     
     if (!Referral::create($data)) {
-        ?><script type="text/javascript">top.stop_upload('-7');</script><?php
+        ?><script type="text/javascript">top.stop_quick_refer_upload('-7');</script><?php
         exit();
     }
     
@@ -818,7 +818,7 @@ if ($_POST['action'] == 'quick_refer') {
     // fwrite($handle, $message);
     // fclose($handle);
     
-    ?><script type="text/javascript">top.stop_upload('0');</script><?php
+    ?><script type="text/javascript">top.stop_quick_refer_upload('0');</script><?php
     exit();
 }
 
@@ -841,6 +841,7 @@ if ($_POST['action'] == 'quick_upload') {
     $data['candidate_lastname'] = sanitize($_POST['qu_candidate_lastname']);
     $data['candidate_zip'] = sanitize($_POST['qu_candidate_zip']);
     $data['candidate_country'] = sanitize($_POST['qu_candidate_country']);
+    $data['added_on'] = $today;
     
     $i = 0;
     $query = "INSERT INTO users_contributed_resumes SET ";
@@ -861,53 +862,54 @@ if ($_POST['action'] == 'quick_upload') {
     
     // 2. upload file
     $resume_file = $_FILES['qu_my_file'];
-    
-    if ($resume_file['size'] > $GLOBALS['resume_size_limit']) {
-        ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
-        exit();
-    }
-    
-    $is_allowed_type = false;
-    foreach ($GLOBALS['allowable_resume_types'] as $mime_type) {
-        if ($resume_file['type'] == $mime_type) {
-            $is_allowed_type = true;
-            break;
+    if (!empty($resume_file['size']) && !is_null($resume_file['size'])) {
+        if ($resume_file['size'] > $GLOBALS['resume_size_limit']) {
+            ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
+            exit();
         }
-    }
-    
-    if (!$is_allowed_type) {
-        ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
-        exit();
-    }
-    
-    $data = array();
-    $data['file_name'] = basename($resume_file['name']);
-    $data['file_hash'] = generate_random_string_of(3). '.'. generate_random_string_of(6);
-    $data['file_type'] = $resume_file['type'];
-    $data['file_size'] = $resume_file['size'];
-    $resume_file['new_name'] = $data['file_hash'];
-    if (move_uploaded_file($resume_file['tmp_name'], $GLOBALS['buffered_resume_dir']. '/'. $resume_file['new_name']) === false) {
-        ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
-        exit();
-    }
-    
-    $i = 0;
-    $query = "UPDATE users_contributed_resumes SET ";
-    foreach ($data as $key => $value) {
-        $query .= "`". $key. "` = '". $value. "'";
-        
-        if ($i < count($data)-1) {
-            $query .= ", ";
+
+        $is_allowed_type = false;
+        foreach ($GLOBALS['allowable_resume_types'] as $mime_type) {
+            if ($resume_file['type'] == $mime_type) {
+                $is_allowed_type = true;
+                break;
+            }
         }
-        
-        $i++;
-    }
-    $query .= " WHERE job_id = ". $_POST['qu_job_id']. " AND 
-               referrer_email_addr = '". sanitize($_POST['qu_referrer_email']). "' AND 
-               candidate_email_addr = '". sanitize($_POST['qu_candidate_email']). "'";
-    if (!$mysqli->execute($query)) {
-        ?><script type="text/javascript">top.stop_quick_upload('-3');</script><?php
-        exit();
+
+        if (!$is_allowed_type) {
+            ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
+            exit();
+        }
+
+        $data = array();
+        $data['file_name'] = basename($resume_file['name']);
+        $data['file_hash'] = generate_random_string_of(3). '.'. generate_random_string_of(6);
+        $data['file_type'] = $resume_file['type'];
+        $data['file_size'] = $resume_file['size'];
+        $resume_file['new_name'] = $data['file_hash'];
+        if (move_uploaded_file($resume_file['tmp_name'], $GLOBALS['buffered_resume_dir']. '/'. $resume_file['new_name']) === false) {
+            ?><script type="text/javascript">top.stop_quick_upload('-1');</script><?php
+            exit();
+        }
+
+        $i = 0;
+        $query = "UPDATE users_contributed_resumes SET ";
+        foreach ($data as $key => $value) {
+            $query .= "`". $key. "` = '". $value. "'";
+
+            if ($i < count($data)-1) {
+                $query .= ", ";
+            }
+
+            $i++;
+        }
+        $query .= " WHERE job_id = ". $_POST['qu_job_id']. " AND 
+                   referrer_email_addr = '". sanitize($_POST['qu_referrer_email']). "' AND 
+                   candidate_email_addr = '". sanitize($_POST['qu_candidate_email']). "'";
+        if (!$mysqli->execute($query)) {
+            ?><script type="text/javascript">top.stop_quick_upload('-3');</script><?php
+            exit();
+        }
     }
     
     ?><script type="text/javascript">top.stop_quick_upload('0');</script><?php
