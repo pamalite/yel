@@ -81,7 +81,7 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'get_jobs') {
-    $order_by = 'jobs.created_on desc';
+    $order_by = 'num_referred desc';
     
     if (isset($_POST['order_by'])) {
         $order_by = $_POST['order_by'];
@@ -165,17 +165,16 @@ if ($_POST['action'] == 'get_employer_name') {
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array(array('employer' => array('name' => $result[0]['name'])));
     exit();
-    
 }
 
-if ($_POST['action'] == 'get_job_description') {
-    $query = "SELECT description FROM jobs WHERE id = ". $_POST['id']. " LIMIT 1";
+if ($_POST['action'] == 'get_job_title') {
+    $query = "SELECT title FROM jobs WHERE id = ". $_POST['id']. " LIMIT 1";
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
     
     $xml_dom = new XMLDOM();
     header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array(array('job' => array('description' => $result[0]['description'])));
+    echo $xml_dom->get_xml_from_array(array('job' => array('title' => $result[0]['title'])));
     exit();
 }
 ?>
