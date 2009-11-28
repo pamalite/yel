@@ -188,6 +188,24 @@ function validate_quick_upload_form() {
     return true;
 }
 
+function toggle_new_contact_form() {
+    if ($('qr_candidate_email_from_list').options[$('qr_candidate_email_from_list').selectedIndex].value == '0') {
+        $('qr_candidate_email').disabled = false;
+        $('qr_candidate_phone').disabled = false;
+        $('qr_candidate_firstname').disabled = false;
+        $('qr_candidate_lastname').disabled = false;
+        $('qr_candidate_zip').disabled = false;
+        $('qr_candidate_country').disabled = false;
+    } else {
+        $('qr_candidate_email').disabled = true;
+        $('qr_candidate_phone').disabled = true;
+        $('qr_candidate_firstname').disabled = true;
+        $('qr_candidate_lastname').disabled = true;
+        $('qr_candidate_zip').disabled = true;
+        $('qr_candidate_country').disabled = true;
+    }
+}
+
 function show_candidates() {
     $('candidates').set('html', '');
     
