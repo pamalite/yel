@@ -94,6 +94,42 @@ class PrsResumesPage extends Page {
         echo '</select>'. "\n";
     }
     
+    private function get_non_activateds() {
+        $mysqli = Database::connect();
+        $query = "SELECT COUNT(email_addr) AS num_non_actives 
+                  FROM members 
+                  WHERE active <> 'Y' AND 
+                  added_by IS NULL AND 
+                  (members.zip IS NOT NULL AND members.zip <> '')";
+        $result = $mysqli->query($query);
+        return $result[0]['num_non_actives'];
+    }
+    
+    private function get_has_resumes() {
+        $mysqli = Database::connect();
+        $query = "SELECT COUNT(members.email_addr) AS num_has_resumes 
+                  FROM members 
+                  INNER JOIN resumes ON resumes.member = members.email_addr
+                  WHERE members.active = 'Y' AND members.added_by IS NULL AND 
+                  (members.zip IS NOT NULL AND members.zip <> '')";
+        $result = $mysqli->query($query);
+        return $result[0]['num_has_resumes'];
+    }
+    
+    private function get_no_resumes() {
+        $mysqli = Database::connect();
+        $query = "SELECT COUNT(members.email_addr) AS num_no_resumes 
+                  FROM members 
+                  LEFT JOIN resumes ON resumes.member = members.email_addr 
+                  WHERE members.active = 'Y' AND members.added_by IS NULL AND 
+                  members.email_addr NOT LIKE 'team%@yellowelevator.com' AND 
+                  members.email_addr <> 'initial@yellowelevator.com' AND 
+                  (members.zip IS NOT NULL AND members.zip <> '') AND 
+                  resumes.id IS NULL";
+        $result = $mysqli->query($query);
+        return $result[0]['num_no_resumes'];
+    }
+    
     public function show() {
         $this->begin();
         $this->top_prs($this->employee->get_name(). " - Other Resumes");
@@ -105,6 +141,13 @@ class PrsResumesPage extends Page {
         </div>
         
         <div id="div_candidates">
+            <div style="padding-top: 5px; padding-bottom: 5px; text-align: left; color: #666666;">
+                [&bull;&bull;]: <?php echo $this->get_non_activateds(); ?>
+                &nbsp;&nbsp;&nbsp;
+                [&bull;]: <?php echo $this->get_no_resumes(); ?>
+                &nbsp;&nbsp;&nbsp;
+                []: <?php echo $this->get_has_resumes(); ?>
+            </div>
             <table class="header">
                 <tr>
                     <td class="date"><span class="sort" id="sort_joined_on">Joined On</span></td>
