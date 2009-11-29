@@ -108,10 +108,10 @@ class PrsResumesPage extends Page {
     private function get_has_resumes() {
         $mysqli = Database::connect();
         $query = "SELECT COUNT(members.email_addr) AS num_has_resumes 
-                  FROM members 
-                  INNER JOIN resumes ON resumes.member = members.email_addr
-                  WHERE members.active = 'Y' AND members.added_by IS NULL AND 
-                  (members.zip IS NOT NULL AND members.zip <> '')";
+                  WHERE members.active = 'Y' AND 
+                  members.added_by IS NULL AND
+                  (members.zip IS NOT NULL AND members.zip <> '') AND
+                  members.email_addr IN (SELECT DISTINCT member FROM resumes)";
         $result = $mysqli->query($query);
         return $result[0]['num_has_resumes'];
     }
