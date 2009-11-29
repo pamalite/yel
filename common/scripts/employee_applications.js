@@ -69,6 +69,7 @@ function show_employers() {
                 var employers = xml.getElementsByTagName('name');
                 var open_jobs = xml.getElementsByTagName('num_open');
                 var num_referreds = xml.getElementsByTagName('num_referred');
+                var num_submitteds = xml.getElementsByTagName('num_submitted');
                 var num_kivs = xml.getElementsByTagName('num_kiv');
                 
                 for (i=0; i < ids.length; i++) {
@@ -83,6 +84,7 @@ function show_employers() {
                         html = html + '<td class="count"><a class="no_link" onClick="show_jobs(\'' + id + '\');">' + open_jobs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     }
                     html = html + '<td class="count">' + num_referreds[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="count">' + num_submitteds[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="count">' + num_kivs[i].childNodes[0].nodeValue + '</td>' + "\n";
                 }
                 html = html + '</table>';
@@ -148,6 +150,7 @@ function show_jobs(_employer_id) {
             var created_ons = xml.getElementsByTagName('created_on');
             var expire_ons = xml.getElementsByTagName('expire_on');
             var num_referreds = xml.getElementsByTagName('num_referred');
+            var num_submitteds = xml.getElementsByTagName('num_submitted');
             var num_kivs = xml.getElementsByTagName('num_kiv');
             
             var html = '<table id="list" class="list">';
@@ -164,8 +167,9 @@ function show_jobs(_employer_id) {
                     html = html + '<td class="title"><a href="../job/' + job_id.childNodes[0].nodeValue + '" target="_new">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="date">' + created_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="date">' + expire_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="count"><a class="no_link" onClick="show_referrals(\'' + job_id.childNodes[0].nodeValue + '\', false);">' + num_referreds[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="count"><a class="no_link" onClick="show_referrals(\'' + job_id.childNodes[0].nodeValue + '\', true);">' + num_kivs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="count"><a class="no_link" onClick="show_referrals(\'' + job_id.childNodes[0].nodeValue + '\', \'referred\');">' + num_referreds[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="count"><a class="no_link" onClick="show_referrals(\'' + job_id.childNodes[0].nodeValue + '\', \'submitted\');">' + num_submitteds[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="count"><a class="no_link" onClick="show_referrals(\'' + job_id.childNodes[0].nodeValue + '\', \'kiv\');">' + num_kivs[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
                 html = html + '</table>';
@@ -203,7 +207,7 @@ function show_referrals_with_selected_job() {
     show_referrals(selected_job_id, false);
 }
 
-function show_referrals(_job_id, _show_kiv_first) {
+function show_referrals(_job_id, _sort_by) {
     selected_job_id = _job_id;
     
     $('div_jobs').setStyle('display', 'none');
@@ -214,13 +218,17 @@ function show_referrals(_job_id, _show_kiv_first) {
     
     var params = 'id=' + selected_job_id + '&action=get_referrals';
     
-    if (_show_kiv_first) {
-        referrals_order_by = 'referrals.employer_agreed_terms_on';
-        referrals_order = 'desc';
-        params = params + '&order_by=' + referrals_order_by + ' ' + referrals_order;
-    } else {
-        params = params + '&order_by=' + referrals_order_by + ' ' + referrals_order;
+    switch (_sort_by) {
+        case 'submitted':
+            referrals_order_by = 'referrals.member_confirmed_on';
+            referrals_order = 'desc';            
+            break;
+        case 'kiv':
+            referrals_order_by = 'referrals.employer_agreed_terms_on';
+            referrals_order = 'desc';
+            break;
     }
+    params = params + '&order_by=' + referrals_order_by + ' ' + referrals_order;
     
     var uri = root + "/employees/applications_action.php";
     var request = new Request({
@@ -241,6 +249,7 @@ function show_referrals(_job_id, _show_kiv_first) {
             var referrer_phone_nums = xml.getElementsByTagName('referrer_phone_num');
             var referred_ons = xml.getElementsByTagName('formatted_referred_on');
             var viewed_ons = xml.getElementsByTagName('formatted_employer_viewed_on');
+            var confirmed_ons = xml.getElementsByTagName('formatted_confirmed_on');
             var resume_ids = xml.getElementsByTagName('resume_id');
             var resume_names = xml.getElementsByTagName('resume_name');
             
@@ -256,6 +265,12 @@ function show_referrals(_job_id, _show_kiv_first) {
                     html = html + '<td class="date">' + referred_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="referrer"><a href="mailto: ' + referrer_email_addrs[i].childNodes[0].nodeValue + '">' + referrer_names[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + referrer_phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + referrer_email_addrs[i].childNodes[0].nodeValue + '</div></td>' + "\n";
                     html = html + '<td class="candidate"><a href="mailto: ' + candidate_email_addrs[i].childNodes[0].nodeValue + '">' + candidate_names[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + candidate_phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + candidate_email_addrs[i].childNodes[0].nodeValue + '</div></td>' + "\n";
+                    
+                    var confirmed_on = '<span style="font-size: 9pt; color: #CCCCCC;">Pending...</span>';
+                    if (confirmed_ons[i].childNodes.length > 0) {
+                        confirmed_on = confirmed_ons[i].childNodes[0].nodeValue;
+                    }
+                    html = html + '<td class="date">' + confirmed_on + '</td>' + "\n";
                     
                     var viewed_on = '<span style="font-size: 9pt; color: #CCCCCC;">Pending...</span>';
                     if (viewed_ons[i].childNodes.length > 0) {
@@ -340,6 +355,12 @@ function onDomReady() {
         show_employers();
     });
     
+    $('sort_submitted').addEvent('click', function() {
+        employers_order_by = 'num_submitted';
+        employers_ascending_or_descending();
+        show_employers();
+    });
+    
     $('sort_viewed').addEvent('click', function() {
         employers_order_by = 'num_kiv';
         employers_ascending_or_descending();
@@ -378,6 +399,12 @@ function onDomReady() {
         show_jobs_with_selected_employer();
     });
     
+    $('sort_jobs_submitted').addEvent('click', function() {
+        order_by = 'num_submitted';
+        ascending_or_descending();
+        show_jobs_with_selected_employer();
+    });
+    
     $('sort_jobs_viewed').addEvent('click', function() {
         order_by = 'num_kiv';
         ascending_or_descending();
@@ -400,6 +427,12 @@ function onDomReady() {
     
     $('sort_candidate').addEvent('click', function() {
         referrals_order_by = 'members.lastname';
+        referrals_ascending_or_descending();
+        show_referrals_with_selected_job();
+    });
+    
+    $('sort_submitted_on').addEvent('click', function() {
+        referrals_order_by = 'referrals.member_confirmed_on';
         referrals_ascending_or_descending();
         show_referrals_with_selected_job();
     });

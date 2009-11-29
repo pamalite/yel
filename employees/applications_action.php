@@ -47,9 +47,18 @@ if (!isset($_POST['action'])) {
               WHERE (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND
               (referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00 00:00:00') AND
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND
-              -- (referrals.member_read_resume_on IS NOT NULL AND referrals.member_read_resume_on <> '0000-00-00 00:00:00') AND  
+              (referrals.member_confirmed_on IS NULL OR referrals.member_confirmed_on = '0000-00-00 00:00:00') AND  
               jobs.employer = employers.id 
               ) AS num_referred, 
+              (SELECT COUNT(referrals.id) 
+              FROM referrals 
+              LEFT JOIN jobs ON jobs.id = referrals.job
+              WHERE (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND
+              (referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00 00:00:00') AND
+              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND
+              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND  
+              jobs.employer = employers.id 
+              ) AS num_submitted, 
               (SELECT COUNT(referrals.id) 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job
@@ -93,9 +102,16 @@ if ($_POST['action'] == 'get_jobs') {
               WHERE job = jobs.id AND 
               (employed_on IS NULL OR employed_on = '0000-00-00 00:00:00') AND
               (employer_agreed_terms_on IS NULL OR employer_agreed_terms_on = '0000-00-00 00:00:00') AND
-              (referee_acknowledged_on IS NOT NULL AND referee_acknowledged_on <> '0000-00-00 00:00:00') 
-              -- AND (member_read_resume_on IS NOT NULL AND member_read_resume_on <> '0000-00-00 00:00:00')
+              (referee_acknowledged_on IS NOT NULL AND referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+              (member_confirmed_on IS NULL OR member_confirmed_on = '0000-00-00 00:00:00')
               ) AS num_referred,
+              (SELECT COUNT(id) FROM referrals 
+              WHERE job = jobs.id AND 
+              (employed_on IS NULL OR employed_on = '0000-00-00 00:00:00') AND
+              (employer_agreed_terms_on IS NULL OR employer_agreed_terms_on = '0000-00-00 00:00:00') AND
+              (referee_acknowledged_on IS NOT NULL AND referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+              (member_confirmed_on IS NOT NULL AND member_confirmed_on <> '0000-00-00 00:00:00')
+              ) AS num_submitted,
               (SELECT COUNT(id) FROM referrals
               WHERE job = jobs.id AND 
               (employed_on IS NULL OR employed_on = '0000-00-00 00:00:00') AND
@@ -134,6 +150,7 @@ if ($_POST['action'] == 'get_referrals') {
               referrers.phone_num AS referrer_phone_num, 
               CONCAT(referrers.lastname, ', ', referrers.firstname) AS referrer_name, 
               DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
+              DATE_FORMAT(referrals.member_confirmed_on, '%e %b, %Y') AS formatted_confirmed_on, 
               DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_viewed_on 
               FROM referrals 
               LEFT JOIN resumes ON resumes.id = referrals.resume 
@@ -142,7 +159,6 @@ if ($_POST['action'] == 'get_referrals') {
               WHERE referrals.job = ". $_POST['id']. " AND 
               (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') 
-              -- AND (referrals.member_read_resume_on IS NOT NULL AND referrals.member_read_resume_on <> '0000-00-00 00:00:00') 
               ORDER BY ". $order_by;
     $mysqli = Database::connect();
     $result = $mysqli->query($query);

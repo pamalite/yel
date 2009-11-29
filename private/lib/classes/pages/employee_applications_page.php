@@ -48,6 +48,7 @@ class EmployeeApplicationsPage extends Page {
                     <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
                     <td class="count"><span class="sort" id="sort_open">Open Jobs</span></td>
                     <td class="count"><span class="sort" id="sort_referred">Referred</span></td>
+                    <td class="count"><span class="sort" id="sort_submitted">Submitted</span></td>
                     <td class="count"><span class="sort" id="sort_viewed">Viewed</span></td>
                 </tr>
             </table>
@@ -71,6 +72,7 @@ class EmployeeApplicationsPage extends Page {
                     <td class="date"><span class="sort" id="sort_created_on">Created On</span></td>
                     <td class="date"><span class="sort" id="sort_expire_on">Expire On</span></td>
                     <td class="count"><span class="sort" id="sort_jobs_referred">Referred</span></td>
+                    <td class="count"><span class="sort" id="sort_jobs_submitted">Submitted</span></td>
                     <td class="count"><span class="sort" id="sort_jobs_viewed">Viewed</span></td>
                 </tr>
             </table>
@@ -92,6 +94,7 @@ class EmployeeApplicationsPage extends Page {
                     <td class="date"><span class="sort" id="sort_referred_on">Referred On</span></td>
                     <td class="referrer"><span class="sort" id="sort_referrer">Referrer</span></td>
                     <td class="candidate"><span class="sort" id="sort_candidate">Candidate</span></td>
+                    <td class="date"><span class="sort" id="sort_submitted_on">Submitted On</span></td>
                     <td class="date"><span class="sort" id="sort_employer_viewed_on">Viewed On</span></td>
                     <td class="links">&nbsp;</td>
                 </tr>
