@@ -46,6 +46,6 @@ if (count($photos) > 0 && $photos != false) {
     readfile($GLOBALS['photo_dir']. "/". $photos[0]['id']. ".". $photos[0]['photo_hash']);
     exit();
 } else {
-    echo "The candidate did not upload one's photo.";
+    echo "No photo was uploaded by this candidate.";
 }
 ?>

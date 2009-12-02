@@ -211,7 +211,7 @@ if ($_POST['action'] == 'acknowledge_job') {
     $message = str_replace('%job%', htmlspecialchars_decode($job), $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
-    $subject = htmlspecialchars_decode($candidate). ' accepted the '. htmlspecialchars_decode($job). ' position';
+    $subject = 'Please screen & write testimony for '. htmlspecialchars_decode($candidate). ' for the '. htmlspecialchars_decode($job). ' position';
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     mail($member_email, $subject, $message, $headers);
 

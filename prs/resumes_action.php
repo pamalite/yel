@@ -317,19 +317,19 @@ if ($_POST['action'] == 'make_referral') {
     }
     
     $position = '- '. $job['job']. ' at '. $job['employer'];
-    $lines = file(dirname(__FILE__). '/../private/mail/member_referred.txt');
+    $lines = file(dirname(__FILE__). '/../private/mail/member_referred_from_prs.txt');
     $message = '';
     foreach($lines as $line) {
         $message .= $line;
     }
     
-    $message = str_replace('%member_name%', htmlspecialchars_decode(desanitize($employee->get_name())), $message);
-    $message = str_replace('%member_email_addr%', $employee->email_address(), $message);
+    $message = str_replace('%member_name%', 'Yellow Elevator', $message);
+    $message = str_replace('%member_email_addr%', $member, $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     $message = str_replace('%positions%', $position, $message);
-    $subject = htmlspecialchars_decode(desanitize($employee->get_name())). " has screened and submitted your resume for the ". htmlspecialchars_decode($job['job']). " position";
-    $headers = 'From: '. str_replace(',', '', htmlspecialchars_decode(desanitize($employee->get_name()))). ' <'. $employee->email_address(). '>' . "\n";
+    $subject = "Yellow Elevator has screened and submitted your resume for the ". htmlspecialchars_decode($job['job']). " position";
+    $headers = 'From: Yellow Elevator <'. $member. '>' . "\n";
     mail($_POST['referee'], $subject, $message, $headers);
     
     // $handle = fopen('/tmp/ref_email_to_'. $_POST['referee']. '.txt', 'w');

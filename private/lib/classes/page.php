@@ -81,12 +81,14 @@ class Page {
                 <div class="loginpanel">
                     <?php
                     if (isset($_SESSION['yel']['employer']) && 
-                        !empty($_SESSION['yel']['employer']['id'])) {
+                        !empty($_SESSION['yel']['employer']['id']) && 
+                        !is_null($_SESSION['yel']['employer']['id'])) {
                         ?>
                     Go back to <span style="font-weight: bold;"><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers">Employer Home Page</a></span> or <span style="font-weight: bold;"><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/logout.php">Logout</a></span>
                         <?php
                     } elseif (isset($_SESSION['yel']['member']) && 
-                              !empty($_SESSION['yel']['member']['id'])) {
+                              !empty($_SESSION['yel']['member']['id']) && 
+                              !is_null($_SESSION['yel']['member']['id'])) {
                         ?>
                     Go back to <span style="font-weight: bold;"><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members">Member Home Page</a></span> or <span style="font-weight: bold;"><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/logout.php">Logout</a></span>
                         <?php

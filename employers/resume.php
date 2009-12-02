@@ -3,14 +3,14 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 
 session_start();
 
-if (!isset($_GET['ie_suck'])) {
-    if ($GLOBALS['protocol'] == 'https') {
-        if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') {
-            redirect_to('https://'. $GLOBALS['root']. '/employers/resume.php?id='. $_GET['id']);
-            exit();
-        }
-    }
-}
+// if (!isset($_GET['ie_suck'])) {
+//     if ($GLOBALS['protocol'] == 'https') {
+//         if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') {
+//             redirect_to('https://'. $GLOBALS['root']. '/employers/resume.php?id='. $_GET['id']);
+//             exit();
+//         }
+//     }
+// }
 
 if (!isset($_SESSION['yel']['employer']) || 
     empty($_SESSION['yel']['employer']['id']) || 
@@ -20,47 +20,14 @@ if (!isset($_SESSION['yel']['employer']) ||
     exit();
 }
 
-
 $resume = new Resume(0, $_GET['id']);
 $cover = $resume->get();
+$member = new Member($cover[0]['member']);
 
 if ($cover[0]['private'] == 'Y') {
     echo 'Sorry, the candidate had decided to lock the resume from public viewing.';
     exit();
 }
-
-if (!is_null($cover[0]['file_name'])) {
-    $file = $resume->get_file();
-    
-    if (stripos($_SERVER['HTTP_USER_AGENT'], 'MSIE') !== false && !isset($_GET['ie_suck'])) {
-        ?>
-            <div style="text-align: center;">
-                <a href="http://<?php echo $GLOBALS['root']. '/employers/resume.php?id='. $_GET['id'] ?>&ie_suck=indeed">
-                    Click here to download the resume.
-                </a>
-            </div>
-        <?php
-    } else {
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Pragma: public');
-        header('Expires: -1');
-        header('Content-Description: File Transfer');
-        header('Content-Length: ' . $file['size']);
-        header('Content-Disposition: attachment; filename="' . $file['name'].'"');
-        header('Content-type: '. $file['type']);
-        ob_clean();
-        flush();
-        readfile($GLOBALS['resume_dir']. "/". $_GET['id']. ".". $file['hash']);
-    }
-    exit();
-} 
-
-$member = new Member($cover[0]['member']);
-$contacts = $member->get();
-$experiences = $resume->get_work_experiences();
-$educations = $resume->get_educations();
-$skills = $resume->get_skills();
-$technical_skills = $resume->get_technical_skills();
 
 $query = "SELECT COUNT(*) AS has_photo 
           FROM member_photos 
@@ -72,6 +39,38 @@ $has_photo = false;
 if ($result[0]['has_photo'] > 0) {
     $has_photo = true;
 }
+
+if (!is_null($cover[0]['file_name'])) {
+    if ($has_photo) {
+        ?>
+            <div style="text-align: center;">
+                <a href="http://<?php echo $GLOBALS['root']. '/employers/resume_download.php?id='. $_GET['id'] ?>">
+                    Click here to download the resume.
+                </a>
+            </div>
+            <br/>
+            <div style="text-align: center;">
+                <img src="candidate_photo.php?id=<?php echo $member->id() ?>" style="border: none;" />
+            </div>
+        <?php
+    } else {
+        ?>
+            <div style="text-align: center;">
+                <a href="http://<?php echo $GLOBALS['root']. '/employers/resume_download.php?id='. $_GET['id'] ?>">
+                    Click here to download the resume.
+                </a>
+            </div>
+        <?php
+    }
+    exit();
+} 
+
+
+$contacts = $member->get();
+$experiences = $resume->get_work_experiences();
+$educations = $resume->get_educations();
+$skills = $resume->get_skills();
+$technical_skills = $resume->get_technical_skills();
 
 ?>
 
@@ -92,7 +91,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
     <?php
         if ($has_photo) {
     ?>
-            <a href="candidate_photo.php?id=<?php echo $member->id(); ?>">View Photo</a>
+            <a href="candidate_photo.php?id=<?php echo $member->id(); ?>" target="_new">View Photo</a>
             &nbsp;
     <?php
         }
@@ -356,7 +355,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
     <?php
         if ($has_photo) {
     ?>
-            <a href="candidate_photo.php?id=<?php echo $member->id(); ?>">View Photo</a>
+            <a href="candidate_photo.php?id=<?php echo $member->id(); ?>" target="_new">View Photo</a>
             &nbsp;
     <?php
         }

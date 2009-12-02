@@ -1,0 +1,12 @@
+Congratulations!
+
+Yellow Elevator has screened and submitted your resume for the %positions% position.
+
+Please sign into your account to track your job application at the "Jobs Applied" section. 
+
+To sign in, go to:
+
+%protocol%://%root%/members/
+
+Yellow Elevator
+Refer a job
