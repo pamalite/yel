@@ -172,6 +172,11 @@ function close_acknowledge_form() {
 }
 
 function show_acknowledge_form(referral_id, job_title, _resume_id) {
+    if ($('resume') == null) {
+        alert('You have yet to create a resume. You need to have a resume before you can accept a job referral. Please create one in \'Resumes\'.\n\nIf you have already created a resume, you will need to make it non-private.');
+        return false;
+    }
+    
     referral = referral_id;
     $('resume').disabled = false;
     
