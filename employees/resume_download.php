@@ -3,10 +3,21 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 
 session_start();
 
-if (!isset($_SESSION['yel']['employer']) || 
-    empty($_SESSION['yel']['employer']['id']) || 
-    empty($_SESSION['yel']['employer']['sid']) || 
-    empty($_SESSION['yel']['employer']['hash'])) {
+if ($GLOBALS['protocol'] == 'https') {
+    if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') {
+        if (isset($GET['id'])) {
+            redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?id='. $_GET['id']);
+        } else {
+            redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?job_id='. $_GET['job_id']. '&candidate_email='. $_GET['candidate_email']. '&referrer_email='. $_GET['referrer_email']);
+        }
+        exit();
+    }
+}
+
+if (!isset($_SESSION['yel']['employee']) || 
+    empty($_SESSION['yel']['employee']['id']) || 
+    empty($_SESSION['yel']['employee']['sid']) || 
+    empty($_SESSION['yel']['employee']['hash'])) {
     echo "An illegal attempt to view resume has been detected.";
     exit();
 }
@@ -28,7 +39,7 @@ if (!is_null($cover[0]['file_name'])) {
     flush();
     readfile($GLOBALS['resume_dir']. "/". $_GET['id']. ".". $file['hash']);
 } else {
-    redirect_to('https://'. $GLOBALS['root']. '/employers/resume.php?id='. $_GET['id']);
+    redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?id='. $_GET['id']);
 }
 
 exit();

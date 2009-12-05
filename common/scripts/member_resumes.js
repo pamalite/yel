@@ -33,12 +33,6 @@ function save_cover_note(_show_experience) {
     params = params + '&name=' + $('name').value;
     params = params + '&cover_note=' + $('cover_note').value;
     
-    /*if ($('private').checked) {
-        params = params + '&private=Y';
-    } else {
-        params = params + '&private=N';
-    }*/
-    
     var uri = root + "/members/resume_action.php";
     var request = new Request({
         url: uri,
@@ -72,68 +66,6 @@ function show_resume(resume_id) {
     $('div_upload_resume_form').setStyle('display', 'none');
     $('resume_id').value = resume_id;
     show_cover_note();
-}
-
-function delete_resumes() {
-    var inputs = $('list').getElementsByTagName('input');
-    var payload = '<resumes>' + "\n";
-    var count = 0;
-    
-    for(i=0; i < inputs.length; i++) {
-        var attributes = inputs[i].attributes;
-        if (attributes.getNamedItem('type').value == 'checkbox' && 
-            attributes.getNamedItem('name').value == 'id') {
-            if (inputs[i].checked) {
-                payload = payload + '<id>' + inputs[i].id + '</id>' + "\n";
-                count++;
-            }
-        }
-    }
-    
-    payload = payload + '</resumes>';
-    
-    if (count <= 0) {
-        set_status('Please select at least one resume.');
-        return false;
-    }
-    
-    var proceed = confirm('Are you sure to delete the selected resumes? \n\nThe selected resumes maybe used to some acknowledged jobs. Deleting them may prevent the employers to view it, which will lower the chances of being reviewed.');
-    if (!proceed) {
-        return false;
-    }
-    
-    var params = 'id=0';
-    params = params + '&action=delete';
-    params = params + '&payload=' + payload;
-    
-    var uri = root + "/members/resume_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while deleting selected resumes.');
-                return false;
-            }
-            
-            for (i=0; i < inputs.length; i++) {
-                var attributes = inputs[i].attributes;
-                if (attributes.getNamedItem('type').value == 'checkbox' && 
-                    attributes.getNamedItem('name').value == 'id') {
-                    if (inputs[i].checked) {
-                        $(inputs[i].id).setStyle('display', 'none');
-                    }
-                }
-            }
-            
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading resumes...');
-        }
-    });
-    
-    request.send(params);
 }
 
 function add_new_resume() {
@@ -190,32 +122,21 @@ function show_resumes() {
             
             var ids = xml.getElementsByTagName('id');
             var names = xml.getElementsByTagName('name');
-            var privates = xml.getElementsByTagName('private');
             var modified_ons = xml.getElementsByTagName('modified_date');
             var file_hashes = xml.getElementsByTagName('file_hash');
             
             var html = '<table id="list" class="list">';
             if (ids.length <= 0) {
                 html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">Please click on the \"Create New Resume\" or the \"Upload Resume\" button to get started.</div>';
-                
-                $('delete_resumes').disabled = true;
-                $('delete_resumes_1').disabled = true;
+
             } else {
                 for (var i=0; i < ids.length; i++) {
                     var resume_id = ids[i];
                     
                     html = html + '<tr id="'+ resume_id.childNodes[0].nodeValue + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="checkbox"><input type="checkbox" id="'+ resume_id.childNodes[0].nodeValue + '" name="id" /></td>' + "\n";
-                    //html = html + '<td class="id">' + resume_id.childNodes[0].nodeValue + '</td>' + "\n";
-                    
-                    if (privates[i].childNodes[0].nodeValue == 'N') {
-                        html = html + '<td class="private"><input type="checkbox" id="'+ resume_id.childNodes[0].nodeValue + '" name="private" onClick="make_private(\'' + resume_id.childNodes[0].nodeValue + '\', !this.checked);" /></td>' + "\n";
-                    } else {
-                        html = html + '<td class="private"><input type="checkbox" id="'+ resume_id.childNodes[0].nodeValue + '" name="private" onClick="make_private(\'' + resume_id.childNodes[0].nodeValue + '\', !this.checked);" checked /></td>' + "\n";
-                    }
-                    
+
                     if (file_hashes[i].childNodes.length > 0) {
-                        html = html + '<td class="title"><span class="reupload"><a class="no_link" onClick="upload_new_resume(\'' + resume_id.childNodes[0].nodeValue + '\');">Update File</a></span>&nbsp;<a href="resume.php?id=' + resume_id.childNodes[0].nodeValue + '&member=' + id + '">' + names[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                        html = html + '<td class="title"><input type="button" value="Replace Resume" onClick="upload_new_resume(\'' + resume_id.childNodes[0].nodeValue + '\');" />&nbsp;<a href="resume.php?id=' + resume_id.childNodes[0].nodeValue + '&member=' + id + '">' + names[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     } else {
                         html = html + '<td class="title"><a href="#" onClick="show_resume(\'' + resume_id.childNodes[0].nodeValue + '\')">' + names[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     }
@@ -224,9 +145,6 @@ function show_resumes() {
                     html = html + '</tr>' + "\n";
                 }
                 html = html + '</table>';
-                
-                $('delete_resumes').disabled = false;
-                $('delete_resumes_1').disabled = false;
             }
             
             $('div_list').set('html', html);
@@ -234,57 +152,6 @@ function show_resumes() {
         },
         onRequest: function(instance) {
             set_status('Loading resumes...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function select_all_resumes() {
-    var inputs = $('list').getElementsByTagName('input');
-    
-    if ($('select_all').checked) {
-        for (i=0; i < inputs.length; i++) {
-            var attributes = inputs[i].attributes;
-            if (attributes.getNamedItem('type').value == 'checkbox' &&
-                attributes.getNamedItem('name').value == 'id') {
-                inputs[i].checked = true;
-            }
-        }
-    } else {
-        for (i=0; i < inputs.length; i++) {
-            var attributes = inputs[i].attributes;
-            if (attributes.getNamedItem('type').value == 'checkbox' &&
-                attributes.getNamedItem('name').value == 'id') {
-                inputs[i].checked = false;
-            }
-        }
-    }
-}
-
-function make_private(resume_id, checked) {
-    var params = 'id=' + resume_id + '&member=' + id;
-    
-    if (checked) {
-        params = params + '&action=unprivatize';
-    } else {
-        params = params + '&action=privatize';
-    }
-    
-    var uri = root + "/members/resume_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while saving resume.');
-                return false;
-            }
-            
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Saving resume...');
         }
     });
     
@@ -1464,13 +1331,10 @@ function onDomReady() {
     get_jobs_employed_count();
     set_mouse_events();
     
-    $('delete_resumes').addEvent('click', delete_resumes);
-    $('delete_resumes_1').addEvent('click', delete_resumes);
     $('add_new_resume').addEvent('click', add_new_resume);
     $('add_new_resume_1').addEvent('click', add_new_resume);
     $('upload_new_resume').addEvent('click', upload_new_resume);
     $('upload_new_resume_1').addEvent('click', upload_new_resume);
-    $('select_all').addEvent('click', select_all_resumes);
     
     $('li_resumes').addEvent('click', show_resumes);
     $('li_cover_note').addEvent('click', show_cover_note);
@@ -1478,14 +1342,6 @@ function onDomReady() {
     $('li_educations').addEvent('click', show_educations);
     $('li_skills').addEvent('click', show_skills);
     $('li_technical_skills').addEvent('click', show_technical_skills);
-    
-    //$('save_cover_note').addEvent('click', save_cover_note);
-    
-    $('sort_private').addEvent('click', function() {
-        order_by = 'private';
-        ascending_or_descending();
-        show_resumes();
-    });
     
     $('sort_name').addEvent('click', function() {
         order_by = 'name';

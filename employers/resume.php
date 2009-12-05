@@ -24,11 +24,6 @@ $resume = new Resume(0, $_GET['id']);
 $cover = $resume->get();
 $member = new Member($cover[0]['member']);
 
-if ($cover[0]['private'] == 'Y') {
-    echo 'Sorry, the candidate had decided to lock the resume from public viewing.';
-    exit();
-}
-
 $query = "SELECT COUNT(*) AS has_photo 
           FROM member_photos 
           WHERE member = '". $member->id(). "'";
@@ -65,7 +60,6 @@ if (!is_null($cover[0]['file_name'])) {
     exit();
 } 
 
-
 $contacts = $member->get();
 $experiences = $resume->get_work_experiences();
 $educations = $resume->get_educations();
@@ -88,14 +82,6 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
 <body>
 <p class="disclaimer">Generated from YellowElevator.com.</p>
 <div id="div_buttons">
-    <?php
-        if ($has_photo) {
-    ?>
-            <a href="candidate_photo.php?id=<?php echo $member->id(); ?>" target="_new">View Photo</a>
-            &nbsp;
-    <?php
-        }
-    ?>
     <input class="button" type="button" value="Save as XML" onClick="location.replace('resume_xml.php?id=<?php echo $_GET['id'] ?>');"/>
     &nbsp;
     <input class="button" type="button" value="Save as PDF" onClick="location.replace('resume_pdf.php?id=<?php echo $_GET['id'] ?>');"/>
@@ -114,6 +100,20 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
         <tr>
             <td colspan="2" class="separator"></td>
         </tr>
+        <?php 
+            if ($has_photo) {
+                ?>
+        <tr>
+            <td colspan="2" class="title" style="border: none; ">
+                <img style="border: none; vertical-align: top;" src="candidate_photo.php?id=<?php echo $member->id(); ?>" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="separator"></td>
+        </tr>
+                <?php
+            }
+        ?>
         <tr>
             <td colspan="2" class="title">Contacts</td>
         </tr>
@@ -352,15 +352,6 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
 </div>
 
 <div id="div_buttons">
-    <?php
-        if ($has_photo) {
-    ?>
-            <a href="candidate_photo.php?id=<?php echo $member->id(); ?>" target="_new">View Photo</a>
-            &nbsp;
-    <?php
-        }
-    ?>
-    &nbsp;
     <input class="button" type="button" value="Save as XML" onClick="location.replace('resume_xml.php?id=<?php echo $_GET['id'] ?>');"/>
     &nbsp;
     <input class="button" type="button" value="Save as PDF" onClick="location.replace('resume_pdf.php?id=<?php echo $_GET['id'] ?>');"/>

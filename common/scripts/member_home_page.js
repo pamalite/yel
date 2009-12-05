@@ -173,7 +173,7 @@ function close_acknowledge_form() {
 
 function show_acknowledge_form(referral_id, job_title, _resume_id) {
     if ($('resume') == null) {
-        alert('You have yet to create a resume. You need to have a resume before you can accept a job referral. Please create one in \'Resumes\'.\n\nIf you have already created a resume, you will need to make it non-private.');
+        alert('You have yet to create a resume. You need to have a resume before you can accept a job referral. Please create/upload one in \'Resumes\'.');
         return false;
     }
     
@@ -200,42 +200,20 @@ function show_acknowledge_form(referral_id, job_title, _resume_id) {
     $('div_acknowledge_form').setStyle('top', ((window_height - div_height) / 2));
     $('div_acknowledge_form').setStyle('left', ((window_width - div_width) / 2));
     
-    var params = 'id=' + id;
-    params = params + '&action=has_resumes';
+    $('job_title').set('html', job_title);
+    $('div_blanket').setStyle('display', 'block');
+    $('div_acknowledge_form').setStyle('display', 'block');
     
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            set_status('');
-            if (txt == '0') {
-                alert('You have yet to create a resume. You need to have a resume before you can accept a job referral. Please create one in \'Resumes\'.\n\nIf you have already created a resume, you will need to make it non-private.');
-                referral = 0;
-                return false;
+    if (_resume_id > 0) {
+        var options = $('resume').options;
+        for (var i=0; i < options.length; i++) {
+            if (options[i].value == _resume_id) {
+                $('resume').options[i].selected = true;
+                $('resume').disabled = true;
+                break;
             }
-            
-            $('job_title').set('html', job_title);
-            $('div_blanket').setStyle('display', 'block');
-            $('div_acknowledge_form').setStyle('display', 'block');
-            
-            if (_resume_id > 0) {
-                var options = $('resume').options;
-                for (var i=0; i < options.length; i++) {
-                    if (options[i].value == _resume_id) {
-                        $('resume').options[i].selected = true;
-                        $('resume').disabled = true;
-                        break;
-                    }
-                }
-            }
-        },
-        onRequest: function(instance) {
-            set_status('Checking resumes...');
         }
-    });
-    
-    request.send(params);
+    }
 }
 
 function acknowledge() {

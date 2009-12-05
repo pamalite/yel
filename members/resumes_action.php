@@ -17,7 +17,7 @@ if (isset($_POST['order_by'])) {
 }
 
 $criteria = array(
-    'columns' => 'id, name, private, DATE_FORMAT(modified_on, \'%e %b, %Y\') AS modified_date, file_hash',
+    'columns' => 'id, name, DATE_FORMAT(modified_on, \'%e %b, %Y\') AS modified_date, file_hash',
     'order' => $order_by,
     'match' => 'member = \''. $_POST['id']. '\' AND deleted = \'N\''
 );

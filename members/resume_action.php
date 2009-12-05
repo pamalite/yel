@@ -20,65 +20,65 @@ if (!isset($_POST['action'])) {
     exit();
 }
 
-if ($_POST['action'] == 'privatize') {
-    $resume = new Resume($_POST['member'], $_POST['id']);
-    $data = array();
-    $data['private'] = 'Y';
-    
-    if ($resume->update($data) == false) {
-        echo "ko";
-        exit();
-    }
-    
-    echo "ok";
-    exit();
-}
+// if ($_POST['action'] == 'privatize') {
+//     $resume = new Resume($_POST['member'], $_POST['id']);
+//     $data = array();
+//     $data['private'] = 'Y';
+//     
+//     if ($resume->update($data) == false) {
+//         echo "ko";
+//         exit();
+//     }
+//     
+//     echo "ok";
+//     exit();
+// }
+// 
+// if ($_POST['action'] == 'unprivatize') {
+//     $resume = new Resume($_POST['member'], $_POST['id']);
+//     $data = array();
+//     $data['private'] = 'N';
+//     
+//     if ($resume->update($data) == false) {
+//         echo "ko";
+//         exit();
+//     }
+//     
+//     echo "ok";
+//     exit();
+// }
 
-if ($_POST['action'] == 'unprivatize') {
-    $resume = new Resume($_POST['member'], $_POST['id']);
-    $data = array();
-    $data['private'] = 'N';
-    
-    if ($resume->update($data) == false) {
-        echo "ko";
-        exit();
-    }
-    
-    echo "ok";
-    exit();
-}
-
-if ($_POST['action'] == 'delete') {
-    if (!isset($_POST['payload'])) {
-        echo "ko";
-        exit();
-    }
-    
-    $xml_dom->load_from_xml($_POST['payload']);
-    $resumes = $xml_dom->get('id');
-    $query = "UPDATE resumes SET deleted = 'Y' WHERE id IN (";
-    $i = 0;
-    foreach ($resumes as $id) {
-        $query .= $id->nodeValue;
-        
-        if ($i < $resumes->length-1) {
-            $query .= ", ";
-        }
-        
-        $i++;
-    }
-    $query .= ")";
-    
-    $mysqli = Database::connect();
-    
-    if (!$mysqli->execute($query)) {
-        echo "ko";
-        exit();
-    }
-    
-    echo "ok";
-    exit();
-}
+// if ($_POST['action'] == 'delete') {
+//     if (!isset($_POST['payload'])) {
+//         echo "ko";
+//         exit();
+//     }
+//     
+//     $xml_dom->load_from_xml($_POST['payload']);
+//     $resumes = $xml_dom->get('id');
+//     $query = "UPDATE resumes SET deleted = 'Y' WHERE id IN (";
+//     $i = 0;
+//     foreach ($resumes as $id) {
+//         $query .= $id->nodeValue;
+//         
+//         if ($i < $resumes->length-1) {
+//             $query .= ", ";
+//         }
+//         
+//         $i++;
+//     }
+//     $query .= ")";
+//     
+//     $mysqli = Database::connect();
+//     
+//     if (!$mysqli->execute($query)) {
+//         echo "ko";
+//         exit();
+//     }
+//     
+//     echo "ok";
+//     exit();
+// }
 
 if ($_POST['action'] == 'upload') {
     $resume = NULL;

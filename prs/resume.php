@@ -28,7 +28,6 @@ if (!isset($_GET['id'])) {
     redirect_to('login.php');
 }
 
-
 $resume = new Resume($_GET['member'], $_GET['id']);
 $file = $resume->get_file();
 

@@ -92,7 +92,6 @@ class MemberResumesPage extends Page {
         <div id="div_resumes">
             <table class="buttons">
                 <tr>
-                    <td class="left"><input class="button" type="button" id="delete_resumes" name="delete_resumes" value="Delete Selected Resumes" /></td>
                     <td class="right">
                         <input class="button" type="button" id="add_new_resume" name="add_new_resume" value="Create New Resume" />
                         <input class="button" type="button" id="upload_new_resume" name="upload_new_resume" value="Upload Resume" />
@@ -101,9 +100,6 @@ class MemberResumesPage extends Page {
             </table>
             <table class="header">
                 <tr>
-                    <td class="checkbox"><input type="checkbox" id="select_all" /></td>
-                    <!--td class="id">&nbsp;</td-->
-                    <td class="private"><span class="sort" id="sort_private">Private</span></td>
                     <td class="name"><span class="sort" id="sort_name">Resume Label</span></td>
                     <td class="date"><span class="sort" id="sort_modified_on">Modified On</span></td>
                 </tr>
@@ -112,7 +108,6 @@ class MemberResumesPage extends Page {
             </div>
             <table class="buttons">
                 <tr>
-                    <td class="left"><input class="button" type="button" id="delete_resumes_1" name="delete_resumes_1" value="Delete Selected Resumes" /></td>
                     <td class="right">
                         <input class="button" type="button" id="add_new_resume_1" name="add_new_resume_1" value="Create New Resume" />
                         <input class="button" type="button" id="upload_new_resume_1" name="upload_new_resume_1" value="Upload Resume" />
@@ -133,10 +128,10 @@ class MemberResumesPage extends Page {
                     <table class="upload_form">
                         <tr>
                             <td class="label"><label for="my_file">Resume File:</label></td>
-                            <td class="field"><input class="field" name="my_file" type="file" /><br/><span class="upload_note">1. Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed. <br />2. Only ONE resume can be uploaded to the system for every resume. <br />3. You can update your resume by clicking "<span style="font-weight: bold;">Update File</span>" button in the previous page next to the file name.</span></td>
+                            <td class="field"><input class="field" name="my_file" type="file" /><br/><span class="upload_note">1. Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed. <br />2. Only ONE resume can be uploaded to the system for every resume. <br />3. You can update your resume by clicking "<span style="font-weight: bold;">Replace Resume</span>" button in the previous page next to the file name.</span></td>
                         </tr>
                         <tr>
-                            <td class="buttons_left">&nbsp;</td>
+                            <td class="buttons_left"><input class="button" type="button" value="Cancel" onClick="show_resumes();" /></td>
                             <td class="buttons_right"><input class="button" type="submit" id="upload_resume" name="upload_resume" value="Upload" onClick="start_upload();" /></td>
                         </tr>
                     </table>
@@ -169,10 +164,6 @@ class MemberResumesPage extends Page {
                             <td class="label"><label for="name">Resume Label:</label></td>
                             <td class="field"><input class="field" type="text" id="name" name="name" value="Untitled Resume" /></td>
                         </tr>
-                        <!--tr>
-                            <td class="label"><label for="private">Private:</label></td>
-                            <td class="field"><input type="checkbox" id="private" name="private" checked/></td>
-                        </tr-->
                         <tr>
                             <td class="label"><label for="cover_note">Cover Note:</label></td>
                             <td class="field"><textarea id="cover_note" name="cover_note"></textarea></td>

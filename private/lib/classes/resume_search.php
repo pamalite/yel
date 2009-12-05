@@ -55,8 +55,6 @@ class ResumeSearch {
                                  resume_index.file_text) 
                           AGAINST ('". $keywords. "'". $boolean_mode. ")";
         
-        $filter_resume_status = "resumes.private = 'N'";
-        
         $filter_industry = "members.primary_industry IS NOT NULL OR members.primary_industry IS NULL";
         if ($this->industry > 0) {
             $filter_industry = "(members.primary_industry = ". $this->industry. " OR members.secondary_industry = ". $this->industry. ")";
@@ -96,17 +94,15 @@ class ResumeSearch {
            $query .= "WHERE ";
        }
        
-       $query .= $filter_resume_status. " 
-                  AND (". $filter_industry. ") 
+       $query .= "(". $filter_industry. ") 
                   AND (". $filter_country. ") 
                   AND members.active <> 'S' ";
        
        if ($with_limit) {
            $query .= "ORDER BY ". $this->order_by. " 
                       LIMIT ". $this->offset. ", ". $this->limit; 
-       } 
-        
-        
+       }
+       
        return $query;
     }
     
