@@ -58,18 +58,45 @@ class MemberReferralRequestsPage extends Page {
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
-        <div id="div_requests">
-            <table class="header">
-                <tr>
-                    <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
-                    <td class="title"><span class="sort" id="sort_title">Job</span></td>
-                    <td class="title"><span class="sort" id="sort_candidate">Contact</span></td>
-                    <td class="date"><span class="sort" id="sort_requested_on">Requested On</span></td>
-                    <td class="potential_title"><span class="sort" id="sort_reward">Potential Reward</span></td>
-                    <td class="actions">&nbsp;</td>
-                </tr>
-            </table>
-            <div id="div_list">
+        
+        <div id="div_tabs">
+            <ul>
+                <li id="li_from_contacts">From My Contacts</li>
+                <li id="li_from_me">From Myself</li>
+            </ul>
+        </div>
+        
+        <div id="div_from_contacts">        
+            <div id="div_requests">
+                <table class="header">
+                    <tr>
+                        <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
+                        <td class="title"><span class="sort" id="sort_title">Job</span></td>
+                        <td class="title"><span class="sort" id="sort_candidate">Contact</span></td>
+                        <td class="date"><span class="sort" id="sort_requested_on">Requested On</span></td>
+                        <td class="potential_title"><span class="sort" id="sort_reward">Potential Reward</span></td>
+                        <td class="actions">&nbsp;</td>
+                    </tr>
+                </table>
+                <div id="div_list">
+                </div>
+            </div>
+        </div>
+        
+        <div id="div_from_me">        
+            <div id="div_requests_from_me">
+                <table class="header">
+                    <tr>
+                        <td class="employer"><span class="sort" id="sort_from_me_employer">Employer</span></td>
+                        <td class="title"><span class="sort" id="sort_from_me_title">Job</span></td>
+                        <td class="title"><span class="sort" id="sort_from_me_referrer">Referrer</span></td>
+                        <td class="title">Resume</td>
+                        <td class="date"><span class="sort" id="sort_from_me_requested_on">Requested On</span></td>
+                        <td class="date"><span class="sort" id="sort_from_me_read_on">Resume Viewed On</span></td>
+                    </tr>
+                </table>
+                <div id="div_from_me_list">
+                </div>
             </div>
         </div>
         

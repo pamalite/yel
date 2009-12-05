@@ -21,29 +21,7 @@ if (!isset($_SESSION['yel']['member']) ||
 $resume = new Resume(0, $_GET['id']);
 $cover = $resume->get();
 
-if (!is_null($cover[0]['file_name'])) {
-    $file = $resume->get_file();
-
-    header('Content-type: '. $file['type']);
-    header('Content-Disposition: attachment; filename="'. $file['name'].'"');
-    header('Content-Transfer-Encoding: binary');
-    header('Expires: 0');
-    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-    header('Pragma: public');
-    header('Content-length: '. $file['size']);
-    ob_clean();
-    flush();
-    readfile($GLOBALS['resume_dir']. "/". $_GET['id']. ".". $file['hash']);
-    exit();
-} 
-
 $member = new Member($cover[0]['member']);
-$contacts = $member->get();
-$experiences = $resume->get_work_experiences();
-$educations = $resume->get_educations();
-$skills = $resume->get_skills();
-$technical_skills = $resume->get_technical_skills();
-
 $query = "SELECT COUNT(*) AS has_photo 
           FROM member_photos 
           WHERE member = '". $member->id(). "'";
@@ -54,6 +32,38 @@ $has_photo = false;
 if ($result[0]['has_photo'] > 0) {
     $has_photo = true;
 }
+
+
+if (!is_null($cover[0]['file_name'])) {
+    if ($has_photo) {
+        ?>
+            <div style="text-align: center;">
+                <a href="http://<?php echo $GLOBALS['root']. '/members/resume.php?id='. $_GET['id'] ?>">
+                    Click here to download the resume.
+                </a>
+            </div>
+            <br/>
+            <div style="text-align: center;">
+                <img src="candidate_photo.php?id=<?php echo $member->id() ?>" style="border: none;" />
+            </div>
+        <?php
+    } else {
+        ?>
+            <div style="text-align: center;">
+                <a href="http://<?php echo $GLOBALS['root']. '/members/resume.php?id='. $_GET['id'] ?>">
+                    Click here to download the resume.
+                </a>
+            </div>
+        <?php
+    }
+    exit();
+} 
+
+$contacts = $member->get();
+$experiences = $resume->get_work_experiences();
+$educations = $resume->get_educations();
+$skills = $resume->get_skills();
+$technical_skills = $resume->get_technical_skills();
 
 ?>
 
@@ -71,15 +81,6 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
 <body>
 <p class="disclaimer">Generated from YellowElevator.com.</p>
 <div id="div_buttons">
-    <?php
-        if ($has_photo) {
-    ?>
-            <a href="candidate_photo.php?id=<?php echo $member->id(); ?>">View Photo</a>
-            &nbsp;
-    <?php
-        }
-    ?>
-    &nbsp;
     <input class="button" type="button" value="Save as PDF" onClick="location.replace('resume_pdf.php?id=<?php echo $_GET['id'] ?>');"/>
     &nbsp;
     <input class="button" type="button" value="Print Resume" onClick="window.print();"/>
@@ -96,6 +97,20 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
         <tr>
             <td colspan="2" class="separator"></td>
         </tr>
+        <?php 
+            if ($has_photo) {
+                ?>
+        <tr>
+            <td colspan="2" class="title" style="border: none; ">
+                <img style="border: none; vertical-align: top;" src="candidate_photo.php?id=<?php echo $member->id(); ?>" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" class="separator"></td>
+        </tr>
+                <?php
+            }
+        ?>
         <tr>
             <td colspan="2" class="title">Contacts</td>
         </tr>
@@ -334,15 +349,6 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
 </div>
 
 <div id="div_buttons">
-    <?php
-        if ($has_photo) {
-    ?>
-            <a href="candidate_photo.php?id=<?php echo $member->id(); ?>">View Photo</a>
-            &nbsp;
-    <?php
-        }
-    ?>
-    &nbsp;
     <input class="button" type="button" value="Save as PDF" onClick="location.replace('resume_pdf.php?id=<?php echo $_GET['id'] ?>');"/>
     &nbsp;
     <input class="button" type="button" value="Print Resume" onClick="window.print();"/>

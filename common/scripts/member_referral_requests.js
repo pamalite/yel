@@ -1,7 +1,10 @@
 var order_by = 'requested_on';
 var order = 'desc';
+var from_me_order_by = 'requested_on';
+var from_me_order = 'desc';
 
 var candidate_names = new Array();
+var referrer_names = new Array();
 var job_names = new Array();
 var selected_candidate_name = '';
 var selected_candidate_id = '';
@@ -15,6 +18,14 @@ function ascending_or_descending() {
         order = 'asc';
     } else {
         order = 'desc';
+    }
+}
+
+function from_me_ascending_or_descending() {
+    if (from_me_order == 'desc') {
+        from_me_order = 'asc';
+    } else {
+        from_me_order = 'desc';
     }
 }
 
@@ -121,6 +132,15 @@ function show_testimony_form(_request_id, _candidate_index, _candidate_id, _job_
 }
 
 function show_requests() {
+    candidate_names = new Array();
+    job_names = new Array();
+    
+    $('div_from_me').setStyle('display', 'none');
+    $('div_from_contacts').setStyle('display', 'block');
+    
+    $('li_from_me').setStyle('border', '1px solid #0000FF');
+    $('li_from_contacts').setStyle('border', '1px solid #CCCCCC');
+    
     var params = 'id=' + id;
     params = params + '&order_by=' + order_by + ' ' + order;
     
@@ -178,7 +198,7 @@ function show_requests() {
                     html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
 
                     html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title"><a class="no_link" onClick="toggle_description(\'' + id + '\')">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="title"><a class="no_link" onClick="toggle_description(\'' + id + '\', false);">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="title">' + candidates[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="date">' + requested_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="reward">' + currencies[i].childNodes[0].nodeValue + '&nbsp;' + rewards[i].childNodes[0].nodeValue + '</td>' + "\n";
@@ -231,11 +251,110 @@ function show_requests() {
     request.send(params);
 }
 
-function toggle_description(job_id) {
-    if ($('desc_' + job_id).getStyle('display') == 'none') {
-        $('desc_' + job_id).setStyle('display', 'block');
+function show_requests_from_me() {
+    referrer_names = new Array();
+    job_names = new Array();
+    
+    $('div_from_me').setStyle('display', 'block');
+    $('div_from_contacts').setStyle('display', 'none');
+    
+    $('li_from_me').setStyle('border', '1px solid #CCCCCC');
+    $('li_from_contacts').setStyle('border', '1px solid #0000FF');
+    
+    var params = 'id=' + id + '&action=get_requests_from_me';
+    params = params + '&order_by=' + order_by + ' ' + order;
+    
+    var uri = root + "/members/referral_requests_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                set_status('An error occured while loading requests.');
+                return false;
+            }
+            
+            var has_requests = false;
+            var html = '<table id="list" class="list">';
+            if (txt == '0') {
+                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no requests from yourself.</div>';
+            } else {
+                var ids = xml.getElementsByTagName('id');
+                var job_ids = xml.getElementsByTagName('job_id');
+                var referrer_ids = xml.getElementsByTagName('referrer_id');
+                var employers = xml.getElementsByTagName('employer');
+                var titles = xml.getElementsByTagName('title');
+                var referrers = xml.getElementsByTagName('referrer');
+                var requested_ons = xml.getElementsByTagName('formatted_requested_on');
+                var viewed_ons = xml.getElementsByTagName('formatted_resume_viewed_on');
+                var resumes = xml.getElementsByTagName('resume');
+                var resume_names = xml.getElementsByTagName('resume_name');
+                
+                for (var i=0; i < ids.length; i++) {
+                    var id = ids[i].childNodes[0].nodeValue;
+                    referrer_names[i] = referrers[i].childNodes[0].nodeValue;
+                    job_names[i] = titles[i].childNodes[0].nodeValue;
+                    
+                    html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
+
+                    html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="title"><a class="no_link" onClick="toggle_description(\'' + id + '\', true);">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    
+                    html = html + '<td class="title"><a href="mailto:' + referrer_ids[i].childNodes[0].nodeValue + '">' + referrers[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>E-mail:</strong> ' + referrer_ids[i].childNodes[0].nodeValue + '</div></td>' + "\n";
+                    
+                    html = html + '<td class="title"><a href="resume_viewer.php?id=' + resumes[i].childNodes[0].nodeValue + '" target="_new">' + resume_names[i].childNodes[0].nodeValue + '</a></td>';
+                    html = html + '<td class="date">' + requested_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    
+                    var viewed_on = '<span style="font-size: 9pt; color: #CCCCCC;">Pending...</span>';
+                    if (viewed_ons[i].childNodes.length > 0) {
+                        viewed_on = viewed_ons[i].childNodes[0].nodeValue;
+                    }
+                    html = html + '<td class="date">' + viewed_on + '</td>' + "\n";
+                    
+                    html = html + '</tr>' + "\n";
+                    html = html + '<tr onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
+                    html = html + '<td colspan="7"><div class="description" id="from_me_desc_' + id + '"></div></td>' + "\n";
+                    html = html + '</tr>';
+                }
+                html = html + '</table>';
+                
+                has_requests = true;
+            }
+            
+            $('div_from_me_list').set('html', html);
+            
+            if (has_requests) {
+                var ids = xml.getElementsByTagName('id');
+                var descriptions = xml.getElementsByTagName('description');
+                
+                for (var i=0; i < ids.length; i++) {
+                    var id = ids[i].childNodes[0].nodeValue;
+                    $('from_me_desc_' + id).set('html', descriptions[i].childNodes[0].nodeValue);
+                }
+            }
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading requests...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function toggle_description(job_id, _from_me_tab) {
+    if (!_from_me_tab) {
+        if ($('desc_' + job_id).getStyle('display') == 'none') {
+            $('desc_' + job_id).setStyle('display', 'block');
+        } else {
+            $('desc_' + job_id).setStyle('display', 'none');
+        }
     } else {
-        $('desc_' + job_id).setStyle('display', 'none');
+        if ($('from_me_desc_' + job_id).getStyle('display') == 'none') {
+            $('from_me_desc_' + job_id).setStyle('display', 'block');
+        } else {
+            $('from_me_desc_' + job_id).setStyle('display', 'none');
+        }
     }
 }
 
@@ -375,8 +494,39 @@ function refer() {
     request.send(params);
 }
 
+function set_mouse_events() {
+    $('li_from_contacts').addEvent('mouseover', function() {
+        $('li_from_contacts').setStyles({
+            'color': '#FF0000',
+            'text-decoration': 'underline'
+        });
+    });
+    
+    $('li_from_contacts').addEvent('mouseout', function() {
+        $('li_from_contacts').setStyles({
+            'color': '#000000',
+            'text-decoration': 'none'
+        });
+    });
+    
+    $('li_from_me').addEvent('mouseover', function() {
+        $('li_from_me').setStyles({
+            'color': '#FF0000',
+            'text-decoration': 'underline'
+        });
+    });
+    
+    $('li_from_me').addEvent('mouseout', function() {
+        $('li_from_me').setStyles({
+            'color': '#000000',
+            'text-decoration': 'none'
+        });
+    });
+}
+
 function onDomReady() {
     set_root();
+    set_mouse_events();
     get_employers_for_mini();
     get_industries_for_mini();
     get_referrals_count();
@@ -399,6 +549,9 @@ function onDomReady() {
     $('testimony_answer_4').addEvent('keypress', function() {
        update_word_count_of('word_count_q4', 'testimony_answer_4') 
     });
+    
+    $('li_from_contacts').addEvent('click', show_requests);
+    $('li_from_me').addEvent('click', show_requests_from_me);
     
     $('sort_employer').addEvent('click', function() {
         order_by = 'employer';
@@ -430,6 +583,35 @@ function onDomReady() {
         show_requests();
     });
     
+    $('sort_from_me_employer').addEvent('click', function() {
+        from_me_order_by = 'employer';
+        from_me_ascending_or_descending();
+        show_requests_from_me();
+    });
+    
+    $('sort_from_me_title').addEvent('click', function() {
+        from_me_order_by = 'title';
+        from_me_ascending_or_descending();
+        show_requests_from_me();
+    });
+     
+    $('sort_from_me_referrer').addEvent('click', function() {
+        from_me_order_by = 'members.lastname';
+        from_me_ascending_or_descending();
+        show_requests_from_me();
+    });
+    
+    $('sort_from_me_requested_on').addEvent('click', function() {
+        from_me_order_by = 'requested_on';
+        from_me_ascending_or_descending();
+        show_requests_from_me();
+    });
+    
+    $('sort_from_me_read_on').addEvent('click', function() {
+        from_me_order_by = 'referrer_read_resume_on';
+        from_me_ascending_or_descending();
+        show_requests_from_me();
+    });
     
     show_requests();
     

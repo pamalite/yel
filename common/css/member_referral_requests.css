@@ -1,3 +1,39 @@
+#div_from_me {
+    display: none;
+}
+
+#div_tabs {
+    text-align: center;
+}
+
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
+}
+
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
+}
+
+#li_from_contacts {
+    border: 1px solid #CCCCCC;
+}
+
+#li_from_me {
+    border: 1px solid #0000FF;
+}
+
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
 td.actions {
     width: 163px;
     text-align: center;
