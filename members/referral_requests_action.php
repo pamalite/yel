@@ -135,8 +135,7 @@ if ($_POST['action'] == 'get_requests_from_me') {
               referrals.resume, resumes.name AS resume_name, 
               referrals.member, referrals.referee_acknowledged_on, 
               CONCAT(members.lastname, ', ', members.firstname), jobs.description, 
-              DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y'), 
-              DATE_FORMAT(referrals.member_read_resume_on, '%e %b, %Y') 
+              DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y') 
               FROM referrals 
               LEFT JOIN  resumes ON resumes.id = referrals.resume 
               LEFT JOIN jobs ON jobs.id = referrals.job 
