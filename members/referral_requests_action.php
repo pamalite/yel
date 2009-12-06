@@ -116,20 +116,41 @@ if ($_POST['action'] == 'get_requests_from_me') {
               referral_requests.resume, resumes.name AS resume_name, 
               referral_requests.referrer AS referrer_id, referral_requests.requested_on, 
               CONCAT(members.lastname, ', ', members.firstname) AS referrer, jobs.description, 
-              DATE_FORMAT(referral_requests.requested_on, '%e %b, %Y') AS formatted_requested_on, 
-              DATE_FORMAT(referral_requests.referrer_read_resume_on, '%e %b, %Y') AS formatted_resume_viewed_on 
+              DATE_FORMAT(referral_requests.requested_on, '%e %b, %Y') AS formatted_requested_on 
               FROM referral_requests 
               LEFT JOIN resumes ON resumes.id = referral_requests.resume 
               LEFT JOIN jobs ON jobs.id = referral_requests.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
               LEFT JOIN members ON members.email_addr = referral_requests.member 
               LEFT JOIN member_referees ON member_referees.member = referral_requests.referrer AND 
-              member_referees.referee = referral_requests.member
+              member_referees.referee = referral_requests.member 
               WHERE referral_requests.member = '". $_POST['id']. "' AND 
               member_referees.referee = '". $_POST['id']. "' AND 
               referral_requests.rejected = 'N' AND 
               (referral_requests.referrer_acknowledged_on IS NULL OR referral_requests.referrer_acknowledged_on = '0000-00-00 00:00:00') AND 
               (referral_requests.acknowledged_by_others_on IS NULL OR referral_requests.acknowledged_by_others_on = '0000-00-00 00:00:00') 
+              AND (jobs.closed = 'N' AND jobs.expire_on >= NOW()) 
+              UNION 
+              SELECT referrals.id, employers.name, jobs.id, jobs.title, 
+              referrals.resume, resumes.name AS resume_name, 
+              referrals.member, referrals.referee_acknowledged_on, 
+              CONCAT(members.lastname, ', ', members.firstname), jobs.description, 
+              DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y'), 
+              DATE_FORMAT(referrals.member_read_resume_on, '%e %b, %Y') 
+              FROM referrals 
+              LEFT JOIN  resumes ON resumes.id = referrals.resume 
+              LEFT JOIN jobs ON jobs.id = referrals.job 
+              LEFT JOIN employers ON employers.id = jobs.employer 
+              LEFT JOIN members ON members.email_addr = referrals.referee 
+              LEFT JOIN member_referees ON member_referees.member = referrals.member AND 
+              member_referees.referee = referrals.referee 
+              WHERE referrals.referee = '". $_POST['id']. "' AND 
+              member_referees.referee = '". $_POST['id']. "' AND 
+              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
+              referrals.resume IS NOT NULL AND 
+              (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
+              (referrals.member_confirmed_on IS NULL OR referrals.member_confirmed_on = '0000-00-00 00:00:00') AND 
+              (referrals.member_rejected_on IS NULL OR referrals.member_rejected_on = '0000-00-00 00:00:00') 
               AND (jobs.closed = 'N' AND jobs.expire_on >= NOW()) 
               ORDER BY ". $order_by;
     

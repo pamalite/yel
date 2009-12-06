@@ -262,7 +262,7 @@ function show_requests_from_me() {
     $('li_from_contacts').setStyle('border', '1px solid #0000FF');
     
     var params = 'id=' + id + '&action=get_requests_from_me';
-    params = params + '&order_by=' + order_by + ' ' + order;
+    params = params + '&order_by=' + from_me_order_by + ' ' + from_me_order;
     
     var uri = root + "/members/referral_requests_action.php";
     var request = new Request({
@@ -286,7 +286,6 @@ function show_requests_from_me() {
                 var titles = xml.getElementsByTagName('title');
                 var referrers = xml.getElementsByTagName('referrer');
                 var requested_ons = xml.getElementsByTagName('formatted_requested_on');
-                var viewed_ons = xml.getElementsByTagName('formatted_resume_viewed_on');
                 var resumes = xml.getElementsByTagName('resume');
                 var resume_names = xml.getElementsByTagName('resume_name');
                 
@@ -304,12 +303,6 @@ function show_requests_from_me() {
                     
                     html = html + '<td class="title"><a href="resume_viewer.php?id=' + resumes[i].childNodes[0].nodeValue + '" target="_new">' + resume_names[i].childNodes[0].nodeValue + '</a></td>';
                     html = html + '<td class="date">' + requested_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    
-                    var viewed_on = '<span style="font-size: 9pt; color: #CCCCCC;">Pending...</span>';
-                    if (viewed_ons[i].childNodes.length > 0) {
-                        viewed_on = viewed_ons[i].childNodes[0].nodeValue;
-                    }
-                    html = html + '<td class="date">' + viewed_on + '</td>' + "\n";
                     
                     html = html + '</tr>' + "\n";
                     html = html + '<tr onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
@@ -603,12 +596,6 @@ function onDomReady() {
     
     $('sort_from_me_requested_on').addEvent('click', function() {
         from_me_order_by = 'requested_on';
-        from_me_ascending_or_descending();
-        show_requests_from_me();
-    });
-    
-    $('sort_from_me_read_on').addEvent('click', function() {
-        from_me_order_by = 'referrer_read_resume_on';
         from_me_ascending_or_descending();
         show_requests_from_me();
     });

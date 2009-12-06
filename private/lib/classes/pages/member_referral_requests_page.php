@@ -92,7 +92,6 @@ class MemberReferralRequestsPage extends Page {
                         <td class="title"><span class="sort" id="sort_from_me_referrer">Referrer</span></td>
                         <td class="title">Resume</td>
                         <td class="date"><span class="sort" id="sort_from_me_requested_on">Requested On</span></td>
-                        <td class="date"><span class="sort" id="sort_from_me_read_on">Resume Viewed On</span></td>
                     </tr>
                 </table>
                 <div id="div_from_me_list">

@@ -204,7 +204,7 @@ class JobPage extends Page {
         } 
         
         if (!$this->is_employee_viewing) {
-            if ($job['expired'] > 0 || $job['closed'] == 'Y') {
+            if ($job['expired'] >= 0 || $job['closed'] == 'Y') {
                 $error_message = 'The job that you are looking for is no longer available.';
             }
         }
