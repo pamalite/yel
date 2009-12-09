@@ -44,7 +44,7 @@ if ($_POST['action'] == 'upload') {
     $data['FILE'] = array();
     $data['FILE']['type'] = $_FILES['my_file']['type'];
     $data['FILE']['size'] = $_FILES['my_file']['size'];
-    $data['FILE']['name'] = $_FILES['my_file']['name'];
+    $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_file']['name']));
     $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
 
     if (!$member->create_photo($data)) {
