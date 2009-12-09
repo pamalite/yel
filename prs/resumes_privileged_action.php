@@ -266,7 +266,7 @@ if ($_POST['action'] == 'upload_resume') {
     $is_update = false;
     $data = array();
     $data['modified_on'] = now();
-    $data['name'] = $_FILES['my_file']['name'];
+    $data['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_file']['name']));
     $data['private'] = 'N';
     
     if ($_POST['id'] == '0') {
@@ -292,7 +292,7 @@ if ($_POST['action'] == 'upload_resume') {
     $data['FILE'] = array();
     $data['FILE']['type'] = $_FILES['my_file']['type'];
     $data['FILE']['size'] = $_FILES['my_file']['size'];
-    $data['FILE']['name'] = $_FILES['my_file']['name'];
+    $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_file']['name']));
     $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
     
     if (!$resume->upload_file($data, $is_update)) {
