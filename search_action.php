@@ -689,7 +689,7 @@ if ($_POST['action'] == 'quick_refer') {
             $data['FILE'] = array();
             $data['FILE']['type'] = $_FILES['qr_my_file']['type'];
             $data['FILE']['size'] = $_FILES['qr_my_file']['size'];
-            $data['FILE']['name'] = $_FILES['qr_my_file']['name'];
+            $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['qr_my_file']['name']));
             $data['FILE']['tmp_name'] = $_FILES['qr_my_file']['tmp_name'];
             if (!$resume->upload_file($data)) {
                 $query = "DELETE FROM resume_index WHERE resume = ". $resume->id(). ";
@@ -755,7 +755,7 @@ if ($_POST['action'] == 'quick_refer') {
     // 1. create resume record
     $data = array();
     $data['modified_on'] = $today;
-    $data['name'] = $_FILES['qr_my_file']['name'];
+    $data['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['qr_my_file']['name']));
     $data['private'] = 'N';
     $resume = new Resume($candidate_email);
     if (!$resume->create($data)) {
@@ -768,7 +768,7 @@ if ($_POST['action'] == 'quick_refer') {
     $data['FILE'] = array();
     $data['FILE']['type'] = $_FILES['qr_my_file']['type'];
     $data['FILE']['size'] = $_FILES['qr_my_file']['size'];
-    $data['FILE']['name'] = $_FILES['qr_my_file']['name'];
+    $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['qr_my_file']['name']));
     $data['FILE']['tmp_name'] = $_FILES['qr_my_file']['tmp_name'];
     if (!$resume->upload_file($data)) {
         $query = "DELETE FROM resume_index WHERE resume = ". $resume->id(). ";
@@ -882,7 +882,7 @@ if ($_POST['action'] == 'quick_upload') {
         }
 
         $data = array();
-        $data['file_name'] = basename($resume_file['name']);
+        $data['file_name'] = str_replace(array('\'', '"', '\\'), '', basename($resume_file['name']));
         $data['file_hash'] = generate_random_string_of(3). '.'. generate_random_string_of(6);
         $data['file_type'] = $resume_file['type'];
         $data['file_size'] = $resume_file['size'];
