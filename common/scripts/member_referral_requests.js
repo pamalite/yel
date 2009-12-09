@@ -112,7 +112,13 @@ function show_testimony_form(_request_id, _candidate_index, _candidate_id, _job_
         window_width = document.documentElement.clientWidth;
     }
     
-    $('div_testimony_form').setStyle('top', ((window_height - div_height) / 2));
+    if (window_height <= div_height) {
+        $('div_testimony_form').setStyle('height', window_height);
+        $('div_testimony_form').setStyle('top', 0);
+        window.scrollTo(0, 0);
+    } else {
+        $('div_testimony_form').setStyle('top', ((window_height - div_height) / 2));
+    }
     $('div_testimony_form').setStyle('left', ((window_width - div_width) / 2));
     
     var testimony_form = $('div_testimony_form');

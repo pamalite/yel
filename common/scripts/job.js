@@ -348,7 +348,12 @@ function show_refer_job() {
         window_width = document.documentElement.clientWidth;
     }
     
-    $('div_refer_form').setStyle('top', ((window_height - div_height) / 2));
+    if (window_height <= div_height) {
+        $('div_refer_form').setStyle('height', window_height);
+        $('div_refer_form').setStyle('top', 0);
+    } else {
+        $('div_refer_form').setStyle('top', ((window_height - div_height) / 2));
+    }
     $('div_refer_form').setStyle('left', ((window_width - div_width) / 2));
     
     $('job_title').set('html', $('job.title').get('html'));
@@ -575,7 +580,13 @@ function show_refer_me() {
         window_width = document.documentElement.clientWidth;
     }
     
-    $('div_acknowledge_form').setStyle('top', ((window_height - div_height) / 2));
+    if (window_height <= div_height) {
+        $('div_acknowledge_form').setStyle('height', window_height);
+        $('div_acknowledge_form').setStyle('top', 0);
+        window.scrollTo(0, 0);
+    } else {
+        $('div_acknowledge_form').setStyle('top', ((window_height - div_height) / 2));
+    }
     $('div_acknowledge_form').setStyle('left', ((window_width - div_width) / 2));
     
     var params = 'id=' + id;
@@ -772,7 +783,12 @@ function show_quick_refer_form() {
         window_width = document.documentElement.clientWidth;
     }
     
-    $('div_quick_refer_form').setStyle('top', ((window_height - div_height) / 2));
+    if (window_height <= div_height) {
+        $('div_quick_refer_form').setStyle('height', window_height);
+        $('div_quick_refer_form').setStyle('top', 0);
+    } else {
+        $('div_quick_refer_form').setStyle('top', ((window_height - div_height) / 2));
+    }
     $('div_quick_refer_form').setStyle('left', ((window_width - div_width) / 2));
     
     var quick_refer_form = $('div_quick_refer_form');
@@ -812,7 +828,12 @@ function show_quick_upload_form() {
         window_width = document.documentElement.clientWidth;
     }
     
-    $('div_quick_upload_form').setStyle('top', ((window_height - div_height) / 2));
+    if (window_height <= div_height) {
+        $('div_quick_upload_form').setStyle('height', window_height);
+        $('div_quick_upload_form').setStyle('top', 0);
+    } else {
+        $('div_quick_upload_form').setStyle('top', ((window_height - div_height) / 2));
+    }
     $('div_quick_upload_form').setStyle('left', ((window_width - div_width) / 2));
     
     $('qu_job_title').set('html', $('job.title').get('html'));

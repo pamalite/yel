@@ -120,7 +120,7 @@ if ($_POST['action'] == 'get_jobs') {
               ) AS num_kiv 
               FROM jobs 
               LEFT JOIN industries ON industries.id = jobs.industry 
-              WHERE jobs.employer = '". $_POST['id']. "' AND jobs.closed = 'N' 
+              WHERE jobs.employer = '". $_POST['id']. "' 
               ORDER BY ". $order_by;
     $mysqli = Database::connect();
     $jobs = $mysqli->query($query);
