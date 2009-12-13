@@ -232,6 +232,10 @@ class WelcomePage extends Page {
                                 <a href="http://www.silterra.com" target="_new">
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/silterra.jpg" alt="dsem" style="width: 105px; height: 93px; vertical-align: middle;" />
                                 </a>
+                                &nbsp;&nbsp;&nbsp;
+                                <a href="http://www.my-essence.com/" target="_new">
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/essence.jpg" alt="dsem" style="width: 105px; height: 93px; vertical-align: middle;" />
+                                </a>
                             </div>
                         </td>
                         <td width="23"><a id="toggle_right" class="no_link"><img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/nav-logo-right.jpg" width="23" height="134" class="prev" /></a></td>

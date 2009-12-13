@@ -195,7 +195,8 @@ if ($_POST['action'] == 'publish') {
         $data['salary_end'] = 'NULL';
     }
     $data['potential_reward'] = Job::calculate_potential_reward_from($salary_end, $_POST['employer']);
-    
+    print_r($data);
+    exit();
     // Check whether employer's account is ready.
     if ($data['potential_reward'] <= 0) {
         echo '-1';

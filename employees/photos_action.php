@@ -62,6 +62,10 @@ if ($_POST['action'] == 'approve_photo') {
         exit();
     }
     
+    $message = 'The photo that you have uploaded is approved and is now viewable by employers.';
+    $subject = "Uploaded Photo Approved";
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    mail($_POST['member'], $subject, $message, $headers);
     echo 'ok';
     exit();
 }
@@ -72,6 +76,11 @@ if ($_POST['action'] == 'disapprove_photo') {
         echo 'ko';
         exit();
     }
+    
+    $message = 'The photo that you have uploaded cannot be approved. Please upload a new photo at the "Photo" section in your member account.';
+    $subject = "Uploaded Photo Cannot Be Approved";
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    mail($_POST['member'], $subject, $message, $headers);
     
     echo 'ok';
     exit();

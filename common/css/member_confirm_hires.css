@@ -13,21 +13,21 @@ td.id {
 }
 
 td.confirm {
-    width: 120px;
+    width: 17%;
     text-align: center;
     vertical-align: middle;
 }
 
 td.employer {
-    width: 150px;
+    width: 15%;
 }
 
 td.title {
-    width: 150px;
+    width: 15%;
 }
 
 td.date {
-    width: 150px;
+    width: 10%;
 }
 
 span.sort {

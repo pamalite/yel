@@ -17,7 +17,7 @@ function close_photo_preview() {
 
 function show_photo_preview(_id, _email_addr, _name) {
     var html = '<input type="button" onClick="close_photo_preview();" value="Close" />&nbsp;';
-    html = html + '<input type="button" onClick="approve_photo(\'' + _id + '\');" value="Approve" />&nbsp;';
+    html = html + '<input type="button" onClick="approve_photo(\'' + _id + '\', \'' + _email_addr + '\');" value="Approve" />&nbsp;';
     html = html + '<input type="button" onClick="disapprove_photo(\'' + _id + '\', \'' + _email_addr + '\');" value="Disapprove" />';
     
     $('member_name').set('html', _name);
@@ -94,13 +94,13 @@ function show_photos() {
     request.send(params);
 }
 
-function approve_photo(_photo_id) {
+function approve_photo(_photo_id, _email_addr) {
     var is_ok = confirm('Are you sure to APPROVE this photo?');
     if (!is_ok) {
         return false;
     }
     
-    var params = 'id=' + _photo_id;
+    var params = 'id=' + _photo_id + '&member=' + _email_addr;
     params = params + '&action=approve_photo';
     
     var uri = root + "/employees/photos_action.php";

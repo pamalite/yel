@@ -599,7 +599,7 @@ function show_refer_me() {
         onSuccess: function(txt, xml) {
             set_status('');
             if (txt == '0') {
-                alert('You have not created or uploaded your resume yet. In order to request for a referral, you need to either create or upload a resume at the "Resumes" section. \n\nIf you have already created one, please ensure that the \'Private\' check box is unchecked.');
+                alert('You have not created or uploaded your resume yet. In order to request for a referral, you need to either create or upload a resume at the "Resumes" section.');
                 referral = 0;
                 return false;
             }
