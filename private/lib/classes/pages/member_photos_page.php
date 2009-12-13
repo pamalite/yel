@@ -50,9 +50,10 @@ class MemberPhotosPage extends Page {
         }
         
         ?>
-        <div class="banner">
-            Please ensure that the photos you uploaded are decent and appropriate i.e. not of any controversial, offensive or sexually explicit in nature.<br/><br/>
-            We reserve the right to disapprove your photos and remove them based on our discretion.
+        <div class="banner" id="div_banner">
+            <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guide</a>
+            <br/>
+            <img style="border: none;" src="..\common\images\banner_photo.jpg" />
         </div>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>

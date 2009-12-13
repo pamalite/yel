@@ -651,6 +651,49 @@ function refer_me() {
     request.send(params);
 }
 
+function toggle_banner() {
+    var height = $('div_banner').getStyle('height');
+    var params = 'id=' + id + '&action=set_hide_banner';
+    
+    if (parseInt(height) >= 100) {
+        $('hide_show_label').set('html', 'Show');
+        $('div_banner').tween('height', '15px');
+        params = params + '&hide=1';
+    } else {
+        $('hide_show_label').set('html', 'Hide');
+        $('div_banner').tween('height', '230px');
+        params = params + '&hide=0';
+    }
+    
+    var uri = root + "/members/saved_jobs_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post'
+    });
+    
+    request.send(params);
+}
+
+function hide_show_banner() {
+    var params = 'id=' + id + '&action=get_hide_banner';
+    
+    var uri = root + "/members/saved_jobs_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post', 
+        onSuccess: function(txt, xml) {
+            if (txt == '1') {
+                $('hide_show_label').set('html', 'Show');
+                $('div_banner').setStyle('height', '15px');
+            } else {
+                $('hide_show_label').set('html', 'Hide');
+                $('div_banner').setStyle('height', '230px');
+            }
+        }
+    });
+    
+    request.send(params);
+}
 
 function set_mouse_events() {
     /*$('li_open').addEvent('mouseover', function() {
@@ -677,6 +720,8 @@ function onDomReady() {
     get_requests_count();
     get_jobs_employed_count();
     set_mouse_events();
+    
+    hide_show_banner();
     
     $('remove_jobs').addEvent('click', remove_jobs);
     $('remove_jobs_1').addEvent('click', remove_jobs);

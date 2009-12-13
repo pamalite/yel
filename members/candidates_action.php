@@ -128,4 +128,37 @@ if ($_POST['action'] == 'find') {
     exit();
 }
 
+if ($_POST['action'] == 'get_hide_banner') {
+    $query = "SELECT pref_value FROM member_banners 
+              WHERE member = '". $_POST['id']. "' AND pref_key = 'hide_contacts_banner' LIMIT 1";
+    $mysqli = Database::connect();
+    $result = $mysqli->query($query);
+    if (is_null($result)) {
+        echo '0';
+    } else {
+        echo $result[0]['pref_value']; 
+    }
+    
+    exit();
+}
+
+if ($_POST['action'] == 'set_hide_banner') {
+    $query = "SELECT id FROM member_banners 
+              WHERE member = '". $_POST['id']. "' AND pref_key = 'hide_contacts_banner' LIMIT 1";
+    $mysqli = Database::connect();
+    $result = $mysqli->query($query);
+    if ($result[0]['id'] > 0) {
+        $query = "UPDATE member_banners SET pref_value = '". $_POST['hide']. "' WHERE id = ". $result[0]['id'];
+    } else {
+        $query = "INSERT INTO member_banners SET 
+                  id = 0,
+                  pref_key = 'hide_contacts_banner', 
+                  pref_value = '". $_POST['hide']. "',
+                  member = '". $_POST['id']. "'";
+    }
+    
+    $mysqli->execute($query);
+    
+    exit();
+}
 ?>

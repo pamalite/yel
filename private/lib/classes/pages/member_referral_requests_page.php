@@ -55,6 +55,12 @@ class MemberReferralRequestsPage extends Page {
         $this->menu('member', 'referral_requests');
         
         ?>
+        <div class="banner" id="div_banner">
+            <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guide</a>
+            <br/>
+            <img style="border: none;" src="..\common\images\banner_referral_request.jpg" />
+        </div>
+        
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
@@ -62,7 +68,7 @@ class MemberReferralRequestsPage extends Page {
         <div id="div_tabs">
             <ul>
                 <li id="li_from_contacts">From My Contacts</li>
-                <li id="li_from_me">From Myself</li>
+                <li id="li_from_me">By Myself</li>
             </ul>
         </div>
         

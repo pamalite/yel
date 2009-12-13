@@ -82,10 +82,12 @@ class MemberResumesPage extends Page {
         $this->menu('member', 'resumes');
         
         ?>
-        <div class="banner">
-            You are allowed to create multiple resumes for different job applications.<br/><br/>
-            In order to apply for a desired job position, you MUST be referred by another member. If you come across a job position that you are interested in, please get a member who knows you well to refer you. Only someone who knows you well will be able to write a good testimonial about you.
+        <div class="banner" id="div_banner">
+            <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guide</a>
+            <br/>
+            <img style="border: none;" src="..\common\images\banner_resumes.jpg" />
         </div>
+        
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>

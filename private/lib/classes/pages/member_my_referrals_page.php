@@ -85,6 +85,11 @@ class MemberMyReferralsPage extends Page {
         $this->menu('member', 'my_referrals');
         
         ?>
+        <div class="banner" id="div_banner">
+            <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guide</a>
+            <br/>
+            <img style="border: none;" src="..\common\images\banner_my_referral.jpg" />
+        </div>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>

@@ -1,3 +1,12 @@
+div.banner {
+    text-align: center;
+}
+
+#div_banner {
+    overflow: hidden;
+    /*height: 175px;*/
+}
+
 div.profile {
     padding-top: 20px;
 }

@@ -1,5 +1,10 @@
-div.notice {
+div.banner {
     text-align: center;
+}
+
+#div_banner {
+    overflow: hidden;
+    /*height: 175px;*/
 }
 
 div.description {

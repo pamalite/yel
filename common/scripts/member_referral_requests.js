@@ -493,6 +493,50 @@ function refer() {
     request.send(params);
 }
 
+function toggle_banner() {
+    var height = $('div_banner').getStyle('height');
+    var params = 'id=' + id + '&action=set_hide_banner';
+    
+    if (parseInt(height) >= 100) {
+        $('hide_show_label').set('html', 'Show');
+        $('div_banner').tween('height', '15px');
+        params = params + '&hide=1';
+    } else {
+        $('hide_show_label').set('html', 'Hide');
+        $('div_banner').tween('height', '300px');
+        params = params + '&hide=0';
+    }
+    
+    var uri = root + "/members/referral_requests_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post'
+    });
+    
+    request.send(params);
+}
+
+function hide_show_banner() {
+    var params = 'id=' + id + '&action=get_hide_banner';
+    
+    var uri = root + "/members/referral_requests_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post', 
+        onSuccess: function(txt, xml) {
+            if (txt == '1') {
+                $('hide_show_label').set('html', 'Show');
+                $('div_banner').setStyle('height', '15px');
+            } else {
+                $('hide_show_label').set('html', 'Hide');
+                $('div_banner').setStyle('height', '300px');
+            }
+        }
+    });
+    
+    request.send(params);
+}
+
 function set_mouse_events() {
     $('li_from_contacts').addEvent('mouseover', function() {
         $('li_from_contacts').setStyles({
@@ -532,6 +576,8 @@ function onDomReady() {
     get_requests_count();
     get_jobs_employed_count();
     set_mini_keywords();
+    
+    hide_show_banner();
     
     $('testimony_answer_1').addEvent('keypress', function() {
        update_word_count_of('word_count_q1', 'testimony_answer_1') 

@@ -36,10 +36,11 @@ class MemberConfirmHiresPage extends Page {
         $this->menu('member', 'confirm_hires');
         
         ?>
-        <div class="notice">
-                <img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/member_banners/confirm_employ.jpg" />
-        </div>
-        
+        <div class="banner" id="div_banner">
+            <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guide</a>
+            <br/>
+            <img style="border: none;" src="..\common\images\banner_jobs_applied.jpg" />
+        </div>        
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>

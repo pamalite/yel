@@ -45,6 +45,50 @@ function stop_upload(success) {
     }
 }
 
+function toggle_banner() {
+    var height = $('div_banner').getStyle('height');
+    var params = 'id=' + id + '&action=set_hide_banner';
+    
+    if (parseInt(height) >= 100) {
+        $('hide_show_label').set('html', 'Show');
+        $('div_banner').tween('height', '15px');
+        params = params + '&hide=1';
+    } else {
+        $('hide_show_label').set('html', 'Hide');
+        $('div_banner').tween('height', '230px');
+        params = params + '&hide=0';
+    }
+    
+    var uri = root + "/members/photos_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post'
+    });
+    
+    request.send(params);
+}
+
+function hide_show_banner() {
+    var params = 'id=' + id + '&action=get_hide_banner';
+    
+    var uri = root + "/members/photos_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post', 
+        onSuccess: function(txt, xml) {
+            if (txt == '1') {
+                $('hide_show_label').set('html', 'Show');
+                $('div_banner').setStyle('height', '15px');
+            } else {
+                $('hide_show_label').set('html', 'Hide');
+                $('div_banner').setStyle('height', '230px');
+            }
+        }
+    });
+    
+    request.send(params);
+}
+
 function onDomReady() {
     set_root();
     get_employers_for_mini();
@@ -53,6 +97,8 @@ function onDomReady() {
     get_referrals_count();
     get_requests_count();
     get_jobs_employed_count();
+    
+    hide_show_banner();
     
     var suggest_url = root + '/common/php/search_suggest.php';
     new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {

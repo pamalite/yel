@@ -115,11 +115,13 @@ class MemberCandidatesPage extends Page {
         $this->menu('member', 'candidates');
         
         ?>
+        <div class="banner" id="div_banner">
+            <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guide</a>
+            <br/>
+            <img style="border: none;" src="..\common\images\banner_contacts.jpg" />
+        </div>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
-        </div>
-        <div id="banner" class="banner">
-            <img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/member_banners/add_contacts.jpg" />
         </div>
         <div id="div_tabs">
             <ul>

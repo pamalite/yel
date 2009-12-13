@@ -1,11 +1,10 @@
 div.banner {
-    border: none;
-    padding-top: 10px;
-    padding-bottom: 10px;
     text-align: center;
-    font-size: 9pt;
-    margin-left: 250px;
-    margin-right: 250px;
+}
+
+#div_banner {
+    overflow: hidden;
+    /*height: 175px;*/
 }
 
 table.upload_form, table.cover_note_form, table.experiences_form, 

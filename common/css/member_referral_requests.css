@@ -34,6 +34,15 @@ div.phone_num {
     font-style: italic;
 }
 
+div.banner {
+    text-align: center;
+}
+
+#div_banner {
+    overflow: hidden;
+    /*height: 175px;*/
+}
+
 td.actions {
     width: 163px;
     text-align: center;

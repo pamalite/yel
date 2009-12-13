@@ -36,9 +36,10 @@ class MemberBanksPage extends Page {
         $this->menu('member', 'banks');
         
         ?>
-        <div class="banner">
-            We will bank your rewards directly into your account for every successful job referral you make.<br/><br/>
-            Please ensure that the bank account information you provide is genuine and accurate. Failure to do so may result in you not receiving your reward.
+        <div class="banner" id="div_banner">
+            <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guide</a>
+            <br/>
+            <img style="border: none;" src="..\common\images\banner_bank_accounts.jpg" />
         </div>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
