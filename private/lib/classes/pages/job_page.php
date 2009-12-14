@@ -321,22 +321,52 @@ class JobPage extends Page {
                     <?php
                     if (!is_null($this->member)) {
                         ?>
-                        <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />&nbsp;<input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" />
+                        <!--input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />&nbsp;<input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" /-->
+                        <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />
                         <?php
                     } else {
                         ?>
-                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" /> or <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" /> or <input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" />
+                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" /> or <!--input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" /> or <input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" /-->
+                        <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />
                         <?php
                     }
                     ?>
-                        <br/>
-                        Or, you can <input class="button" type="button" id="upload_resume" name="upload_resume" value="Upload" onClick="show_quick_upload_form();" /> your friend's resume to us, and we will do the rest.
+                        <!--br/>
+                        Or, you can <input class="button" type="button" id="upload_resume" name="upload_resume" value="Upload" onClick="show_quick_upload_form();" /> your friend's resume to us, and we will do the rest.-->
                     </td>
                 </tr>
             </table>
         </div>
         
         <div id="div_blanket"></div>
+        <div id="div_refer_options">
+            <table class="refer_options">
+                <tr>
+                    <td>
+                        <a class="no_link" onClick="show_refer_job();">Standard</a>
+                    </td>
+                    <td>
+                        <a class="no_link" onClick="show_quick_refer_form();">Express</a>
+                    </td>
+                    <td>
+                        <a class="no_link" onClick="show_quick_upload_form();">Ask Yellow Elevator</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                    <?php
+                    if (is_null($this->member)) {
+                    ?>
+                        <a href="../members/sign_up.php">Sign Up</a>&nbsp;
+                    <?php
+                    }
+                    ?>
+                        <a class="no_link" onClick="close_refer_options();">Continue Browsing</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
         <div id="div_refer_form">
             <form onSubmit="return false;">
                 <table class="refer_form">
