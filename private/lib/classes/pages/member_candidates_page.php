@@ -118,7 +118,7 @@ class MemberCandidatesPage extends Page {
         <div class="banner" id="div_banner">
             <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guide</a>
             <br/>
-            <img style="border: none;" src="..\common\images\banner_contacts.jpg" />
+            <img style="border: none;" src="../common/images/banner_contacts.jpg" />
         </div>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>

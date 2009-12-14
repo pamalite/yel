@@ -99,10 +99,10 @@ function show_employed_jobs() {
                 
                 if (enable_confirm_button) {
                     // html = html + '<td class="confirm"><input class="button" type="button" value="I\'m Employed" onClick="confirm_hire(\'' + referral_id.childNodes[0].nodeValue + '\', \'' + titles[i].childNodes[0].nodeValue + '\', \'' + employers[i].childNodes[0].nodeValue + '\');" /></td>' + "\n";
-                    html = html + '<td class="confirm"><input type="image" src="..\\common\\images\\i_am_employed_btn_enabled.gif" onClick="confirm_hire(\'' + referral_id.childNodes[0].nodeValue + '\', \'' + titles[i].childNodes[0].nodeValue + '\', \'' + employers[i].childNodes[0].nodeValue + '\');" /></td>' + "\n";
+                    html = html + '<td class="confirm"><input type="image" src="../common/images/i_am_employed_btn_enabled.gif" onClick="confirm_hire(\'' + referral_id.childNodes[0].nodeValue + '\', \'' + titles[i].childNodes[0].nodeValue + '\', \'' + employers[i].childNodes[0].nodeValue + '\');" /></td>' + "\n";
                 } else {
                     //html = html + '<td class="confirm"><input class="button" type="button" value="I\'m Employed" disabled /></td>' + "\n";
-                    html = html + '<td class="confirm"><img src="..\\common\\images\\i_am_employed_btn_disabled.gif" /></td>' + "\n";
+                    html = html + '<td class="confirm"><img src="../common/images/i_am_employed_btn_disabled.gif" /></td>' + "\n";
                 }
                 
                 html = html + '</tr>' + "\n";

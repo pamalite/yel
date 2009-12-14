@@ -85,7 +85,7 @@ class MemberResumesPage extends Page {
         <div class="banner" id="div_banner">
             <a class="no_link" onClick="toggle_banner();"><span id="hide_show_label">Hide</span> Guide</a>
             <br/>
-            <img style="border: none;" src="..\common\images\banner_resumes.jpg" />
+            <img style="border: none;" src="../common/images/banner_resumes.jpg" />
         </div>
         
         <div id="div_status" class="status">
