@@ -245,8 +245,6 @@ function publish_job() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            alert(txt);
-            return;
             if (txt == 'ok') {
                 set_status('New job successfully published.');
             } else if (txt == '-1') {
