@@ -401,7 +401,7 @@ class JobPage extends Page {
                             <a href="../members/sign_up.php">Sign Up</a>
                             &nbsp;or&nbsp;
                             <a href="../members/">Sign In</a> 
-                            to perform Standard &amp; Express Referrals.
+                            to make a <span style="font-weight: bold;">Standard</span> &amp; <span style="font-weight: bold;">Express</span> Referral.
                         </div>
                     </td>
                 </tr>
