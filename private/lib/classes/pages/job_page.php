@@ -322,12 +322,12 @@ class JobPage extends Page {
                     if (!is_null($this->member)) {
                         ?>
                         <!--input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />&nbsp;<input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" /-->
-                        <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />
+                        <input type="image" src="../common/images/button_refer_now.gif" onClick="show_refer_options();" />&nbsp;<input type="image" src="../common/images/button_req_referral.gif" onClick="show_refer_me();" />&nbsp;<input type="image" src="../common/images/button_save_job.gif" onClick="save_job();" />
                         <?php
                     } else {
                         ?>
-                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" /> or <!--input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" /> or <input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" /-->
-                        <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />
+                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to <input type="image" src="../common/images/button_save_job.gif" style="vertical-align: middle;" onClick="save_job();" /> or <!--input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" /> or <input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" /-->
+                        <input type="image" src="../common/images/button_refer_now.gif" style="vertical-align: middle;" onClick="show_refer_options();" /> or <input type="image" src="../common/images/button_req_referral.gif" style="vertical-align: middle;" onClick="show_refer_me();" />
                         <?php
                     }
                     ?>
@@ -343,28 +343,75 @@ class JobPage extends Page {
             <table class="refer_options">
                 <tr>
                     <td>
-                        <a class="no_link" onClick="show_refer_job();">Standard</a>
+                        <div style="text-align: center; height: 50px; margin-top: 15px;">
+                            <a class="no_link" onClick="close_refer_options(); show_refer_job();">Standard Referral</a>
+                            &nbsp;
+                            <img style="border: none; vertical-align: middle;" src="../common/images/icons/triangle.jpg" />
+                        </div>
+                        <div style="color: #666666;">
+                            <p>
+                                Send the details of this job to your contact(s) so that they can apply for it with your as the referrer.
+                            </p><br/>
+                            <p>
+                                As the referrer, you will need to ensure that your contact has properly completed the application so that you can retrieve his/her resume from the <span style="font-weight: bold;">Referral Requests</span> section in your member account.
+                            </p><br/>
+                            <p>
+                                You are then required to <span style="font-weight: bold">screen</span> his/her resume and write a short <span style="font-weight: bold">testimony</span> for him/her before submitting it to the employer.
+                            </p>
+                        </div>
                     </td>
                     <td>
-                        <a class="no_link" onClick="show_quick_refer_form();">Express</a>
+                        <div style="text-align: center; height: 50px; margin-top: 15px;">
+                             <a class="no_link" onClick="close_refer_options(); show_quick_refer_form();">Express Referral</a>
+                             &nbsp;
+                             <img style="border: none; vertical-align: middle;" src="../common/images/icons/triangle.jpg" />
+                        </div>
+                        <div style="color: #666666;">
+                            <p>
+                                If you have your contact's permission, as well as his/her resume, you can directly refer your contact to the job.
+                            </p><br/>
+                            <p>
+                                Please ensure that your contact approves your referral by clicking <span style="font-weight: bold;">Accept</span> under the <span style="font-weight: bold;">Jobs Referred To Me</span> section in his/her account so that this referral can go through.
+                            </p>
+                        </div>
                     </td>
-                    <td>
-                        <a class="no_link" onClick="show_quick_upload_form();">Ask Yellow Elevator</a>
+                    <td rowspan="2">
+                        <div style="text-align: center; height: 50px; margin-top: 15px;">
+                            <a class="no_link" onClick="close_refer_options(); show_quick_upload_form();">Ask Yellow Elevator To Refer On Your Behalf</a>
+                            &nbsp;
+                            <img style="border: none; vertical-align: middle;" src="../common/images/icons/triangle.jpg" />
+                        </div>
+                        <div style="color: #666666;">
+                            <p>
+                                Drop off your contact's details and resume (if any) so that Yellow Elevator can refer him/her on your behalf to make it more convenient for you.
+                            </p><br/>
+                            <p>
+                                Please note that if you use this method of referral, which requires us to do the screening on your behalf, you will only receive a portion of the referrer's reward if your contact is hired.
+                            </p>
+                        </div>
                     </td>
                 </tr>
+            <?php
+            if (is_null($this->member)) {
+            ?>
                 <tr>
-                    <td colspan="3">
-                    <?php
-                    if (is_null($this->member)) {
-                    ?>
-                        <a href="../members/sign_up.php">Sign Up</a>&nbsp;
-                    <?php
-                    }
-                    ?>
-                        <a class="no_link" onClick="close_refer_options();">Continue Browsing</a>
+                    <td colspan="2">
+                        <div style="color: #666666; text-align: center; vertical-align: middle;">
+                            You need to 
+                            <a href="../members/sign_up.php">Sign Up</a>
+                            &nbsp;or&nbsp;
+                            <a href="../members/">Sign In</a> 
+                            to perform Standard &amp; Express Referrals.
+                        </div>
                     </td>
                 </tr>
+            <?php
+            }
+            ?>
             </table>
+            <p class="button">
+                <a class="no_link" onClick="close_refer_options();">Continue Browsing</a>
+            </p>
         </div>
         
         <div id="div_refer_form">

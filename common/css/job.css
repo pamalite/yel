@@ -77,6 +77,23 @@ table.job_info div.job_description {
     height: 100%;
 }
 
+#div_refer_options {
+    display: none;
+    background-color: #FFFFFF;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 675px;
+    height: 463px;
+    overflow: auto;
+}
+
+#div_refer_options table.refer_options td {
+    width: 30%;
+    vertical-align: top;
+    border: 1px solid #CCCCCC;
+}
+
 #div_refer_form {
     display: none;
     background-color: #FFFFFF;
@@ -88,6 +105,7 @@ table.job_info div.job_description {
     overflow: auto;
 }
 
+#div_refer_options table.refer_options, 
 #div_refer_form table.refer_form, 
 #div_acknowledge_form table.request_form, 
 #div_quick_refer_form table.quick_refer_form, 
@@ -154,6 +172,7 @@ table.job_info div.job_description {
     border: 1px solid #CCCCCC;
 }
 
+#div_refer_options p, 
 #div_refer_form p, 
 #div_quick_refer_form p,
 #div_quick_upload_form p {
@@ -161,6 +180,7 @@ table.job_info div.job_description {
     margin: 3px 3px 3px 3px;
 }
 
+#div_refer_options p.button, 
 #div_refer_form p.button, 
 #div_quick_refer_form p.button, 
 #div_quick_upload_form p.button {

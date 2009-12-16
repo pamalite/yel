@@ -552,6 +552,42 @@ function refer() {
     request.send(params);
 }
 
+function close_refer_options() {
+    $('div_refer_options').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+}
+
+function show_refer_options() {
+    $('div_blanket').setStyle('display', 'block');
+    
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_refer_options').getStyle('height'));
+    var div_width = parseInt($('div_refer_options').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    if (window_height <= div_height) {
+        $('div_refer_options').setStyle('height', window_height);
+        $('div_refer_options').setStyle('top', 0);
+    } else {
+        $('div_refer_options').setStyle('top', ((window_height - div_height) / 2));
+    }
+    $('div_refer_options').setStyle('left', ((window_width - div_width) / 2));
+    
+    $('div_refer_options').setStyle('display', 'block');
+}
+
 function close_refer_me() {
     $('div_acknowledge_form').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');
