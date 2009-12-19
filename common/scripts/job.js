@@ -351,6 +351,7 @@ function show_refer_job() {
     if (window_height <= div_height) {
         $('div_refer_form').setStyle('height', window_height);
         $('div_refer_form').setStyle('top', 0);
+        window.scrollTo(0, 0);
     } else {
         $('div_refer_form').setStyle('top', ((window_height - div_height) / 2));
     }
@@ -822,6 +823,7 @@ function show_quick_refer_form() {
     if (window_height <= div_height) {
         $('div_quick_refer_form').setStyle('height', window_height);
         $('div_quick_refer_form').setStyle('top', 0);
+        window.scrollTo(0, 0);
     } else {
         $('div_quick_refer_form').setStyle('top', ((window_height - div_height) / 2));
     }
@@ -867,6 +869,7 @@ function show_quick_upload_form() {
     if (window_height <= div_height) {
         $('div_quick_upload_form').setStyle('height', window_height);
         $('div_quick_upload_form').setStyle('top', 0);
+        window.scrollTo(0, 0);
     } else {
         $('div_quick_upload_form').setStyle('top', ((window_height - div_height) / 2));
     }

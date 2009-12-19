@@ -326,8 +326,7 @@ class JobPage extends Page {
                         <?php
                     } else {
                         ?>
-                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to <input type="image" src="../common/images/button_save_job.gif" style="vertical-align: middle;" onClick="save_job();" /> or <!--input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" /> or <input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" /-->
-                        <input type="image" src="../common/images/button_refer_now.gif" style="vertical-align: middle;" onClick="show_refer_options();" /> or <input type="image" src="../common/images/button_req_referral.gif" style="vertical-align: middle;" onClick="show_refer_me();" />
+                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to <input type="image" src="../common/images/button_refer_now.gif" style="vertical-align: middle;" onClick="show_refer_options();" /> or <input type="image" src="../common/images/button_req_referral.gif" style="vertical-align: middle;" onClick="show_refer_me();" /> or <input type="image" src="../common/images/button_save_job.gif" style="vertical-align: middle;" onClick="save_job();" />
                         <?php
                     }
                     ?>
@@ -400,7 +399,7 @@ class JobPage extends Page {
                             You need to 
                             <a href="../members/sign_up.php">Sign Up</a>
                             &nbsp;or&nbsp;
-                            <a href="../members/">Sign In</a> 
+                            <a href="../members?job=<?php echo $job['id']; ?>">Sign In</a> 
                             to make a <span style="font-weight: bold;">Standard</span> &amp; <span style="font-weight: bold;">Express</span> Referral.
                         </div>
                     </td>
