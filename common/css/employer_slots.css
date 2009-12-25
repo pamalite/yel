@@ -1,0 +1,94 @@
+#div_slots_info {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+table.slots_info {
+    width: 99%;
+    margin: auto;
+}
+
+table.slots_info td.info {
+    width: 90%;
+}
+
+table.slots_info td.buy {
+    text-align: center;
+}
+
+div.slots_details {
+    color: #666666;
+    font-size: 18pt;
+}
+
+#div_buttons {
+    text-align: right;
+    background-color: #CCCCCC;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+input.mini_button {
+    font-size: 9pt;
+}
+
+td.number_of_slots, td.price_per_slot, 
+td.amount, td.date, td.number_of_slots_title, td.price_per_slot_title, 
+td.amount_title {
+    width: 25%;
+}
+
+td.number_of_slots, td.price_per_slot, 
+td.amount {
+    text-align: right;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_buy_slots_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 150px;
+    overflow: auto;
+}
+
+#div_buy_slots_form p.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+}
+
+#div_buy_slots_form table.buy_slots_form {
+    width: 95%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+#div_buy_slots_form table.buy_slots_form td {
+    padding: 5px 5px 5px 5px;
+    font-size: 10pt;
+}
+
+#div_buy_slots_form table.buy_slots_form td.label {
+    width: 20%;
+}

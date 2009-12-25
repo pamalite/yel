@@ -348,6 +348,34 @@ class Employer {
         return $this->mysqli->query($query);
     }
     
+    public function get_slots_left() {
+        $query = "SELECT slots, DATEDIFF(slots_expire_on, NOW()) AS expired, 
+                  DATE_FORMAT(slots_expire_on, '%e %b, %Y') AS formatted_expire_on 
+                  FROM employers 
+                  WHERE id = '". $this->id. "' LIMIT 1";
+        return $this->mysqli->query($query);
+    }
+    
+    public function add_slots($_new_slots = 0) {
+        if ($_new_slots > 0) {
+            $query = "UPDATE employers SET slots = (slots + ". $_new_slots. ") 
+                      WHERE id = '". $this->id. "'";
+            return $this->mysqli->execute($query);
+        }
+        
+        return true;
+    }
+    
+    public function subtract_slots($_slots_to_sub = 0) {
+        if ($_slots_to_sub_slots > 0) {
+            $query = "UPDATE employers SET slots = (slots - ". $_slots_to_sub. ") 
+                      WHERE id = '". $this->id. "'";
+            return $this->mysqli->execute($query);
+        }
+        
+        return true;
+    }
+    
     public function create_fee($data) {
         if (is_null($data) || !is_array($data)) {
             return false;
