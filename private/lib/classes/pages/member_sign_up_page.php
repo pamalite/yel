@@ -14,10 +14,6 @@ class MemberSignUpPage extends Page {
         if (!empty($_member)) {
             $this->member = desanitize($_member);
         }
-        
-        if ($_job > 0) {
-            $this->job = desanitize($_job);
-        }
     }
     
     public function insert_inline_css() {
