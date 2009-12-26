@@ -27,12 +27,13 @@ if (empty($country) || is_null($country)) {
     $country = '??';
 }
 
+$http_referer = (isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : "";
 $query = "INSERT INTO visitors SET 
           ip_address = '". $_SERVER['REMOTE_ADDR']. "', 
           country = '". $country. "', 
           visited_on = NOW(), 
           user_agent = '". $_SERVER['HTTP_USER_AGENT']. "', 
-          http_referer = '". (isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : "" . "'";
+          http_referer = '". $http_referer . "'";
 $mysqli->execute($query);
 
 // 2. Generate page
