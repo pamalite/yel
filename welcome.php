@@ -32,7 +32,7 @@ $query = "INSERT INTO visitors SET
           country = '". $country. "', 
           visited_on = NOW(), 
           user_agent = '". $_SERVER['HTTP_USER_AGENT']. "', 
-          http_referer = '". $_SERVER['HTTP_REFERER']. "'";
+          http_referer = '". (isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : "" . "'";
 $mysqli->execute($query);
 
 // 2. Generate page
