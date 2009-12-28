@@ -55,9 +55,9 @@ class EmployerSlotsPage extends Page {
                 <tr>
                     <td class="info">
                         <div class="slots_details">
-                            Number of Job Slots left: <span id="num_slots">0</span>
+                            Job Slots left: <span id="num_slots" style="font-weight: bold;">0</span>
                             <br/>
-                            Expiring on: <span id="slots_expiry" style="font-style: italic;"></span>
+                            Expiring on: <span id="slots_expiry" style="font-weight: bold;"></span>
                         </div>
                     </td>
                     <td class="buy"><input type="button" value="Buy Slots" onClick="show_buy_slots_form();" /></td>

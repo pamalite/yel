@@ -65,6 +65,9 @@ if ($_POST['action'] == 'get_slots_left') {
     if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
         $employer = new Employer($_POST['id']);
         $result = $employer->get_slots_left();
+    } else {
+        echo '-1';
+        exit();
     }
     
     $response = array('slots_info' => array('slots' => $result[0]['slots'], 

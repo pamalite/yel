@@ -201,7 +201,7 @@ table.job_info div.job_description {
     display: none;
     background-color: #FFFFFF;
     border: 3px solid #0000FF;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     width: 950px;
