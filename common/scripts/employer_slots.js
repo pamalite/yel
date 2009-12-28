@@ -67,15 +67,15 @@ function show_purchase_histories() {
                 html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There is no past purchase of slots.</div>';
             } else {
                 var price_per_slots = xml.getElementsByTagName('price_per_slot');
-                var number_of_slots = xml.getElementsByTagName('number_of_slots');
+                var number_of_slots = xml.getElementsByTagName('number_of_slot');
                 var total_amounts = xml.getElementsByTagName('total_amount');
                 var purchased_ons = xml.getElementsByTagName('formatted_purchased_on');
                 
                 for (var i=0; i < price_per_slots.length; i++) {
                     html = html + '<tr onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                     html = html + '<td class="date">' + purchased_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="price_per_slot">' + price_per_slots[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="number_of_slots">' + number_of_slots[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="price_per_slot">' + price_per_slots[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="amount">' + total_amounts[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
@@ -155,8 +155,8 @@ function buy_slot() {
 function show_buy_slots_form() {
     var window_height = 0;
     var window_width = 0;
-    var div_height = parseInt($('div_employ_form').getStyle('height'));
-    var div_width = parseInt($('div_employ_form').getStyle('width'));
+    var div_height = parseInt($('div_buy_slots_form').getStyle('height'));
+    var div_width = parseInt($('div_buy_slots_form').getStyle('width'));
     
     if (typeof window.innerHeight != 'undefined') {
         window_height = window.innerHeight;
@@ -170,26 +170,47 @@ function show_buy_slots_form() {
         window_width = document.documentElement.clientWidth;
     }
     
-    $('div_employ_form').setStyle('top', ((window_height - div_height) / 2));
-    $('div_employ_form').setStyle('left', ((window_width - div_width) / 2));
+    if (window_height <= div_height) {
+        $('div_buy_slots_form').setStyle('height', window_height);
+        $('div_buy_slots_form').setStyle('top', 0);
+        window.scrollTo(0, 0);
+    } else {
+        $('div_buy_slots_form').setStyle('top', ((window_height - div_height) / 2));
+    }
+    $('div_buy_slots_form').setStyle('left', ((window_width - div_width) / 2));
     
     $('div_blanket').setStyle('display', 'block');
-    $('div_employ_form').setStyle('display', 'block');
-    
-    $('month_list_dropdown').addEvent('change', function() {
-        if ($('month_list_dropdown').options[$('month_list_dropdown').selectedIndex].value < (parseInt(today.getMonth())+1)) {
-            $('year_label').set('html', (parseInt(today.getFullYear())+1));
-        } else {
-            $('year_label').set('html', today.getFullYear());
-        }
-    });
+    $('div_buy_slots_form').setStyle('display', 'block');
 }
 
 function close_buy_slots_form() {
-    used_suggested = 'N';
-    employ_referral_id = 0;
-    $('div_employ_form').setStyle('display', 'none');
+    $('div_buy_slots_form').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');
+}
+
+function calculate_fee() {
+    var price = parseFloat($('price_per_slot').get('html'));
+    var qty = parseInt($('qty').value);
+    var discount = 0;
+    var amount = 0.00;
+    
+    if (qty <= 0 || isEmpty($('qty').value) || isNaN($('qty').value)) {
+        $('total_amount').set('html', '0.00');
+        return;
+    } else if (qty > 5 && qty <= 15) {
+        discount = 10;
+    } else if (qty > 15 && qty <= 25) {
+        discount = 15;
+    } else if (qty > 25 && qty <= 35) {
+        discount = 20;
+    } else if (qty > 35) {
+        discount = 25;
+    } 
+    
+    amount = (price * qty) - ((price * qty) * (discount / 100));
+    
+    $('discount').set('html', discount + '%');
+    $('total_amount').set('html', amount);
 }
 
 function onDomReady() {

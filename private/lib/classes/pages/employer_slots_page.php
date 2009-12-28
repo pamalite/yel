@@ -69,8 +69,8 @@ class EmployerSlotsPage extends Page {
                 <tr>
                     <td class="date">Date of Purchase</td>
                     <td class="number_of_slots_title">Number of Slots</td>
-                    <td class="price_per_slot_title">Slot Price</td>
-                    <td class="amount_title">Amount</td>
+                    <td class="price_per_slot_title">Price (<?php echo $currency; ?>)</td>
+                    <td class="amount_title">Amount (<?php echo $currency; ?>)</td>
                 </tr>
             </table>
             <div id="div_list">
@@ -83,17 +83,17 @@ class EmployerSlotsPage extends Page {
                 <input type="hidden" id="currency" name="currency" value="<?php echo $currency; ?>" />
                 <table class="buy_slots_form">
                     <tr>
-                        <td class="label">Price per slot:</td>
-                        <td><?php echo $currency; ?><span id="price_per_slot">200</span></td>
+                        <td class="label">Price:</td>
+                        <td><?php echo $currency; ?>$&nbsp;<span id="price_per_slot">200</span></td>
                     </tr>
                     <tr>
                         <td class="label">Number of slots:</td>
-                        <td><input type="text" class="field" id="num_slots" name="num_slots" value="5" /></td>
+                        <td><input type="text" id="qty" name="qty" value="5" onKeyUp="calculate_fee();" />&nbsp;<span style="font-size: 9pt; color: #888888;">discount: <span id="discount">0%</span></span></td>
                     </tr>
                     <tr>
-                        <td style="border-top: 1px solid #666666; font-weight: bold; class="label">Total:</td>
-                        <td style="border-bottom: 1px solid #666666; font-weight: bold;">
-                            <?php echo $currency; ?><span id="total_amount">1000</span>
+                        <td style="font-weight: bold;" class="label">Amount</td>
+                        <td style="border-top: 1px solid #666666; border-bottom: 1px double #666666; font-weight: bold;">
+                            <?php echo $currency; ?>$&nbsp;<span id="total_amount">1000</span>
                         </td>
                     </tr>
                 </table>
