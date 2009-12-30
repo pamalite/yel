@@ -126,7 +126,57 @@ if ($_POST['action'] == 'buy_slots') {
         }
         exit();
     } else {
-        // 1. forward to PayPal payment portal and wait for signal
+        // forward to PayPal payment portal and wait for signal
+        $paymentAmount = $_POST['amount'];
+        $currencyID = $_POST['currency'];    // or other currency code ('GBP', 'EUR', 'JPY', 'CAD', 'AUD')
+        $paymentType = 'Sale';      // or 'Sale' or 'Order'
+
+        $returnURL = $GLOBALS['paypal_return_url'];
+        $cancelURL = $GLOBALS['paypal_cancel_url'];
+        
+        $paypal = new PayPal($GLOBALS['paypal_api_username'], 
+                             $GLOBALS['paypal_api_password'], 
+                             $GLOBALS['paypal_api_signature'],
+                             true);
+                             
+        $paypal->addValue('METHOD', 'SetExpressCheckout');
+        $paypal->addValue('VERSION', '56.0');
+        $paypal->addValue('Amt', $paymentAmount);
+        $paypal->addValue('ReturnUrl', $returnURL);
+        $paypal->addValue('CancelUrl', $cancelURL);
+        
+        $response = $paypal->call_paypal(true);
+        print_r($response);
+        exit();
+        
+        
+        
+        // Add request-specific fields to the request string.
+        $nvpStr = "&Amt=$paymentAmount&ReturnUrl=$returnURL&CANCELURL=$cancelURL&PAYMENTACTION=$paymentType&CURRENCYCODE=$currencyID";
+
+        // Execute the API operation; see the PPHttpPost function above.
+        print_r(PPHttpPost('SetExpressCheckout', $nvpStr));
+        exit();
+        $httpParsedResponseAr = PPHttpPost('SetExpressCheckout', $nvpStr);
+
+        if ("SUCCESS" == strtoupper($httpParsedResponseAr["ACK"]) || 
+            "SUCCESSWITHWARNING" == strtoupper($httpParsedResponseAr["ACK"])) {
+            // Redirect to paypal.com.
+            $token = urldecode($httpParsedResponseAr["TOKEN"]);
+            $payPalURL = "https://www.paypal.com/webscr&cmd=_express-checkout&token=$token";
+            if("sandbox" === $GLOBALS['paypal_environment'] || "beta-sandbox" === $GLOBALS['paypal_environment']) {
+                $payPalURL = "https://www.$environment.paypal.com/webscr&cmd=_express-checkout&token=$token";
+            }
+            
+            echo $payPalURL;
+            //header("Location: $payPalURL");
+            exit();
+        } else  {
+            exit('SetExpressCheckout failed: ' . print_r($httpParsedResponseAr, true));
+        }
     }
+    
+    echo 'ok';
+    exit();
 }
 ?>

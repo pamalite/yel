@@ -132,6 +132,9 @@ function buy_slots() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            close_buy_slots_form();
+            set_status('<pre>' + txt + '</pre>');
+            return;
             if (txt == 'ko') {
                 alert('An error occured while purchasing slots.');
                 return false;
@@ -145,6 +148,8 @@ function buy_slots() {
             close_buy_slots_form();
             show_purchase_histories();
             get_slots_left();
+            
+            
         },
         onRequest: function(instance) {
             set_status('Purchasing slots...');

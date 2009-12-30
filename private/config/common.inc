@@ -8,6 +8,14 @@ $data_path = "/Users/pamalite/yel2_files/db";
 $forex_feed = 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml'; // the file is updated daily between 14:15 and 15:00 CET
 $openinviter_path = '/../../openinviter';
 
+// Paypal Settings
+$paypal_api_endpoint = 'https://api-3t.sandbox.paypal.com/nvp';
+$paypal_api_username = 'ye_biz_1262163871_biz_api1.gmail.com';
+$paypal_api_password = '1262163878';
+$paypal_api_signature = 'APHxV.LNkzPMLcGHuw3ilV4WyHC.Ad.jCAcoCwvQXaJl9oBym6nyNgvh';
+$paypal_return_url = 'http://www.yellowelevator.com/';
+$paypal_cancel_url = 'http://www.yellowelevator.com/';
+
 // Geographical settings
 $default_country_code = "MY";
 $default_country = "Malaysia";
