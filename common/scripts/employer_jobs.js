@@ -213,7 +213,10 @@ function publish_job() {
             if (txt == 'ok') {
                 set_status('New job successfully published.');
             } else if (txt == '-1') {
-                set_status('Your account is not set up yet. Upon receiving the Welcome email from us, please allow up to the next 24 hours for your account to be active. <br/>If this message still shows up after 24 hours, please contact your account manager immediately.');
+                alert('Your account is not set up yet. Upon receiving the Welcome email from us, please allow up to the next 24 hours for your account to be active. <br/>If this message still shows up after 24 hours, please contact your account manager immediately.');
+                return false;
+            } else if (txt == '-2') {
+                alert('You have no more job slots left to publish!' + "\n\nPlease save your job and publish it later after you have purchased enough job slots from the 'Job Slots' page.");
                 return false;
             } else {
                 set_status('Sorry! We are not able to publish the new job at the moment. Please try again later.');

@@ -57,6 +57,34 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'publish') {
+    // check enough job slots to be used?
+    $mysqli = Database::connect();
+    $employer = new Employer($_POST['employer']);
+    $query = "SELECT YEAR(joined_on) AS joined_year, MONTH(joined_on) AS joined_month 
+              FROM employers WHERE id = '". $_POST['employer']. "'";
+    $result = $mysqli->query($query);
+    
+    $is_prior = false;
+    $is_expired = false;
+    if (($result[0]['joined_year'] < 2010) || 
+        ($result[0]['joined_year'] == 2010 && $result[0]['joined_month'] < 3)) {
+        $is_prior = true;
+        $query = "SELECT DATEDIFF(NOW(), joined_on) AS expired 
+                  FROM employers WHERE id = '". $_POST['employer']. "'";
+        $result = $mysqli->query($query);
+        if ($result[0]['expired'] > 0) {
+            $is_expired = true;
+        }
+    } 
+    
+    if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
+        $result = $employer->get_slots_left();
+        if ($result[0]['expired'] < 0 || $result[0]['slots'] <= 0) {
+            echo '-2';
+            exit();
+        }
+    } 
+    
     $id = $_POST['job'];
     $job = '';
     
@@ -113,6 +141,13 @@ if ($_POST['action'] == 'publish') {
         }
     }
     
+    if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
+        if ($employer->subtract_slots(1) === false) {
+            echo 'ko';
+            exit();
+        }
+    }
+    
     $tmp = explode('/', $GLOBALS['root']);
     $is_test_site = false;
     foreach ($tmp as $t) {
@@ -125,7 +160,6 @@ if ($_POST['action'] == 'publish') {
     // Tweet about this job, if it is new
     if ($new_id > 0 && !$is_test_site) {
         $query = "SELECT name FROM employers WHERE id = '". $_POST['employer']. "' LIMIT 1";
-        $mysqli = Database::connect();
         $result = $mysqli->query($query);
         $employer = $result[0]['name'];
         $url = $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $new_id;

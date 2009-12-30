@@ -101,7 +101,7 @@ class EmployerSlotsPage extends Page {
                         <td>
                             <input type="radio" name="payment_method" id="payment_method_credit_card" value="credit_card" checked onClick="remove_admin_fee();" /><label for="payment_method_credit_card">Credit Card</label><br/>
                             <input type="radio" name="payment_method" id="payment_method_paypal" value="paypal" onClick="remove_admin_fee();" /><label for="payment_method_paypal">Paypal</label><br/>
-                            <input type="radio" name="payment_method" id="payment_method_cheque" value="cheque" onClick="add_admin_fee();" /><label for="payment_method_cheque">Cheque/Money Order <span style="font-size: 7pt; color: #666666;">(+5% admin fee)</span></label>
+                            <input type="radio" name="payment_method" id="payment_method_cheque" value="cheque" onClick="add_admin_fee();" /><label for="payment_method_cheque">Cheque/Money Order/Bank Transfer <span style="font-size: 7pt; color: #666666;">(+5% admin fee)</span></label>
                         </td>
                     </tr>
                 </table>

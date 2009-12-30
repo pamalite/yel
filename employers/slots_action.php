@@ -44,7 +44,7 @@ if (!isset($_POST['action'])) {
 
 if ($_POST['action'] == 'get_slots_left') {
     $mysqli = Database::connect();
-    $query = "SELECT YEAR(joined_on) AS joined_year, MONHT(joined_on) AS joined_month 
+    $query = "SELECT YEAR(joined_on) AS joined_year, MONTH(joined_on) AS joined_month 
               FROM employers WHERE id = '". $_POST['id']. "'";
     $result = $mysqli->query($query);
     
@@ -111,7 +111,7 @@ if ($_POST['action'] == 'buy_slots') {
             $message = str_replace('%currency%', $_POST['currency'], $message);
             $message = str_replace('%price%', $_POST['price'], $message);
             $message = str_replace('%purchased_on%', $purchased_on, $message);
-            $subject = 'Job Slots Purchase Payment Instructions for Cheques/Money Order';
+            $subject = 'Job Slots Purchase Payment Instructions for Cheques/Money Order/Bank Transfer';
             $headers = 'From: YellowElevator.com <sales@yellowelevator.com>' . "\n";
             mail($email_addr, $subject, $message, $headers);
 
