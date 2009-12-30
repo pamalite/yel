@@ -1,3 +1,5 @@
+var added_admin_fee = false;
+
 function get_slots_left() {
     $('num_slots').set('html', '(Free Job Publishing Activated)');
     $('num_slots').setStyle('color', '#CCCCCC');
@@ -94,58 +96,58 @@ function show_purchase_histories() {
     
 }
 
-function buy_slot() {
-    var month = $('month_list_dropdown').options[$('month_list_dropdown').selectedIndex].value;
-    var day = parseInt($('day').value);
-    if (isNaN(day) || day < 1 || day > 31) {
-        alert('Day must be in the range of 1-31, inclusive.');
+function buy_slots() {
+    var qty = $('qty').value;
+    
+    if (isNaN(qty) || isEmpty(qty) || parseInt(qty) <= 0) {
+        alert('You must purchase at least 1 slot.');
         return false;
     }
     
-    if (parseFloat($('salary').value) < 1 || isNaN($('salary').value)) {
-        alert('Annual salary cannot be less than 1.00.');
-        return false;
-    }
+    var is_confirmed = confirm('You are about to purchase ' + qty + ' slot(s) at ' + $('currency').value + '$ ' + $('total_amount').get('html') + ".\n\nPlease click 'OK' to proceed to payment portal or 'Cancel' to continue using the available slots.");
     
-    var commence = $('year_label').get('html') + '-' + month + '-' + day;
-    
-    var is_employment = confirm('You are about confirm this employment.\n\nPlease click \'OK\' to confirm the employment, or \'Cancel\' if you are requesting for a replacement instead.');
-    
-    if (!is_employment) {
-        alert('Please call or e-mail us if you want to request for a replacement instead.');
+    if (!is_confirmed) {
         set_status('');
-        close_employ_form();
+        close_buy_slots_form();
         return false;
     }
     
-    var params = 'id=' + employ_referral_id;
-    params = params + '&action=employ_candidate';
-    params = params + '&employer=' + id;
-    params = params + '&commence=' + commence;
-    params = params + '&salary=' + $('salary').value;
-    params = params + '&used_suggested=' + used_suggested;
+    var payment_method = 'credit_card';
+    if ($('payment_method_paypal').checked) {
+        payment_method = 'paypal';
+    } else if ($('payment_method_cheque').checked) {
+        payment_method = 'cheque';
+    }
     
-    var uri = root + "/employers/referrals_action.php";
+    var params = 'id=' + id;
+    params = params + '&action=buy_slots';
+    params = params + '&currency=' + $('currency').value;
+    params = params + '&price=' + parseFloat($('price_per_slot').get('html'));
+    params = params + '&qty=' + parseInt(qty);
+    params = params + '&amount=' + parseFloat($('total_amount').get('html'));
+    params = params + '&payment_method=' + payment_method;
+    
+    var uri = root + "/employers/slots_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
             if (txt == 'ko') {
-                alert('An error occured while employing candidate.');
+                alert('An error occured while purchasing slots.');
                 return false;
             }
             
             if (txt == '-1') {
-                alert('Seems like your account is not ready. Please contact your account manager about this problem.\n\nReminder: Please allow up to 24 hours for your account to be prepared by your account manager, upon receiving the new account e-mail.');
-                return false;
+                alert('A payment instruction has been send to your email account. Please follow the instruction to lodge your payment.');
             }
             
             set_status('');
-            close_employ_form();
-            show_referred_candidates();
+            close_buy_slots_form();
+            show_purchase_histories();
+            get_slots_left();
         },
         onRequest: function(instance) {
-            set_status('Employing candidate...');
+            set_status('Purchasing slots...');
         }
     });
     
@@ -208,9 +210,26 @@ function calculate_fee() {
     } 
     
     amount = (price * qty) - ((price * qty) * (discount / 100));
+    if (added_admin_fee) {
+        amount = amount + (amount * 0.05);
+    }
     
     $('discount').set('html', discount + '%');
     $('total_amount').set('html', amount);
+}
+
+function add_admin_fee() {
+    if ($('payment_method_cheque').checked) {
+        added_admin_fee = true;
+        calculate_fee();
+    }
+}
+
+function remove_admin_fee() {
+    if (added_admin_fee) {
+        added_admin_fee = false;
+        calculate_fee();
+    }
 }
 
 function onDomReady() {

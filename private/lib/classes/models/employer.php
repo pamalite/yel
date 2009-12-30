@@ -359,7 +359,7 @@ class Employer {
     public function add_slots($_new_slots = 0) {
         if ($_new_slots > 0) {
             $query = "UPDATE employers SET slots = (slots + ". $_new_slots. ") 
-                      WHERE id = '". $this->id. "'";
+                      WHERE id = '". $this->id. "' ";
             return $this->mysqli->execute($query);
         }
         

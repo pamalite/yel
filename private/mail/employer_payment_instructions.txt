@@ -1,0 +1,44 @@
+Hi %employer%,
+
+Our systems had indicated that you have chosen to purchase %qty% of slot(s) 
+through manual payment (cheque or money order) at %currency%$ %price% a slot, 
+inclusive of 5% administrative fee, on %purchased_on%. 
+
+Your %qty% of slot(s) are currently being withheld until payment is processed. 
+To proceed with payment, please follow the instructions below to avoid further 
+delays:
+
+For Bank Transfer:
+------------------
+Payable To: Yellow Elevator Sdn Bhd
+Amount: %currency% $ %amount%
+Account Number: ???
+SWIFT Code: ???
+Bank (Branch): HSBC (Bayan Baru)
+
+For Cheque/Money Order:
+-----------------------
+Payable To: Yellow Elevator (Sdn Bhd / Pty Ltd; depending on which branch you are
+sending the payment to.)
+Amount: %currency% $ %amount%
+Send it to the closest branches listed below:
+
+Malaysia
+--------
+Yellow Elevator Sdn. Bhd.
+1-12B-9, Suntech @ Penang Cybercity,
+Lintang Mayang Pasir 3, 
+11950 Penang, Malaysia.
+
+Australia
+---------
+Yellow Elevator Pty Ltd
+Suite 3, 22 Council St, 
+Hawthorn East, 
+VIC 3123, Australia.
+
+
+Thank you for choosing Yellow Elevator.
+
+Yellow Elevator
+Refer a job

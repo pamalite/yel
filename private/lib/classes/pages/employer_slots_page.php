@@ -87,13 +87,21 @@ class EmployerSlotsPage extends Page {
                         <td><?php echo $currency; ?>$&nbsp;<span id="price_per_slot">200</span></td>
                     </tr>
                     <tr>
-                        <td class="label">Number of slots:</td>
-                        <td><input type="text" id="qty" name="qty" value="5" onKeyUp="calculate_fee();" />&nbsp;<span style="font-size: 9pt; color: #888888;">discount: <span id="discount">0%</span></span></td>
+                        <td class="label"><label for="qty">Number of slots:</label></td>
+                        <td><input type="text" class="field" id="qty" name="qty" value="5" onKeyUp="calculate_fee();" />&nbsp;<span style="font-size: 9pt; color: #888888;">discount: <span id="discount">0%</span></span></td>
                     </tr>
                     <tr>
-                        <td style="font-weight: bold;" class="label">Amount</td>
+                        <td style="font-weight: bold;" class="label">Amount:</td>
                         <td style="border-top: 1px solid #666666; border-bottom: 1px double #666666; font-weight: bold;">
                             <?php echo $currency; ?>$&nbsp;<span id="total_amount">1000</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">Payment Method:</td>
+                        <td>
+                            <input type="radio" name="payment_method" id="payment_method_credit_card" value="credit_card" checked onClick="remove_admin_fee();" /><label for="payment_method_credit_card">Credit Card</label><br/>
+                            <input type="radio" name="payment_method" id="payment_method_paypal" value="paypal" onClick="remove_admin_fee();" /><label for="payment_method_paypal">Paypal</label><br/>
+                            <input type="radio" name="payment_method" id="payment_method_cheque" value="cheque" onClick="add_admin_fee();" /><label for="payment_method_cheque">Cheque/Money Order <span style="font-size: 7pt; color: #666666;">(+5% admin fee)</span></label>
                         </td>
                     </tr>
                 </table>

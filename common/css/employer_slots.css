@@ -69,12 +69,12 @@ td.amount {
     position: absolute;
     left: 0;
     top: 0;
-    width: 400px;
-    height: 150px;
+    width: 450px;
+    height: 209px;
     overflow: auto;
 }
 
-#div_buy_slots_form input {
+#div_buy_slots_form input.field {
     width: 20%;
 }
 
@@ -86,7 +86,7 @@ td.amount {
 }
 
 #div_buy_slots_form table.buy_slots_form {
-    width: 95%;
+    width: 99%;
     margin: auto;
     border-collapse: collapse;
 }
