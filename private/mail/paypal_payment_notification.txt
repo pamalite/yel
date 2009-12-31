@@ -1,0 +1,7 @@
+[transaction id]: %txn_id%
+[employer id]: %employer_id%
+[currency]: %currency%
+[amount]: %amount%
+[qty]: %qty%
+[price]: %price%
+[purchased on]: %purchased_on%

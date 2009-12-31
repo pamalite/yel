@@ -1,3 +1,5 @@
+Transaction ID: %pending_id%
+
 Hi %employer%,
 
 Our systems had indicated that you have chosen to purchase %qty% of slot(s) 

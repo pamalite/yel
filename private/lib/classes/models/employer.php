@@ -358,7 +358,9 @@ class Employer {
     
     public function add_slots($_new_slots = 0) {
         if ($_new_slots > 0) {
-            $query = "UPDATE employers SET slots = (slots + ". $_new_slots. ") 
+            $query = "UPDATE employers SET 
+                      slots = (slots + ". $_new_slots. "), 
+                      slots_expire_on = DATE_ADD(NOW(), INTERVAL 6 MONTH) 
                       WHERE id = '". $this->id. "'";
             return $this->mysqli->execute($query);
         }

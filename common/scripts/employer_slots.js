@@ -113,10 +113,71 @@ function buy_slots() {
     }
     
     var payment_method = 'credit_card';
-    if ($('payment_method_paypal').checked) {
-        payment_method = 'paypal';
-    } else if ($('payment_method_cheque').checked) {
+    if ($('payment_method_cheque').checked) {
         payment_method = 'cheque';
+    }
+    
+    if (payment_method == 'credit_card') {
+        var return_url = root + paypal_return_url_base;
+        var cancel_url = root + paypal_return_url_base;
+        paypal_ipn_url = paypal_ipn_url + '?employer=' + id + '&price=' + parseFloat($('price_per_slot').get('html')) + '&qty=' + qty;
+        
+        var paypal_form = document.createElement('form');
+        paypal_form.action = paypal_url;
+        paypal_form.method = 'POST';
+        
+        var input_cmd = document.createElement('input');
+        input_cmd.type = 'hidden';
+        input_cmd.name = 'cmd';
+        input_cmd.value = '_xclick';
+        paypal_form.appendChild(input_cmd);
+        
+        var input_business = document.createElement('input');
+        input_business.type = 'hidden';
+        input_business.name = 'business';
+        input_business.value = paypal_id;
+        paypal_form.appendChild(input_business);
+        
+        var input_item_name = document.createElement('input');
+        input_item_name.type = 'hidden';
+        input_item_name.name = 'item_name';
+        input_item_name.value = qty + ' Job Slots';
+        paypal_form.appendChild(input_item_name);
+        
+        var input_amount = document.createElement('input');
+        input_amount.type = 'hidden';
+        input_amount.name = 'amount';
+        input_amount.value = parseFloat($('total_amount').get('html'));
+        paypal_form.appendChild(input_amount);
+        
+        var input_currency_code = document.createElement('input');
+        input_currency_code.type = 'hidden';
+        input_currency_code.name = 'currency_code';
+        input_currency_code.value = $('currency').value;
+        paypal_form.appendChild(input_currency_code);
+        
+        var input_return = document.createElement('input');
+        input_return.type = 'hidden';
+        input_return.name = 'return';
+        input_return.value = return_url;
+        paypal_form.appendChild(input_return);
+        
+        var input_cancel_return = document.createElement('input');
+        input_cancel_return.type = 'hidden';
+        input_cancel_return.name = 'cancel_return';
+        input_cancel_return.value = cancel_url;
+        paypal_form.appendChild(input_cancel_return);
+        
+        var input_notify_url = document.createElement('input');
+        input_notify_url.type = 'hidden';
+        input_notify_url.name = 'notify_url';
+        input_notify_url.value = paypal_ipn_url;
+        paypal_form.appendChild(input_notify_url);
+        
+        document.getElementsByTagName('body')[0].appendChild(paypal_form); 
+        paypal_form.submit();
+        
+        return;
     }
     
     var params = 'id=' + id;
@@ -132,9 +193,6 @@ function buy_slots() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            close_buy_slots_form();
-            set_status('<pre>' + txt + '</pre>');
-            return;
             if (txt == 'ko') {
                 alert('An error occured while purchasing slots.');
                 return false;
@@ -148,8 +206,6 @@ function buy_slots() {
             close_buy_slots_form();
             show_purchase_histories();
             get_slots_left();
-            
-            
         },
         onRequest: function(instance) {
             set_status('Purchasing slots...');

@@ -1,6 +1,5 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
-require_once dirname(__FILE__). "/credit_note.php";
 
 session_start();
 
@@ -83,9 +82,10 @@ if ($_POST['action'] == 'buy_slots') {
     
     if ($_POST['payment_method'] == 'cheque') {
         // 1. add the slots to employer_slots_purchases as on_hold = true
+        $pending_id = 'pend.'. generate_random_string_of(15);
         $query = "INSERT INTO employer_slots_purchases SET 
                   employer = '". $_POST['id']. "', 
-                  transaction_id = 'pend.". generate_random_string_of(10). "', 
+                  transaction_id = '". $pending_id. "', 
                   purchased_on = '". $purchased_on. "', 
                   price_per_slot = ". $_POST['price']. ", 
                   number_of_slot = ". $_POST['qty']. ", 
@@ -104,7 +104,8 @@ if ($_POST['action'] == 'buy_slots') {
             foreach ($lines as $line) {
                 $message .= $line;
             }
-
+            
+            $message = str_replace('%pending_id%', $pending_id, $message);
             $message = str_replace('%employer%', htmlspecialchars_decode($company), $message);
             $message = str_replace('%amount%', number_format($_POST['amount'], '2', '.', ', '), $message);
             $message = str_replace('%qty%', $_POST['qty'], $message);
@@ -125,55 +126,6 @@ if ($_POST['action'] == 'buy_slots') {
             echo 'ko';
         }
         exit();
-    } else {
-        // forward to PayPal payment portal and wait for signal
-        $paymentAmount = $_POST['amount'];
-        $currencyID = $_POST['currency'];    // or other currency code ('GBP', 'EUR', 'JPY', 'CAD', 'AUD')
-        $paymentType = 'Sale';      // or 'Sale' or 'Order'
-
-        $returnURL = $GLOBALS['paypal_return_url'];
-        $cancelURL = $GLOBALS['paypal_cancel_url'];
-        
-        $paypal = new PayPal($GLOBALS['paypal_api_username'], 
-                             $GLOBALS['paypal_api_password'], 
-                             $GLOBALS['paypal_api_signature'],
-                             true);
-                             
-        $paypal->addValue('METHOD', 'SetExpressCheckout');
-        $paypal->addValue('VERSION', '56.0');
-        $paypal->addValue('Amt', $paymentAmount);
-        $paypal->addValue('ReturnUrl', $returnURL);
-        $paypal->addValue('CancelUrl', $cancelURL);
-        
-        $response = $paypal->call_paypal(true);
-        print_r($response);
-        exit();
-        
-        
-        
-        // Add request-specific fields to the request string.
-        $nvpStr = "&Amt=$paymentAmount&ReturnUrl=$returnURL&CANCELURL=$cancelURL&PAYMENTACTION=$paymentType&CURRENCYCODE=$currencyID";
-
-        // Execute the API operation; see the PPHttpPost function above.
-        print_r(PPHttpPost('SetExpressCheckout', $nvpStr));
-        exit();
-        $httpParsedResponseAr = PPHttpPost('SetExpressCheckout', $nvpStr);
-
-        if ("SUCCESS" == strtoupper($httpParsedResponseAr["ACK"]) || 
-            "SUCCESSWITHWARNING" == strtoupper($httpParsedResponseAr["ACK"])) {
-            // Redirect to paypal.com.
-            $token = urldecode($httpParsedResponseAr["TOKEN"]);
-            $payPalURL = "https://www.paypal.com/webscr&cmd=_express-checkout&token=$token";
-            if("sandbox" === $GLOBALS['paypal_environment'] || "beta-sandbox" === $GLOBALS['paypal_environment']) {
-                $payPalURL = "https://www.$environment.paypal.com/webscr&cmd=_express-checkout&token=$token";
-            }
-            
-            echo $payPalURL;
-            //header("Location: $payPalURL");
-            exit();
-        } else  {
-            exit('SetExpressCheckout failed: ' . print_r($httpParsedResponseAr, true));
-        }
     }
     
     echo 'ok';
