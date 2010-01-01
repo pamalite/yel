@@ -99,8 +99,24 @@ class EmployerSlotsPage extends Page {
                     <tr>
                         <td class="label">Payment Method:</td>
                         <td>
-                            <input type="radio" name="payment_method" id="payment_method_credit_card" value="credit_card" checked onClick="remove_admin_fee();" /><label for="payment_method_credit_card">Credit Card <span style="font-size: 7pt; color: #666666;">(via PayPal)</span></label><br/>
-                            <input type="radio" name="payment_method" id="payment_method_cheque" value="cheque" onClick="add_admin_fee();" /><label for="payment_method_cheque">Cheque/Money Order/Bank Transfer <span style="font-size: 7pt; color: #666666;">(+5% admin fee)</span></label>
+                            <table style="border: none; margin: auto; width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="width: 10px;">
+                                        <input type="radio" name="payment_method" id="payment_method_credit_card" value="credit_card" checked onClick="remove_admin_fee();" />
+                                    </td>
+                                    <td>
+                                        <label for="payment_method_credit_card">Credit Card/PayPal <span style="font-size: 7pt; color: #666666;">(via PayPal portal)</span></label>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="vertical-align: top;">
+                                        <input type="radio" name="payment_method" id="payment_method_cheque" value="cheque" onClick="add_admin_fee();" />
+                                    </td>
+                                    <td>
+                                        <label for="payment_method_cheque">Cheque/Money Order/Bank Transfer <span style="font-size: 7pt; color: #666666;">(+5% admin fee)</span></label>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
