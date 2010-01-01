@@ -70,6 +70,11 @@ function validate_profile_form() {
             set_status('User ID must be at most 10 characters.');
             return false;
         }
+        
+        if (isEmpty($('slots').value) || isNaN($('slots').value) || parseInt($('slots').value) <= 0) {
+            set_status('Default job slots must be at least 1 or more.');
+            return false;
+        }
     }
     
     if (isEmpty($('email').value)) {
@@ -258,6 +263,9 @@ function add_new_employer() {
     $('working_months').value = '12';
     //$('bonus_months').value = '1';
     $('payment_terms_days').selectedIndex = 0;
+    $('slots').value = '5';
+    $('slots').disabled = false;
+    $('slots_expiry').set('html', '');
 }
 
 function new_from_employer(_employer_id) {
@@ -300,6 +308,7 @@ function new_from_employer(_employer_id) {
             var working_months = xml.getElementsByTagName('working_months');
             //var bonus_months = xml.getElementsByTagName('bonus_months');
             var payment_terms_days = xml.getElementsByTagName('payment_terms_days');
+            var slots = xml.getElementsByTagName('slots');
             
             var new_user_id = ids[0].childNodes[0].nodeValue + '_1';
             if (new_user_id.length > 10) {
@@ -343,6 +352,10 @@ function new_from_employer(_employer_id) {
                     break;
                 }
             }
+            
+            $('slots').value = slots[0].childNodes[0].nodeValue;
+            $('slots').disabled = false;
+            $('slots_expiry').set('html', '');
             
             set_status('');
         },
@@ -408,6 +421,8 @@ function show_employer_profile() {
             //var bonus_months = xml.getElementsByTagName('bonus_months');
             var payment_terms_days = xml.getElementsByTagName('payment_terms_days');
             var website_urls = xml.getElementsByTagName('website_url');
+            var slots = xml.getElementsByTagName('slots');
+            var slots_expire_on = xml.getElementsByTagName('slots_expire_on');
             
             $('user_id_placeholder').set('html', ids[0].childNodes[0].nodeValue);
             $('password_placeholder').set('html', '<input type="button" value="Reset Password" onClick="reset_password();" />');
@@ -446,6 +461,11 @@ function show_employer_profile() {
             if (website_urls[0].childNodes.length > 0) {
                 $('website_url').value = website_urls[0].childNodes[0].nodeValue;
             }
+            
+            $('slots').value = slots[0].childNodes[0].nodeValue;
+            $('slots').disabled = true;
+            $('slots_expiry').set('html', '(Expire on: ' + slots_expire_on[0].childNodes[0].nodeValue + ')');
+            
             set_status('');
         },
         onRequest: function(instance) {
@@ -908,6 +928,7 @@ function save_profile() {
     if (mode == 'create') {
         params = params + '&user_id=' + $('user_id').value;
         params = params + '&password=' + $('password').value;
+        params = params + '&slots=' + $('slots').value;
     }
     
     var uri = root + "/employees/employers_action.php";

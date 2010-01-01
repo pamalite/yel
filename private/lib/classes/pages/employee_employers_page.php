@@ -157,6 +157,10 @@ class EmployeeEmployersPage extends Page {
                             </td>
                         </tr>
                         <tr>
+                            <td class="label"><label for="slots">Default Job Slots:</label></td>
+                            <td class="field"><input class="field_number" type="text" id="slots" name="slots" value="5" maxlength="2" onChange="profile_is_dirty();" />&nbsp;<span id="slots_expiry" style="font-size: 9pt; color: #666666;"></span></td>
+                        </tr>
+                        <tr>
                             <td class="label"><label for="website_url">Web-site URL:</label></td>
                             <td class="field"><input class="field" type="text" id="website_url" name="website_url" value="" onChange="profile_is_dirty();" /></td>
                         </tr>

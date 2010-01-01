@@ -697,7 +697,10 @@ function extend_job(job_id) {
             if (txt == 'ko') {
                 set_status('An error occured while extending job.');
                 return false;
-            } 
+            } else if (txt == '-2') {
+                alert('You have no more job slots left to publish!' + "\n\nPlease extend it later after you have purchased enough job slots from the 'Job Slots' page.");
+                return false;
+            }
             
             //show_job(job_id);
             show_open_jobs();
