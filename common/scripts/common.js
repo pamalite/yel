@@ -900,3 +900,24 @@ function list_available_industries(_industry) {
     
     request.send(params);
 }
+
+function post_to_paypal_with(_hash_value_pairs) {
+    if (_hash_value_pairs.getLength() <= 0) {
+        return;
+    }
+    
+    var paypal_form = document.createElement('form');
+    paypal_form.action = paypal_url;
+    paypal_form.method = 'POST';
+    
+    _hash_value_pairs.each(function(value, key) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        paypal_form.appendChild(input);
+    });
+    
+    document.getElementsByTagName('body')[0].appendChild(paypal_form); 
+    paypal_form.submit();
+}

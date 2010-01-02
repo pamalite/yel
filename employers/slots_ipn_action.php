@@ -26,7 +26,7 @@ if (isset($_POST['txn_id']) &&
     
     $message = str_replace('%txn_id%', $txn_id, $message);
     $message = str_replace('%employer_id%', $employer_id, $message);
-    $message = str_replace('%currency%', Currency::symbol_from_country_code($employer->get_country_code()), $message);
+    $message = str_replace('%currency%', $_POST['mc_currency'], $message);
     $message = str_replace('%amount%', number_format($amount, '2', '.', ', '), $message);
     $message = str_replace('%qty%', $qty, $message);
     $message = str_replace('%price%', $price, $message);
@@ -74,7 +74,13 @@ if (isset($_POST['txn_id']) &&
     fclose($handle);
 } else {
     $handle = fopen($error_log_file, 'a');
-    fwrite($handle, date('Y-m-d H:i:s'). ' txn_id not found.'. "\n");
+    fwrite($handle, date('Y-m-d H:i:s'). ' Either _POST[txn_id], _GET[employer], _GET[qty] or _GET[price] is not found.'. "\n");
+    fclose($handle);
+    
+    $handle = fopen('/tmp/ipn_feedback.txt', 'w');
+    foreach ($_POST as $key=>$value) {
+        fwrite($handle, '['. $key. '] => '. $value. "\n");
+    }
     fclose($handle);
 }
 echo 'ok';

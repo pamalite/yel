@@ -30,7 +30,7 @@ class EmployerSlotsPage extends Page {
         echo '</script>'. "\n";
     }
     
-    public function show() {
+    public function show($_paypal_responded = 0) {
         $this->begin();
         $this->support();
         $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Job Slots</span>");
