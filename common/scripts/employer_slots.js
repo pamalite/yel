@@ -127,9 +127,10 @@ function buy_slots() {
             'item_name': qty + ' Job Slots',
             'amount': parseFloat($('total_amount').get('html')),
             'currency_code': $('currency').value, 
+            'custom': 'employer=' + id + '&price=' + parseFloat($('price_per_slot').get('html')) + '&qty=' + qty,
             'return': root + paypal_return_url_base,
             'cancel_return': root + paypal_return_url_base,
-            'notify_url': paypal_ipn_url + '?employer=' + id + '&price=' + parseFloat($('price_per_slot').get('html')) + '&qty=' + qty
+            'notify_url': paypal_ipn_url
         });
         
         post_to_paypal_with(paypal_inputs);

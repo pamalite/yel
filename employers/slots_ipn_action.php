@@ -4,16 +4,44 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 $txn_log_file = '/var/log/paypal_ipn_txn.log';
 $error_log_file = '/var/log/paypal_ipn_err.log';
 
-if (isset($_POST['txn_id']) && 
-    isset($_GET['employer']) && 
-    isset($_GET['price']) && 
-    isset($_GET['qty'])) {
+if (isset($_POST['txn_id']) && isset($_POST['custom'])) {
+    $employer_id = '';
+    $price = '';
+    $qty = '';
     $txn_id = $_POST['txn_id'];
-    $employer_id = $_GET['employer'];
-    $price = $_GET['price'];
-    $qty = $_GET['qty'];
     $amount = $_POST['mc_gross'];
     $purchased_on = now();
+    
+    // check whether does it has the 3 important variable
+    $vars = explode('&', $_POST['custom']);
+    if (count($vars) == 3) {
+        foreach ($vars as $var) {
+            $pass_thru = explode('=', $var);
+            switch ($pass_thru[0]) {
+                case 'employer':
+                    $employer_id = $pass_thru[1];
+                    break;
+                case 'price':
+                    $price = $pass_thru[1];
+                    break;
+                case 'qty':
+                    $qty = $pass_thru[1];
+                    break;
+                default:
+                    $handle = fopen($error_log_file, 'a');
+                    fwrite($handle, date('Y-m-d H:i:s'). ' Invalid pass-thru variable found.'. "\n");
+                    fclose($handle);
+                    echo 'ko - Invalid pass-thru variable found.';
+                    exit();
+            }
+        }
+    } else {
+        $handle = fopen($error_log_file, 'a');
+        fwrite($handle, date('Y-m-d H:i:s'). ' Invalid _POST[custom] count.'. "\n");
+        fclose($handle);
+        echo 'ko - Invalid _POST[custom] count.';
+        exit();
+    }
     
     $employer = new Employer($employer_id);
     
@@ -38,7 +66,7 @@ if (isset($_POST['txn_id']) &&
     // $handle = fopen('/tmp/email_to_ken.sng.wong@yellowelevator.com.txt', 'w');
     // fwrite($handle, 'Subject: '. $subject. "\n\n");
     // fwrite($handle, $message);
-    // fclose($handle);
+    // fclose($handle);    
     
     // 2. Update the purchase history
     $mysqli = Database::connect();
@@ -74,14 +102,17 @@ if (isset($_POST['txn_id']) &&
     fclose($handle);
 } else {
     $handle = fopen($error_log_file, 'a');
-    fwrite($handle, date('Y-m-d H:i:s'). ' Either _POST[txn_id], _GET[employer], _GET[qty] or _GET[price] is not found.'. "\n");
+    fwrite($handle, date('Y-m-d H:i:s'). ' Either _POST[txn_id] or _POST[custom] is not found.'. "\n");
     fclose($handle);
-    
+
     // $handle = fopen('/tmp/ipn_feedback.txt', 'w');
     // foreach ($_POST as $key=>$value) {
     //     fwrite($handle, '['. $key. '] => '. $value. "\n");
     // }
     // fclose($handle);
+    
+    echo 'ko - Either _POST[txn_id] or _POST[custom] is not found.';
+    exit();
 }
 echo 'ok';
 ?>
