@@ -35,10 +35,10 @@ if (isset($_POST['txn_id']) &&
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     mail('sui.cheng.wong@yellowelevator.com', $subject, $message, $headers);
 
-    /*$handle = fopen('/tmp/email_to_ken.sng.wong@yellowelevator.com.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);*/
+    // $handle = fopen('/tmp/email_to_ken.sng.wong@yellowelevator.com.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     // 2. Update the purchase history
     $mysqli = Database::connect();
@@ -77,11 +77,11 @@ if (isset($_POST['txn_id']) &&
     fwrite($handle, date('Y-m-d H:i:s'). ' Either _POST[txn_id], _GET[employer], _GET[qty] or _GET[price] is not found.'. "\n");
     fclose($handle);
     
-    $handle = fopen('/tmp/ipn_feedback.txt', 'w');
-    foreach ($_POST as $key=>$value) {
-        fwrite($handle, '['. $key. '] => '. $value. "\n");
-    }
-    fclose($handle);
+    // $handle = fopen('/tmp/ipn_feedback.txt', 'w');
+    // foreach ($_POST as $key=>$value) {
+    //     fwrite($handle, '['. $key. '] => '. $value. "\n");
+    // }
+    // fclose($handle);
 }
 echo 'ok';
 ?>
