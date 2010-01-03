@@ -496,7 +496,7 @@ class JobPage extends Page {
                         <tr>
                             <td colspan="5">
                                 <div style="color: #666666; margin: 5px 5px 5px 5px; padding: 10px 10px 10px 10px; border: 1px solid #CCCCCC; font-size: 9pt; font-style: italic;">
-                                    Making a good first impression! Strengthen your application by nominating someone who has worked with you before to write a testimony for you. If you are hired, both of you will be rewarded!
+                                    Make a good first impression! Strengthen your application by nominating someone who has worked with you before to write a testimony for you. If you are hired, both of you will be rewarded!
                                 </div>
                             </td>
                             <td class="separator">&nbsp;</td>
@@ -600,7 +600,7 @@ class JobPage extends Page {
                         </td>
                         <td class="separator"></td>
                         <td class="right">
-                            <p>1. What experience and skill-sets do <span id="candidate_name" style="font-weight: bold;"></span> have that makes him/her suitable for the <span id="qr_job_title" style="font-weight: bold;"></span> position? (<span id="word_count_q1">0</span>/200 words)</p>
+                            <p>1. What experience and skill-sets do <span style="font-weight: bold;">the candidate</span> have that makes him/her suitable for the <span id="qr_job_title" style="font-weight: bold;"></span> position? (<span id="word_count_q1">0</span>/200 words)</p>
                             <p><textarea class="mini_field" id="testimony_answer_1" name="testimony_answer_1"></textarea></p>
                             <p>2. Does <span style="font-weight: bold;">the candidate</span> meet all the requirements of the <span id="qr_job_title" style="font-weight: bold;"></span> position?</p><div style="text-align: center;"><input type="radio" id="meet_req_yes" name="meet_req" value="yes" checked /><label for="meet_req_yes">Yes</label>&nbsp;&nbsp;&nbsp;<input type="radio" id="meet_req_no" name="meet_req" value="no" /><label for="meet_req_no">No</label></div><p>Briefly describe how they are met if you choose 'Yes'. (<span id="word_count_q2">0</span>/200 words)</p>
                             <p><textarea class="mini_field" id="testimony_answer_2" name="testimony_answer_2"></textarea></p>
