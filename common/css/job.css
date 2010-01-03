@@ -88,6 +88,17 @@ table.job_info div.job_description {
     overflow: auto;
 }
 
+#div_refer_me_ad {
+    display: none;
+    background-color: #FFFFFF;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 500px;
+    height: 140px;
+    overflow: auto;
+}
+
 #div_refer_options table.refer_options td {
     width: 30%;
     vertical-align: top;
@@ -173,6 +184,7 @@ table.job_info div.job_description {
 }
 
 #div_refer_options p, 
+#div_refer_me_ad p, 
 #div_refer_form p, 
 #div_quick_refer_form p,
 #div_quick_upload_form p {
@@ -181,6 +193,7 @@ table.job_info div.job_description {
 }
 
 #div_refer_options p.button, 
+#div_refer_me_ad p.button, 
 #div_refer_form p.button, 
 #div_quick_refer_form p.button, 
 #div_quick_upload_form p.button {

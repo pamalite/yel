@@ -323,7 +323,7 @@ class JobPage extends Page {
                         ?>
                         <!--input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />&nbsp;<input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" /-->
                         
-                        <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />&nbsp;<input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />
+                        <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Apply Now" onClick="show_refer_me();" />&nbsp;<input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />
                         
                         
                         <!--input type="image" src="../common/images/button_refer_now.gif" onClick="show_refer_options();" />&nbsp;<input type="image" src="../common/images/button_req_referral.gif" onClick="show_refer_me();" />&nbsp;<input type="image" src="../common/images/button_save_job.gif" onClick="save_job();" /-->
@@ -332,7 +332,7 @@ class JobPage extends Page {
                         ?>
                         <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to 
                         
-                        <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" /> or <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />
+                        <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Apply Now" onClick="show_refer_me_ad();" /> or <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />
                         
                         <!--input type="image" src="../common/images/button_refer_now.gif" style="vertical-align: middle;" onClick="show_refer_options();" /> or <input type="image" src="../common/images/button_req_referral.gif" style="vertical-align: middle;" onClick="show_refer_me();" /> or <input type="image" src="../common/images/button_save_job.gif" style="vertical-align: middle;" onClick="save_job();" /-->
                         <?php
@@ -421,6 +421,17 @@ class JobPage extends Page {
             </p>
         </div>
         
+        <div id="div_refer_me_ad">
+            <div style="color: #666666; padding: 15px 15px 15px 15px;">
+                Ask someone to be your referrer for this job. Please <a href="../members?job=<?php echo $job['id']; ?>">Sign In</a> and select your most current resume so that your referrer can screen it and write a testimony for you before submitting it to the employer.
+                <br/><br/>
+                Not signed up yet? Click here to <a href="../members/sign_up.php">Sign Up</a> now!
+            </div>
+            <p class="button">
+                <a class="no_link" onClick="close_refer_me_ad();">Continue Browsing</a>
+            </p>
+        </div>
+        
         <div id="div_refer_form">
             <form onSubmit="return false;">
                 <table class="refer_form">
@@ -473,15 +484,28 @@ class JobPage extends Page {
         <div id="div_acknowledge_form">
             <form onSubmit="return false;">
                 <p>
-                    You are about to make a request for a referral to the <span id="acknowledge_form_job_title" style="font-weight: bold;"><?php echo $job['title']; ?></span> position.
+                    <span style="font-weight: bold;">To apply for the <span id="acknowledge_form_job_title" style="font-weight: bold; text-decoration: underline;"><?php echo $job['title']; ?></span> position...</span>
                 </p>
                 <p>
-                    Please select the resume you wish to submit, as well as, make a request to your desired referrer.
+                    <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Please select the most current resume you wish to submit for your referrer's screening.</span>
                 </p>
                 <p><?php $this->generate_resumes_list(); ?></p>
                 <p>
-                    You may make this request to your desired referrer.
+                    <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Apply through one of the following options.</span>
                     <table class="request_form">
+                        <tr>
+                            <td colspan="5">
+                                <div style="color: #666666; margin: 5px 5px 5px 5px; padding: 10px 10px 10px 10px; border: 1px solid #CCCCCC; font-size: 9pt; font-style: italic;">
+                                    Making a good first impression! Strengthen your application by nominating someone who has worked with you before to write a testimony for you. If you are hired, both of you will be rewarded!
+                                </div>
+                            </td>
+                            <td class="separator">&nbsp;</td>
+                            <td colspan="2">
+                                <div style="color: #666666; margin: 5px 5px 5px 5px; padding: 10px 10px 10px 10px; border: 1px solid #CCCCCC; font-size: 9pt; font-style: italic;">
+                                    Or, if you have no suitable referrers, let Yellow Elevator screen your resume and write a testimony for you.
+                                </div>
+                            </td>
+                        </tr>
                         <tr>
                             <td class="radio"><input type="radio" id="referrer_contacts" name="referrer_option" value="contacts" checked /></td>
                             <td class="option">
@@ -503,7 +527,7 @@ class JobPage extends Page {
                         </tr>
                     </table>
                 </p>
-                <p class="button"><input type="button" value="Cancel" onClick="close_refer_me();" />&nbsp;<input type="button" value="Submit Request" onClick="refer_me();" /></p>
+                <p class="button"><input type="button" value="Cancel" onClick="close_refer_me();" />&nbsp;<input type="button" value="Apply Now" onClick="refer_me();" /></p>
             </form>
         </div>
         
