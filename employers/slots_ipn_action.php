@@ -44,6 +44,19 @@ if (isset($_POST['txn_id']) && isset($_POST['custom'])) {
     }
     
     $employer = new Employer($employer_id);
+    $mysqli = Database::connect();
+    
+    // get the billing email
+    $query = "SELECT branches.country 
+              FROM branches 
+              INNER JOIN employees ON branches.id = employees.branch 
+              INNER JOIN employers ON employees.id = employers.registered_by 
+              WHERE employers.id = '". $employer_id. "' LIMIT 1";
+    $result = $mysqli->query($query);
+    $billing_email = 'billing.my@yellowelevator.com';
+    if (!is_null($result[0]['country']) && !empty($result[0]['country'])) {
+        $billing_email = 'billing.'. strtolower($result[0]['country']). '@yellowelevator.com';
+    }
     
     // 1. Notify ourselves about Paypal Transaction
     $lines = file('../private/mail/paypal_payment_notification.txt');
@@ -61,15 +74,14 @@ if (isset($_POST['txn_id']) && isset($_POST['custom'])) {
     $message = str_replace('%purchased_on%', $purchased_on, $message);
     $subject = 'Paypal Transaction on '. $purchased_on;
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    mail('sui.cheng.wong@yellowelevator.com', $subject, $message, $headers);
+    mail($billing_email, $subject, $message, $headers);
 
-    // $handle = fopen('/tmp/email_to_ken.sng.wong@yellowelevator.com.txt', 'w');
+    // $handle = fopen('/tmp/email_to_'. $billing_email. '.txt', 'w');
     // fwrite($handle, 'Subject: '. $subject. "\n\n");
     // fwrite($handle, $message);
     // fclose($handle);    
     
     // 2. Update the purchase history
-    $mysqli = Database::connect();
     $query = "INSERT INTO employer_slots_purchases SET 
               employer = '". $employer_id. "', 
               transaction_id = '". $txn_id. "', 
