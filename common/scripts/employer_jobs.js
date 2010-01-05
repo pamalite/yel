@@ -325,9 +325,11 @@ function show_job(job_id) {
             
             var is_closed = closed[0].childNodes[0].nodeValue;
             if (is_closed == 'Y') {
-                $('job.extend').set('html', '<a class="no_link" onClick="extend_job(\'' + job_id + '\');">Re-open this job for another 30 days</a>');
+                // $('job.extend').set('html', '<a class="no_link" onClick="extend_job(\'' + job_id + '\');">Re-open this job for another 30 days</a>');
+                $('job.extend').set('html', '<input type="button" onClick="extend_job(\'' + job_id + '\');" value="Re-open this job for another 30 days" />');
             } else {
-                $('job.extend').set('html', '<a class="no_link" onClick="extend_job(\'' + job_id + '\');">Extend this job for another 30 days</a>');
+                // $('job.extend').set('html', '<a class="no_link" onClick="extend_job(\'' + job_id + '\');">Extend this job for another 30 days</a>');
+                $('job.extend').set('html', '<input type="button" onClick="extend_job(\'' + job_id + '\');" value="Extend this job for another 30 days" />');
             }
             
             $('job_extend_note').setStyle('display', 'block');

@@ -278,7 +278,7 @@ class EmployerJobsPage extends Page {
                     <td class="label">Expires On:</td>
                     <td class="field">
                         <span id="job.expire_on">Loading</span>&nbsp;<span id="job.extend"></span><br/><br/>
-                        <div id="job_extend_note" style="padding: 3px 3px 3px 3px;">NOTE: By clicking the "Extend" or "Re-open" link, you are automatically in agreement with our Terms and Agreement to be billed this job as a new post.</div><br/>
+                        <div id="job_extend_note" style="padding: 3px 3px 3px 3px;">NOTE: By clicking the "Extend" or "Re-open" button, you are automatically in agreement with our Terms and Agreement to be billed this job as a new post.</div><br/>
                     </td>
                 </tr>
                 <tr>
