@@ -351,13 +351,15 @@ class JobPage extends Page {
                 <tr>
                     <td>
                         <div style="text-align: center; height: 50px; margin-top: 15px;">
-                            <a class="no_link" onClick="close_refer_options(); show_refer_job();">Standard Referral</a>
+                            <span style="font-weight: bold;">
+                                <a class="no_link" style="color: #1D3E6E;" onClick="close_refer_options(); show_refer_job();">Standard Referral</a>
+                            </span>
                             &nbsp;
                             <img style="border: none; vertical-align: middle;" src="../common/images/icons/triangle.jpg" />
                         </div>
                         <div style="color: #666666;">
                             <p>
-                                Send the details of this job to your contact(s) so that they can apply for it with your as the referrer.
+                                Send the details of this job to your contact(s) so that they can apply for it with you as the referrer.
                             </p><br/>
                             <p>
                                 As the referrer, you will need to ensure that your contact has properly completed the application so that you can retrieve his/her resume from the <span style="font-weight: bold;">Referral Requests</span> section in your member account.
@@ -369,7 +371,9 @@ class JobPage extends Page {
                     </td>
                     <td>
                         <div style="text-align: center; height: 50px; margin-top: 15px;">
-                             <a class="no_link" onClick="close_refer_options(); show_quick_refer_form();">Express Referral</a>
+                             <span style="font-weight: bold;">
+                                 <a class="no_link" style="color: #1D3E6E;" onClick="close_refer_options(); show_quick_refer_form();">Express Referral</a>
+                             </span>
                              &nbsp;
                              <img style="border: none; vertical-align: middle;" src="../common/images/icons/triangle.jpg" />
                         </div>
@@ -384,7 +388,9 @@ class JobPage extends Page {
                     </td>
                     <td rowspan="2">
                         <div style="text-align: center; height: 50px; margin-top: 15px;">
-                            <a class="no_link" onClick="close_refer_options(); show_quick_upload_form();">Ask Yellow Elevator To Refer On Your Behalf</a>
+                            <span style="font-weight: bold;">
+                                <a class="no_link" style="color: #1D3E6E;" onClick="close_refer_options(); show_quick_upload_form();">Ask Yellow Elevator To Refer On Your Behalf</a>
+                            </span>
                             &nbsp;
                             <img style="border: none; vertical-align: middle;" src="../common/images/icons/triangle.jpg" />
                         </div>

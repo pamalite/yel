@@ -84,7 +84,7 @@ table.job_info div.job_description {
     border: 3px solid #0000FF;
     text-align: center;
     width: 675px;
-    height: 463px;
+    height: 468px;
     overflow: auto;
 }
 
@@ -116,7 +116,12 @@ table.job_info div.job_description {
     overflow: auto;
 }
 
-#div_refer_options table.refer_options, 
+#div_refer_options table.refer_options {
+    width: 95%;
+    margin: auto;
+    padding-top: 5px;
+}
+
 #div_refer_form table.refer_form, 
 #div_acknowledge_form table.request_form, 
 #div_quick_refer_form table.quick_refer_form, 
