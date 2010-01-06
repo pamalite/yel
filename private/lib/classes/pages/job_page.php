@@ -410,11 +410,9 @@ class JobPage extends Page {
                 <tr>
                     <td colspan="2">
                         <div style="color: #666666; text-align: center; vertical-align: middle;">
-                            You need to 
-                            <a href="../members/sign_up.php">Sign Up</a>
-                            &nbsp;or&nbsp;
-                            <a href="../members?job=<?php echo $job['id']; ?>">Sign In</a> 
-                            to make a <span style="font-weight: bold;">Standard</span> &amp; <span style="font-weight: bold;">Express</span> Referral.
+                            To make a <span style="font-weight: bold;">Standard</span> or an <span style="font-weight: bold;">Express</span>, please <a href="../members?job=<?php echo $job['id']; ?>">Sign In</a>.
+                            <br/>
+                            Not signed up yet? Click here to <a href="../members/sign_up.php">Sign Up</a>!
                         </div>
                     </td>
                 </tr>
@@ -429,7 +427,7 @@ class JobPage extends Page {
         
         <div id="div_refer_me_ad">
             <div style="color: #666666; padding: 15px 15px 15px 15px;">
-                Ask someone to be your referrer for this job. Please <a href="../members?job=<?php echo $job['id']; ?>">Sign In</a> and select your most current resume so that your referrer can screen it and write a testimony for you before submitting it to the employer.
+                In order to apply for this job position, please <a href="../members?job=<?php echo $job['id']; ?>">Sign In</a> to submit your resume.
                 <br/><br/>
                 Not signed up yet? Click here to <a href="../members/sign_up.php">Sign Up</a> now!
             </div>

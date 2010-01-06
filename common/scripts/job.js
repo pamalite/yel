@@ -325,8 +325,10 @@ function close_refer_form() {
 
 function show_refer_job() {
     if (id <= 0) {
-        window.location = root + '/members?job=' + $('job_id').value;
-        navigator.reload();
+        alert('Please Sign In or Sign Up as a member to make a Standard Referral!');
+        return;
+        // window.location = root + '/members?job=' + $('job_id').value;
+        // navigator.reload();
     }
     
     $('div_blanket').setStyle('display', 'block');
@@ -833,8 +835,10 @@ function close_quick_refer_form() {
 
 function show_quick_refer_form() {
     if (id <= 0) {
-        window.location = root + '/members?job=' + $('job_id').value;
-        navigator.reload();
+        alert('Please Sign In or Sign Up as a member to make an Express Referral!');
+        return;
+        // window.location = root + '/members?job=' + $('job_id').value;
+        // navigator.reload();
     }
     
     $('div_blanket').setStyle('display', 'block');
