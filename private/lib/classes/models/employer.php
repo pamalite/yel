@@ -360,7 +360,7 @@ class Employer {
         if ($_new_slots > 0) {
             $query = "UPDATE employers SET 
                       slots = (slots + ". $_new_slots. "), 
-                      slots_expire_on = DATE_ADD(NOW(), INTERVAL 6 MONTH) 
+                      slots_expire_on = DATE_ADD(NOW(), INTERVAL 3 MONTH) 
                       WHERE id = '". $this->id. "'";
             return $this->mysqli->execute($query);
         }

@@ -183,7 +183,7 @@ if ($_POST['action'] == 'save_profile') {
         $data['registered_through'] = 'M';
         $data['joined_on'] = now();
         $data['slots'] = $_POST['slots'];
-        $data['slots_expire_on'] = sql_date_add($data['joined_on'], 6, 'month');
+        $data['slots_expire_on'] = sql_date_add($data['joined_on'], 3, 'month');
         if (!$employer->create($data)) {
             echo 'ko';
             exit();
