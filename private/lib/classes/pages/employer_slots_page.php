@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
+require_once dirname(__FILE__). "/../../../config/postings_rate.inc";
 
 class EmployerSlotsPage extends Page {
     private $employer = NULL;
@@ -36,14 +37,23 @@ class EmployerSlotsPage extends Page {
         $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Job Slots</span>");
         $this->menu('employer', 'slots');
         
-        $query = "SELECT currencies.symbol FROM currencies 
-                  LEFT JOIN employers ON currencies.country_code = employers.country 
+        $query = "SELECT currencies.symbol 
+                  FROM currencies 
+                  LEFT JOIN branches ON currencies.country_code = branches.country 
+                  LEFT JOIN employers ON branches.id = employers.branch 
                   WHERE employers.id = '". $this->employer->id(). "' LIMIT 1";
         $mysqli = Database::connect();
         $result = $mysqli->query($query);
-        $currency = '???';
+        $currency = 'MYR';
         if (count($result) > 0 && !is_null($result)) {
             $currency = $result[0]['symbol'];
+        }
+        
+        $posting_rates = $GLOBALS['posting_rates'];
+        $posting_rate = $posting_rates[$currency];
+        if (!array_key_exists($currency, $posting_rates)) {
+            $currency = 'MYR';
+            $posting_rate = $posting_rates['MYR'];
         }
         
         ?>
@@ -84,16 +94,16 @@ class EmployerSlotsPage extends Page {
                 <table class="buy_slots_form">
                     <tr>
                         <td class="label">Price:</td>
-                        <td><?php echo $currency; ?>$&nbsp;<span id="price_per_slot">200</span></td>
+                        <td><?php echo $currency; ?>$&nbsp;<span id="price_per_slot"><?php echo $posting_rate; ?></span></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="qty">Number of slots:</label></td>
-                        <td><input type="text" class="field" id="qty" name="qty" value="5" onKeyUp="calculate_fee();" />&nbsp;<span style="font-size: 9pt; color: #888888;">discount: <span id="discount">0%</span></span></td>
+                        <td><input type="text" class="field" id="qty" name="qty" value="3" onKeyUp="calculate_fee();" />&nbsp;<span style="font-size: 9pt; color: #888888;">discount: <span id="discount">0%</span></span></td>
                     </tr>
                     <tr>
                         <td style="font-weight: bold;" class="label">Amount:</td>
                         <td style="border-top: 1px solid #666666; border-bottom: 1px double #666666; font-weight: bold;">
-                            <?php echo $currency; ?>$&nbsp;<span id="total_amount">1000</span>
+                            <?php echo $currency; ?>$&nbsp;<span id="total_amount"><?php echo ($posting_rate * 3) ?></span>
                         </td>
                     </tr>
                     <tr>

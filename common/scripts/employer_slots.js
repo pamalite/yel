@@ -217,7 +217,7 @@ function calculate_fee() {
     if (qty <= 0 || isEmpty($('qty').value) || isNaN($('qty').value)) {
         $('total_amount').set('html', '0.00');
         return;
-    } else if (qty > 5 && qty <= 15) {
+    } else if (qty >= 5 && qty <= 15) {
         discount = 10;
     } else if (qty > 15 && qty <= 25) {
         discount = 15;
