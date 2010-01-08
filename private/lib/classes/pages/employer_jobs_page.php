@@ -129,13 +129,13 @@ class EmployerJobsPage extends Page {
                 <tr>
                     <td class="info">
                         <div class="slots_details">
-                            Job Slots left: <span id="num_slots" style="font-weight: bold;">0</span>
+                            Job Postings left: <span id="num_slots" style="font-weight: bold;">0</span>
                             <br/>
                             Expiring on: <span id="slots_expiry" style="font-weight: bold;"></span>
                         </div>
                     </td>
                     <td class="buy">
-                        <input type="button" value="Buy Slots" onClick="show_buy_slots_form();" />
+                        <input type="button" id="buy_postings_button" value="Buy Postings" onClick="show_buy_slots_form();" />
                         <br/>
                         <span style="font-size: 7pt;">
                             <a class="no_link" onClick="show_purchase_histories();">View Purchase History</a>
@@ -342,7 +342,7 @@ class EmployerJobsPage extends Page {
                         <td><?php echo $payment_currency; ?>$&nbsp;<span id="price_per_slot"><?php echo $posting_rate; ?></span></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="qty">Number of slots:</label></td>
+                        <td class="label"><label for="qty">Number of postings:</label></td>
                         <td><input type="text" class="field" id="qty" name="qty" value="3" onKeyUp="calculate_fee();" />&nbsp;<span style="font-size: 9pt; color: #888888;">discount: <span id="discount">0%</span></span></td>
                     </tr>
                     <tr>
@@ -384,7 +384,7 @@ class EmployerJobsPage extends Page {
                 <table class="header">
                     <tr>
                         <td class="date">Date of Purchase</td>
-                        <td class="number_of_slots_title">Number of Slots</td>
+                        <td class="number_of_slots_title">Number of Postings</td>
                         <td class="price_per_slot_title">Price (<?php echo $payment_currency; ?>)</td>
                         <td class="amount_title">Amount (<?php echo $payment_currency; ?>)</td>
                     </tr>
@@ -393,6 +393,13 @@ class EmployerJobsPage extends Page {
                 </div>
             </div>
             <p class="button"><input type="button" value="Close" onClick="close_purchase_histories();" /></p>
+        </div>
+        
+        <div id="div_paypal_progress">
+            <div style="text-align: center;">
+                Please wait while you are redirected to PayPal's payment portal...<br/><br/>
+                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
+            </div>
         </div>
         <?php
     }

@@ -232,6 +232,19 @@ div.slots_details {
     overflow: auto;
 }
 
+#div_paypal_progress {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100px;
+    overflow: auto;
+}
+
 #div_buy_slots_form input.field {
     width: 20%;
 }
@@ -261,7 +274,8 @@ div.slots_details {
 }
 
 #div_purchase_histories #purchase_histories {
-    width: 95%;
+    width: 100%;
+    height: 425px;
     overflow: auto;
 }
 

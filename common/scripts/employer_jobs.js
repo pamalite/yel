@@ -901,6 +901,7 @@ function get_slots_left() {
     $('num_slots').setStyle('color', '#CCCCCC');
     $('slots_expiry').set('html', '(Not Applicable)');
     $('slots_expiry').setStyle('color', '#666666');
+    $('buy_postings_button').disabled = true;
     
     var params = 'id=' + id + '&action=get_slots_left';
     
@@ -919,7 +920,7 @@ function get_slots_left() {
                 var slots = xml.getElementsByTagName('slots');
                 var expired = xml.getElementsByTagName('expired');
                 var expire_on = xml.getElementsByTagName('expire_on');
-
+                
                 $('slots_expiry').set('html', expire_on[0].childNodes[0].nodeValue);
 
                 if (parseInt(expired[0].childNodes[0].nodeValue) < 0) {
@@ -940,6 +941,8 @@ function get_slots_left() {
                         }
                     }
                 }
+                
+                $('buy_postings_button').disabled = false;
             }
         }
     });
@@ -1062,6 +1065,34 @@ function buy_slots() {
             'notify_url': paypal_ipn_url
         });
         
+        close_buy_slots_form();
+        
+        div_height = parseInt($('div_paypal_progress').getStyle('height'));
+        div_width = parseInt($('div_paypal_progress').getStyle('width'));
+
+        if (typeof window.innerHeight != 'undefined') {
+            window_height = window.innerHeight;
+        } else {
+            window_height = document.documentElement.clientHeight;
+        }
+
+        if (typeof window.innerWidth != 'undefined') {
+            window_width = window.innerWidth;
+        } else {
+            window_width = document.documentElement.clientWidth;
+        }
+
+        if (window_height <= div_height) {
+            $('div_paypal_progress').setStyle('height', window_height);
+            $('div_paypal_progress').setStyle('top', 0);
+            window.scrollTo(0, 0);
+        } else {
+            $('div_paypal_progress').setStyle('top', ((window_height - div_height) / 2));
+        }
+        $('div_paypal_progress').setStyle('left', ((window_width - div_width) / 2));
+        $('div_blanket').setStyle('display', 'block');
+        $('div_paypal_progress').setStyle('display', 'block');
+        
         post_to_paypal_with(paypal_inputs);
         return;
     }
@@ -1127,6 +1158,49 @@ function show_purchase_histories() {
         $('div_purchase_histories').setStyle('top', ((window_height - div_height) / 2));
     }
     $('div_purchase_histories').setStyle('left', ((window_width - div_width) / 2));
+    
+    var params = 'id=' + id;
+    
+    var uri = root + "/employers/slots_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                set_status('An error occured while loading slots purchase histories.');
+                return false;
+            }
+            
+            var html = '<table id="list" class="list">';
+            if (txt == '0') {
+                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There is no past purchase of slots.</div>';
+            } else {
+                var price_per_slots = xml.getElementsByTagName('price_per_slot');
+                var number_of_slots = xml.getElementsByTagName('number_of_slot');
+                var total_amounts = xml.getElementsByTagName('total_amount');
+                var purchased_ons = xml.getElementsByTagName('formatted_purchased_on');
+                
+                for (var i=0; i < price_per_slots.length; i++) {
+                    html = html + '<tr onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
+                    html = html + '<td class="date">' + purchased_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="number_of_slots">' + number_of_slots[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="price_per_slot">' + price_per_slots[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '<td class="amount">' + total_amounts[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    html = html + '</tr>' + "\n";
+                }
+                
+                html = html + '</table>';
+            }
+            
+            $('div_purchases_list').set('html', html);
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading slots purchase histories...');
+        }
+    });
+    
+    request.send(params);
     
     $('div_blanket').setStyle('display', 'block');
     $('div_purchase_histories').setStyle('display', 'block');
