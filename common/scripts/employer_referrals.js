@@ -636,6 +636,10 @@ function show_referred_candidates_with(job_id, _title, _industry) {
                 
                 var view_testimony_link = '<a class="no_link" onClick="toggle_testimony(\'referred_\', \'' + referral_id.childNodes[0].nodeValue + '\');">Testimony</a>';
                 
+                if (testimonies[i].childNodes.length > 0) {
+                    view_testimony_link = view_testimony_link + '&nbsp;<a href="' + root + '/employers/testimony_pdf.php?id=' + referral_id.childNodes[0].nodeValue + '"><img style="border: none;" src="' + root + '/common/images/icons/pdf.gif" /></a>';
+                }
+                
                 var view_resume_link = '<span style="text-decoration: line-through;">Resume</span>';
                 if (resumes[i].childNodes.length > 0) {
                     view_resume_link = '<a class="no_link" onClick="show_resume(\'' + resumes[i].childNodes[0].nodeValue + '\', \'' + referral_id.childNodes[0].nodeValue + '\');">Resume</a>'
@@ -785,6 +789,10 @@ function show_suggested_candidates_with(job_id, _title, _industry) {
                 
                 var view_testimony_link = '<a class="no_link" onClick="toggle_testimony(\'suggested_\', \'' + referral_id.childNodes[0].nodeValue + '\');">Testimony</a>';
                 
+                if (testimonies[i].childNodes.length > 0) {
+                    view_testimony_link = view_testimony_link + '&nbsp;<a href="' + root + '/employers/testimony_pdf.php?id=' + referral_id.childNodes[0].nodeValue + '"><img style="border: none;" src="' + root + '/common/images/icons/pdf.gif" /></a>';
+                }
+                
                 var view_resume_link = '<span style="text-decoration: line-through;">Resume</span>';
                 if (resumes[i].childNodes.length > 0) {
                     view_resume_link = '<a class="no_link" onClick="show_resume(\'' + resumes[i].childNodes[0].nodeValue + '\', \'' + referral_id.childNodes[0].nodeValue + '\');">Resume</a>'
@@ -923,6 +931,10 @@ function show_shortlisted_candidates_with(job_id, _title, _industry) {
                 html = html + '<td class="indicator">' + new_referral + '</td>' + "\n";
                 
                 var view_testimony_link = '<a class="no_link" onClick="toggle_testimony(\'shortlisted_\', \'' + referral_id.childNodes[0].nodeValue + '\');">Testimony</a>';
+                
+                if (testimonies[i].childNodes.length > 0) {
+                    view_testimony_link = view_testimony_link + '&nbsp;<a href="' + root + '/employers/testimony_pdf.php?id=' + referral_id.childNodes[0].nodeValue + '"><img style="border: none;" src="' + root + '/common/images/icons/pdf.gif" /></a>';
+                }
                 
                 var view_resume_link = '<span style="text-decoration: line-through;">Resume</span>';
                 if (resumes[i].childNodes.length > 0) {
