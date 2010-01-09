@@ -647,7 +647,7 @@ if ($_POST['action'] == 'quick_refer') {
             $data['firstname'] = sanitize($_POST['qr_candidate_firstname']);
             $data['lastname'] = sanitize($_POST['qr_candidate_lastname']);
             $data['phone_num'] = sanitize($_POST['qr_candidate_phone']);
-            $data['zip'] = sanitize($_POST['qr_candidate_zip']);
+            $data['zip'] = '0';
             $data['country'] = sanitize($_POST['qr_candidate_country']);
             $data['forget_password_question'] = 1;
             $data['forget_password_answer'] = 'system generated';
@@ -834,12 +834,12 @@ if ($_POST['action'] == 'quick_upload') {
     $data['referrer_phone_num'] = sanitize($_POST['qu_referrer_phone']);
     $data['referrer_firstname'] = sanitize($_POST['qu_referrer_firstname']);
     $data['referrer_lastname'] = sanitize($_POST['qu_referrer_lastname']);
-    $data['referrer_zip'] = sanitize($_POST['qu_referrer_zip']);
+    $data['referrer_zip'] = '0';
     $data['referrer_country'] = sanitize($_POST['qu_referrer_country']);
     $data['candidate_phone_num'] = sanitize($_POST['qu_candidate_phone']);
     $data['candidate_firstname'] = sanitize($_POST['qu_candidate_firstname']);
     $data['candidate_lastname'] = sanitize($_POST['qu_candidate_lastname']);
-    $data['candidate_zip'] = sanitize($_POST['qu_candidate_zip']);
+    $data['candidate_zip'] = '0';
     $data['candidate_country'] = sanitize($_POST['qu_candidate_country']);
     $data['added_on'] = $today;
     

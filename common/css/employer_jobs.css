@@ -76,11 +76,11 @@ td.id {
 }
 
 td.industry {
-   width: 150px;
+    width: 150px;
 }
 
 td.date {
-    width: 150px;
+    width: 50px;
 }
 
 td.new_from {

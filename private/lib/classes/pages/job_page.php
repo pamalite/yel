@@ -58,7 +58,7 @@ class JobPage extends Page {
         }
         
         echo '</script>'. "\n";
-        echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
+        // echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
     }
     
     public function is_employee_viewing() {
@@ -437,19 +437,22 @@ class JobPage extends Page {
         </div>
         
         <div id="div_refer_form">
+            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Choose the contacts, whom you want to refer &nbsp;<span id="job_title" style="font-weight: bold;"></span>&nbsp; to, through either...</span>
+            </div>
             <form onSubmit="return false;">
                 <table class="refer_form">
-                    <tr>
+                    <!--tr>
                     <td colspan="3"><p>You are about to refer the job position,&nbsp;<span id="job_title" style="font-weight: bold;"></span>&nbsp;to your contacts. Please select...</p></td>
-                    </tr>
+                    </tr-->
                     <tr>
                         <td class="left">
                             <table class="candidate_form">
                                 <tr>
                                     <td class="radio"><input type="radio" id="from_list" name="candidate_from" value="list" checked /></td>
                                     <td>
-                                        <label for="from_list">from your Contacts</label><br/>
-                                        <span class="filter">[ Show candidates from <?php (!is_null($this->member)) ? $this->generate_networks_list() : ''; ?> ]</span><br/>
+                                        <label for="from_list">your Contacts list</label><br/>
+                                        <span class="filter">[ Show contacts from <?php (!is_null($this->member)) ? $this->generate_networks_list() : ''; ?> ]</span><br/>
                                         <div class="candidates" id="candidates" name="candidates"></div>
                                     </td>
                                 </tr>
@@ -536,6 +539,9 @@ class JobPage extends Page {
         </div>
         
         <div id="div_quick_refer_form">
+            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Choose the resume of your contact you have on file to be referred to &nbsp;<span id="qr_job_title" style="font-weight: bold;"></span>&nbsp; position.</span>
+            </div>
             <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_refer_form();">
                 <input type="hidden" name="id" id="id" value="<?php echo (is_null($this->member)) ? '' : $this->member->id(); ?>" />
                 <input type="hidden" name="qr_job_id" id="qr_job_id" value="<?php echo $this->job_id; ?>" />
@@ -547,8 +553,8 @@ class JobPage extends Page {
                     <tr>
                         <td colspan="3">
                             <p style="text-align: center;">
-                                You are about to quickly refer the job position,&nbsp;<span id="qr_job_title" style="font-weight: bold;"></span>&nbsp;to one of your contacts. Please attached the candidate's resume:
-                                <br/><br/>
+                                <!-- You are about to quickly refer the job position,&nbsp;<span id="qr_job_title" style="font-weight: bold;"></span>&nbsp;to one of your contacts. Please attached the candidate's resume:
+                                <br/><br/-->
                                 <input class="field" id="qr_my_file" name="qr_my_file" type="file" />
                                 <br/><br/>
                                 <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
@@ -560,8 +566,11 @@ class JobPage extends Page {
                     </tr>
                     <tr>
                         <td class="left">
+                            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                                <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Select a contact from either one of the following options.</span>
+                            </div>
                             <div style="border-bottom: 1px dashed #666666; padding-bottom: 15px;">
-                                <label for="qr_candidate_email_from_list">Please select a candidate from one of your Contacts:</label><br/>
+                                <label for="qr_candidate_email_from_list">Your Contacts list:</label><br/>
                                 <?php $this->generateContactsDropdown(); ?>
                             </div>
                             <div style="padding-top: 15px;">
@@ -588,12 +597,12 @@ class JobPage extends Page {
                                         <input type="text" class="mini_field" id="qr_candidate_lastname" name="qr_candidate_lastname" />
                                     </td>
                                 </tr>
-                                <tr>
+                                <!--tr>
                                     <td class="label"><label for="qr_candidate_zip">Postcode/Zip:</label></td>
                                     <td class="field">
                                         <input type="text" class="mini_field" id="qr_candidate_zip" name="qr_candidate_zip" />
                                     </td>
-                                </tr>
+                                </tr-->
                                 <tr>
                                     <td class="label"><label for="qr_candidate_country">Country:</label></td>
                                     <td class="field">
@@ -604,6 +613,9 @@ class JobPage extends Page {
                         </td>
                         <td class="separator"></td>
                         <td class="right">
+                            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                                <span style="color: #FC8503; font-weight: bold;">Step 3:</span> <span style="color: #666666;">Give a brief testimony about your contact by answering the following questions.</span>
+                            </div>
                             <p>1. What experience and skill-sets do <span style="font-weight: bold;">the candidate</span> have that makes him/her suitable for the <span id="qr_job_title" style="font-weight: bold;"></span> position? (<span id="word_count_q1">0</span>/200 words)</p>
                             <p><textarea class="mini_field" id="testimony_answer_1" name="testimony_answer_1"></textarea></p>
                             <p>2. Does <span style="font-weight: bold;">the candidate</span> meet all the requirements of the <span id="qr_job_title" style="font-weight: bold;"></span> position?</p><div style="text-align: center;"><input type="radio" id="meet_req_yes" name="meet_req" value="yes" checked /><label for="meet_req_yes">Yes</label>&nbsp;&nbsp;&nbsp;<input type="radio" id="meet_req_no" name="meet_req" value="no" /><label for="meet_req_no">No</label></div><p>Briefly describe how they are met if you choose 'Yes'. (<span id="word_count_q2">0</span>/200 words)</p>
@@ -625,6 +637,9 @@ class JobPage extends Page {
         </div>
         
         <div id="div_quick_upload_form">
+            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Fill up the following details, about your contact, you want to refer to &nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp; position, and about yourself.</span>
+            </div>
             <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_upload_form();">
                 <input type="hidden" name="qu_job_id" id="qu_job_id" value="<?php echo $this->job_id; ?>" />
                 <input type="hidden" name="action" value="quick_upload" />
@@ -633,26 +648,14 @@ class JobPage extends Page {
                 </p>
                 <table id="table_quick_upload_form" class="quick_upload_form">
                     <tr colspan="3">
-                        <div style="text-align: center; margin: auto; width: 95%;">
+                        <!--div style="text-align: center; margin: auto; width: 95%;">
                             You are about to quickly drop us your contact for the job position,&nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp;. Please tell us more about him/her by filling up <span style="text-decoration: underline;">all</span> the following fields:
-                        </div>
+                        </div-->
                     </tr>
                     <tr>
                         <td class="left">
-                            <div style="font-size: 12pt; font-weight: bold; padding-bottom: 15px;">Candidate's Details</div>
+                            <div style="font-size: 12pt; font-weight: bold; padding-bottom: 15px;">Contact's Details</div>
                             <table class="qu_candidate_form">
-                                <tr>
-                                    <td class="label"><label for="qu_candidate_email">Email:</label></td>
-                                    <td class="field">
-                                        <input type="text" class="mini_field" id="qu_candidate_email" name="qu_candidate_email" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="qu_candidate_phone">Telephone:</label></td>
-                                    <td class="field">
-                                        <input type="text" class="mini_field" id="qu_candidate_phone" name="qu_candidate_phone" />
-                                    </td>
-                                </tr>
                                 <tr>
                                     <td class="label"><label for="qu_candidate_firstname">Firstname:</label></td>
                                     <td class="field">
@@ -666,11 +669,23 @@ class JobPage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td class="label"><label for="qu_candidate_email">Email:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_candidate_email" name="qu_candidate_email" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_candidate_phone">Telephone:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_candidate_phone" name="qu_candidate_phone" />
+                                    </td>
+                                </tr>
+                                <!--tr>
                                     <td class="label"><label for="qu_candidate_zip">Postcode/Zip:</label></td>
                                     <td class="field">
                                         <input type="text" class="mini_field" id="qu_candidate_zip" name="qu_candidate_zip" />
                                     </td>
-                                </tr>
+                                </tr-->
                                 <tr>
                                     <td class="label"><label for="qu_candidate_country">Country:</label></td>
                                     <td class="field">
@@ -684,18 +699,6 @@ class JobPage extends Page {
                             <div style="font-size: 12pt; font-weight: bold; padding-bottom: 15px;">Your Details</div>
                             <table class="qu_candidate_form">
                                 <tr>
-                                    <td class="label"><label for="qu_referrer_email">Email:</label></td>
-                                    <td class="field">
-                                        <input type="text" class="mini_field" id="qu_referrer_email" name="qu_referrer_email" />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="qu_referrer_phone">Telephone:</label></td>
-                                    <td class="field">
-                                        <input type="text" class="mini_field" id="qu_referrer_phone" name="qu_referrer_phone" />
-                                    </td>
-                                </tr>
-                                <tr>
                                     <td class="label"><label for="qu_referrer_firstname">Firstname:</label></td>
                                     <td class="field">
                                         <input type="text" class="mini_field" id="qu_referrer_firstname" name="qu_referrer_firstname" />
@@ -708,11 +711,23 @@ class JobPage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td class="label"><label for="qu_referrer_email">Email:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_referrer_email" name="qu_referrer_email" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qu_referrer_phone">Telephone:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qu_referrer_phone" name="qu_referrer_phone" />
+                                    </td>
+                                </tr>
+                                <!--tr>
                                     <td class="label"><label for="qu_referrer_zip">Postcode/Zip:</label></td>
                                     <td class="field">
                                         <input type="text" class="mini_field" id="qu_referrer_zip" name="qu_referrer_zip" />
                                     </td>
-                                </tr>
+                                </tr-->
                                 <tr>
                                     <td class="label"><label for="qu_referrer_country">Country:</label></td>
                                     <td class="field">
@@ -727,9 +742,12 @@ class JobPage extends Page {
                     </tr>
                     <tr>
                         <td colspan="3">
+                            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                                <span style="color: #FC8503; font-weight: bold;">Step 2 (Optional): </span> <span style="color: #666666;">You can upload your contact's resume, if you have it on file.</span>
+                            </div>
                             <p style="text-align: center;">
-                                You can also upload your contact's resume, if you have it with you, for our perusal. If not, you can skip the following part and click the 'Refer' button:
-                                <br/><br/>
+                                <!--You can also upload your contact's resume, if you have it with you, for our perusal. If not, you can skip the following part and click the 'Refer' button:
+                                <br/><br/-->
                                 <input class="field" id="qu_my_file" name="qu_my_file" type="file" />
                                 <br/><br/>
                                 <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>

@@ -176,6 +176,10 @@ class MemberSignUpPage extends Page {
                         </td>
                     </tr>
                     <tr>
+                        <td class="label"><label for="individual_headhunter">I am an individual headhunter:</label></td>
+                        <td class="field"><input type="checkbox" id="individual_headhunter" name="individual_headhunter" <?php echo ($_session['individual_headhunter'] == 'Y' || isset($_GET['indiv_hh'])) ? 'checked' : '' ?> /></td>
+                    </tr>
+                    <tr>
                         <td class="title" colspan="2">Expertise</td>
                     </tr>
                     <tr>

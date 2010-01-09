@@ -66,11 +66,13 @@ input.mini_button {
 }
 
 td.score {
-    width: 50px;
+    /*width: 50px;*/
+    width: 10%;
 }
 
 td.checkbox {
-    width: 10px;
+    /*width: 10px;*/
+    width: 1%;
 }
 
 td.id {
@@ -79,24 +81,29 @@ td.id {
 
 td.indicator {
     text-align: center;
-    width: 16px;
+    /*width: 16px;*/
+    width: 2%;
 }
 
 td.referrals {
-    width: 65px;
+    /*width: 65px;*/
+    width: 10%;
     text-align: center;
 }
 
 td.industry {
-    width: 150px;
+    /*width: 150px;*/
+    width: 15%;
 }
 
 td.title, td.member, td.referee {
-    width: 150px;
+    /*width: 150px;*/
+    width: 25%;
 }
 
 td.date {
-    width: 150px;
+    /*width: 150px;*/
+    width: 10%;
 }
 
 td.view {
@@ -105,7 +112,8 @@ td.view {
 }
 
 td.employ {
-    width: 220px;
+    /*width: 220px;*/
+    width: 30%;
     text-align: center;
 }
 

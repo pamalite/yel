@@ -307,7 +307,7 @@ CREATE TABLE `employer_slots_purchases` (
   `transaction_id` varchar(20) NOT NULL,
   `purchased_on` datetime NOT NULL,
   `price_per_slot` float(9,2) NOT NULL,
-  `number_of_slot` int(10) unsigned NOT NULL,
+  `number_of_slot` int(11) NOT NULL,
   `total_amount` float(9,2) NOT NULL,
   `on_hold` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`employer`,`transaction_id`),
@@ -348,7 +348,7 @@ CREATE TABLE `employers` (
   `registered_through` enum('E','M') DEFAULT 'M',
   `registered_by` int(11) NOT NULL,
   `branch` int(11) NOT NULL,
-  `slots` int(10) unsigned DEFAULT '5',
+  `slots` int(11) DEFAULT '5',
   `slots_expire_on` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `contact_person` (`contact_person`),
@@ -458,7 +458,7 @@ CREATE TABLE `job_extensions` (
   PRIMARY KEY (`id`),
   KEY `job_extensions` (`job`),
   CONSTRAINT `job_extensions` FOREIGN KEY (`job`) REFERENCES `jobs` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -481,7 +481,7 @@ CREATE TABLE `job_index` (
   FULLTEXT KEY `title` (`title`),
   FULLTEXT KEY `state` (`state`),
   FULLTEXT KEY `criteria_match` (`description`,`title`,`state`)
-) ENGINE=MyISAM AUTO_INCREMENT=130 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=132 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -522,7 +522,7 @@ CREATE TABLE `jobs` (
   CONSTRAINT `jobs_ibfk_2` FOREIGN KEY (`industry`) REFERENCES `industries` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `jobs_ibfk_3` FOREIGN KEY (`country`) REFERENCES `countries` (`country_code`) ON UPDATE CASCADE,
   CONSTRAINT `jobs_ibfk_4` FOREIGN KEY (`currency`) REFERENCES `currencies` (`symbol`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=156 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -762,6 +762,7 @@ CREATE TABLE `members` (
   `added_by` int(11) DEFAULT NULL,
   `checked_profile` enum('Y','N') DEFAULT 'N',
   `remarks` varchar(255) DEFAULT NULL,
+  `individual_headhunter` enum('Y','N') DEFAULT 'N',
   PRIMARY KEY (`email_addr`),
   KEY `firstname` (`firstname`,`lastname`),
   KEY `lastname` (`lastname`),
@@ -1029,7 +1030,7 @@ CREATE TABLE `referrals` (
   CONSTRAINT `referrals_ibfk_3` FOREIGN KEY (`job`) REFERENCES `jobs` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `referrals_ibfk_4` FOREIGN KEY (`resume`) REFERENCES `resumes` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `referrals_ibfk_5` FOREIGN KEY (`replaced_referral`) REFERENCES `referrals` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=213 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=215 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1187,7 +1188,7 @@ CREATE TABLE `resumes` (
   PRIMARY KEY (`id`),
   KEY `resumes_ibfk_1` (`member`),
   CONSTRAINT `resumes_ibfk_1` FOREIGN KEY (`member`) REFERENCES `members` (`email_addr`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=123 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1287,7 +1288,7 @@ CREATE TABLE `seeds` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `seed` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=873 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=907 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1354,4 +1355,4 @@ CREATE TABLE `visitors` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-12-31 15:56:42
+-- Dump completed on 2010-01-09 22:19:18

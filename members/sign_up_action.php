@@ -18,6 +18,7 @@ $_SESSION['yel']['sign_up']['state'] = $_POST['state'];
 $_SESSION['yel']['sign_up']['zip'] = $_POST['zip'];
 $_SESSION['yel']['sign_up']['country'] = $_POST['country'];
 $_SESSION['yel']['sign_up']['like_newsletter'] = ($_POST['like_newsletter']) ? 'Y' : 'N';
+$_SESSION['yel']['sign_up']['individual_headhunter'] = ($_POST['individual_headhunter']) ? 'Y' : 'N';
 
 if (!empty($_POST['member']) && !empty($_POST['referee'])) {
     $invited = true;
@@ -78,6 +79,7 @@ $data['country'] = $_POST['country'];
 $data['address'] = $_POST['address'];
 $data['state'] = $_POST['state'];
 $data['like_newsletter'] = $_SESSION['yel']['sign_up']['like_newsletter'];
+$data['individual_headhunter'] = $_SESSION['yel']['sign_up']['individual_headhunter'];
 $data['joined_on'] = $joined_on;
 $data['active'] = 'N';
 $data['invites_available'] = '10';
