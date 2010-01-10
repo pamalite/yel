@@ -95,7 +95,8 @@ function validate_quick_refer_form() {
     var msg = 'You will need to fulfill the following steps to make this referral work:' + "\n\n";
     msg = msg + 'Step 4: Inform your contact about the referral you made, and let one approve it.' + "\n\n";
     msg = msg + 'Step 5: Complete the referral by going to Referral Requests, screen one\'s resume, and refer your contact to one\'s dream job.' + "\n\n";
-    msg = msg + 'Click "OK" to proceed, or "Cancel" to continue browsing.';
+    msg = msg + 'Click "OK" to proceed, or "Cancel" to continue browsing.' + "\n\n";
+    msg = msg + 'NOTE: By clicking "OK", you confirm that you have screened your contact\'s resume and have also assessed one\'s suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding your contact, and you agree to provide any other necessary information requested by the employer.'
     
     // var agreed = confirm('By clicking "OK", you confirm that you have screened the candidate\'s resume and have also assessed the candidate\'s suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding the candidate, and you agree to provide any other necessary information requested by the employer.\n\nOtherwise, you may click the "Cancel" button.');
     var agreed = confirm(msg);
@@ -184,7 +185,8 @@ function validate_quick_upload_form() {
     var msg = 'You will need to fulfill the following steps to make this referral work:' + "\n\n";
     msg = msg + 'Step 3: Inform your contact about the referral you made, and let one approve it.' + "\n\n";
     msg = msg + 'Step 4: Sit back and relax, while we at Yellow Elevator will complete the referral for you.' + "\n\n";
-    msg = msg + 'Click "OK" to proceed, or "Cancel" to continue browsing.';
+    msg = msg + 'Click "OK" to proceed, or "Cancel" to continue browsing.' + "\n\n";
+    msg = msg + 'NOTE: By clicking "OK", you confirm that you have screened your contact\'s resume and have also assessed one\'s suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding your contact, and you agree to provide any other necessary information requested by the employer.'
     
     // var agreed = confirm('By clicking "OK", you confirm that you have screened the candidate\'s resume and have also assessed the candidate\'s suitability for this job position. Also, you acknowledge that Yellow Elevator may contact you for further references regarding the candidate, and you agree to provide any other necessary information requested by Yellow Elevator.\n\nOtherwise, you may click the "Cancel" button.');
     var agreed = confirm(msg);
@@ -509,7 +511,8 @@ function refer() {
     var msg = 'You will need to fulfill the following steps to make this referral work:' + "\n\n";
     msg = msg + 'Step 2: Inform your contact(s) and have them submit their resumes for your screening.' + "\n\n";
     msg = msg + 'Step 3: Complete the referral by going to Referral Requests, screen their resumes, and refer them to their dream jobs.' + "\n\n";
-    msg = msg + 'Click "OK" to proceed, or "Cancel" to continue browsing.';
+    msg = msg + 'Click "OK" to proceed, or "Cancel" to continue browsing.' + "\n\n";
+    msg = msg + 'NOTE: By clicking "OK", you confirm that you have screened your contacts\' resume and have also assessed their suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding your contacts, and you agree to provide any other necessary information requested by the employer.'
     
     // var proceed = confirm('Your referred candidates will be requested to submit their resumes. As a referrer, you are responsible for screening your candidates\' resumes to confirm that they are suitable for this job position before recommending them.\n\nYou will be notified by email to check the "Referral Requests" section once the resumes are submitted.\n\nClick "OK" to continue or "Cancel" to make changes.');
     
