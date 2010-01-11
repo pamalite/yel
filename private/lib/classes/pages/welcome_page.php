@@ -129,7 +129,6 @@ class WelcomePage extends Page {
                         <span id="industry_drop_down"></span><br/>
                         <div style="padding-top: 5px;">
                             <input type="text" name="keywords" id="keywords" value="Job title or keywords">
-                            <!--input id="search_button" type="submit" value="Search"-->
                             <input type="image" name="submit" id="search_button" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/but-search.gif" value="Search" />
                         </div>
                     </div>
@@ -188,53 +187,53 @@ class WelcomePage extends Page {
                         <td width="23"><a id="toggle_left" class="no_link"><img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/nav-logo-left.jpg" width="23" height="134" class="prev" /></a></td>
                         <td class="nav-center" id="employer_tabs">
                             <div class="employer_logos" id="employers_0">
-                                <a href="http://www.mattel.com" target="_new">
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=MATTEL_M&keywords=">
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/mattel.jpg" alt="Mattel" style="vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.wdc.com" target="_new">
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=wdc_m&keywords=" >
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/wd.jpg" alt="Western Digital" style="vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.digi.com.my" target="_new">
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=digi&keywords=" >
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/digi.jpg" alt="digi" style="vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.altera.com" target="_new">
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/altera.jpg" alt="digi" style="vertical-align: middle;" />
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=altera&keywords=" >
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/altera.jpg" alt="altera" style="vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.entegris.com" target="_new">
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=entegris&keywords=" >
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/entegris.jpg" alt="entegris" style="width: 105px; height: 93px; vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.nuskin.com" target="_new">
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=nuskin&keywords=" >
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/nuskin.jpg" alt="nuskin" style="width: 105px; height: 93px; vertical-align: middle;" />
                                 </a>
                             </div>
                             <div class="employer_logos" id="employers_1">
-                                <a href="http://www.rstn.com" target="_new">
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=rstn_m&keywords=" >
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/rstn.jpg" alt="RSTN" style="vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.elawyer.com.my" target="_new">
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=elawyer&keywords=" >
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/el.jpg" alt="elawyers" style="width: 105px; height: 93px; vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.exabytes.com.my" target="_new">
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=exabytes&keywords=" >
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/ex.jpg" alt="Exabytes" style="width: 105px; vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.dsem.com" target="_new">
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=dsem&keywords=" >
                                     <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/dsem.jpg" alt="dsem" style="width: 105px; height: 93px; vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.silterra.com" target="_new">
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/silterra.jpg" alt="dsem" style="width: 105px; height: 93px; vertical-align: middle;" />
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=silterra&keywords=" >
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/silterra.jpg" alt="silterra" style="width: 105px; height: 93px; vertical-align: middle;" />
                                 </a>
                                 &nbsp;&nbsp;&nbsp;
-                                <a href="http://www.my-essence.com/" target="_new">
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/essence.jpg" alt="dsem" style="width: 105px; height: 93px; vertical-align: middle;" />
+                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=ESS&keywords=" >
+                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/essence.jpg" alt="Essence" style="width: 105px; height: 93px; vertical-align: middle;" />
                                 </a>
                             </div>
                         </td>

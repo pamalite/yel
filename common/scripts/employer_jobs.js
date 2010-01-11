@@ -902,6 +902,7 @@ function get_slots_left() {
     $('slots_expiry').set('html', '(Not Applicable)');
     $('slots_expiry').setStyle('color', '#666666');
     $('buy_postings_button').disabled = true;
+    $('buy_postings_button').src = '../common/images/button_buy_now_disabled.gif';
     
     var params = 'id=' + id + '&action=get_slots_left';
     
@@ -943,6 +944,7 @@ function get_slots_left() {
                 }
                 
                 $('buy_postings_button').disabled = false;
+                $('buy_postings_button').src = '../common/images/button_buy_now.gif';
             }
         }
     });

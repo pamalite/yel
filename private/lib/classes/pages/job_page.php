@@ -321,25 +321,15 @@ class JobPage extends Page {
                     <?php
                     if (!is_null($this->member)) {
                         ?>
-                        <!--input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Request for a Referral" onClick="show_refer_me();" />&nbsp;<input class="button" type="button" id="quick_refer" name="quick_refer" value="Quick Refer" onClick="show_quick_refer_form();" /-->
-                        
-                        <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" />&nbsp;<input class="button" type="button" id="refer_me" name="refer_me" value="Apply Now" onClick="show_refer_me();" />&nbsp;<input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />
-                        
-                        
-                        <!--input type="image" src="../common/images/button_refer_now.gif" onClick="show_refer_options();" />&nbsp;<input type="image" src="../common/images/button_req_referral.gif" onClick="show_refer_me();" />&nbsp;<input type="image" src="../common/images/button_save_job.gif" onClick="save_job();" /-->
+                        <input type="image" src="../common/images/button_refer_now.gif" onClick="show_refer_options();" />&nbsp;<input type="image" src="../common/images/button_apply_now.gif" onClick="show_refer_me();" />&nbsp;<input type="image" src="../common/images/button_save_job.gif" onClick="save_job();" />
                         <?php
                     } else {
                         ?>
                         <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members?job=<?php echo $job['id']; ?>">Sign In</a> or <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/sign_up.php">Sign Up</a> to 
-                        
-                        <input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_options();" /> or <input class="button" type="button" id="refer_me" name="refer_me" value="Apply Now" onClick="show_refer_me_ad();" /> or <input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />
-                        
-                        <!--input type="image" src="../common/images/button_refer_now.gif" style="vertical-align: middle;" onClick="show_refer_options();" /> or <input type="image" src="../common/images/button_req_referral.gif" style="vertical-align: middle;" onClick="show_refer_me();" /> or <input type="image" src="../common/images/button_save_job.gif" style="vertical-align: middle;" onClick="save_job();" /-->
+                        <input type="image" src="../common/images/button_refer_now.gif" style="vertical-align: middle;" onClick="show_refer_options();" /> or <input type="image" src="../common/images/button_apply_now.gif" style="vertical-align: middle;" onClick="show_refer_me_ad();" /> or <input type="image" src="../common/images/button_save_job.gif" style="vertical-align: middle;" onClick="save_job();" />
                         <?php
                     }
                     ?>
-                        <!--br/>
-                        Or, you can <input class="button" type="button" id="upload_resume" name="upload_resume" value="Upload" onClick="show_quick_upload_form();" /> your friend's resume to us, and we will do the rest.-->
                     </td>
                 </tr>
             </table>
@@ -442,9 +432,6 @@ class JobPage extends Page {
             </div>
             <form onSubmit="return false;">
                 <table class="refer_form">
-                    <!--tr>
-                    <td colspan="3"><p>You are about to refer the job position,&nbsp;<span id="job_title" style="font-weight: bold;"></span>&nbsp;to your contacts. Please select...</p></td>
-                    </tr-->
                     <tr>
                         <td class="left">
                             <table class="candidate_form">
@@ -470,20 +457,8 @@ class JobPage extends Page {
                                 </tr>
                             </table>
                         </td>
-                        <!--td class="separator"></td>
-                        <td class="right">
-                            <p>1. How long have you known and how do you know <span id="candidate_name" style="font-weight: bold;">this contact</span>? (<span id="word_count_q1">0</span>/50 words)</p>
-                            <p><textarea class="mini_field" id="testimony_answer_1"></textarea></p>
-                            <p>2. What makes <span id="candidate_name" style="font-weight: bold;">this contact</span> suitable for <span id="job_title" style="font-weight: bold;">the job</span>?  (<span id="word_count_q2">0</span>/50 words)</p>
-                            <p><textarea class="mini_field" id="testimony_answer_2"></textarea></p>
-                            <p>3. Briefly, what are the areas of improvements for <span id="candidate_name" style="font-weight: bold;">this contact</span>?  (<span id="word_count_q3">0</span>/50 words)</p>
-                            <p><textarea class="mini_field" id="testimony_answer_3"></textarea></p>
-                        </td-->
                     </tr>
                 </table>
-                <!--div style="padding: 2px 2px 2px 2px; text-align: center; font-style: italic;">
-                    Your testimonial for this contact can only be viewed by the employer.
-                </div-->
                 <p class="button"><input type="button" value="Cancel" onClick="close_refer_form();" />&nbsp;<input type="button" value="Refer Now" onClick="refer();" /></p>
             </form>
         </div>
@@ -553,8 +528,6 @@ class JobPage extends Page {
                     <tr>
                         <td colspan="3">
                             <p style="text-align: center;">
-                                <!-- You are about to quickly refer the job position,&nbsp;<span id="qr_job_title" style="font-weight: bold;"></span>&nbsp;to one of your contacts. Please attached the candidate's resume:
-                                <br/><br/-->
                                 <input class="field" id="qr_my_file" name="qr_my_file" type="file" />
                                 <br/><br/>
                                 <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
@@ -597,12 +570,6 @@ class JobPage extends Page {
                                         <input type="text" class="mini_field" id="qr_candidate_lastname" name="qr_candidate_lastname" />
                                     </td>
                                 </tr>
-                                <!--tr>
-                                    <td class="label"><label for="qr_candidate_zip">Postcode/Zip:</label></td>
-                                    <td class="field">
-                                        <input type="text" class="mini_field" id="qr_candidate_zip" name="qr_candidate_zip" />
-                                    </td>
-                                </tr-->
                                 <tr>
                                     <td class="label"><label for="qr_candidate_country">Country:</label></td>
                                     <td class="field">
@@ -637,9 +604,6 @@ class JobPage extends Page {
         </div>
         
         <div id="div_quick_upload_form">
-            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Fill up the following details, about your contact, you want to refer to &nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp; position, and about yourself.</span>
-            </div>
             <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_upload_form();">
                 <input type="hidden" name="qu_job_id" id="qu_job_id" value="<?php echo $this->job_id; ?>" />
                 <input type="hidden" name="action" value="quick_upload" />
@@ -648,9 +612,9 @@ class JobPage extends Page {
                 </p>
                 <table id="table_quick_upload_form" class="quick_upload_form">
                     <tr colspan="3">
-                        <!--div style="text-align: center; margin: auto; width: 95%;">
-                            You are about to quickly drop us your contact for the job position,&nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp;. Please tell us more about him/her by filling up <span style="text-decoration: underline;">all</span> the following fields:
-                        </div-->
+                        <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                            <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Fill up the following details, about your contact, you want to refer to &nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp; position, and about yourself.</span>
+                        </div>
                     </tr>
                     <tr>
                         <td class="left">
@@ -680,12 +644,6 @@ class JobPage extends Page {
                                         <input type="text" class="mini_field" id="qu_candidate_phone" name="qu_candidate_phone" />
                                     </td>
                                 </tr>
-                                <!--tr>
-                                    <td class="label"><label for="qu_candidate_zip">Postcode/Zip:</label></td>
-                                    <td class="field">
-                                        <input type="text" class="mini_field" id="qu_candidate_zip" name="qu_candidate_zip" />
-                                    </td>
-                                </tr-->
                                 <tr>
                                     <td class="label"><label for="qu_candidate_country">Country:</label></td>
                                     <td class="field">
@@ -722,12 +680,6 @@ class JobPage extends Page {
                                         <input type="text" class="mini_field" id="qu_referrer_phone" name="qu_referrer_phone" />
                                     </td>
                                 </tr>
-                                <!--tr>
-                                    <td class="label"><label for="qu_referrer_zip">Postcode/Zip:</label></td>
-                                    <td class="field">
-                                        <input type="text" class="mini_field" id="qu_referrer_zip" name="qu_referrer_zip" />
-                                    </td>
-                                </tr-->
                                 <tr>
                                     <td class="label"><label for="qu_referrer_country">Country:</label></td>
                                     <td class="field">
@@ -746,8 +698,6 @@ class JobPage extends Page {
                                 <span style="color: #FC8503; font-weight: bold;">Step 2 (Optional): </span> <span style="color: #666666;">You can upload your contact's resume, if you have it on file.</span>
                             </div>
                             <p style="text-align: center;">
-                                <!--You can also upload your contact's resume, if you have it with you, for our perusal. If not, you can skip the following part and click the 'Refer' button:
-                                <br/><br/-->
                                 <input class="field" id="qu_my_file" name="qu_my_file" type="file" />
                                 <br/><br/>
                                 <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>

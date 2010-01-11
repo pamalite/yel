@@ -135,11 +135,10 @@ class EmployerJobsPage extends Page {
                         </div>
                     </td>
                     <td class="buy">
-                        <input type="button" id="buy_postings_button" value="Buy Postings" onClick="show_buy_slots_form();" />
-                        <br/>
-                        <span style="font-size: 7pt;">
+                        <input type="image" id="buy_postings_button" onClick="show_buy_slots_form();" src="../common/images/button_buy_now.gif" />
+                        <div style="font-size: 7pt; margin-top: -3px; text-align: center;">
                             <a class="no_link" onClick="show_purchase_histories();">View Purchase History</a>
-                        </span>
+                        </div>
                     </td>
                 </tr>
             </table>

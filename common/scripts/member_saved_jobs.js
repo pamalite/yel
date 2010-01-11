@@ -226,34 +226,16 @@ function show_saved_jobs() {
                     html = html + '<td class="checkbox"><input type="checkbox" id="'+ job_id.childNodes[0].nodeValue + '" /></td>' + "\n";
                     html = html + '<td class="industry">' + industries[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title"><a href="#" onClick="toggle_description(\'' + job_id.childNodes[0].nodeValue + '\')">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="title"><a href="' + root + '/job/' + job_id.childNodes[0].nodeValue + '">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
                     html = html + '<td class="date">' + saved_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="date">' + expire_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="potential_reward">' + currencies[i].childNodes[0].nodeValue + '$&nbsp;' + potential_rewards[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="actions"><a class="no_link" onClick="show_refer_job(\'' + job_id.childNodes[0].nodeValue + '\')">Refer Now</a>&nbsp;|&nbsp;<a class="no_link" onClick="show_refer_me(\'' + job_id.childNodes[0].nodeValue + '\')">Request a Referral</a></td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                    html = html + '<tr id="desc_' + job_id.childNodes[0].nodeValue + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td colspan="8"><div class="description" id="description_' + job_id.childNodes[0].nodeValue + '"></div></td>' + "\n";
                     html = html + '</tr>' + "\n";
                 }
                 html = html + '</table>';
-                
-                has_saved_jobs = true;
             }
             
-            $('div_list').set('html', html);
-            
-            if (has_saved_jobs) {
-                var ids = xml.getElementsByTagName('id');
-                var descriptions = xml.getElementsByTagName('description');
-                
-                for (i=0; i < ids.length; i++) {
-                    var job_id = ids[i].childNodes[0].nodeValue;
-                    
-                    $('description_' + job_id).set('html', descriptions[i].childNodes[0].nodeValue);
-                }
-            }
-            
+            $('div_list').set('html', html);            
             set_status('');
         },
         onRequest: function(instance) {

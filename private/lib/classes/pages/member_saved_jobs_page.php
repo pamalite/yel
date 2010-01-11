@@ -108,7 +108,6 @@ class MemberSavedJobsPage extends Page {
                     <td class="date"><span class="sort" id="sort_saved_on">Saved On</span></td>
                     <td class="date"><span class="sort" id="sort_expire_on">Expire On</span></td>
                     <td class="potential_reward_title"><span class="sort" id="sort_potential_reward">Potential Reward</span></td>
-                    <td class="actions">&nbsp;</td>
                 </tr>
             </table>
             <div id="div_list">
