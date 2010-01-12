@@ -1008,4 +1008,36 @@ if ($_POST['action'] == 'employ_candidate') {
     echo "ok";
     exit();
 }
+
+if ($_POST['action'] == 'save_remarks') {
+    if (!empty($_POST['remarks'])) {
+        $query = "UPDATE referrals 
+                  SET employer_remarks = '". sanitize($_POST['remarks']). "' 
+                  WHERE id = ". $_POST['id'];
+        $mysqli = Database::connect();
+        $mysqli->execute($query);
+    }
+    exit();
+}
+
+if ($_POST['action'] == 'get_remark') {
+    $mysqli = Database::connect();
+    $query = "SELECT jobs.title, CONCAT(members.firstname, ', ', members.lastname) AS candidate, 
+              referrals.employer_remarks AS remark 
+              FROM referrals 
+              INNER JOIN jobs ON jobs.id = referrals.job 
+              INNER JOIN members ON members.email_addr = referrals.referee 
+              WHERE referrals.id = ". $_POST['id']. " LIMIT 1";
+    $result = $mysqli->query($query);
+    
+    $result[0]['remark'] = htmlspecialchars_decode(desanitize($result[0]['remark']));
+    $result[0]['job_title'] = htmlspecialchars_decode(desanitize($result[0]['title']));
+    $result[0]['candidate'] = htmlspecialchars_decode(desanitize($result[0]['candidate']));
+    
+    $response = array('referrals' => array('referral' => $result));
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
 ?>

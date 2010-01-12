@@ -672,9 +672,9 @@ function show_referred_candidates_with(job_id, _title, _industry) {
                 
                 if (employed_ons[i].childNodes.length <= 0) {
                     if (employer_rejected_ons[i].childNodes.length <= 0) {
-                        html = html + '<td class="employ"><a class="no_link" onClick="show_employ_form_with(' + already_used_suggested + ', \'' + referral_id.childNodes[0].nodeValue+ '\', \'' + add_slashes(referees[i].childNodes[0].nodeValue) + '\');">Comfirm Employed</a>&nbsp;|&nbsp;' + shortlist + '&nbsp;|&nbsp;<a class="no_link" onClick="reject(\'' + referral_id.childNodes[0].nodeValue + '\', ' + already_used_suggested + ');">Reject</a></td>' + "\n";
+                        html = html + '<td class="employ"><a class="no_link" onClick="show_employ_form_with(' + already_used_suggested + ', \'' + referral_id.childNodes[0].nodeValue+ '\', \'' + add_slashes(referees[i].childNodes[0].nodeValue) + '\');">Comfirm Employed</a><br/>' + shortlist + '&nbsp;|&nbsp;<a class="no_link" onClick="reject(\'' + referral_id.childNodes[0].nodeValue + '\', ' + already_used_suggested + ');">Reject</a>&nbsp;|&nbsp;<a class="no_link" onClick="show_remarks_form(\'' + referral_id.childNodes[0].nodeValue + '\');">Remarks</a></td>' + "\n";
                     } else {
-                        html = html + '<td class="employ"><span style="font-size: 9pt; vertical-align: middle; color: #666666;">Rejected on ' + employer_rejected_ons[i].childNodes[0].nodeValue + '</span>' + '&nbsp;|&nbsp;<a class="no_link" onClick="unreject(\'' + referral_id.childNodes[0].nodeValue + '\');">Un-reject</a></td>' + "\n";
+                        html = html + '<td class="employ"><span style="font-size: 9pt; vertical-align: middle; color: #666666;">Rejected on ' + employer_rejected_ons[i].childNodes[0].nodeValue + '</span>' + '&nbsp;|&nbsp;<a class="no_link" onClick="unreject(\'' + referral_id.childNodes[0].nodeValue + '\');">Un-reject</a>&nbsp;|&nbsp;<a class="no_link" onClick="show_employer_remarks_form(\'' + referral_id.childNodes[0].nodeValue + '\');">Remarks</a></td>' + "\n";
                     }
                 } else {
                     html = html + '<td class="employ"><span style="font-size: 9pt; vertical-align: middle; color: #666666;">Employed on ' + employed_ons[i].childNodes[0].nodeValue + '</span></td>' + "\n";
@@ -820,9 +820,9 @@ function show_suggested_candidates_with(job_id, _title, _industry) {
                 
                 //if (employed_ons[i].childNodes.length <= 0) {
                     if (employer_rejected_ons[i].childNodes.length <= 0) {
-                        html = html + '<td class="employ"><a class="no_link" onClick="show_employ_form_with(true, \'' + referral_id.childNodes[0].nodeValue+ '\', \'' + add_slashes(referees[i].childNodes[0].nodeValue) + '\');">Confirm Employed</a>&nbsp;|&nbsp;' + shortlist + '&nbsp;|&nbsp;<a class="no_link" onClick="reject(\'' + referral_id.childNodes[0].nodeValue + '\', true);">Reject</a></td>' + "\n";
+                        html = html + '<td class="employ"><a class="no_link" onClick="show_employ_form_with(true, \'' + referral_id.childNodes[0].nodeValue+ '\', \'' + add_slashes(referees[i].childNodes[0].nodeValue) + '\');">Confirm Employed</a><br/>' + shortlist + '&nbsp;|&nbsp;<a class="no_link" onClick="reject(\'' + referral_id.childNodes[0].nodeValue + '\', true);">Reject</a>&nbsp;|&nbsp;<a class="no_link" onClick="show_remarks_form(\'' + referral_id.childNodes[0].nodeValue + '\');">Remarks</a></td>' + "\n";
                     } else {
-                        html = html + '<td class="employ"><span style="font-size: 9pt; vertical-align: middle; color: #666666;">Rejected on ' + employer_rejected_ons[i].childNodes[0].nodeValue + '</span>' + '&nbsp;|&nbsp;<a class="no_link" onClick="unreject(\'' + referral_id.childNodes[0].nodeValue + '\');">Un-reject</a></td>' + "\n";
+                        html = html + '<td class="employ"><span style="font-size: 9pt; vertical-align: middle; color: #666666;">Rejected on ' + employer_rejected_ons[i].childNodes[0].nodeValue + '</span>' + '&nbsp;|&nbsp;<a class="no_link" onClick="unreject(\'' + referral_id.childNodes[0].nodeValue + '\');">Un-reject</a>&nbsp;|&nbsp;<a class="no_link" onClick="show_remarks_form(\'' + referral_id.childNodes[0].nodeValue + '\');">Remarks</a></td>' + "\n";
                     }
                     
                 //} else {
@@ -964,10 +964,10 @@ function show_shortlisted_candidates_with(job_id, _title, _industry) {
                 
                 var shortlist = '';
                 if (shortlisted_ons[i].childNodes.length > 0) {
-                    shortlist = '&nbsp;|&nbsp;<a class="no_link" onClick="unshortlist(\'' + referral_id.childNodes[0].nodeValue + '\');">Un-shortlist</a>';
+                    shortlist = '<br/><a class="no_link" onClick="unshortlist(\'' + referral_id.childNodes[0].nodeValue + '\');">Un-shortlist</a>';
                 }
                 
-                html = html + '<td class="employ"><a class="no_link" onClick="show_employ_form_with(' + already_used_suggested + ', \'' + referral_id.childNodes[0].nodeValue+ '\', \'' + add_slashes(referees[i].childNodes[0].nodeValue) + '\');">Confirmed Employed</a>' + shortlist + '</td>' + "\n";
+                html = html + '<td class="employ"><a class="no_link" onClick="show_employ_form_with(' + already_used_suggested + ', \'' + referral_id.childNodes[0].nodeValue+ '\', \'' + add_slashes(referees[i].childNodes[0].nodeValue) + '\');">Confirmed Employed</a>' + shortlist + '&nbsp;|&nbsp;<a class="no_link" onClick="show_remarks_form(\'' + referral_id.childNodes[0].nodeValue + '\');">Remarks</a></td>' + "\n";
                 html = html + '</tr>' + "\n";
                 html = html + '<tr id="tr_referred_testimony_'+ referral_id.childNodes[0].nodeValue + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
                 
@@ -1104,6 +1104,97 @@ function show_resume_viewing_terms() {
 function close_resume_viewing_terms() {
     $('div_resume_viewing_terms').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');
+}
+
+function save_remarks() {
+    if (isEmpty($('remarks_field').value)) {
+        close_remarks_form();
+        return;
+    }
+    
+    var params = 'id=' + $('remarks_referral_id').value + '&action=save_remarks';
+    params = params + '&remarks=' + encodeURIComponent($('remarks_field').value);
+    
+    var uri = root + "/employers/referrals_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            close_remarks_form();
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Saving remarks...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_remarks_form() {
+    $('div_employer_remarks').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+}
+
+function show_remarks_form(_referral_id) {
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_employer_remarks').getStyle('height'));
+    var div_width = parseInt($('div_employer_remarks').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_employer_remarks').setStyle('top', ((window_height - div_height) / 2));
+    $('div_employer_remarks').setStyle('left', ((window_width - div_width) / 2));
+    
+    $('remarks_referral_id').value = _referral_id;
+    
+    var params = 'id=' + _referral_id;
+    params = params + '&action=get_remark';
+    
+    var uri = root + "/employers/referrals_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                set_status('An error occured while retrieving referral details.');
+                return;
+            }
+            
+            var candidates = xml.getElementsByTagName('candidate');
+            var titles = xml.getElementsByTagName('title');
+            var remarks = xml.getElementsByTagName('remark');
+            
+            $('remarks_job_title').set('html', titles[0].childNodes[0].nodeValue);
+            $('remarks_candidate_name').set('html', candidates[0].childNodes[0].nodeValue);
+            
+            if (remarks[0].childNodes.length <= 0) {
+                $('remarks_field').value = '';
+            } else {
+                $('remarks_field').value = remarks[0].childNodes[0].nodeValue;
+            }
+            
+            $('div_blanket').setStyle('display', 'block');
+            $('div_employer_remarks').setStyle('display', 'block');
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Loading description...');
+        }
+    });
+    
+    request.send(params);
 }
 
 function select_all_referred_candidates() {

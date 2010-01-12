@@ -526,7 +526,7 @@ class JobPage extends Page {
                 </p>
                 <table id="table_quick_refer_form" class="quick_refer_form">
                     <tr>
-                        <td class="left">
+                        <td class="left" style="height: 50%;">
                             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
                                 <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Select the Candidate that you wish to refer for this job position.</span>
                             </div>
@@ -535,17 +535,9 @@ class JobPage extends Page {
                                 <?php $this->generateContactsDropdown(); ?>
                             </div>
                             <div style="padding-top: 15px;">
-                                <label for="qr_candidate_email">Or, you can enter the candidate's email address:</label><br/>
-                                <input class="mini_field" type="text" id="qr_candidate_email" name="qr_candidate_email" /><br/><br/>
-                                and complete the following form on the candidate's behalf:
+                                Or, if your Candidate is not in your Contacts, enter one's details below:
                             </div>
                             <table class="qr_candidate_form" style="border-bottom: 1px dashed #666666; padding-bottom: 15px;">
-                                <tr>
-                                    <td class="label"><label for="qr_candidate_phone">Telephone:</label></td>
-                                    <td class="field">
-                                        <input type="text" class="mini_field" id="qr_candidate_phone" name="qr_candidate_phone" />
-                                    </td>
-                                </tr>
                                 <tr>
                                     <td class="label"><label for="qr_candidate_firstname">Firstname:</label></td>
                                     <td class="field">
@@ -556,6 +548,18 @@ class JobPage extends Page {
                                     <td class="label"><label for="qr_candidate_lastname">Lastname:</label></td>
                                     <td class="field">
                                         <input type="text" class="mini_field" id="qr_candidate_lastname" name="qr_candidate_lastname" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qr_candidate_email">E-mail:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qr_candidate_email" name="qr_candidate_email" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="qr_candidate_phone">Telephone:</label></td>
+                                    <td class="field">
+                                        <input type="text" class="mini_field" id="qr_candidate_phone" name="qr_candidate_phone" />
                                     </td>
                                 </tr>
                                 <tr>

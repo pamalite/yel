@@ -159,6 +159,23 @@ div.description {
     height: 400px;
 }
 
+#div_employer_remarks {
+    display: none;
+    background-color: #FFFFFF;
+    position: absolute;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 400px;
+    height: 350px;
+}
+
+#div_employer_remarks p.button {
+    text-align: center;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background-color: #CCCCCC;
+}
+
 #div_description #job_title {
     font-size: 10pt;
     font-weight: bold;
@@ -172,8 +189,7 @@ div.description {
     overflow: auto;
 }
 
-#div_description p.button, #div_resume_viewing_terms p.button, 
-#div_employ_form p.button {
+#div_description p.button, #div_employ_form p.button {
     padding-top: 3px;
     padding-bottom: 3px;
     text-align: center;

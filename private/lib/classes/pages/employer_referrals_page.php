@@ -225,23 +225,21 @@ class EmployerReferralsPage extends Page {
                         <td class="field"><span id="currency"><?php echo $currency; ?></span>$&nbsp;<input type="text" class="field" id="salary" name="salary" value="1.00" /></td>
                     </tr>
                 </table>
-                <!--div class="note"><p class="note">NOTE: By clicking the "Employ" button, you are automatically in agreement with our Resume Terms of Use, and this employment is subjected to the terms as stated.</p></div-->
                 <p class="button"><input type="button" value="Cancel" onClick="close_employ_form();" />&nbsp;<input type="button" value="Confirm Employed" onClick="employ();" /></p>
             </form>
         </div>
         
-        <div id="div_resume_viewing_terms">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ultrices varius risus. Ut non metus. Nullam viverra ante nec ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Maecenas eu nulla. Proin pharetra volutpat augue. Aenean semper, sapien eu convallis sollicitudin, eros urna congue massa, vel lobortis risus ante non justo. Nullam eget massa. In aliquet nulla non ligula. Duis mattis.</p>
-
-            <p>Quisque ligula nulla, dictum sit amet, gravida sit amet, elementum viverra, nulla. Vestibulum ipsum ligula, laoreet rutrum, ullamcorper eu, ultricies a, sem. Etiam eu leo. Fusce ut tortor. Ut rhoncus, mauris sit amet molestie posuere, urna erat tempus ligula, vitae feugiat sapien risus et sapien. Nulla facilisi. Curabitur nisl. Vivamus magna. Duis sit amet nisi ut justo lobortis tristique. Maecenas eleifend ultricies orci. Nulla molestie. Nulla metus. Curabitur tincidunt interdum eros. Vivamus gravida, lectus eu elementum bibendum, lacus lacus rutrum lectus, vel vestibulum lorem turpis vel leo.</p>
-
-            <p>Aenean accumsan, ipsum fermentum consequat eleifend, felis sapien ornare odio, eu cursus quam pede commodo leo. Duis vel nisi eget dolor convallis convallis. Suspendisse sodales elit ut nunc. Integer a nulla a nisl semper consectetur. Suspendisse magna. Sed aliquam. Phasellus rhoncus faucibus metus. Curabitur nisi nunc, ultricies quis, blandit et, sodales et, mi. Aenean et dolor. Donec varius diam id mauris. Nullam laoreet orci fringilla elit. Donec ut quam sed nisl pellentesque fermentum. Morbi bibendum pulvinar risus. Donec orci. Quisque non lorem.</p>
-
-            <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse aliquam. Donec hendrerit arcu vitae magna. Vestibulum vitae ipsum vitae lorem sodales venenatis. Ut ornare, lacus vitae posuere iaculis, quam sem volutpat purus, id blandit orci mi vitae nunc. Etiam ipsum. Mauris auctor sem eget quam. Duis elit justo, semper suscipit, vestibulum vitae, tincidunt id, orci. Proin at tortor vel urna bibendum interdum. Nullam sagittis tempus tortor. Donec elementum lobortis metus.</p>
-
-            <p>Nam molestie aliquet mi. Quisque laoreet. In hac habitasse platea dictumst. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla nunc. Suspendisse porta. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse vehicula augue id magna. Phasellus suscipit leo ut neque. Vivamus volutpat lacus sit amet massa.</p>
-            
-            <p class="button"><input type="button" value="Close" onClick="close_resume_viewing_terms();" /></p>
+        <div id="div_employer_remarks">
+            <form onSubmit="return false;">
+                <input type="hidden" id="remarks_referral_id" value="" />
+                <div style="text-align: center; padding-top: 15px; padding-bottom: 15px;">
+                    Remarks for <span id="remarks_candidate_name" style="font-weight: bold;"></span>'s on <span id="remarks_job_title" style="font-weight: bold;"></span>&nbsp;position:
+                </div>
+                <div style="width: 100%; margin:auto; text-align: center;">
+                    <textarea id="remarks_field" style="width: 98%; height: 250px;"></textarea>
+                </div>
+                <p class="button"><input type="button" value="Cancel" onClick="close_remarks_form();" />&nbsp;<input type="button" value="Save Remarks" onClick="save_remarks();" /></p>
+            </form>
         </div>
         <?php
     }
