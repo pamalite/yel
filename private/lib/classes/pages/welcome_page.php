@@ -165,7 +165,7 @@ class WelcomePage extends Page {
             </div>
         </div>
         <div id="sign_up_banner">
-            <a href="members/sign_up.php"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/bigtitle.gif" /></a>
+            <a href="members/sign_up.php?indiv_hh=1"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/bigtitle.gif" /></a>
         </div>
         
         <div id="top_jobs">

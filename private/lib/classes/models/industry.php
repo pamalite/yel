@@ -178,5 +178,12 @@ class Industry {
         */
         return $mysqli->query($query);
     }
+    
+    public static function get_industry_from_id($_id) {
+        $mysqli = Database::connect();
+        $query = "SELECT industry FROM industries WHERE id = ". $_id. " LIMIT 1";
+        $result = $mysqli->query($query);
+        return $result[0]['industry'];
+    }
 }
 ?>

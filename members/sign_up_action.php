@@ -285,5 +285,30 @@ mail($_POST['email_addr'], $subject, $message, $headers);
 // fwrite($handle, $message);
 // fclose($handle);
 
+// 6. If it is individual headhunter, notify ourselves.
+
+if ($data['individual_headhunter'] == 'Y') {
+    $message = 'Name: '. $data['firstname']. ', '. $data['lastname']. "\n";
+    $message .= 'Phone Num: '. $data['phone_num']. "\n";
+    $message .= 'E-mail address: '. $data['email_addr']. "\n";
+    $message .= 'Primary Industry: '. Industry::get_industry_from_id($data['primary_industry']). "\n";
+    $message .= 'Secondary Industry: '. Industry::get_industry_from_id($data['secondary_industry']). "\n";
+    $message .= 'Tertiary Industry: '. Industry::get_industry_from_id($data['tertiary_industry']). "\n";
+    $message .= 'Country: '. Country::country_from_code($data['country'])"\n";
+    $subject = 'New IRC: '. $data['firstname']. ', '. $data['lastname']. "\n";
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>'. "\n". 'Reply-To: '. $data['email_addr'];
+    
+    $sales_email_addr = 'sales.my@yellowelevator.com';
+    $query = "SELECT DISTINCT country FROM branches";
+    $result = $mysqli->query($query);
+    foreach ($result as $country) {
+        if ($data['country'] == $country['country']) {
+            $sales_email_addr = 'sales.'. strtolower($data['country']). '@yellowlevator.com';
+            break;
+        }
+    }
+    mail($sales_email_addr, $subject, $message, $headers);
+}
+
 redirect_to('login.php?signed_up=success');
 ?>

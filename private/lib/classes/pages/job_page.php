@@ -58,7 +58,7 @@ class JobPage extends Page {
         }
         
         echo '</script>'. "\n";
-        // echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
+        echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
     }
     
     public function is_employee_viewing() {
@@ -514,8 +514,8 @@ class JobPage extends Page {
         </div>
         
         <div id="div_quick_refer_form">
-            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Choose the resume of your contact you have on file to be referred to &nbsp;<span id="qr_job_title" style="font-weight: bold;"></span>&nbsp; position.</span>
+            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px; font-weight: bold;">
+                To make an Express Referral of &nbsp;<span id="qr_job_title" style="text-decoration: underline;"></span>...
             </div>
             <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_refer_form();">
                 <input type="hidden" name="id" id="id" value="<?php echo (is_null($this->member)) ? '' : $this->member->id(); ?>" />
@@ -526,23 +526,11 @@ class JobPage extends Page {
                 </p>
                 <table id="table_quick_refer_form" class="quick_refer_form">
                     <tr>
-                        <td colspan="3">
-                            <p style="text-align: center;">
-                                <input class="field" id="qr_my_file" name="qr_my_file" type="file" />
-                                <br/><br/>
-                                <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3">&nbsp;</td>
-                    </tr>
-                    <tr>
                         <td class="left">
                             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                                <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Select a contact from either one of the following options.</span>
+                                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Select the Candidate that you wish to refer for this job position.</span>
                             </div>
-                            <div style="border-bottom: 1px dashed #666666; padding-bottom: 15px;">
+                            <div style="padding-bottom: 5px;">
                                 <label for="qr_candidate_email_from_list">Your Contacts list:</label><br/>
                                 <?php $this->generateContactsDropdown(); ?>
                             </div>
@@ -551,7 +539,7 @@ class JobPage extends Page {
                                 <input class="mini_field" type="text" id="qr_candidate_email" name="qr_candidate_email" /><br/><br/>
                                 and complete the following form on the candidate's behalf:
                             </div>
-                            <table class="qr_candidate_form">
+                            <table class="qr_candidate_form" style="border-bottom: 1px dashed #666666; padding-bottom: 15px;">
                                 <tr>
                                     <td class="label"><label for="qr_candidate_phone">Telephone:</label></td>
                                     <td class="field">
@@ -578,10 +566,10 @@ class JobPage extends Page {
                                 </tr>
                             </table>
                         </td>
-                        <td class="separator"></td>
-                        <td class="right">
+                        <td rowspan="2" class="separator"></td>
+                        <td rowspan="2" class="right">
                             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                                <span style="color: #FC8503; font-weight: bold;">Step 3:</span> <span style="color: #666666;">Give a brief testimony about your contact by answering the following questions.</span>
+                                <span style="color: #FC8503; font-weight: bold;">Step 3:</span> <span style="color: #666666;">Give a brief testimony about the Candidate by answering the following questions.</span>
                             </div>
                             <p>1. What experience and skill-sets do <span style="font-weight: bold;">the candidate</span> have that makes him/her suitable for the <span id="qr_job_title" style="font-weight: bold;"></span> position? (<span id="word_count_q1">0</span>/200 words)</p>
                             <p><textarea class="mini_field" id="testimony_answer_1" name="testimony_answer_1"></textarea></p>
@@ -591,6 +579,18 @@ class JobPage extends Page {
                             <p><textarea class="mini_field" id="testimony_answer_3" name="testimony_answer_3"></textarea></p>
                             <p>4. Additional recommendations for <span style="font-weight: bold;">the candidate</span> (if any) ? (<span id="word_count_q4">0</span>/200 words)</p>
                             <p><textarea class="mini_field" id="testimony_answer_4" name="testimony_answer_4"></textarea></p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                                <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Attach the Candidate's resume.</span>
+                            </div>
+                            <p style="text-align: center;">
+                                <input class="field" id="qr_my_file" name="qr_my_file" type="file" />
+                                <br/><br/>
+                                <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
+                            </p>
                         </td>
                     </tr>
                 </table>
