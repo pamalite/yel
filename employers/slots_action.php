@@ -53,7 +53,7 @@ if ($_POST['action'] == 'get_slots_left') {
     // if (($result[0]['joined_year'] < 2010) || 
     //     ($result[0]['joined_year'] == 2010 && $result[0]['joined_month'] < 3)) {
         $is_prior = true;
-        $query = "SELECT DATEDIFF(NOW(), joined_on) AS expired 
+        $query = "SELECT DATEDIFF(NOW(), DATE_ADD(joined_on, INTERVAL 1 YEAR)) AS expired 
                   FROM employers WHERE id = '". $_POST['id']. "'";
         $result = $mysqli->query($query);
         
