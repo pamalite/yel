@@ -569,9 +569,17 @@ class JobPage extends Page {
                                     </td>
                                 </tr>
                             </table>
+                            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                                <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Attach the Candidate's resume.</span>
+                            </div>
+                            <p style="text-align: center;">
+                                <input class="field" id="qr_my_file" name="qr_my_file" type="file" />
+                                <br/><br/>
+                                <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
+                            </p>
                         </td>
-                        <td rowspan="2" class="separator"></td>
-                        <td rowspan="2" class="right">
+                        <td class="separator"></td>
+                        <td class="right">
                             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
                                 <span style="color: #FC8503; font-weight: bold;">Step 3:</span> <span style="color: #666666;">Give a brief testimony about the Candidate by answering the following questions.</span>
                             </div>
@@ -583,18 +591,6 @@ class JobPage extends Page {
                             <p><textarea class="mini_field" id="testimony_answer_3" name="testimony_answer_3"></textarea></p>
                             <p>4. Additional recommendations for <span style="font-weight: bold;">the candidate</span> (if any) ? (<span id="word_count_q4">0</span>/200 words)</p>
                             <p><textarea class="mini_field" id="testimony_answer_4" name="testimony_answer_4"></textarea></p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                                <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Attach the Candidate's resume.</span>
-                            </div>
-                            <p style="text-align: center;">
-                                <input class="field" id="qr_my_file" name="qr_my_file" type="file" />
-                                <br/><br/>
-                                <div class="upload_note">Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 2MB are allowed.</div>
-                            </p>
                         </td>
                     </tr>
                 </table>
