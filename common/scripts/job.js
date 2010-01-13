@@ -508,11 +508,7 @@ function refer() {
     
     check_has_banks(id);
     
-    var msg = 'You will need to fulfill the following steps to make this referral work:' + "\n\n";
-    msg = msg + 'Step 2: Inform your contact(s) and have them submit their resumes for your screening.' + "\n\n";
-    msg = msg + 'Step 3: Complete the referral by going to Referral Requests, screen their resumes, and refer them to their dream jobs.' + "\n\n";
-    msg = msg + 'Click "OK" to proceed, or "Cancel" to continue browsing.' + "\n\n";
-    msg = msg + 'NOTE: By clicking "OK", you confirm that you have screened your contacts\' resume and have also assessed their suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding your contacts, and you agree to provide any other necessary information requested by the employer.'
+    var msg = 'NOTE: By clicking "OK", you confirm that you have screened your contacts\' resume and have also assessed their suitability for this job position. Also, you acknowledge that the employer may contact you for further references regarding your contacts, and you agree to provide any other necessary information requested by the employer.'
     
     // var proceed = confirm('Your referred candidates will be requested to submit their resumes. As a referrer, you are responsible for screening your candidates\' resumes to confirm that they are suitable for this job position before recommending them.\n\nYou will be notified by email to check the "Referral Requests" section once the resumes are submitted.\n\nClick "OK" to continue or "Cancel" to make changes.');
     
