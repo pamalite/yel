@@ -17,13 +17,13 @@ class EmployeeHeadhuntersPage extends Page {
     public function insert_employee_headhunters_css() {
         $this->insert_css();
         
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_admin_members.css">'. "\n";
+        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_headhunters.css">'. "\n";
     }
     
     public function insert_employee_headhunters_scripts() {
         $this->insert_scripts();
         
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_admin_members.js"></script>'. "\n";
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_headhunters.js"></script>'. "\n";
     }
     
     public function insert_inline_scripts() {
@@ -43,7 +43,7 @@ class EmployeeHeadhuntersPage extends Page {
     public function show() {
         $this->begin();
         $this->top_employee($this->employee->get_name(). " - Individual Recruitment Consultants");
-        $this->menu_employee($this->clearances, 'members');
+        $this->menu_employee($this->clearances, 'headhunters');
         
         $count = $this->count_members();
         ?>
@@ -63,12 +63,11 @@ class EmployeeHeadhuntersPage extends Page {
             </div>
             <table class="header">
                 <tr>
+                    <td class="date"><span class="sort" id="sort_joined_on">Joined On</span></td>
                     <td class="member"><span class="sort" id="sort_member">Member</span></td>
                     <td class="email_addr"><span class="sort" id="sort_email_addr">E-mail Address</span></td>
                     <td class="phone">Phone Number</td>
-                    <td class="country"><span class="sort" id="sort_country">Country</td>
-                    <td class="date"><span class="sort" id="sort_joined_on">Joined On</span></td>
-                    <td class="actions">&nbsp;</td>
+                    <td class="country"><span class="sort" id="sort_country">Country</span></td>
                 </tr>
             </table>
             <div id="div_members_list">
