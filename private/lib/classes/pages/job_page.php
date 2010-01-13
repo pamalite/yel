@@ -613,7 +613,7 @@ class JobPage extends Page {
                 <table id="table_quick_upload_form" class="quick_upload_form">
                     <tr colspan="3">
                         <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                            <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Fill up the following details, about your contact, you want to refer to &nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp; position, and about yourself.</span>
+                            <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Please fill in your details along with the details of your contact whom you are referring for the &nbsp;<span id="qu_job_title" style="font-weight: bold;"></span>&nbsp; position.</span>
                         </div>
                     </tr>
                     <tr>
@@ -695,7 +695,7 @@ class JobPage extends Page {
                     <tr>
                         <td colspan="3">
                             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                                <span style="color: #FC8503; font-weight: bold;">Step 2 (Optional): </span> <span style="color: #666666;">You can upload your contact's resume, if you have it on file.</span>
+                                <span style="color: #FC8503; font-weight: bold;">Step 2 (Optional): </span> <span style="color: #666666;">YPlease upload your Contact's resume if you have it.</span>
                             </div>
                             <p style="text-align: center;">
                                 <input class="field" id="qu_my_file" name="qu_my_file" type="file" />
