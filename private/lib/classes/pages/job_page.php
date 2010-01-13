@@ -459,6 +459,12 @@ class JobPage extends Page {
                         </td>
                     </tr>
                 </table>
+                <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                    <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Inform your contact(s) and have them submit their resumes for your screening.</span>
+                </div>
+                <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
+                    <span style="color: #FC8503; font-weight: bold;">Step 3:</span> <span style="color: #666666;">Complete the referral by going to <span style="font-style:bold;">Referral Requests</span>, screen their resumes, and refer them to their dream jobs.</span>
+                </div>
                 <p class="button"><input type="button" value="Cancel" onClick="close_refer_form();" />&nbsp;<input type="button" value="Refer Now" onClick="refer();" /></p>
             </form>
         </div>
