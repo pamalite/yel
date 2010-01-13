@@ -427,8 +427,11 @@ class JobPage extends Page {
         </div>
         
         <div id="div_refer_form">
+            <p>
+                <span style="font-weight: bold;">To make a Standard Referral &nbsp;<span id="job_title" style="text-decoration: underline;"></span>&nbsp; position...</span>
+            </p>
             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Choose the contacts, whom you want to refer &nbsp;<span id="job_title" style="font-weight: bold;"></span>&nbsp; to, through either...</span>
+                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Choose the contacts, whom you want to refer to, through either...</span>
             </div>
             <form onSubmit="return false;">
                 <table class="refer_form">
