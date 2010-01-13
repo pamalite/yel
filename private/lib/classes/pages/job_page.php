@@ -431,7 +431,7 @@ class JobPage extends Page {
                 To make a Standard Referral of &nbsp;<span id="job_title" style="text-decoration: underline;"></span>&nbsp; position...</span>
             </div>
             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Choose the contacts, whom you want to refer to, through either...</span>
+                <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Select the Contacts that you wish to refer for the job position.</span>
             </div>
             <form onSubmit="return false;">
                 <table class="refer_form">
@@ -441,7 +441,7 @@ class JobPage extends Page {
                                 <tr>
                                     <td class="radio"><input type="radio" id="from_list" name="candidate_from" value="list" checked /></td>
                                     <td>
-                                        <label for="from_list">your Contacts list</label><br/>
+                                        <label for="from_list">From your Contacts list</label><br/>
                                         <span class="filter">[ Show contacts from <?php (!is_null($this->member)) ? $this->generate_networks_list() : ''; ?> ]</span><br/>
                                         <div class="candidates" id="candidates" name="candidates"></div>
                                     </td>
@@ -462,11 +462,11 @@ class JobPage extends Page {
                         </td>
                     </tr>
                 </table>
-                <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                    <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Inform your contact(s) and have them submit their resumes for your screening.</span>
+                <div style="text-align: center; padding-top: 10px; padding-bottom: 10px; width: 100%; margin-left: 15px; margin-right: 15px;">
+                    <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Follow up on your Contacts whether have they received an email informing them to submit their resumes to you for screening. If they have not, please notify us at <a href="mailto: support@yellowelevator.com">support@yellowelevator.com</a>.</span>
                 </div>
-                <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                    <span style="color: #FC8503; font-weight: bold;">Step 3:</span> <span style="color: #666666;">Complete the referral by going to <span style="font-style:bold;">Referral Requests</span>, screen their resumes, and refer them to their dream jobs.</span>
+                <div style="text-align: center; padding-top: 10px; padding-bottom: 10px; width: 100%; margin-left: 15px; margin-right: 15px;">
+                    <span style="color: #FC8503; font-weight: bold;">Step 3:</span> <span style="color: #666666;">Retrieve your Contacts resumes from the <span style="font-weight: bold;">Referral Requests</span> section in your member account. Then, screen their resumes and write a testimony for them.</span>
                 </div>
                 <p class="button"><input type="button" value="Cancel" onClick="close_refer_form();" />&nbsp;<input type="button" value="Refer Now" onClick="refer();" /></p>
             </form>
