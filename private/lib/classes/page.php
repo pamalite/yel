@@ -157,7 +157,7 @@ class Page {
                     <td>
                         <img style="vertical-align: middle; float: left; border: none;" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/warning.jpg"/>
                         <div class="reminder" style="padding-left: 25px;">
-                            Always remember to submit your newly employed candidate's details by clicking on <strong>'Confirm Employed'</strong> in the <strong>Referrals</strong> section, and fax/scan over a copy of the signed Letter of Offer of every newly employed candidate.
+                            Always remember to submit your newly employed candidate's details by clicking on <strong>'Confirm Employed'</strong> in the <a href="referrals.php"><strong>Resumes</strong></a> section, and fax/scan over a copy of the signed Letter of Offer of every newly employed candidate.
                         </div>
                     </td>
                 </tr>
