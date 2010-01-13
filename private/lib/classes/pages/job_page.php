@@ -427,9 +427,9 @@ class JobPage extends Page {
         </div>
         
         <div id="div_refer_form">
-            <p>
-                <span style="font-weight: bold;">To make a Standard Referral &nbsp;<span id="job_title" style="text-decoration: underline;"></span>&nbsp; position...</span>
-            </p>
+            <div style="text-align: center; font-weight: bold; padding-top: 10px; padding-bottom: 10px;">
+                To make a Standard Referral of &nbsp;<span id="job_title" style="text-decoration: underline;"></span>&nbsp; position...</span>
+            </div>
             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
                 <span style="color: #FC8503; font-weight: bold;">Step 1:</span> <span style="color: #666666;">Choose the contacts, whom you want to refer to, through either...</span>
             </div>
@@ -524,7 +524,7 @@ class JobPage extends Page {
         
         <div id="div_quick_refer_form">
             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px; font-weight: bold;">
-                To make an Express Referral of &nbsp;<span id="qr_job_title" style="text-decoration: underline;"></span>...
+                To make an Express Referral of &nbsp;<span id="qr_job_title" style="text-decoration: underline;"></span>&nbsp; position...
             </div>
             <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_refer_form();">
                 <input type="hidden" name="id" id="id" value="<?php echo (is_null($this->member)) ? '' : $this->member->id(); ?>" />
