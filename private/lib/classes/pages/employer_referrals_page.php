@@ -233,7 +233,7 @@ class EmployerReferralsPage extends Page {
             <form onSubmit="return false;">
                 <input type="hidden" id="remarks_referral_id" value="" />
                 <div style="text-align: center; padding-top: 15px; padding-bottom: 15px;">
-                    Remarks for <span id="remarks_candidate_name" style="font-weight: bold;"></span>'s on <span id="remarks_job_title" style="font-weight: bold;"></span>&nbsp;position:
+                    Remarks for <span id="remarks_candidate_name" style="font-weight: bold;"></span> - <span id="remarks_job_title" style="font-weight: bold;"></span>:
                 </div>
                 <div style="width: 100%; margin:auto; text-align: center;">
                     <textarea id="remarks_field" style="width: 98%; height: 250px;"></textarea>

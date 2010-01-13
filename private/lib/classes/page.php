@@ -388,6 +388,14 @@ class Page {
         ?>
         
         <?php
+        if (Employee::has_clearances_for('employers', $_clearances)) {
+        ?>
+                <li <?php echo ($page == 'headhunters') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/headhunters.php">IRCs</a></li>
+        <?php
+        }
+        ?>
+        
+        <?php
         if (Employee::has_clearances_for('admin_employers', $_clearances)) {
         ?>
                 <li <?php echo ($page == 'slots') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/slots.php">Slots</a></li>

@@ -463,7 +463,7 @@ class JobPage extends Page {
                     </tr>
                 </table>
                 <div style="text-align: center; padding-top: 10px; padding-bottom: 10px; width: 95%; margin-left: 15px; margin-right: 15px;">
-                    <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Follow up on your Contacts whether have they received an email informing them to submit their resumes to you for screening. If they have not, please notify us at <a href="mailto: support@yellowelevator.com">support@yellowelevator.com</a>.</span>
+                    <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Follow up with your Contacts to see if they have received an email informing them to submit their resumes to you for screening. If they have not received the email, please notify us at <a href="mailto: support@yellowelevator.com">support@yellowelevator.com</a>.</span>
                 </div>
                 <div style="text-align: center; padding-top: 10px; padding-bottom: 10px; width: 95%; margin-left: 15px; margin-right: 15px;">
                     <span style="color: #FC8503; font-weight: bold;">Step 3:</span> <span style="color: #666666;">Retrieve your Contacts resumes from the <span style="font-weight: bold;">Referral Requests</span> section in your member account. Then, screen their resumes and write a testimony for them.</span>
@@ -546,7 +546,7 @@ class JobPage extends Page {
                             <div style="padding-top: 15px;">
                                 Or, if your Candidate is not in your Contacts, enter one's details below:
                             </div>
-                            <table class="qr_candidate_form" style="border-bottom: 1px dashed #666666; padding-bottom: 15px;">
+                            <table class="qr_candidate_form">
                                 <tr>
                                     <td class="label"><label for="qr_candidate_firstname">Firstname:</label></td>
                                     <td class="field">
@@ -578,6 +578,7 @@ class JobPage extends Page {
                                     </td>
                                 </tr>
                             </table>
+                            <div style="width: 100%; height: 10px; border-bottom: 1px dashed #666666;"></div>
                             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
                                 <span style="color: #FC8503; font-weight: bold;">Step 2:</span> <span style="color: #666666;">Attach the Candidate's resume.</span>
                             </div>
@@ -613,6 +614,9 @@ class JobPage extends Page {
         </div>
         
         <div id="div_quick_upload_form">
+            <div style="text-align: center; padding-top: 10px; padding-bottom: 10px; font-weight: bold;">
+                To have Yellow Elevator refer &nbsp;<span id="qu_job_title" style="text-decoration: underline;"></span>&nbsp; position on your behalf...
+            </div>
             <form action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search_action.php" method="post" enctype="multipart/form-data" target="upload_target" onSubmit="return validate_quick_upload_form();">
                 <input type="hidden" name="qu_job_id" id="qu_job_id" value="<?php echo $this->job_id; ?>" />
                 <input type="hidden" name="action" value="quick_upload" />
@@ -704,7 +708,7 @@ class JobPage extends Page {
                     <tr>
                         <td colspan="3">
                             <div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">
-                                <span style="color: #FC8503; font-weight: bold;">Step 2 (Optional): </span> <span style="color: #666666;">YPlease upload your Contact's resume if you have it.</span>
+                                <span style="color: #FC8503; font-weight: bold;">Step 2 (Optional): </span> <span style="color: #666666;">Please upload your Contact's resume if you have it.</span>
                             </div>
                             <p style="text-align: center;">
                                 <input class="field" id="qu_my_file" name="qu_my_file" type="file" />
