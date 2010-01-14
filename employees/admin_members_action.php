@@ -22,7 +22,7 @@ if (!isset($_POST['action'])) {
               CONCAT(lastname, ', ', firstname) AS fullname, 
               DATE_FORMAT(joined_on, '%e %b, %Y') AS formatted_joined_on 
               FROM members 
-              WHERE active = 'Y' OR active = 'S' 
+              -- WHERE active = 'Y' OR active = 'S' 
               ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
@@ -72,10 +72,11 @@ if ($_POST['action'] == 'reset_password') {
 }
 
 if ($_POST['action'] == 'activate') {
-    $data = array();
-    $data['active'] = 'Y';
     $member = new Member($_POST['id']);
-    if (!$member->update($data, true)) {
+    $data = array();
+    $data['password'] = md5($member->id());
+    $data['active'] = 'Y';
+        if (!$member->update($data, true)) {
         echo "ko";
         exit();
     }

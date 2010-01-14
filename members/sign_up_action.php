@@ -239,7 +239,7 @@ if (!empty($result)) {
     }
 } 
 
-// 4. Add the closest branch as a friend
+// 4. Add the closest branch as a friend and pre-approve it.
 $query = "SELECT DISTINCT country FROM branches";
 $result = $mysqli->query($query);
 $available_branches = array();
@@ -247,13 +247,22 @@ foreach ($result as $row) {
     $available_branches[] = $row['country'];
 }
 
-$team = NULL;
+$team = 'team.my@yellowelevator.com';
 if (in_array($member->get_country_code(), $available_branches)) {
-    $team = new Member('team.'. strtolower($member->get_country_code()). '@yellowelevator.com');
-} else {
-    $team = new Member('team.my@yellowelevator.com');
-}
-$team->create_referee($member->id());
+    $team = 'team.'. strtolower($member->get_country_code()). '@yellowelevator.com';
+} 
+
+$query = "INSERT INTO member_referees SET 
+          `member` = '". $member->id(). "', 
+          `referee` = '". $team. "', 
+          `referred_on` = NOW(), 
+          `approved` = 'Y'; 
+          INSERT INTO member_referees SET 
+          `referee` = '". $member->id(). "', 
+          `member` = '". $team. "', 
+          `referred_on` = NOW(), 
+          `approved` = 'Y'";
+$mysqli->transact($query);
 
 // 5. Create activation token and email
 $activation_id = microtime(true);

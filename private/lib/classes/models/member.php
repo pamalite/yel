@@ -459,6 +459,7 @@ class Member {
                       FROM member_referees 
                       LEFT JOIN members ON members.email_addr = member_referees.referee 
                       WHERE member_referees.member = '". $this->id. "' AND 
+                      member_referees.referee NOT LIKE 'team.%yellowelevator.com' AND 
                       member_referees.approved = 'Y' ORDER BY ". $_order_by;
         } else {
             $query = "SELECT member_referees.*, CONCAT(members.lastname, ', ', members.firstname) AS referee_name 
@@ -466,6 +467,7 @@ class Member {
                       LEFT JOIN member_networks_referees ON member_referees.id = member_networks_referees.referee 
                       LEFT JOIN members ON members.email_addr = member_referees.referee 
                       WHERE member_referees.member = '". $this->id. "' AND 
+                      member_referees.referee NOT LIKE 'team.%yellowelevator.com' AND 
                       member_referees.approved = 'Y' AND member_networks_referees.network = " . $_filter_by . " ORDER BY ". $_order_by;
         }
         return $this->mysqli->query($query);

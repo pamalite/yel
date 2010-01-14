@@ -84,7 +84,7 @@ if ($_POST['action'] == 'find') {
     $criteria = array(
         'columns' => "email_addr, CONCAT(lastname, ', ', firstname) AS name, DATE_FORMAT(joined_on, '%e %b, %Y') AS joined_date",
         'order' => $result_order_by,
-        'match' => $match
+        'match' => $match. " AND email_addr NOT LIKE 'team.%@yellowelevator.com'"
     );
     
     $result = Member::find($criteria);
