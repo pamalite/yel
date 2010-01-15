@@ -23,6 +23,8 @@ if (!isset($_POST['action'])) {
               DATE_FORMAT(joined_on, '%e %b, %Y') AS formatted_joined_on 
               FROM members 
               -- WHERE active = 'Y' OR active = 'S' 
+              WHERE email_addr NOT LIKE 'team.%@yellowelevator.com' AND 
+              email_addr <> 'initial@yellowelevator.com' 
               ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
@@ -90,6 +92,11 @@ if ($_POST['action'] == 'activate') {
     $subject = "Membership Re-activated";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     mail($_POST['id'], $subject, $message, $headers);
+    
+    // $handle = fopen('/tmp/email_to_'. $_POST['id']. '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     echo 'ok';
     exit();

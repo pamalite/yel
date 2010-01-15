@@ -25,11 +25,11 @@ if (!isset($_POST['action'])) {
               recommenders.email_addr AS recommender_email_addr, 
               recommenders.phone_num AS recommender_phone_num, 
               CONCAT(recommenders.firstname, ', ', recommenders.lastname) AS recommender_name  
-              FROM members
+              FROM members 
               LEFT JOIN recommenders ON recommenders.email_addr = members.recommender 
               LEFT JOIN employees ON members.added_by = employees.id 
               WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " AND 
-              members.email_addr != 'initial@yellowelevator.com' 
+              members.email_addr <> 'initial@yellowelevator.com' 
               ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);

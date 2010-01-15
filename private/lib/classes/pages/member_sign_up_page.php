@@ -177,7 +177,8 @@ class MemberSignUpPage extends Page {
                     </tr>
                     <tr>
                         <td class="label"><label for="individual_headhunter">I am an Independent Recruitment Consultant:</label></td>
-                        <td class="field"><input type="checkbox" id="individual_headhunter" name="individual_headhunter" <?php echo ($_session['individual_headhunter'] == 'Y' || isset($_GET['indiv_hh'])) ? 'checked' : '' ?> /></td>
+                        <td class="field"><input type="checkbox" id="individual_headhunter" name="individual_headhunter" <?php echo ($_session['individual_headhunter'] == 'Y' || isset($_GET['indiv_hh'])) ? 'checked' : '' ?> />
+                        <p class="note">Please sign in through the Members Login page after you have signed up.</p></td>
                     </tr>
                     <tr>
                         <td class="title" colspan="2">Expertise</td>

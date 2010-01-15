@@ -162,7 +162,7 @@ function show_candidates() {
                     html = html + '<td class="candidate">' + status + '<a href="mailto: ' + id + '">' + members[i].childNodes[0].nodeValue + '</a><br/><div class="phone_num"><strong>Tel:</strong> ' + phone_nums[i].childNodes[0].nodeValue + '<br/><strong>E-mail:</strong> ' + id + '</div></td>' + "\n";
                     html = html + '<td class="country">' + countries[i].childNodes[0].nodeValue + '</td>' + "\n";
                     html = html + '<td class="zip">' + zips[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="actions"><a class="no_link" onClick="show_profile(\'' + id + '\');">View Profile &amp; Resumes</a></td>' + "\n";
+                    html = html + '<td class="actions"><a class="no_link" onClick="show_profile(\'' + id + '\');">View Profile &amp; Resumes</a><br/><a class="no_link" onClick="make_member_privileged(\'' + id + '\');">Make Privileged</a></td>' + "\n";
                     html = html + '</tr>' + "\n";
                     
                     var remark = '';
@@ -607,6 +607,45 @@ function refer() {
         },
         onRequest: function(instance) {
             set_status('Making referral...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function make_member_privileged(_member_id) {
+    if (isEmpty(_member_id)) {
+        return;
+    }
+    
+    var params = 'id=' + user_id + '&action=make_member_privileged';
+    params = params + '&member=' + _member_id;
+    
+    var uri = root + "/prs/resumes_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error occured while making the selected member privileged.');
+                set_status('');
+                return;
+            } else if (txt == '-1') {
+                alert('An error occured while adding team.xx@yellowelevator.com as recommender.');
+                set_status('');
+                return;
+            } else if (txt == '-2') {
+                alert('Failed to activate member.');
+                set_status('');
+                return;
+            } else if (txt == '-3') {
+                alert('Cannot add team.xx@yellowelevator.com as default contact.');
+            }
+            
+            show_candidates();
+        },
+        onRequest: function(instance) {
+            set_status('Processing...');
         }
     });
     

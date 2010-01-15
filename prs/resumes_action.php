@@ -353,4 +353,117 @@ if ($_POST['action'] == 'save_remark') {
     
     exit();
 }
+
+if ($_POST['action'] == 'make_member_privileged') {
+    $mysqli = Database::connect();
+    $joined_on = today();
+    
+    // 1. get the branch of the employee
+    $employee = new Employee($_POST['id']);
+    $branch_data = $employee->get_branch();
+    $branch = 'team.'. strtolower($branch_data[0]['country_code']). '@yellowelevator.com';
+    
+    // 2. check whether is this branch already in the recommenders' table
+    $query = "SELECT COUNT(*) AS id_used FROM recommenders WHERE email_addr = '". $branch. "'";
+    $result = $mysqli->query($query);
+    
+    if ($result[0]['id_used'] == '0') {
+        // create it since not added
+        $recommender_data = array();
+        $recommender_data['firstname'] = 'Yellow';
+        $recommender_data['lastname'] = 'Elevator';
+        $recommender_data['phone_num'] = '0';
+        $recommender_data['region'] = $branch_data[0]['country'];
+        $recommender_data['added_by'] = $employee->id();
+        $recommender_data['added_on'] = $joined_on;
+        
+        $recommender = new Recommender($branch);
+        if ($recommender->create($recommender_data) === false) {
+            echo '-1'; // failed to create new recommender
+            exit();
+        }
+    }
+    
+    // 3. make the member privileged
+    // 3.1 check whether is the member active?
+    //     if not, reset the password to the email and set flag to send email, and make member active.
+    // 3.2 make the recommender field to use the $branch
+    
+    $send_password_reset_email = false;
+    $member_data = array();
+    $member_data['recommender'] = $branch;
+    $member_data['added_by'] = $employee->id();
+    $member = new Member($_POST['member']);
+    if (!$member->is_active()) {
+        $member_data['password'] = md5($member->id());
+        $member_data['active'] = 'Y';
+        $send_password_reset_email = true;
+    } 
+    
+    if ($member->update($member_data, true) === false) {
+        echo '-2'; // failed to activate member
+        exit();
+    }
+    
+    // 4. make this $branch as default friend
+    // 4.1 if such a relationship does not exist, add and pre-approve it. 
+    $contact_adding_error = false;
+    $query = "SELECT approved FROM member_referees 
+              WHERE member = '". $member->id(). "' AND 
+              referee = '". $branch. "'";
+    $result = $mysqli->query($query);
+    if (is_null($result[0]['approved'])) {
+        // add
+        $query = "INSERT INTO member_referees SET 
+                  `member` = '". $member->id(). "', 
+                  `referee` = '". $branch. "', 
+                  `referred_on` = NOW(), 
+                  `approved` = 'Y'; 
+                  INSERT INTO member_referees SET 
+                  `referee` = '". $member->id(). "', 
+                  `member` = '". $branch. "', 
+                  `referred_on` = NOW(), 
+                  `approved` = 'Y'";
+    } else if ($result[0]['approved'] == 'N') {
+        // update
+        $query = "UPDATE member_referees 
+                  SET `approved` = 'Y', rejected = 'N' 
+                  WHERE `member` = '". $member->id(). "' AND  
+                  `referee` = '". $branch. "'; 
+                  UPDATE member_referees 
+                  SET `approved` = 'Y', rejected = 'N' 
+                  WHERE `referee` = '". $member->id(). "' AND  
+                  `member` = '". $branch. "'";
+    }
+    
+    if (!$mysqli->transact($query)) {
+        echo '-3'; // contact adding error
+    }
+    
+    // 5. send out an email if password reset flag was turned on
+    if ($send_password_reset_email) {
+        // remove any tokens as the account has been activated
+        $query = "DELETE FROM member_activation_tokens WHERE member = '". $member->id(). "'";
+        $mysqli->execute($query);
+        
+        // send a notification
+        $lines = file(dirname(__FILE__). '/../private/mail/member_reactivated_admin.txt');
+        $message = '';
+        foreach($lines as $line) {
+            $message .= $line;
+        }
+
+        $subject = "Membership Re-activated";
+        $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+        // mail($member->id(), $subject, $message, $headers);
+                    
+        $handle = fopen('/tmp/email_to_'. $member->id(). '.txt', 'w');
+        fwrite($handle, 'Subject: '. $subject. "\n\n");
+        fwrite($handle, $message);
+        fclose($handle);
+    }
+    
+    echo 'ok';
+    exit();
+}
 ?>

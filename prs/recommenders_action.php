@@ -30,7 +30,8 @@ if (!isset($_POST['action'])) {
                    WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " AND 
                    recommender_industries.industry = ". $_POST['filter_by'];
     }
-    $query .= " ORDER BY ". $_POST['order_by'];
+    $query .= " AND recommenders.email_addr NOT LIKE 'team.%@yellowelevator.com' 
+               ORDER BY ". $_POST['order_by'];
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
     if (count($result) <= 0 || is_null($result)) {
