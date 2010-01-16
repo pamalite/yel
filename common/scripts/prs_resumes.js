@@ -618,6 +618,11 @@ function make_member_privileged(_member_id) {
         return;
     }
     
+    var confirmed = confirm('Make ' + _member_id + ' a privileged member?');
+    if (!confirmed) {
+        return;
+    }
+    
     var params = 'id=' + user_id + '&action=make_member_privileged';
     params = params + '&member=' + _member_id;
     
