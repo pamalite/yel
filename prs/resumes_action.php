@@ -455,12 +455,12 @@ if ($_POST['action'] == 'make_member_privileged') {
 
         $subject = "Membership Re-activated";
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-        // mail($member->id(), $subject, $message, $headers);
+        mail($member->id(), $subject, $message, $headers);
                     
-        $handle = fopen('/tmp/email_to_'. $member->id(). '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $message);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_'. $member->id(). '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
     }
     
     echo 'ok';
