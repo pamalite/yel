@@ -66,10 +66,9 @@ if ($_POST['action'] == 'publish') {
     
     $is_prior = false;
     $is_expired = false;
-    if (($result[0]['joined_year'] < 2010) || 
-        ($result[0]['joined_year'] == 2010 && $result[0]['joined_month'] < 3)) {
+    if ($result[0]['joined_year'] < 2010) {
         $is_prior = true;
-        $query = "SELECT DATEDIFF(NOW(), joined_on) AS expired 
+        $query = "SELECT DATEDIFF(NOW(), DATE_ADD(joined_on, INTERVAL 1 YEAR)) AS expired 
                   FROM employers WHERE id = '". $_POST['employer']. "'";
         $result = $mysqli->query($query);
         if ($result[0]['expired'] > 0) {
@@ -294,10 +293,9 @@ if ($_POST['action'] == 'extend') {
     
     $is_prior = false;
     $is_expired = false;
-    if (($result[0]['joined_year'] < 2010) || 
-        ($result[0]['joined_year'] == 2010 && $result[0]['joined_month'] < 3)) {
+    if ($result[0]['joined_year'] < 2010) {
         $is_prior = true;
-        $query = "SELECT DATEDIFF(NOW(), joined_on) AS expired 
+        $query = "SELECT DATEDIFF(NOW(), DATE_ADD(joined_on, INTERVAL 1 YEAR)) AS expired 
                   FROM employers WHERE id = '". $_POST['employer']. "'";
         $result = $mysqli->query($query);
         if ($result[0]['expired'] > 0) {
