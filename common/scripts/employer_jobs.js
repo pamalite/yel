@@ -979,6 +979,10 @@ function show_buy_slots_form() {
     }
     $('div_buy_slots_form').setStyle('left', ((window_width - div_width) / 2));
     
+    if ($('payment_method_credit_card').disabled) {
+        add_admin_fee();
+    }
+    
     $('div_blanket').setStyle('display', 'block');
     $('div_buy_slots_form').setStyle('display', 'block');
 }

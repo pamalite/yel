@@ -1,6 +1,6 @@
 var root = "";
 var paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
-var paypal_return_url_base = '/employers/slots.php';
+var paypal_return_url_base = '/employers/jobs.php';
 var paypal_ipn_url = 'http://60.50.27.9/yel/employers/slots_ipn_action.php';
 var paypal_id = 'J77S5ZAUFN8SS';
 

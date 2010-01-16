@@ -135,7 +135,7 @@ class EmployerJobsPage extends Page {
                         </div>
                     </td>
                     <td class="buy">
-                        <input type="image" id="buy_postings_button" onClick="show_buy_slots_form();" src="../common/images/button_buy_now.gif" />
+                        <input type="image" id="buy_postings_button" onClick="show_buy_slots_form();" src="../common/images/button_buy_now_disabled.gif" disabled />
                         <div style="font-size: 7pt; margin-top: -3px; text-align: center;">
                             <a class="no_link" onClick="show_purchase_histories();">View Purchase History</a>
                         </div>
@@ -356,7 +356,7 @@ class EmployerJobsPage extends Page {
                             <table style="border: none; margin: auto; width: 100%; border-collapse: collapse;">
                                 <tr>
                                     <td style="width: 10px;">
-                                        <input type="radio" name="payment_method" id="payment_method_credit_card" value="credit_card" checked onClick="remove_admin_fee();" />
+                                        <input type="radio" name="payment_method" id="payment_method_credit_card" value="credit_card" onClick="remove_admin_fee();" <?php echo ($payment_currency != 'MYR') ? 'checked' : 'disabled'; ?> />
                                     </td>
                                     <td>
                                         <label for="payment_method_credit_card">Credit Card/PayPal <span style="font-size: 7pt; color: #666666;">(via PayPal portal)</span></label>
@@ -364,7 +364,7 @@ class EmployerJobsPage extends Page {
                                 </tr>
                                 <tr>
                                     <td style="vertical-align: top;">
-                                        <input type="radio" name="payment_method" id="payment_method_cheque" value="cheque" onClick="add_admin_fee();" />
+                                        <input type="radio" name="payment_method" id="payment_method_cheque" value="cheque" onClick="add_admin_fee();" <?php echo ($payment_currency == 'MYR') ? 'checked' : ''; ?> />
                                     </td>
                                     <td>
                                         <label for="payment_method_cheque">Cheque/Money Order/Bank Transfer <span style="font-size: 7pt; color: #666666;">(+5% admin fee)</span></label>
