@@ -897,8 +897,8 @@ function select_all_jobs() {
 }
 
 function get_slots_left() {
-    $('num_slots').set('html', '(Free Job Publishing Activated)');
-    $('num_slots').setStyle('color', '#CCCCCC');
+    $('num_slots').set('html', '(Free)');
+    $('num_slots').setStyle('color', '#1D3E6E');
     $('slots_expiry').set('html', '(Not Applicable)');
     $('slots_expiry').setStyle('color', '#666666');
     $('buy_postings_button').disabled = true;

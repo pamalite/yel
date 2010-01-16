@@ -129,7 +129,7 @@ class EmployerJobsPage extends Page {
                 <tr>
                     <td class="info">
                         <div class="slots_details">
-                            Job Postings left: <span id="num_slots" style="font-weight: bold;">0</span>
+                            Job Postings available: <span id="num_slots" style="font-weight: bold;">0</span>
                             <br/>
                             Expiring on: <span id="slots_expiry" style="font-weight: bold;"></span>
                         </div>
