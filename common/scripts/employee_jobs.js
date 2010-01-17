@@ -251,7 +251,7 @@ function publish_job() {
                 alert('The account is not set up yet');
                 return false;
             } else if (txt == '-2') {
-                alert('There is no more job slot left to publish!' + "\n\nPlease save the job and publish it later after the employer have purchased enough job slots from the 'Job Slots' page.");
+                alert('The employer\'s subscription is expired.');
                 return false;
             } else {
                 alert('Sorry! We are not able to publish the new job at the moment. Please try again later.');

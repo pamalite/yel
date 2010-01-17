@@ -77,7 +77,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
                 <?php
                     switch ($invoice[0]['type']) {
                         case 'J':
-                            echo "Job Advertisements Fee ". $invoice_or_receipt;
+                            echo "Subscription ". $invoice_or_receipt;
                             break;
                         case 'R':
                             echo "Service Fee ". $invoice_or_receipt;

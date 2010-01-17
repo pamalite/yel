@@ -215,12 +215,15 @@ function publish_job() {
                 set_status('New job successfully published.');
             } else if (txt == '-1') {
                 alert('Your account is not set up yet. Upon receiving the Welcome email from us, please allow up to the next 24 hours for your account to be active. <br/>If this message still shows up after 24 hours, please contact your account manager immediately.');
+                set_status('');
                 return false;
             } else if (txt == '-2') {
-                alert('You have no more job slots left to publish!' + "\n\nPlease save your job and publish it later after you have purchased enough job slots from the 'Job Slots' page.");
+                alert('Your subscription has expired. Please extend/renew it from the top of the page.');
+                set_status('');
                 return false;
             } else {
                 set_status('Sorry! We are not able to publish the new job at the moment. Please try again later.');
+                set_status('');
                 return false;
             }
             
@@ -326,10 +329,8 @@ function show_job(job_id) {
             
             var is_closed = closed[0].childNodes[0].nodeValue;
             if (is_closed == 'Y') {
-                // $('job.extend').set('html', '<a class="no_link" onClick="extend_job(\'' + job_id + '\');">Re-open this job for another 30 days</a>');
                 $('job.extend').set('html', '<input type="button" onClick="extend_job(\'' + job_id + '\');" value="Re-open this job for another 30 days" />');
             } else {
-                // $('job.extend').set('html', '<a class="no_link" onClick="extend_job(\'' + job_id + '\');">Extend this job for another 30 days</a>');
                 $('job.extend').set('html', '<input type="button" onClick="extend_job(\'' + job_id + '\');" value="Extend this job for another 30 days" />');
             }
             
@@ -701,7 +702,7 @@ function extend_job(job_id) {
                 set_status('An error occured while extending job.');
                 return false;
             } else if (txt == '-2') {
-                alert('You have no more job slots left to publish!' + "\n\nPlease extend it later after you have purchased enough job slots from the 'Job Slots' page.");
+                alert('Your subscription has expired. Please extend/renew it from the top of this page.');
                 return false;
             }
             
@@ -918,17 +919,20 @@ function get_subscriptions_details() {
             if (txt != '-1') {
                 var expired = xml.getElementsByTagName('expired');
                 var expire_on = xml.getElementsByTagName('formatted_expire_on');
+                var has_free_posting = xml.getElementsByTagName('has_free_posting');
                 
-                $('subscriptions_expiry').set('html', expire_on[0].childNodes[0].nodeValue);
+                if (has_free_posting[0].childNodes[0].nodeValue == '0') {
+                    $('subscriptions_expiry').set('html', expire_on[0].childNodes[0].nodeValue);
 
-                if (parseInt(expired[0].childNodes[0].nodeValue) < 0) {
-                    $('subscriptions_expiry').setStyle('color', '#FF0000');
-                } else {
-                    $('subscriptions_expiry').setStyle('color', '#0D9C0D');
+                    if (parseInt(expired[0].childNodes[0].nodeValue) < 0) {
+                        $('subscriptions_expiry').setStyle('color', '#FF0000');
+                    } else {
+                        $('subscriptions_expiry').setStyle('color', '#0D9C0D');
+                    }
+
+                    $('buy_subscriptions_button').disabled = false;
+                    $('buy_subscriptions_button').src = '../common/images/button_buy_now.gif';
                 }
-                
-                $('buy_subscriptions_button').disabled = false;
-                $('buy_subscriptions_button').src = '../common/images/button_buy_now.gif';
             }
         }
     });

@@ -13,14 +13,9 @@ if (!isset($_POST['id'])) {
 $xml_dom = new XMLDOM();
 
 if ($_POST['action'] == 'get_subscriptions_details') {
-    $is_expired = false;
     $employer = new Employer($_POST['id']);
     $result = $employer->get_subscriptions_details();
-    
-    if ($result[0]['expire'] < 0)  {
-        $is_expired = true;
-    } 
-    
+    $result[0]['has_free_posting'] = ($employer->has_free_job_posting()) ? '1' : '0';
     $response = array('subscription' => $result[0]);
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
@@ -148,14 +143,14 @@ if ($_POST['action'] == 'buy_subscriptions') {
     $body .= 'Content-Disposition: attachment'. "\n";
     $body .= $attachment. "\n";
     $body .= '--yel_mail_sep_'. $invoice. "--\n\n";
-    mail($employer->get_email_address(), $subject, $body, $headers);
+    // mail($employer->get_email_address(), $subject, $body, $headers);
     
-    // $handle = fopen('/tmp/email_to_'. $employer->get_email_address(). '.txt', 'w');
-    // fwrite($handle, 'Subject: '. $subject. "\n\n");
-    // fwrite($handle, $body);
-    // fclose($handle);
+    $handle = fopen('/tmp/email_to_'. $employer->get_email_address(). '.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $body);
+    fclose($handle);
     
-    unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
+    // unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
     
     // 3. extend the subscription
     if ($employer->extend_subscription($_POST['period']) === false) {

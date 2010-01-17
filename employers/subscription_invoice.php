@@ -39,7 +39,7 @@ class SubscriptionInvoice extends FPDF {
         
         $this->Cell(5, 3, "E-mail:", 0, 0);
         $this->Cell(11);
-        $this->Cell(5, 3, "sales.". $this->branch[0]['country_code']. "@yellowelevator.com", 0, 2);
+        $this->Cell(5, 3, "sales.". strtolower($this->branch[0]['country']). "@yellowelevator.com", 0, 2);
         $this->Cell(-16);
         
         $this->Cell(5, 3, "Mailing Address:", 0, 0);

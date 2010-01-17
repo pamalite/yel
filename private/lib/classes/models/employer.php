@@ -392,6 +392,23 @@ class Employer {
         return $this->mysqli->execute($query);
     }
     
+    public function has_free_job_posting() {
+        $query = "SELECT used_free_posting FROM employers 
+                  WHERE id = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['used_free_posting'] == true) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    public function used_free_job_posting() {
+        $query = "UPDATE employers SET used_free_posting = TRUE 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
     public function create_fee($data) {
         if (is_null($data) || !is_array($data)) {
             return false;
