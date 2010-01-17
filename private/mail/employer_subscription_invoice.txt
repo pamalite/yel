@@ -1,14 +1,12 @@
-Transaction ID: %pending_id%
-
 Hi %employer%,
 
-Our systems had indicated that you have chosen to purchase %qty% of slot(s) 
-through manual payment (cheque or money order) at %currency%$ %price% a slot, 
-inclusive of 5% administrative fee, on %purchased_on%. 
+Our systems had indicated that you have chosen to subscribe %period% of month(s) 
+at %currency% $%amount%, inclusive of 5% administrative fee, on %purchased_on%. 
 
-Your %qty% of slot(s) are currently being withheld until payment is processed. 
-To proceed with payment, please follow the instructions below to avoid further 
-delays:
+Attached is the invoice of the subscription made. 
+
+To proceed with payment, the following are the payment instructions and details 
+for your perusal:
 
 For Bank Transfer:
 ------------------

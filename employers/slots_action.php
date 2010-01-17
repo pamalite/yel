@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
+require_once dirname(__FILE__). "/subscription_invoice.php";
 
 session_start();
 
@@ -11,125 +12,159 @@ if (!isset($_POST['id'])) {
 
 $xml_dom = new XMLDOM();
 
-if (!isset($_POST['action'])) {
-    $query = "SELECT number_of_slot, price_per_slot, total_amount, 
-              DATE_FORMAT(purchased_on, '%e %b, %Y') AS formatted_purchased_on 
-              FROM employer_slots_purchases 
-              WHERE employer = '". $_POST['id']. "' AND on_hold = 0 
-              ORDER BY purchased_on DESC";
+if ($_POST['action'] == 'get_subscriptions_details') {
+    $is_expired = false;
+    $employer = new Employer($_POST['id']);
+    $result = $employer->get_subscriptions_details();
     
+    if ($result[0]['expire'] < 0)  {
+        $is_expired = true;
+    } 
+    
+    $response = array('subscription' => $result[0]);
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
+if ($_POST['action'] == 'buy_subscriptions') {
     $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    if (count($result) <= 0 || is_null($result)) {
-        echo '0';
-        exit();
-    }
+    $employer = new Employer($_POST['id']);
     
-    if (!$result) {
+    // 1. generate invoice in the system
+    $data = array();
+    $data['issued_on'] = today();
+    $data['type'] = 'J';
+    $data['employer'] = $_POST['id'];
+    $data['payable_by'] = sql_date_add($data['issued_on'], $employer->get_payment_terms_days(), 'day');
+    
+    $invoice = Invoice::create($data);
+    if ($invoice === false) {
         echo 'ko';
         exit();
     }
     
-    foreach ($result as $i=>$row) {
-        $result[$i]['price_per_slot'] = number_format($row['price_per_slot'], 2, '.', ', ');
-        $result[$i]['total_amount'] = number_format($row['total_amount'], 2, '.', ', ');;
+    $desc = $_POST['period']. ' month(s) of subscription';
+    $item_added = Invoice::add_item($invoice, $_POST['amount'], '1', $desc);
+    
+    $items = array();
+    $items[0]['itemdesc'] = $desc;
+    $items[0]['amount'] = number_format($_POST['price'], '2', '.', ', ');
+    $items[1]['itemdesc'] = 'Administration Fee';
+    $items[1]['amount'] = number_format($_POST['admin_fee'], '2', '.', ', ');
+    
+    // 2. generate the PDF version to be attached to sales.xx and the employer
+    $branch_raw = $employer->get_branch();
+    $sales = 'sales.'. strtolower($branch_raw[0]['country']). '@yellowelevator.com';
+    $branch_raw[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch_raw[0]['address']);
+    $branch_raw['address_lines'] = explode("\n", $branch_raw[0]['address']);
+    $currency = $_POST['currency'];
+    
+    $pdf = new SubscriptionInvoice();
+    $pdf->AliasNbPages();
+    $pdf->SetAuthor('Yellow Elevator. This invoice was automatically generated. Signature is not required.');
+    $pdf->SetTitle($GLOBALS['COMPANYNAME']. ' - Invoice '. pad($invoice, 11, '0'));
+    $pdf->SetCurrency($currency);
+    $pdf->SetBranch($branch_raw);
+    $pdf->AddPage();
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetTextColor(255, 255, 255);
+    $pdf->SetFillColor(54, 54, 54);
+    $pdf->Cell(60, 5, "Invoice Number",1,0,'C',1);
+    $pdf->Cell(1);
+    $pdf->Cell(33, 5, "Issuance Date",1,0,'C',1);
+    $pdf->Cell(1);
+    $pdf->Cell(33, 5, "Payable By",1,0,'C',1);
+    $pdf->Cell(1);
+    $pdf->Cell(0, 5, "Amount Payable (". $currency. ")",1,0,'C',1);
+    $pdf->Ln(6);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell(60, 5, pad($invoice, 11, '0'),1,0,'C');
+    $pdf->Cell(1);
+    $pdf->Cell(33, 5, $data['issued_on'],1,0,'C');
+    $pdf->Cell(1);
+    $pdf->Cell(33, 5, $data['payable_by'],1,0,'C');
+    $pdf->Cell(1);
+    $pdf->Cell(0, 5, number_format($_POST['amount'], '2', '.', ', '),1,0,'C');
+    $pdf->Ln(6);
+    $pdf->SetTextColor(255, 255, 255);
+    $pdf->Cell(60, 5, "User ID",1,0,'C',1);
+    $pdf->Cell(1);
+    $pdf->Cell(0, 5, "Employer Name",1,0,'C',1);
+    $pdf->Ln(6);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell(60, 5, $employer->id(),1,0,'C');
+    $pdf->Cell(1);
+    $pdf->Cell(0, 5, $employer->get_name(),1,0,'C');
+    $pdf->Ln(10);
+    
+    $table_header = array("No.", "Item", "Amount (". $currency. ")");
+    $pdf->FancyTable($table_header, $items, number_format($_POST['amount'], '2', '.', ', '));
+    
+    $pdf->Ln(13);
+    $pdf->SetFont('','I');
+    $pdf->Cell(0, 0, "This invoice was automatically generated. Signature is not required.", 0, 0, 'C');
+    $pdf->Ln(6);
+    $pdf->Cell(0, 5, "Payment Notice",'LTR',0,'C');
+    $pdf->Ln();
+    $pdf->Cell(0, 5, "- Payment shall be made payable to Yellow Elevator Sdn. Bhd.", 'LR', 0, 'C');
+    $pdf->Ln();
+    $pdf->Cell(0, 5, "- To facilitate the processing of the payment, please write down the invoice number(s) on your cheque(s)/payment slip(s)", 'LBR', 0, 'C');
+    $pdf->Ln(10);
+    $pdf->Cell(0, 0, "E. & O. E.", 0, 0, 'C');
+    $pdf->Close();
+    $pdf->Output($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf', 'F');
+    
+    $attachment = chunk_split(base64_encode(file_get_contents($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf')));
+    
+    $subject = "Subscription Invoice ". pad($invoice, 11, '0');
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    $headers .= 'Bcc: '. $sales. "\n";
+    $headers .= 'MIME-Version: 1.0'. "\n";
+    $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $invoice. '";'. "\n\n";
+    
+    $body = '--yel_mail_sep_'. $invoice. "\n";
+    $body .= 'Content-Type: multipart/alternative; boundary="yel_mail_sep_alt_'. $invoice. '"'. "\n";
+    $body .= '--yel_mail_sep_alt_'. $invoice. "\n";
+    $body .= 'Content-Type: text/plain; charset="iso-8859-1"'. "\n";
+    $body .= 'Content-Transfer-Encoding: 7bit"'. "\n";
+    
+    $mail_lines = file('../private/mail/employer_subscription_invoice.txt');
+    $message = '';
+    foreach ($mail_lines as $line) {
+        $message .= $line;
     }
     
-    $response = array('purchases' => array('purchase' => $result));
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array($response);
-    exit();
-}
-
-if ($_POST['action'] == 'get_slots_left') {
-    $mysqli = Database::connect();
-    $query = "SELECT YEAR(joined_on) AS joined_year, MONTH(joined_on) AS joined_month 
-              FROM employers WHERE id = '". $_POST['id']. "'";
-    $result = $mysqli->query($query);
+    $message = str_replace('%employer%', $employer->get_name(), $message);
+    $message = str_replace('%period%', $_POST['period'], $message);
+    $message = str_replace('%currency%', $currency, $message);
+    $message = str_replace('%amount%', number_format($_POST['amount'], 2, '.', ', '), $message);
     
-    $is_prior = false;
-    $is_expired = false;
-    if ($result[0]['joined_year'] < 2010)  {
-    // if (($result[0]['joined_year'] < 2010) || 
-    //     ($result[0]['joined_year'] == 2010 && $result[0]['joined_month'] < 3)) {
-        $is_prior = true;
-        $query = "SELECT DATEDIFF(NOW(), DATE_ADD(joined_on, INTERVAL 1 YEAR)) AS expired 
-                  FROM employers WHERE id = '". $_POST['id']. "'";
-        $result = $mysqli->query($query);
-        
-        if ($result[0]['expired'] > 0) {
-            $is_expired = true;
-        }
-    } 
+    $body .= $message. "\n";
+    $body .= '--yel_mail_sep_alt_'. $invoice. "--\n\n";
+    $body .= '--yel_mail_sep_'. $invoice. "\n";
+    $body .= 'Content-Type: application/pdf; name="yel_credit_note_'. pad($invoice, 11, '0'). '.pdf"'. "\n";
+    $body .= 'Content-Transfer-Encoding: base64'. "\n";
+    $body .= 'Content-Disposition: attachment'. "\n";
+    $body .= $attachment. "\n";
+    $body .= '--yel_mail_sep_'. $invoice. "--\n\n";
+    mail($employer->get_email_address(), $subject, $body, $headers);
     
-    if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
-        $employer = new Employer($_POST['id']);
-        $result = $employer->get_slots_left();
-    } else {
-        echo '-1';
-        exit();
-    }
+    // $handle = fopen('/tmp/email_to_'. $employer->get_email_address(). '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $body);
+    // fclose($handle);
     
-    $response = array('slots_info' => array('slots' => $result[0]['slots'], 
-                                            'expired' => $result[0]['expired'], 
-                                            'expire_on' => $result[0]['formatted_expire_on']));
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array($response);
-    exit();
-}
-
-if ($_POST['action'] == 'buy_slots') {
-    $purchased_on = now();
+    unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
     
-    if ($_POST['payment_method'] == 'cheque') {
-        // 1. add the slots to employer_slots_purchases as on_hold = true
-        $pending_id = 'pend.'. generate_random_string_of(15);
-        $query = "INSERT INTO employer_slots_purchases SET 
-                  employer = '". $_POST['id']. "', 
-                  transaction_id = '". $pending_id. "', 
-                  purchased_on = '". $purchased_on. "', 
-                  price_per_slot = ". $_POST['price']. ", 
-                  number_of_slot = ". $_POST['qty']. ", 
-                  total_amount = ". $_POST['amount']. ", 
-                  on_hold = 1";
-        $mysqli = Database::connect();
-        if ($mysqli->execute($query) === true) {
-            // 2. send payment instructions to employer
-            $query = "SELECT name AS company, email_addr FROM employers WHERE id = '". $_POST['id']. "'";
-            $result = $mysqli->query($query);
-            $company = $result[0]['company'];
-            $email_addr = $result[0]['email_addr'];
-            
-            $lines = file('../private/mail/employer_payment_instructions.txt');
-            $message = '';
-            foreach ($lines as $line) {
-                $message .= $line;
-            }
-            
-            $message = str_replace('%pending_id%', $pending_id, $message);
-            $message = str_replace('%employer%', htmlspecialchars_decode($company), $message);
-            $message = str_replace('%amount%', number_format($_POST['amount'], '2', '.', ', '), $message);
-            $message = str_replace('%qty%', $_POST['qty'], $message);
-            $message = str_replace('%currency%', $_POST['currency'], $message);
-            $message = str_replace('%price%', $_POST['price'], $message);
-            $message = str_replace('%purchased_on%', $purchased_on, $message);
-            $subject = 'Job Slots Purchase Payment Instructions for Cheques/Money Order/Bank Transfer';
-            $headers = 'From: YellowElevator.com <sales@yellowelevator.com>' . "\n";
-            mail($email_addr, $subject, $message, $headers);
-
-            /*$handle = fopen('/tmp/email_to_'. $email_addr. '.txt', 'w');
-            fwrite($handle, 'Subject: '. $subject. "\n\n");
-            fwrite($handle, $message);
-            fclose($handle);*/
-            
-            echo '-1';
-        } else {
-            echo 'ko';
-        }
+    // 3. extend the subscription
+    if ($employer->extend_subscription($_POST['period']) === false) {
+        echo 'ko';
         exit();
     }
     
     echo 'ok';
     exit();
 }
+
 ?>

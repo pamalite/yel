@@ -1,8 +1,8 @@
 var root = "";
-var paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
-var paypal_return_url_base = '/employers/jobs.php';
-var paypal_ipn_url = 'http://60.50.27.9/yel/employers/slots_ipn_action.php';
-var paypal_id = 'J77S5ZAUFN8SS';
+// var paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr';
+// var paypal_return_url_base = '/employers/jobs.php';
+// var paypal_ipn_url = 'http://60.50.27.9/yel/employers/slots_ipn_action.php';
+// var paypal_id = 'J77S5ZAUFN8SS';
 
 function set_root() {
     root = location.protocol + "//" + location.hostname + "/yel";
@@ -901,23 +901,23 @@ function list_available_industries(_industry) {
     request.send(params);
 }
 
-function post_to_paypal_with(_hash_value_pairs) {
-    if (_hash_value_pairs.getLength() <= 0) {
-        return;
-    }
-    
-    var paypal_form = document.createElement('form');
-    paypal_form.action = paypal_url;
-    paypal_form.method = 'POST';
-    
-    _hash_value_pairs.each(function(value, key) {
-        var input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        paypal_form.appendChild(input);
-    });
-    
-    document.getElementsByTagName('body')[0].appendChild(paypal_form); 
-    paypal_form.submit();
-}
+// function post_to_paypal_with(_hash_value_pairs) {
+//     if (_hash_value_pairs.getLength() <= 0) {
+//         return;
+//     }
+//     
+//     var paypal_form = document.createElement('form');
+//     paypal_form.action = paypal_url;
+//     paypal_form.method = 'POST';
+//     
+//     _hash_value_pairs.each(function(value, key) {
+//         var input = document.createElement('input');
+//         input.type = 'hidden';
+//         input.name = key;
+//         input.value = value;
+//         paypal_form.appendChild(input);
+//     });
+//     
+//     document.getElementsByTagName('body')[0].appendChild(paypal_form); 
+//     paypal_form.submit();
+// }
