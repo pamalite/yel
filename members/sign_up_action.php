@@ -36,13 +36,13 @@ if (!isset($_POST['email_addr']) || !isset($_POST['phone_num']) || !isset($_POST
 }
 
 // NOTE: Remember to comment this out during coding. 
-// if ($_POST['security_code'] != $_SESSION['security_code']) {
-//     if ($invited) {
-//         redirect_to('sign_up.php?error=2&referee='. $_POST['referee']. '&member='. $_POST['member']. '&job='. $_POST['job']);
-//     } else {
-//         redirect_to('sign_up.php?error=2');
-//     }
-// }
+if ($_POST['security_code'] != $_SESSION['security_code']) {
+    if ($invited) {
+        redirect_to('sign_up.php?error=2&referee='. $_POST['referee']. '&member='. $_POST['member']. '&job='. $_POST['job']);
+    } else {
+        redirect_to('sign_up.php?error=2');
+    }
+}
 
 // 1. Check whether the e-mail has been taken. If taken, then inform user to use another.
 $mysqli = Database::connect();
@@ -287,12 +287,12 @@ $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
 $message = str_replace('%root%', $GLOBALS['root'], $message);
 $subject = "Member Activation Required";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-// mail($_POST['email_addr'], $subject, $message, $headers);
+mail($_POST['email_addr'], $subject, $message, $headers);
 
-$handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
-fwrite($handle, 'Subject: '. $subject. "\n\n");
-fwrite($handle, $message);
-fclose($handle);
+// $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
+// fwrite($handle, 'Subject: '. $subject. "\n\n");
+// fwrite($handle, $message);
+// fclose($handle);
 
 // 6. If it is individual headhunter, notify ourselves.
 
@@ -316,7 +316,7 @@ if ($data['individual_headhunter'] == 'Y') {
             break;
         }
     }
-    // mail($sales_email_addr, $subject, $message, $headers);
+    mail($sales_email_addr, $subject, $message, $headers);
 }
 
 redirect_to('login.php?signed_up=success');
