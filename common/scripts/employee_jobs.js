@@ -713,6 +713,7 @@ function get_employer_currency() {
             $('currency').value = selected_employer_currency;
             $('employer.currency').set('html', selected_employer_currency);
             $('employer.currency_1').set('html', selected_employer_currency);
+            $('employer.currency_2').set('html', selected_employer_currency);
         }
     });
     

@@ -99,20 +99,9 @@ class EmployerJobsPage extends Page {
         $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Job Ads</span>");
         $this->menu('employer', 'jobs');
         
-        $currency = Currency::symbol_from_country_code($this->employer->get_country_code());
-        
-        $query = "SELECT currencies.symbol 
-                  FROM currencies 
-                  LEFT JOIN branches ON currencies.country_code = branches.country 
-                  LEFT JOIN employers ON branches.id = employers.branch 
-                  WHERE employers.id = '". $this->employer->id(). "' LIMIT 1";
-        $mysqli = Database::connect();
-        $result = $mysqli->query($query);
-        $payment_currency = 'MYR';
-        if (count($result) > 0 && !is_null($result)) {
-            $payment_currency = $result[0]['symbol'];
-        }
-        
+        $branch = $this->employer->get_branch();
+        $currency = Currency::symbol_from_country_code($branch[0]['country']);
+        $payment_currency = $currency;
         $subscriptions_rates = $GLOBALS['subscriptions_rates'];
         $subscriptions = $subscriptions_rates[$payment_currency];
         if (!array_key_exists($payment_currency, $subscriptions_rates)) {

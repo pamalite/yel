@@ -204,7 +204,7 @@ class EmployeeJobsPage extends Page {
                                 <input type="hidden" id="currency" name="currency" value="" />
                                 <span id="employer.currency"></span>$ <input class="salary" type="text" id="salary" name="salary" />&nbsp;-&nbsp;<input class="salary" type="text" id="salary_end" name="salary_end" /><br>
                                 <input type="checkbox" id="salary_negotiable" name="salary_negotiable" /> <label for="salary_negotiable">Negotiable</label><br/>
-                                <p class="small_notes">This account allows you to create job ads with salary in <?php echo $currency; ?> only. If you wish to create job ads with salary in other currencies, please log into the relevant accounts.</p>
+                                <p class="small_notes">This account allows you to create job ads with salary in <span id="employer.currency_2"></span> only. If you wish to create job ads with salary in other currencies, please log into the relevant accounts.</p>
                             </td>
                         </tr>
                         <tr>
