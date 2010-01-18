@@ -263,9 +263,9 @@ function add_new_employer() {
     $('working_months').value = '12';
     //$('bonus_months').value = '1';
     $('payment_terms_days').selectedIndex = 0;
-    $('slots').value = '5';
-    $('slots').disabled = false;
-    $('slots_expiry').set('html', '');
+    $('subscription_period_label').setStyle('display', 'none');
+    $('subscription_period').setStyle('display', 'block');
+    $('subscription_period').selectedIndex = 0;
 }
 
 function new_from_employer(_employer_id) {
@@ -308,7 +308,6 @@ function new_from_employer(_employer_id) {
             var working_months = xml.getElementsByTagName('working_months');
             //var bonus_months = xml.getElementsByTagName('bonus_months');
             var payment_terms_days = xml.getElementsByTagName('payment_terms_days');
-            var slots = xml.getElementsByTagName('slots');
             
             var new_user_id = ids[0].childNodes[0].nodeValue + '_1';
             if (new_user_id.length > 10) {
@@ -353,9 +352,9 @@ function new_from_employer(_employer_id) {
                 }
             }
             
-            $('slots').value = slots[0].childNodes[0].nodeValue;
-            $('slots').disabled = false;
-            $('slots_expiry').set('html', '');
+            $('subscription_period_label').setStyle('display', 'none');
+            $('subscription_period').setStyle('display', 'block');
+            $('subscription_period').selectedIndex = 0;
             
             set_status('');
         },
@@ -421,8 +420,7 @@ function show_employer_profile() {
             //var bonus_months = xml.getElementsByTagName('bonus_months');
             var payment_terms_days = xml.getElementsByTagName('payment_terms_days');
             var website_urls = xml.getElementsByTagName('website_url');
-            var slots = xml.getElementsByTagName('slots');
-            var slots_expire_on = xml.getElementsByTagName('slots_expire_on');
+            var subscription_expire_ons = xml.getElementsByTagName('formatted_subscription_expire_on');
             
             $('user_id_placeholder').set('html', ids[0].childNodes[0].nodeValue);
             $('password_placeholder').set('html', '<input type="button" value="Reset Password" onClick="reset_password();" />');
@@ -462,9 +460,10 @@ function show_employer_profile() {
                 $('website_url').value = website_urls[0].childNodes[0].nodeValue;
             }
             
-            $('slots').value = slots[0].childNodes[0].nodeValue;
-            $('slots').disabled = true;
-            $('slots_expiry').set('html', '(Expire on: ' + slots_expire_on[0].childNodes[0].nodeValue + ')');
+            $('subscription_period').setStyle('display', 'none');
+            $('subscription_period_label').setStyle('display', 'block');
+            $('subscription_period_label').setStyle('color', '#666666');
+            $('subscription_period_label').set('html', '(Expires On: ' + subscription_expire_ons[0].childNodes[0].nodeValue + ')');
             
             set_status('');
         },
@@ -928,7 +927,7 @@ function save_profile() {
     if (mode == 'create') {
         params = params + '&user_id=' + $('user_id').value;
         params = params + '&password=' + $('password').value;
-        params = params + '&slots=' + $('slots').value;
+        params = params + '&subscription_period=' + $('subscription_period').options[$('subscription_period').selectedIndex].value;
     }
     
     var uri = root + "/employees/employers_action.php";

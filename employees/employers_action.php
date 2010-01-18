@@ -102,6 +102,56 @@ if ($_POST['action'] == 'get_employer') {
         exit();
     }
     
+    $subscription_expire_on = explode('-', $result[0]['subscription_expire_on']);
+    $year = $subscription_expire_on[0];
+    
+    $day = $subscription_expire_on[2];
+    if (substr($day, 0, 1) == '0') {
+        $day = substr($day, 1, 1);
+    }
+    
+    $month = '???';
+    switch ($subscription_expire_on[1]) {
+        case '01':
+            $month = 'Jan';
+            break;
+        case '02':
+            $month = 'Feb';
+            break;
+        case '03':
+            $month = 'Mar';
+            break;
+        case '04':
+            $month = 'Apr';
+            break;
+        case '05':
+            $month = 'May';
+            break;
+        case '06':
+            $month = 'Jun';
+            break;
+        case '07':
+            $month = 'Jal';
+            break;
+        case '08':
+            $month = 'Aug';
+            break;
+        case '09':
+            $month = 'Sep';
+            break;
+        case '10':
+            $month = 'Oct';
+            break;
+        case '11':
+            $month = 'Nov';
+            break;
+        case '12':
+            $month = 'Dec';
+            break;
+    }
+    
+    $result[0]['formatted_subscription_expire_on'] = $day. ' '. $month. ', '. $year;
+    
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array(array('employer' => $result));
     exit();
@@ -182,8 +232,14 @@ if ($_POST['action'] == 'save_profile') {
         $data['registered_by'] = $_POST['employee'];
         $data['registered_through'] = 'M';
         $data['joined_on'] = now();
-        $data['slots'] = $_POST['slots'];
-        $data['slots_expire_on'] = sql_date_add($data['joined_on'], 3, 'month');
+        $data['used_free_posting'] = 0;
+        
+        $subscription_expire_on = $data['joined_on'];
+        if ($_POST['subscription_period'] > 0) {
+            $subscription_expire_on = sql_date_add($data['joined_on'], $_POST['subscription_period'], 'month');
+        }
+        $data['subscription_expire_on'] = $subscription_expire_on;
+        
         if (!$employer->create($data)) {
             echo 'ko';
             exit();
