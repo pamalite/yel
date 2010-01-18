@@ -35,17 +35,10 @@ if (!$invoice) {
 }
 
 $employer = new Employer($invoice[0]['employer']);
-$query = "SELECT currencies.symbol 
-          FROM currencies 
-          LEFT JOIN employers ON currencies.country_code = employers.country 
-          WHERE employers.id = '". $employer->id(). "' LIMIT 1";
-$mysqli = Database::connect();
-$result = $mysqli->query($query);
-$currency = '???';
-if (count($result) > 0 && !is_null($result)) {
-    $currency = $result[0]['symbol'];
-}
-
+$branch = $employer->get_branch();
+$branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
+$branch['address_lines'] = explode("\n", $branch[0]['address']);
+$currency = Currency::symbol_from_country_code($branch[0]['country']);
 $amount_payable = 0.00;
 foreach($items as $i=>$item) {
     $amount_payable += $item['amount'];
@@ -53,9 +46,6 @@ foreach($items as $i=>$item) {
 }
 $amount_payable = number_format($amount_payable, 2, '.', ', ');
 $invoice_or_receipt = (is_null($invoice[0]['paid_on']) || empty($invoice[0]['paid_on'])) ? 'Invoice' : 'Receipt';
-$branch = $employer->get_branch();
-$branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
-$branch['address_lines'] = explode("\n", $branch[0]['address']);
 
 class InvoicePdf extends FPDF   {
     private $invoiceType;
@@ -111,7 +101,7 @@ class InvoicePdf extends FPDF   {
         
         $this->Cell(5, 3, "E-mail:", 0, 0);
         $this->Cell(11);
-        $this->Cell(5, 3, "sales@yellowelevator.com", 0, 2);
+        $this->Cell(5, 3, "sales.". strtolower($this->branch[0]['country']). "@yellowelevator.com", 0, 2);
         $this->Cell(-16);
         
         $this->Cell(5, 3, "Mailing Address:", 0, 0);
@@ -241,7 +231,7 @@ $pdf->Cell(0, 0, "This invoice was automatically generated. Signature is not req
 $pdf->Ln(6);
 $pdf->Cell(0, 5, "Payment Notice",'LTR',0,'C');
 $pdf->Ln();
-$pdf->Cell(0, 5, "- Payment shall be made payable to Yellow Elevator Sdn. Bhd.", 'LR', 0, 'C');
+$pdf->Cell(0, 5, "- Payment shall be made payable to ". $branch[0]['branch']. ".", 'LR', 0, 'C');
 $pdf->Ln();
 $pdf->Cell(0, 5, "- To facilitate the processing of the payment, please write down the invoice number(s) on your cheque(s)/payment slip(s)", 'LBR', 0, 'C');
 $pdf->Ln(10);

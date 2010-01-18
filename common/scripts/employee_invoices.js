@@ -86,7 +86,7 @@ function show_new_invoices() {
                             type = 'Service Fee';
                             break;
                         case 'J':
-                            type = 'Job';
+                            type = 'Subscription';
                             break;
                     }
 
