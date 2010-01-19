@@ -103,7 +103,7 @@ if ($_POST['action'] == 'buy_subscriptions') {
     $pdf->Ln(6);
     $pdf->Cell(0, 5, "Payment Notice",'LTR',0,'C');
     $pdf->Ln();
-    $pdf->Cell(0, 5, "- Payment shall be made payable to Yellow Elevator Sdn. Bhd.", 'LR', 0, 'C');
+    $pdf->Cell(0, 5, "- Payment shall be made payable to ". $branch_raw[0]['branch']. ".", 'LR', 0, 'C');
     $pdf->Ln();
     $pdf->Cell(0, 5, "- To facilitate the processing of the payment, please write down the invoice number(s) on your cheque(s)/payment slip(s)", 'LBR', 0, 'C');
     $pdf->Ln(10);
@@ -144,14 +144,14 @@ if ($_POST['action'] == 'buy_subscriptions') {
     $body .= 'Content-Disposition: attachment'. "\n";
     $body .= $attachment. "\n";
     $body .= '--yel_mail_sep_'. $invoice. "--\n\n";
-    // mail($employer->get_email_address(), $subject, $body, $headers);
+    mail($employer->get_email_address(), $subject, $body, $headers);
     
-    $handle = fopen('/tmp/email_to_'. $employer->get_email_address(). '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $body);
-    fclose($handle);
+    // $handle = fopen('/tmp/email_to_'. $employer->get_email_address(). '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $body);
+    // fclose($handle);
     
-    // unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
+    unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
     
     // 3. extend the subscription
     if ($employer->extend_subscription($_POST['period']) === false) {

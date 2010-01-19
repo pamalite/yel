@@ -859,20 +859,11 @@ if ($_POST['action'] == 'employ_candidate') {
             
             Invoice::accompany_credit_note_with($previous_invoice, $invoice, $issued_on, $credit_amount);
             
-            $query = "SELECT currencies.symbol 
-                      FROM currencies 
-                      LEFT JOIN employers ON currencies.country_code = employers.country 
-                      WHERE employers.id = '". $employer->id(). "' LIMIT 1";
-            $mysqli = Database::connect();
-            $result = $mysqli->query($query);
-            $currency = '???';
-            if (count($result) > 0 && !is_null($result)) {
-                $currency = $result[0]['symbol'];
-            }
-            
             $branch = $employer->get_branch();
+            $sales = 'sales.'. strtolower($branch_raw[0]['country']). '@yellowelevator.com';
             $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
             $branch['address_lines'] = explode("\n", $branch[0]['address']);
+            $currency = Currency::symbol_from_country_code($branch[0]['country']);
             
             $pdf = new CreditNote();
             $pdf->AliasNbPages();
@@ -935,7 +926,7 @@ if ($_POST['action'] == 'employ_candidate') {
 
             $subject = "Balance Refund Notice of Invoice ". pad($previous_invoice, 11, '0');
             $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-            $headers .= 'Bcc: sales@yellowelevator.com'. "\n";
+            $headers .= 'Bcc: '. $sales. "\n";
             $headers .= 'MIME-Version: 1.0'. "\n";
             $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $filename. '";'. "\n\n";
 
