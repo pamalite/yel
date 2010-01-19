@@ -324,19 +324,13 @@ class EmployerJobsPage extends Page {
                         <td class="label"><label for="subscription">Subscription:</label></td>
                         <td>
                             <select id="subscription" name="subscription" onChange="calculate_fee();">
-                                <option value="0">Select a Subscription Period</option>
+                                <option value="0" selected>Select a Subscription Period</option>
                                 <option value="0" disabled>&nbsp;</option>
                         <?php
                             foreach ($subscriptions as $period => $price) {
-                                if ($period == '1') {
-                        ?>
-                                <option id="<?php echo $period; ?>" value="<?php echo $price; ?>">1 month (<?php echo $payment_currency. ' $'. $price; ?>)</option>
-                        <?php
-                                } else {
                         ?>
                                 <option id="<?php echo $period; ?>" value="<?php echo $price; ?>"><?php echo $period. ' months ('. $payment_currency. ' $'. $price. ')'; ?></option>
-                        <?php                        
-                                }
+                        <?php
                             }
                         ?>
                             </select>

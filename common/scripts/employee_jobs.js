@@ -251,7 +251,7 @@ function publish_job() {
                 alert('The account is not set up yet');
                 return false;
             } else if (txt == '-2') {
-                alert('The employer\'s subscription is expired.');
+                alert('The employer\'s subscription has expired/suspended.');
                 return false;
             } else {
                 alert('Sorry! We are not able to publish the new job at the moment. Please try again later.');
@@ -677,7 +677,7 @@ function extend_job(job_id) {
         return;
     }
     
-    var params = 'id=' + job_id + '&action=extend';
+    var params = 'id=' + job_id + '&employer=' + selected_employer_id + '&action=extend';
     var uri = root + "/employees/jobs_action.php";
     var request = new Request({
         url: uri,
@@ -686,7 +686,10 @@ function extend_job(job_id) {
             if (txt == 'ko') {
                 set_status('An error occured while extending job.');
                 return false;
-            } 
+            } else if (txt == '-2') {
+                alert('The employer\'s subscription has expired/suspended.');
+                return false;
+            }
             
             //show_job(job_id);
             show_open_jobs_with_selected_employer();

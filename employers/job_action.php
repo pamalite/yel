@@ -60,13 +60,18 @@ if ($_POST['action'] == 'publish') {
     $mysqli = Database::connect();
     $employer = new Employer($_POST['employer']);
     
-    // check whether employer can use free job posting?
-    if (!$employer->has_free_job_posting()) {
-        // check whether subscription has expired
-        $result = $employer->get_subscriptions_details();
-        if ($result[0]['expired'] < 0) {
-            echo '-2';
-            exit();
+    // check whether employer has free job postings?
+    if (!$employer->has_free_job_postings()) {
+        // check whether employer has paid job postings?
+        if ($employer->has_paid_job_postings() === false) {
+            // check whether subscription has expired
+            $result = $employer->get_subscriptions_details();
+            if ($result[0]['expired'] < 0 || $result[0]['subscription_suspended'] != '0') {
+                echo '-2';
+                exit();
+            }
+        } else {
+            $employer->used_paid_job_posting();
         }
     } else {
         $employer->used_free_job_posting();
@@ -268,10 +273,21 @@ if ($_POST['action'] == 'extend') {
     
     // check whether subscription has expired
     $employer = new Employer($_POST['employer']);
-    $result = $employer->get_subscriptions_details();
-    if ($result[0]['expired'] < 0) {
-        echo '-2';
-        exit();
+    
+    if ($employer->has_free_job_postings() === false) {
+        // check whether employer has paid job postings?
+        if ($employer->has_paid_job_postings() === false) {
+            // check whether subscription has expired
+            $result = $employer->get_subscriptions_details();
+            if ($result[0]['expired'] < 0 || $result[0]['subscription_suspended'] != '0') {
+                echo '-2';
+                exit();
+            }
+        } else {
+            $employer->used_paid_job_posting();
+        }
+    } else {
+        $employer->used_free_job_posting();
     }
     
     $query = "INSERT INTO job_extensions 

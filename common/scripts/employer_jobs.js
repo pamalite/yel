@@ -218,7 +218,7 @@ function publish_job() {
                 set_status('');
                 return false;
             } else if (txt == '-2') {
-                alert('Your subscription has expired. Please extend/renew it from the top of the page.');
+                alert('Your subscription has expired/suspended. Please extend/renew it from the top of the page.');
                 set_status('');
                 return false;
             } else {
@@ -228,6 +228,7 @@ function publish_job() {
             }
             
             $('div_tabs').setStyle('display', 'block');
+            get_subscriptions_details();
             show_open_jobs();
         },
         onRequest: function(instance) {
@@ -692,7 +693,7 @@ function extend_job(job_id) {
         return;
     }
     
-    var params = 'job=' + job_id + '&action=extend';
+    var params = 'job=' + job_id + '&employer=' + id + '&action=extend';
     var uri = root + "/employers/job_action.php";
     var request = new Request({
         url: uri,
@@ -702,11 +703,12 @@ function extend_job(job_id) {
                 set_status('An error occured while extending job.');
                 return false;
             } else if (txt == '-2') {
-                alert('Your subscription has expired. Please extend/renew it from the top of this page.');
+                alert('Your subscription has expired/suspended. Please extend/renew it from the top of this page.');
                 return false;
             }
             
             //show_job(job_id);
+            get_subscriptions_details();
             show_open_jobs();
             set_status('');
         },
@@ -898,7 +900,7 @@ function select_all_jobs() {
 }
 
 function get_subscriptions_details() {
-    $('subscriptions_expiry').set('html', '(Free Job Postings)');
+    $('subscriptions_expiry').set('html', 'Loading...');
     $('subscriptions_expiry').setStyle('color', '#666666');
     $('buy_subscriptions_button').disabled = true;
     $('buy_subscriptions_button').src = '../common/images/button_buy_now_disabled.gif';
@@ -919,19 +921,33 @@ function get_subscriptions_details() {
             if (txt != '-1') {
                 var expired = xml.getElementsByTagName('expired');
                 var expire_on = xml.getElementsByTagName('formatted_expire_on');
-                var has_free_posting = xml.getElementsByTagName('has_free_posting');
+                var has_free_posting = xml.getElementsByTagName('has_free_postings');
+                var has_paid_posting = xml.getElementsByTagName('has_paid_postings');
+                var suspended = xml.getElementsByTagName('subscription_suspended');
                 
-                if (has_free_posting[0].childNodes[0].nodeValue == '0') {
-                    $('subscriptions_expiry').set('html', expire_on[0].childNodes[0].nodeValue);
+                if (suspended[0].childNodes[0].nodeValue == '1') {
+                    $('subscriptions_expiry').set('html', 'Your Subscription Has Been Suspended.');
+                    $('subscriptions_expiry').setStyle('color', '#FF0000');
+                } else {
+                    if (has_free_posting[0].childNodes[0].nodeValue == '0') {
+                        $('buy_subscriptions_button').disabled = false;
+                        $('buy_subscriptions_button').src = '../common/images/button_buy_now.gif';
 
-                    if (parseInt(expired[0].childNodes[0].nodeValue) < 0) {
-                        $('subscriptions_expiry').setStyle('color', '#FF0000');
+                        if (parseInt(has_paid_posting[0].childNodes[0].nodeValue) > 0) {
+                            $('subscriptions_expiry').set('html', '(' + has_paid_posting[0].childNodes[0].nodeValue + ' Paid Job Posting(s) Left)');
+                            $('subscriptions_expiry').setStyle('color', '#666666');
+                        } else {
+                            $('subscriptions_expiry').set('html', expire_on[0].childNodes[0].nodeValue);
+
+                            if (parseInt(expired[0].childNodes[0].nodeValue) < 0) {
+                                $('subscriptions_expiry').setStyle('color', '#FF0000');
+                            } else {
+                                $('subscriptions_expiry').setStyle('color', '#0D9C0D');
+                            }
+                        }
                     } else {
-                        $('subscriptions_expiry').setStyle('color', '#0D9C0D');
+                        $('subscriptions_expiry').set('html', '(' + has_free_posting[0].childNodes[0].nodeValue + ' Free Job Posting(s) Left)');
                     }
-
-                    $('buy_subscriptions_button').disabled = false;
-                    $('buy_subscriptions_button').src = '../common/images/button_buy_now.gif';
                 }
             }
         }

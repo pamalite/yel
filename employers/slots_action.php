@@ -15,7 +15,8 @@ $xml_dom = new XMLDOM();
 if ($_POST['action'] == 'get_subscriptions_details') {
     $employer = new Employer($_POST['id']);
     $result = $employer->get_subscriptions_details();
-    $result[0]['has_free_posting'] = ($employer->has_free_job_posting()) ? '1' : '0';
+    $result[0]['has_free_postings'] = ($employer->has_free_job_postings() === false) ? '0' : $employer->has_free_job_postings();
+    $result[0]['has_paid_postings'] = ($employer->has_paid_job_postings() === false) ? '0' : $employer->has_paid_job_postings();
     $response = array('subscription' => $result[0]);
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);

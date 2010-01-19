@@ -214,6 +214,7 @@ if ($_POST['action'] == 'save_profile') {
     //$data['bonus_months'] = $_POST['bonus_months'];
     $data['payment_terms_days'] = $_POST['payment_terms_days'];
     $data['branch'] = $branch;
+    $data['paid_postings_left'] = $_POST['paid_postings'];
     
     $data['website_url'] = $_POST['website_url'];
     if (substr($_POST['website_url'], 0, 4) != 'http') {
@@ -232,7 +233,7 @@ if ($_POST['action'] == 'save_profile') {
         $data['registered_by'] = $_POST['employee'];
         $data['registered_through'] = 'M';
         $data['joined_on'] = now();
-        $data['used_free_posting'] = 0;
+        $data['free_postings_left'] = $_POST['free_postings'];
         
         $subscription_expire_on = $data['joined_on'];
         if ($_POST['subscription_period'] > 0) {

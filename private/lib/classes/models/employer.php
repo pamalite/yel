@@ -351,7 +351,7 @@ class Employer {
     public function get_subscriptions_details() {
         $query = "SELECT DATEDIFF(subscription_expire_on, NOW()) AS expired, 
                   DATE_FORMAT(subscription_expire_on, '%e %b, %Y') AS formatted_expire_on, 
-                  subscription_expire_on 
+                  subscription_expire_on, subscription_suspended 
                   FROM employers 
                   WHERE id = '". $this->id. "' LIMIT 1";
         return $this->mysqli->query($query);
@@ -392,19 +392,36 @@ class Employer {
         return $this->mysqli->execute($query);
     }
     
-    public function has_free_job_posting() {
-        $query = "SELECT used_free_posting FROM employers 
+    public function has_free_job_postings() {
+        $query = "SELECT free_postings_left FROM employers 
                   WHERE id = '". $this->id. "'";
         $result = $this->mysqli->query($query);
-        if ($result[0]['used_free_posting'] == true) {
+        if ($result[0]['free_postings_left'] <= 0) {
             return false;
         }
         
-        return true;
+        return $result[0]['free_postings_left'];
     }
     
     public function used_free_job_posting() {
-        $query = "UPDATE employers SET used_free_posting = TRUE 
+        $query = "UPDATE employers SET free_postings_left = free_postings_left - 1 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
+    public function has_paid_job_postings() {
+        $query = "SELECT paid_postings_left FROM employers 
+                  WHERE id = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['paid_postings_left'] <= 0) {
+            return false;
+        }
+        
+        return $result[0]['paid_postings_left'];
+    }
+    
+    public function used_paid_job_posting() {
+        $query = "UPDATE employers SET paid_postings_left = paid_postings_left - 1 
                   WHERE id = '". $this->id. "'";
         return $this->mysqli->execute($query);
     }

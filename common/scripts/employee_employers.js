@@ -71,8 +71,21 @@ function validate_profile_form() {
             return false;
         }
         
-        if (isEmpty($('slots').value) || isNaN($('slots').value) || parseInt($('slots').value) <= 0) {
-            set_status('Default job slots must be at least 1 or more.');
+        if (isEmpty($('free_postings').value) || isNaN($('free_postings').value)) {
+            $('free_postings').value = '0';
+        }
+        
+        if (parseInt($('free_postings').value) < 0) {
+            set_status('Free Job Postings must be either 0 or more.');
+            return false;
+        }
+        
+        if (isEmpty($('paid_postings').value) || isNaN($('paid_postings').value)) {
+            $('paid_postings').value = '0';
+        }
+        
+        if (parseInt($('paid_postings').value) < 0) {
+            set_status('Paid Job Postings must be either 0 or more.');
             return false;
         }
     }
@@ -266,6 +279,8 @@ function add_new_employer() {
     $('subscription_period_label').setStyle('display', 'none');
     $('subscription_period').setStyle('display', 'block');
     $('subscription_period').selectedIndex = 0;
+    $('free_postings').value = '1';
+    $('paid_postings').value = '0';
 }
 
 function new_from_employer(_employer_id) {
@@ -355,6 +370,8 @@ function new_from_employer(_employer_id) {
             $('subscription_period_label').setStyle('display', 'none');
             $('subscription_period').setStyle('display', 'block');
             $('subscription_period').selectedIndex = 0;
+            $('free_postings').value = '1';
+            $('paid_postings').value = '0';
             
             set_status('');
         },
@@ -421,6 +438,8 @@ function show_employer_profile() {
             var payment_terms_days = xml.getElementsByTagName('payment_terms_days');
             var website_urls = xml.getElementsByTagName('website_url');
             var subscription_expire_ons = xml.getElementsByTagName('formatted_subscription_expire_on');
+            var free_postings = xml.getElementsByTagName('free_postings_left');
+            var paid_postings = xml.getElementsByTagName('paid_postings_left');
             
             $('user_id_placeholder').set('html', ids[0].childNodes[0].nodeValue);
             $('password_placeholder').set('html', '<input type="button" value="Reset Password" onClick="reset_password();" />');
@@ -464,6 +483,11 @@ function show_employer_profile() {
             $('subscription_period_label').setStyle('display', 'block');
             $('subscription_period_label').setStyle('color', '#666666');
             $('subscription_period_label').set('html', '(Expires On: ' + subscription_expire_ons[0].childNodes[0].nodeValue + ')');
+            
+            $('free_postings').disabled = true;
+            $('free_postings').value = free_postings[0].childNodes[0].nodeValue;
+            
+            $('paid_postings').value = paid_postings[0].childNodes[0].nodeValue;
             
             set_status('');
         },
@@ -923,11 +947,13 @@ function save_profile() {
     //params = params + '&bonus_months=' + $('bonus_months').value;
     params = params + '&payment_terms_days=' + $('payment_terms_days').options[$('payment_terms_days').selectedIndex].value;
     params = params + '&website_url=' + $('website_url').value;
+    params = params + '&paid_postings=' + $('paid_postings').value;
     
     if (mode == 'create') {
         params = params + '&user_id=' + $('user_id').value;
         params = params + '&password=' + $('password').value;
         params = params + '&subscription_period=' + $('subscription_period').options[$('subscription_period').selectedIndex].value;
+        params = params + '&free_postings=' + $('free_postings').value;
     }
     
     var uri = root + "/employees/employers_action.php";
