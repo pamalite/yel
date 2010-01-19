@@ -136,6 +136,10 @@ if ($_POST['action'] == 'buy_subscriptions') {
     $message = str_replace('%currency%', $currency, $message);
     $message = str_replace('%amount%', number_format($_POST['amount'], 2, '.', ', '), $message);
     
+    $issued_date = explode('-', $data['issued_on']);
+    $issued_timestamp = $issued_date[0]. $issued_date[1]. $issued_date[2];
+    $message = str_replace('%purchased_on%', date('j M, Y', $issued_timestamp), $message);
+    
     $body .= $message. "\n";
     $body .= '--yel_mail_sep_alt_'. $invoice. "--\n\n";
     $body .= '--yel_mail_sep_'. $invoice. "\n";
