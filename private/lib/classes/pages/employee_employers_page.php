@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
+require_once dirname(__FILE__). "/../../../config/subscriptions_rate.inc";
 
 class EmployeeEmployersPage extends Page {
     private $employee = NULL;
@@ -37,6 +38,10 @@ class EmployeeEmployersPage extends Page {
         $this->begin();
         $this->top_employee($this->employee->get_name(). " - My Employers");
         $this->menu_employee($this->clearances, 'employers');
+        
+        $subscriptions_rates = $GLOBALS['subscriptions_rates'];
+        $branch = $this->employee->get_branch();
+        $available_subscriptions = $subscriptions_rates[Currency::symbol_from_country_code($branch[0]['country_code'])];
         
         ?>
         <div id="div_status" class="status">
@@ -171,10 +176,13 @@ class EmployeeEmployersPage extends Page {
                                     <option value="0" selected>No subscription purchased</option>
                                     <option value="0" disabled>&nbsp;</option>
                                     <option value="1">1 month</option>
-                                    <option value="3">3 months</option>
-                                    <option value="6">6 months</option>
-                                    <option value="9">9 months</option>
-                                    <option value="12">12 months</option>
+                                <?php
+                                foreach ($available_subscriptions as $month => $price) {
+                                ?>
+                                    <option value="<?php echo $month; ?>"><?php echo $month; ?> months</option>
+                                <?php
+                                }
+                                ?>
                                 </select>
                             </td>
                         </tr>

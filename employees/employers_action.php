@@ -216,6 +216,17 @@ if ($_POST['action'] == 'save_profile') {
     $data['branch'] = $branch;
     $data['paid_postings_left'] = $_POST['paid_postings'];
     
+    // check need to issue paid postings invoice or not
+    $send_postings_invoice = false;
+    $new_postings = 0;
+    if (isset($_POST['add_paid_postings'])) {
+        if ($_POST['add_paid_postings'] > 0 && !empty($_POST['add_paid_postings'])) {
+            $send_postings_invoice = true;
+            $new_postings = $_POST['add_paid_postings'];
+            $data['paid_postings_left'] = $_POST['paid_postings'] + $_POST['add_paid_postings'];
+        }
+    }
+    
     $data['website_url'] = $_POST['website_url'];
     if (substr($_POST['website_url'], 0, 4) != 'http') {
         $data['website_url'] = 'http://'. $_POST['website_url'];
@@ -261,6 +272,10 @@ if ($_POST['action'] == 'save_profile') {
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         mail($_POST['email_addr'], $subject, $message, $headers);
         
+    }
+    
+    if ($send_postings_invoice) {
+        // TODO: generate invoice and send it to employer, BCC sales.xx
     }
     
     echo 'ok';

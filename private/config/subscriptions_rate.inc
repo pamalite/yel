@@ -4,19 +4,23 @@
  * more currencies. 
  */
 
-// default - MYR 
+// subscriptions default - MYR 
 $subscriptions_rates = array(
     'MYR' => array(
-        '3' => 1500,
-        '6' => 2000,
-        '9' => 2500,
-        '12' => 3000
+        '4' => 3000,
+        '8' => 5000,
+        '12' => 6500
     ),
     'SGD' => array(
-        '3' => 1000,
-        '6' => 1500,
-        '9' => 2000,
-        '12' => 2500
+        '4' => 2500,
+        '8' => 4500,
+        '12' => 6000
     )
+);
+
+// postings default - MYR
+$postings_rates = array(
+    'MYR' => 150,
+    'SGD' => 100
 );
 ?>
