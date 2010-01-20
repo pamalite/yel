@@ -124,7 +124,7 @@ class EmployerJobsPage extends Page {
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
-        <div id="div_slots_info">
+        <!--div id="div_slots_info">
             <table class="slots_info">
                 <tr>
                     <td class="info">
@@ -142,7 +142,7 @@ class EmployerJobsPage extends Page {
                     </td>
                 </tr>
             </table>
-        </div>
+        </div-->
         <div id="div_tabs">
             <ul>
                 <li id="li_open"><span id="open_back_arrow">&lt;&lt;&nbsp;</span>Currently Open</li>

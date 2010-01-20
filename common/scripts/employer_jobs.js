@@ -1267,7 +1267,7 @@ function onDomReady() {
     set_mouse_events();
     get_employer_referrals_count();
     
-    get_slots_left();
+    // get_slots_left();
     
     $('li_open').addEvent('click', show_open_jobs);
     $('li_closed').addEvent('click', show_closed_jobs);

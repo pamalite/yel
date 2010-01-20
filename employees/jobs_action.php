@@ -166,29 +166,29 @@ if ($_POST['action'] == 'publish') {
     // check enough job slots to be used?
     $mysqli = Database::connect();
     $employer = new Employer($_POST['employer']);
-    $query = "SELECT YEAR(joined_on) AS joined_year, MONTH(joined_on) AS joined_month 
-              FROM employers WHERE id = '". $_POST['employer']. "'";
-    $result = $mysqli->query($query);
-    
-    $is_prior = false;
-    $is_expired = false;
-    if ($result[0]['joined_year'] < 2010) {
-        $is_prior = true;
-        $query = "SELECT DATEDIFF(NOW(), DATE_ADD(joined_on, INTERVAL 1 YEAR)) AS expired 
-                  FROM employers WHERE id = '". $_POST['employer']. "'";
-        $result = $mysqli->query($query);
-        if ($result[0]['expired'] > 0) {
-            $is_expired = true;
-        }
-    } 
-    
-    if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
-        $result = $employer->get_slots_left();
-        if ($result[0]['expired'] < 0 || $result[0]['slots'] <= 0) {
-            echo '-2';
-            exit();
-        }
-    }
+    // $query = "SELECT YEAR(joined_on) AS joined_year, MONTH(joined_on) AS joined_month 
+    //           FROM employers WHERE id = '". $_POST['employer']. "'";
+    // $result = $mysqli->query($query);
+    // 
+    // $is_prior = false;
+    // $is_expired = false;
+    // if ($result[0]['joined_year'] < 2010) {
+    //     $is_prior = true;
+    //     $query = "SELECT DATEDIFF(NOW(), DATE_ADD(joined_on, INTERVAL 1 YEAR)) AS expired 
+    //               FROM employers WHERE id = '". $_POST['employer']. "'";
+    //     $result = $mysqli->query($query);
+    //     if ($result[0]['expired'] > 0) {
+    //         $is_expired = true;
+    //     }
+    // } 
+    // 
+    // if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
+    //     $result = $employer->get_slots_left();
+    //     if ($result[0]['expired'] < 0 || $result[0]['slots'] <= 0) {
+    //         echo '-2';
+    //         exit();
+    //     }
+    // }
     
     $id = $_POST['id'];
     $job = '';
@@ -242,12 +242,12 @@ if ($_POST['action'] == 'publish') {
         }
     }
     
-    if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
-        if ($employer->subtract_slots(1) === false) {
-            echo 'ko';
-            exit();
-        }
-    }
+    // if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
+    //     if ($employer->subtract_slots(1) === false) {
+    //         echo 'ko';
+    //         exit();
+    //     }
+    // }
     
     $tmp = explode('/', $GLOBALS['root']);
     $is_test_site = false;
