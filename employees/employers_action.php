@@ -231,10 +231,6 @@ if ($_POST['action'] == 'save_profile') {
             echo 'ko';
             exit();
         }
-        
-        if ($_POST['paid_postings'] > 0 && !empty($_POST['paid_postings'])) {
-            $employer->add_paid_posting($_POST['paid_postings']);
-        }
     } else {
         $employer = new Employer($_POST['user_id']);
         $data['password'] = md5($_POST['password']);
@@ -242,7 +238,6 @@ if ($_POST['action'] == 'save_profile') {
         $data['registered_through'] = 'M';
         $data['joined_on'] = $today;
         $data['free_postings_left'] = $_POST['free_postings'];
-        $data['paid_postings_left'] = $_POST['paid_postings'];
         
         $subscription_expire_on = $data['joined_on'];
         if ($_POST['subscription_period'] > 0) {
@@ -269,11 +264,14 @@ if ($_POST['action'] == 'save_profile') {
         $subject = "Welcome To Yellow Elevator!";
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         mail($_POST['email_addr'], $subject, $message, $headers);
-        
     }
     
     if ($_POST['paid_postings'] > 0 && !empty($_POST['paid_postings'])) {
-        // TODO: generate invoice and send it to employer, BCC sales.xx
+        if ($employer->add_paid_posting($_POST['paid_postings']) === false) {
+            echo 'ko';
+            exit();
+        }
+        
         // 0. get the job postings pricing and currency
         $branch = $employer->get_branch();
         $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
@@ -297,7 +295,7 @@ if ($_POST['action'] == 'save_profile') {
         }
         
         $amount = $price * $_POST['paid_postings']''
-        $desc = $_POST['paid_postings']. ' Job Posting(s) @ '. $currency. ' $'. $price. ' a Post';
+        $desc = $_POST['paid_postings']. ' Job Posting(s) @ '. $currency. ' $'. $price;
         $item_added = Invoice::add_item($invoice, $amount, '1', $desc);
         
         $items = array();
@@ -352,7 +350,7 @@ if ($_POST['action'] == 'save_profile') {
         $pdf->Ln(6);
         $pdf->Cell(0, 5, "Payment Notice",'LTR',0,'C');
         $pdf->Ln();
-        $pdf->Cell(0, 5, "- Payment shall be made payable to ". $branch_raw[0]['branch']. ".", 'LR', 0, 'C');
+        $pdf->Cell(0, 5, "- Payment shall be made payable to ". $branch[0]['branch']. ".", 'LR', 0, 'C');
         $pdf->Ln();
         $pdf->Cell(0, 5, "- To facilitate the processing of the payment, please write down the invoice number(s) on your cheque(s)/payment slip(s)", 'LBR', 0, 'C');
         $pdf->Ln(10);
@@ -369,7 +367,44 @@ if ($_POST['action'] == 'save_profile') {
         $headers .= 'MIME-Version: 1.0'. "\n";
         $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $invoice. '";'. "\n\n";
         
-        // TODO: Complete this section
+        $body = '--yel_mail_sep_'. $invoice. "\n";
+        $body .= 'Content-Type: multipart/alternative; boundary="yel_mail_sep_alt_'. $invoice. '"'. "\n";
+        $body .= '--yel_mail_sep_alt_'. $invoice. "\n";
+        $body .= 'Content-Type: text/plain; charset="iso-8859-1"'. "\n";
+        $body .= 'Content-Transfer-Encoding: 7bit"'. "\n";
+
+        $mail_lines = file('../private/mail/employer_posting_invoice.txt');
+        $message = '';
+        foreach ($mail_lines as $line) {
+           $message .= $line;
+        }
+
+        $message = str_replace('%employer%', $employer->get_name(), $message);
+        $message = str_replace('%postings%', $_POST['paid_postings'], $message);
+        $message = str_replace('%price%', $price, $message);
+        $message = str_replace('%currency%', $currency, $message);
+        $message = str_replace('%amount%', number_format($amount, 2, '.', ', '), $message);
+
+        $issued_date = explode('-', $data['issued_on']);
+        $issued_timestamp = $issued_date[0]. $issued_date[1]. $issued_date[2];
+        $message = str_replace('%purchased_on%', date('j M, Y', $issued_timestamp), $message);
+
+        $body .= $message. "\n";
+        $body .= '--yel_mail_sep_alt_'. $invoice. "--\n\n";
+        $body .= '--yel_mail_sep_'. $invoice. "\n";
+        $body .= 'Content-Type: application/pdf; name="yel_invoice_'. pad($invoice, 11, '0'). '.pdf"'. "\n";
+        $body .= 'Content-Transfer-Encoding: base64'. "\n";
+        $body .= 'Content-Disposition: attachment'. "\n";
+        $body .= $attachment. "\n";
+        $body .= '--yel_mail_sep_'. $invoice. "--\n\n";
+        // mail($employer->get_email_address(), $subject, $body, $headers);
+
+        $handle = fopen('/tmp/email_to_'. $employer->get_email_address(). '.txt', 'w');
+        fwrite($handle, 'Subject: '. $subject. "\n\n");
+        fwrite($handle, $body);
+        fclose($handle);
+
+        // unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
     }
     
     echo 'ok';

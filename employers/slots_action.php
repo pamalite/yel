@@ -143,7 +143,7 @@ if ($_POST['action'] == 'buy_subscriptions') {
     $body .= $message. "\n";
     $body .= '--yel_mail_sep_alt_'. $invoice. "--\n\n";
     $body .= '--yel_mail_sep_'. $invoice. "\n";
-    $body .= 'Content-Type: application/pdf; name="yel_credit_note_'. pad($invoice, 11, '0'). '.pdf"'. "\n";
+    $body .= 'Content-Type: application/pdf; name="yel_invoice_'. pad($invoice, 11, '0'). '.pdf"'. "\n";
     $body .= 'Content-Transfer-Encoding: base64'. "\n";
     $body .= 'Content-Disposition: attachment'. "\n";
     $body .= $attachment. "\n";
