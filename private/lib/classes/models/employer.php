@@ -426,6 +426,12 @@ class Employer {
         return $this->mysqli->execute($query);
     }
     
+    public function add_paid_job_posting($_postings) {
+        $query = "UPDATE employers SET paid_postings_left = paid_postings_left + $_postings 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
     public function create_fee($data) {
         if (is_null($data) || !is_array($data)) {
             return false;

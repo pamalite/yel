@@ -669,6 +669,17 @@ class Member {
         return $this->mysqli->execute($query);
     }
     
+    public function is_IRC() {
+        $query = "SELECT individual_headhunter FROM members WHERE 
+                  email_addr = '". $this->id(). "' LIMIT 1";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['individual_headhunter'] == '1') {
+            return true;
+        }
+        
+        return false;
+    }
+    
     public static function find($criteria, $db = "") {
         if (is_null($criteria) || !is_array($criteria)) {
             return false;

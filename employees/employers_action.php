@@ -1,5 +1,7 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
+require_once dirname(__FILE__). "/paid_postings_invoice.php";
+require_once dirname(__FILE__). "/../private/config/subscriptions_rate.inc";
 
 session_start();
 
@@ -187,6 +189,8 @@ if ($_POST['action'] == 'reset_password') {
 }
 
 if ($_POST['action'] == 'save_profile') {
+    $today = now();
+    
     $mode = 'update';
     if ($_POST['id'] == '0') {
         $mode = 'create';
@@ -214,37 +218,31 @@ if ($_POST['action'] == 'save_profile') {
     //$data['bonus_months'] = $_POST['bonus_months'];
     $data['payment_terms_days'] = $_POST['payment_terms_days'];
     $data['branch'] = $branch;
-    $data['paid_postings_left'] = $_POST['paid_postings'];
-    
-    // check need to issue paid postings invoice or not
-    $send_postings_invoice = false;
-    $new_postings = 0;
-    if (isset($_POST['add_paid_postings'])) {
-        if ($_POST['add_paid_postings'] > 0 && !empty($_POST['add_paid_postings'])) {
-            $send_postings_invoice = true;
-            $new_postings = $_POST['add_paid_postings'];
-            $data['paid_postings_left'] = $_POST['paid_postings'] + $_POST['add_paid_postings'];
-        }
-    }
     
     $data['website_url'] = $_POST['website_url'];
     if (substr($_POST['website_url'], 0, 4) != 'http') {
         $data['website_url'] = 'http://'. $_POST['website_url'];
     }
     
+    $employer = NULL;
     if ($mode == 'update') {
         $employer = new Employer($_POST['id']);
         if (!$employer->update($data)) {
             echo 'ko';
             exit();
         }
+        
+        if ($_POST['paid_postings'] > 0 && !empty($_POST['paid_postings'])) {
+            $employer->add_paid_posting($_POST['paid_postings']);
+        }
     } else {
         $employer = new Employer($_POST['user_id']);
         $data['password'] = md5($_POST['password']);
         $data['registered_by'] = $_POST['employee'];
         $data['registered_through'] = 'M';
-        $data['joined_on'] = now();
+        $data['joined_on'] = $today;
         $data['free_postings_left'] = $_POST['free_postings'];
+        $data['paid_postings_left'] = $_POST['paid_postings'];
         
         $subscription_expire_on = $data['joined_on'];
         if ($_POST['subscription_period'] > 0) {
@@ -274,8 +272,104 @@ if ($_POST['action'] == 'save_profile') {
         
     }
     
-    if ($send_postings_invoice) {
+    if ($_POST['paid_postings'] > 0 && !empty($_POST['paid_postings'])) {
         // TODO: generate invoice and send it to employer, BCC sales.xx
+        // 0. get the job postings pricing and currency
+        $branch = $employer->get_branch();
+        $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
+        $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
+        $branch['address_lines'] = explode("\n", $branch[0]['address']);
+        $posting_rates = $GLOBALS['postings_rates'];
+        $currency = Currency::symbol_from_country_code($branch[0]['country']);
+        $price = $posting_rates[$currency];
+        
+        // 1. generate invoice in the system
+        $data = array();
+        $data['issued_on'] = $today;
+        $data['type'] = 'P';
+        $data['employer'] = $_POST['id'];
+        $data['payable_by'] = sql_date_add($today, $employer->get_payment_terms_days(), 'day');
+        
+        $invoice = Invoice::create($data);
+        if ($invoice === false) {
+            echo 'ko';
+            exit();
+        }
+        
+        $amount = $price * $_POST['paid_postings']''
+        $desc = $_POST['paid_postings']. ' Job Posting(s) @ '. $currency. ' $'. $price. ' a Post';
+        $item_added = Invoice::add_item($invoice, $amount, '1', $desc);
+        
+        $items = array();
+        $items[0]['itemdesc'] = $desc;
+        $items[0]['amount'] = number_format($amount, '2', '.', ', ');
+        
+        // 2. generate the invoice as PDF file
+        $pdf = new PaidPostingInvoice();
+        $pdf->AliasNbPages();
+        $pdf->SetAuthor('Yellow Elevator. This invoice was automatically generated. Signature is not required.');
+        $pdf->SetTitle($GLOBALS['COMPANYNAME']. ' - Invoice '. pad($invoice, 11, '0'));
+        $pdf->SetCurrency($currency);
+        $pdf->SetBranch($branch);
+        $pdf->AddPage();
+        $pdf->SetFont('Arial', '', 10);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetFillColor(54, 54, 54);
+        $pdf->Cell(60, 5, "Invoice Number",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, "Issuance Date",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, "Payable By",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, "Amount Payable (". $currency. ")",1,0,'C',1);
+        $pdf->Ln(6);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(60, 5, pad($invoice, 11, '0'),1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, $data['issued_on'],1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, $data['payable_by'],1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, number_format($amount, '2', '.', ', '),1,0,'C');
+        $pdf->Ln(6);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->Cell(60, 5, "User ID",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, "Employer Name",1,0,'C',1);
+        $pdf->Ln(6);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(60, 5, $employer->id(),1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, $employer->get_name(),1,0,'C');
+        $pdf->Ln(10);
+
+        $table_header = array("No.", "Item", "Amount (". $currency. ")");
+        $pdf->FancyTable($table_header, $items, number_format($amount, '2', '.', ', '));
+
+        $pdf->Ln(13);
+        $pdf->SetFont('','I');
+        $pdf->Cell(0, 0, "This invoice was automatically generated. Signature is not required.", 0, 0, 'C');
+        $pdf->Ln(6);
+        $pdf->Cell(0, 5, "Payment Notice",'LTR',0,'C');
+        $pdf->Ln();
+        $pdf->Cell(0, 5, "- Payment shall be made payable to ". $branch_raw[0]['branch']. ".", 'LR', 0, 'C');
+        $pdf->Ln();
+        $pdf->Cell(0, 5, "- To facilitate the processing of the payment, please write down the invoice number(s) on your cheque(s)/payment slip(s)", 'LBR', 0, 'C');
+        $pdf->Ln(10);
+        $pdf->Cell(0, 0, "E. & O. E.", 0, 0, 'C');
+        $pdf->Close();
+        $pdf->Output($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf', 'F');
+        
+        // 3. sends it as an email
+        $attachment = chunk_split(base64_encode(file_get_contents($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf')));
+
+        $subject = "Subscription Invoice ". pad($invoice, 11, '0');
+        $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+        $headers .= 'Bcc: '. $sales. "\n";
+        $headers .= 'MIME-Version: 1.0'. "\n";
+        $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $invoice. '";'. "\n\n";
+        
+        // TODO: Complete this section
     }
     
     echo 'ok';

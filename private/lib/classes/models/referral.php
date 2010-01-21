@@ -202,7 +202,7 @@ class Referral {
         return $mysqli->query($query);
     }
     
-    public static function calculate_total_reward_from($_salary, $_employer) {
+    public static function calculate_total_reward_from($_salary, $_employer, $_is_for_irc = false) {
         if (empty($_salary) || $_salary < 0 || empty($_employer)) {
             return false;
         }
@@ -235,6 +235,9 @@ class Referral {
         }
         
         $reward_percentage = ($fees[0]['reward_percentage'] / 100.00);
+        if ($_is_for_irc) {
+            $reward_percentage = 0.5;
+        }
         
         return (((($_salary * $total_fees) * $discount) + $charges) * $reward_percentage);
     }

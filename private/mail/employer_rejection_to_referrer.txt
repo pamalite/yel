@@ -1,11 +1,17 @@
 Hi %referrer%,
 
-We would like to inform you that %candidate% (email: %candidate_email%) 
-is not shortlisted for the %job% position at %employer%.
+We regretfully inform you that your referred candidate 
+%candidate% (email: %candidate_email%) was not shortlisted for 
+the %job% position at %employer%.
 
-Decisions pertaining to a candidate's suitability are solely made by the 
-employer. The employer also may or may not provide any reasons to why a 
-candidate is not shortlisted.
+Decisions pertaining to a candidate's suitability are made solely 
+by the employer who may or may not provide any reasons for why a 
+candidate is not shortlisted. 
+
+Please take a moment to go through our job opportunities on our 
+website and feel free to refer other candidates for them. Perhaps 
+your next referral will be more successful. We appreciate your time 
+and efforts and hope that you will successfully earn some rewards soon.
 
 Thank you for using Yellow Elevator.
 

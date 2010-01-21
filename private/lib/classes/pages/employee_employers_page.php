@@ -192,7 +192,12 @@ class EmployeeEmployersPage extends Page {
                         </tr>
                         <tr>
                             <td class="label"><label for="paid_postings">Paid Job Postings:</label></td>
-                            <td class="field"><input class="field_number" type="text" id="paid_postings" name="paid_postings" value="0" maxlength="2" onChange="profile_is_dirty();" /></td>
+                            <td class="field">
+                                <span id="paid_postings_field">0</span>
+                                &nbsp;
+                                Add: 
+                                <input class="field_number" type="text" id="paid_postings" name="paid_postings" value="0" maxlength="2" onChange="profile_is_dirty();" />
+                            </td>
                         </tr>
                         <tr>
                             <td class="buttons_bar" colspan="2"><input type="button" id="save_profile_1" value="Save &amp; Update Profile" /></td>
