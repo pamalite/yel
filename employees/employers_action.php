@@ -267,7 +267,7 @@ if ($_POST['action'] == 'save_profile') {
     }
     
     if ($_POST['paid_postings'] > 0 && !empty($_POST['paid_postings'])) {
-        if ($employer->add_paid_posting($_POST['paid_postings']) === false) {
+        if ($employer->add_paid_job_posting($_POST['paid_postings']) === false) {
             echo 'ko';
             exit();
         }
@@ -294,7 +294,7 @@ if ($_POST['action'] == 'save_profile') {
             exit();
         }
         
-        $amount = $price * $_POST['paid_postings']''
+        $amount = $price * $_POST['paid_postings'];
         $desc = $_POST['paid_postings']. ' Job Posting(s) @ '. $currency. ' $'. $price;
         $item_added = Invoice::add_item($invoice, $amount, '1', $desc);
         
@@ -303,7 +303,7 @@ if ($_POST['action'] == 'save_profile') {
         $items[0]['amount'] = number_format($amount, '2', '.', ', ');
         
         // 2. generate the invoice as PDF file
-        $pdf = new PaidPostingInvoice();
+        $pdf = new PaidPostingsInvoice();
         $pdf->AliasNbPages();
         $pdf->SetAuthor('Yellow Elevator. This invoice was automatically generated. Signature is not required.');
         $pdf->SetTitle($GLOBALS['COMPANYNAME']. ' - Invoice '. pad($invoice, 11, '0'));
@@ -324,9 +324,13 @@ if ($_POST['action'] == 'save_profile') {
         $pdf->SetTextColor(0, 0, 0);
         $pdf->Cell(60, 5, pad($invoice, 11, '0'),1,0,'C');
         $pdf->Cell(1);
-        $pdf->Cell(33, 5, $data['issued_on'],1,0,'C');
+        
+        $issued_on = substr($data['issued_on'], 0, 10);
+        $pdf->Cell(33, 5, $issued_on,1,0,'C');
         $pdf->Cell(1);
-        $pdf->Cell(33, 5, $data['payable_by'],1,0,'C');
+        
+        $payable_by = substr($data['payable_by'], 0, 10);
+        $pdf->Cell(33, 5, $payable_by,1,0,'C');
         $pdf->Cell(1);
         $pdf->Cell(0, 5, number_format($amount, '2', '.', ', '),1,0,'C');
         $pdf->Ln(6);
@@ -397,14 +401,14 @@ if ($_POST['action'] == 'save_profile') {
         $body .= 'Content-Disposition: attachment'. "\n";
         $body .= $attachment. "\n";
         $body .= '--yel_mail_sep_'. $invoice. "--\n\n";
-        // mail($employer->get_email_address(), $subject, $body, $headers);
+        mail($employer->get_email_address(), $subject, $body, $headers);
 
-        $handle = fopen('/tmp/email_to_'. $employer->get_email_address(). '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $body);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_'. $employer->get_email_address(). '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $body);
+        // fclose($handle);
 
-        // unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
+        unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
     }
     
     echo 'ok';

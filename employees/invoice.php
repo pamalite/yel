@@ -76,6 +76,9 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
                         case 'J':
                             echo "Subscription ". $invoice_or_receipt;
                             break;
+                        case 'P':
+                            echo "Job Postings ". $invoice_or_receipt;
+                            break;
                         case 'R':
                             echo "Service Fee ". $invoice_or_receipt;
                             break;

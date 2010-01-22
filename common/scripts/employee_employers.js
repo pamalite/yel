@@ -281,6 +281,7 @@ function add_new_employer() {
     $('subscription_period').selectedIndex = 0;
     $('free_postings').value = '1';
     $('paid_postings').value = '0';
+    $('paid_postings_label').set('html', '0');
 }
 
 function new_from_employer(_employer_id) {
@@ -372,6 +373,7 @@ function new_from_employer(_employer_id) {
             $('subscription_period').selectedIndex = 0;
             $('free_postings').value = '1';
             $('paid_postings').value = '0';
+            $('paid_postings_label').set('html', '0');
             
             set_status('');
         },
@@ -487,7 +489,8 @@ function show_employer_profile() {
             $('free_postings').disabled = true;
             $('free_postings').value = free_postings[0].childNodes[0].nodeValue;
             
-            $('paid_postings').value = paid_postings[0].childNodes[0].nodeValue;
+            $('paid_postings_label').set('html', paid_postings[0].childNodes[0].nodeValue);
+            $('paid_postings').value = '0';
             
             set_status('');
         },

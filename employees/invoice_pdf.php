@@ -79,6 +79,9 @@ class InvoicePdf extends FPDF   {
             case 'J':
                 $this->Cell(30, 20, "Subscription ". $this->invoice_or_receipt, 0, 0, 'C');
                 break;
+            case 'P':
+                $this->Cell(30, 20, "Job Postings ". $this->invoice_or_receipt, 0, 0, 'C');
+                break;
             case 'R':
                 $this->Cell(30, 20, "Service Fee ". $this->invoice_or_receipt, 0, 0, 'C');
                 break;

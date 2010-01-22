@@ -117,7 +117,10 @@ function show_new_invoices() {
                             type = 'Reference';
                             break;
                         case 'J':
-                            type = 'Job';
+                            type = 'Subscription';
+                            break;
+                        case 'P':
+                            type = 'Job Posting';
                             break;
                     }
 

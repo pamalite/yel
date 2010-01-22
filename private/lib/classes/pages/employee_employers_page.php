@@ -193,7 +193,7 @@ class EmployeeEmployersPage extends Page {
                         <tr>
                             <td class="label"><label for="paid_postings">Paid Job Postings:</label></td>
                             <td class="field">
-                                <span id="paid_postings_field">0</span>
+                                <span id="paid_postings_label">0</span>
                                 &nbsp;
                                 Add: 
                                 <input class="field_number" type="text" id="paid_postings" name="paid_postings" value="0" maxlength="2" onChange="profile_is_dirty();" />
