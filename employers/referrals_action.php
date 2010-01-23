@@ -702,7 +702,8 @@ if ($_POST['action'] == 'employ_candidate') {
     $referee = new Member($result[0]['referee']);
     $job_title = $result[0]['title'];
     
-    $total_reward = Referral::calculate_total_reward_from($_POST['salary'], $_POST['employer'], $member->is_IRC());
+    $irc_id = ($member->is_IRC()) ? $member->id() : NULL;
+    $total_reward = Referral::calculate_total_reward_from($_POST['salary'], $_POST['employer'], $irc_id);
     $total_token_reward = $total_reward * 0.30;
     $total_reward_to_referrer = $total_reward - $total_token_reward;
     

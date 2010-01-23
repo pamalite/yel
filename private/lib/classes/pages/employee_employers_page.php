@@ -171,19 +171,26 @@ class EmployeeEmployersPage extends Page {
                         <tr>
                             <td class="label"><label for="subscription_period">Subscription:</label></td>
                             <td class="field">
-                                <span id="subscription_period_label"></span>
-                                <select id="subscription_period" name="subscription_period"  onChange="profile_is_dirty();">
-                                    <option value="0" selected>No subscription purchased</option>
-                                    <option value="0" disabled>&nbsp;</option>
-                                    <option value="1">1 month</option>
-                                <?php
-                                foreach ($available_subscriptions as $month => $price) {
-                                ?>
-                                    <option value="<?php echo $month; ?>"><?php echo $month; ?> months</option>
-                                <?php
-                                }
-                                ?>
-                                </select>
+                                <div><span id="subscription_period_label"></span></div>
+                                <table>
+                                    <tr>
+                                        <td><label for="subscription_period">Purchase:</label></td>
+                                        <td>
+                                            <select id="subscription_period" name="subscription_period"  onChange="profile_is_dirty();">
+                                                <option value="0">None</option>
+                                                <option value="0" disabled>&nbsp;</option>
+                                                <option value="1">1 month</option>
+                                            <?php
+                                            foreach ($available_subscriptions as $month => $price) {
+                                            ?>
+                                                <option value="<?php echo $month; ?>"><?php echo $month; ?> months</option>
+                                            <?php
+                                            }
+                                            ?>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                         <tr>

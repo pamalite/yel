@@ -272,6 +272,7 @@ function add_new_employer() {
     $('address').value = '';
     $('state').value = '';
     $('zip').value = '';
+    $('website_url').value = '';
     list_countries_in('0', 'country_dropdown_list', 'country_dropdown', 'country_dropdown', false, 'profile_is_dirty();');
     $('working_months').value = '12';
     //$('bonus_months').value = '1';
@@ -280,6 +281,7 @@ function add_new_employer() {
     $('subscription_period').setStyle('display', 'block');
     $('subscription_period').selectedIndex = 0;
     $('free_postings').value = '1';
+    $('free_postings').disabled = false;
     $('paid_postings').value = '0';
     $('paid_postings_label').set('html', '0');
 }
@@ -372,6 +374,7 @@ function new_from_employer(_employer_id) {
             $('subscription_period').setStyle('display', 'block');
             $('subscription_period').selectedIndex = 0;
             $('free_postings').value = '1';
+            $('free_postings').disabled = false;
             $('paid_postings').value = '0';
             $('paid_postings_label').set('html', '0');
             
@@ -481,10 +484,10 @@ function show_employer_profile() {
                 $('website_url').value = website_urls[0].childNodes[0].nodeValue;
             }
             
-            $('subscription_period').setStyle('display', 'none');
             $('subscription_period_label').setStyle('display', 'block');
             $('subscription_period_label').setStyle('color', '#666666');
-            $('subscription_period_label').set('html', '(Expires On: ' + subscription_expire_ons[0].childNodes[0].nodeValue + ')');
+            $('subscription_period_label').set('html', 'Expires On: ' + subscription_expire_ons[0].childNodes[0].nodeValue);
+            $('subscription_period').selectedIndex = 0;
             
             $('free_postings').disabled = true;
             $('free_postings').value = free_postings[0].childNodes[0].nodeValue;
@@ -951,11 +954,11 @@ function save_profile() {
     params = params + '&payment_terms_days=' + $('payment_terms_days').options[$('payment_terms_days').selectedIndex].value;
     params = params + '&website_url=' + $('website_url').value;
     params = params + '&paid_postings=' + $('paid_postings').value;
+    params = params + '&subscription_period=' + $('subscription_period').options[$('subscription_period').selectedIndex].value;
     
     if (mode == 'create') {
         params = params + '&user_id=' + $('user_id').value;
         params = params + '&password=' + $('password').value;
-        params = params + '&subscription_period=' + $('subscription_period').options[$('subscription_period').selectedIndex].value;
         params = params + '&free_postings=' + $('free_postings').value;
     }
     
