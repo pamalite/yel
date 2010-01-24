@@ -33,6 +33,7 @@ if (isset($_SESSION['yel']['employee']['dev'])) {
             ?>
             <script type="text/javascript">alert('Please logout from your existing connection before proceeding.');</script>
             <?php
+            exit();
         }
     }
 }

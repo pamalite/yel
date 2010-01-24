@@ -22,6 +22,26 @@ if (!isset($_SESSION['yel']['employee']) ||
     exit();
 }
 
+if (isset($_SESSION['yel']['employee']['dev'])) {
+    if ($_SESSION['yel']['employee']['dev'] === true) {
+        $is_dev = false;
+        $root_items = explode('/', $GLOBALS['root']);
+        foreach ($root_items as $value) {
+            if ($value == 'yel') {
+                $is_dev = true;
+                break;
+            }
+        }
+
+        if (!$is_dev) {
+            ?>
+            <script type="text/javascript">alert('Please logout from your existing connection before proceeding.');</script>
+            <?php
+            exit();
+        }
+    }
+}
+
 if (!isset($_GET['id'])) {
     $query = "SELECT file_name, file_hash, file_size, file_type 
               FROM users_contributed_resumes 

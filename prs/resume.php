@@ -28,6 +28,26 @@ if (!isset($_GET['id'])) {
     redirect_to('login.php');
 }
 
+if (isset($_SESSION['yel']['employee']['dev'])) {
+    if ($_SESSION['yel']['employee']['dev'] === true) {
+        $is_dev = false;
+        $root_items = explode('/', $GLOBALS['root']);
+        foreach ($root_items as $value) {
+            if ($value == 'yel') {
+                $is_dev = true;
+                break;
+            }
+        }
+
+        if (!$is_dev) {
+            ?>
+            <script type="text/javascript">alert('Please logout from your existing connection before proceeding.');</script>
+            <?php
+            exit();
+        }
+    }
+}
+
 $resume = new Resume($_GET['member'], $_GET['id']);
 $file = $resume->get_file();
 
