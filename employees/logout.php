@@ -11,6 +11,7 @@ $_SESSION['yel']['employee']['sid'] = "";
 $_SESSION['yel']['employee']['branch'] = "";
 $_SESSION['yel']['employee']['business_groups'] = "";
 $_SESSION['yel']['employee']['security_clearances'] = "";
+$_SESSION['yel']['employee']['dev'] = "";
 
 redirect_to('login.php');
 ?>

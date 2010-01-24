@@ -339,14 +339,24 @@ function show_profile(_member_email_addr) {
                 $('profile.checked_profile').setStyle('display', 'none');
             }
             
-            $('profile.firstname').set('html', member_firstname[0].childNodes[0].nodeValue);
-            $('profile.lastname').set('html', member_lastname[0].childNodes[0].nodeValue);
+            $('profile.firstname').value = member_firstname[0].childNodes[0].nodeValue;
+            $('profile.lastname').value = member_lastname[0].childNodes[0].nodeValue;
             
             current_member_name = member_firstname[0].childNodes[0].nodeValue + ', ' + member_lastname[0].childNodes[0].nodeValue;
             
-            $('profile.email_addr').set('html', current_member_email_addr);
-            $('profile.phone_num').set('html', member_phone_num[0].childNodes[0].nodeValue);
-            $('profile.country').set('html', country[0].childNodes[0].nodeValue);
+            $('profile.email_addr_label').set('html', current_member_email_addr);
+            $('profile.email_addr').value = current_member_email_addr;
+            
+            $('profile.phone_num').value = member_phone_num[0].childNodes[0].nodeValue;
+            
+            $('profile.country').selectedIndex = 0;
+            for (var i=0; i < $('profile.country').options.length; i++) {
+                var option = $('profile.country').options[i].value;
+                if (option == country[0].childNodes[0].nodeValue) {
+                    $('profile.country').selectedIndex = i;
+                    break;
+                }
+            }
             
             var remark = '';
             if (member_remarks[0].childNodes.length > 0) {
@@ -358,7 +368,7 @@ function show_profile(_member_email_addr) {
             if (zip[0].childNodes.length > 0) {
                 zip_code = zip[0].childNodes[0].nodeValue;
             }
-            $('profile.zip').set('html', zip_code);
+            $('profile.zip').value = zip_code;
             
             $('profile.recommender.firstname').set('html', recommender_firstname[0].childNodes[0].nodeValue);
             $('profile.recommender.lastname').set('html', recommender_lastname[0].childNodes[0].nodeValue);
@@ -450,6 +460,58 @@ function show_resumes(_member_email_addr) {
         },
         onRequest: function(instance) {
             set_status('Loading resumes...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function save_profile() {
+    if (isEmpty($('profile.firstname').value)) {
+        alert('Firstname cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('profile.lastname').value)) {
+        alert('Lastname cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('profile.phone_num').value)) {
+        alert('Telephone cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('profile.zip').value)) {
+        alert('Postal/Zip code cannot be empty.');
+        return false;
+    }
+    
+    if ($('profile.country').selectedIndex <= 0) {
+        alert('A country must be chosen.');
+        return false;
+    }
+    
+    var params = 'id=' + id + '&user_id=' + user_id + '&action=save_profile';
+    params = params + '&email_addr=' + $('profile.email_addr').value;
+    params = params + '&firstname=' + $('profile.firstname').value;
+    params = params + '&lastname=' + $('profile.lastname').value;
+    params = params + '&phone_num=' + $('profile.phone_num').value;
+    params = params + '&country=' + $('profile.country').options[$('profile.country').selectedIndex].value;
+    params = params + '&zip=' + $('profile.zip').value;
+    
+    var uri = root + "/prs/resumes_privileged_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error occured while saving profile. Please try again later.');
+            }
+            set_status('');
+        },
+        onRequest: function(instance) {
+            set_status('Saving profile...');
         }
     });
     
@@ -849,6 +911,7 @@ function onDomReady() {
     $('add_new_candidate_1').addEvent('click', show_new_candidate_form);
     
     $('save').addEvent('click', add_new_candidate);
+    $('save_profile').addEvent('click', save_profile);
     
     $('upload_new_resume').addEvent('click', upload_new_resume);
     $('upload_new_resume_1').addEvent('click', upload_new_resume);

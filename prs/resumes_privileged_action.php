@@ -56,13 +56,12 @@ if (!isset($_POST['action'])) {
 
 if ($_POST['action'] == 'get_profile') {
     $query = "SELECT members.firstname AS member_firstname, members.lastname AS member_lastname, members.remarks, 
-              members.phone_num AS member_phone_num, countries.country, members.zip, members.checked_profile, 
+              members.phone_num AS member_phone_num, members.country, members.zip, members.checked_profile, 
               recommenders.email_addr AS recommender_email_addr, 
               recommenders.firstname AS recommender_firstname, recommenders.lastname AS recommender_lastname, 
               recommenders.phone_num AS recommender_phone_num, 
               DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on 
               FROM members 
-              LEFT JOIN countries ON countries.country_code = members.country 
               LEFT JOIN recommenders ON recommenders.email_addr = members.recommender 
               WHERE members.email_addr = '". $_POST['id']. "'";
     $mysqli = Database::connect();
@@ -119,6 +118,28 @@ if ($_POST['action'] == 'get_resumes') {
     echo $xml_dom->get_xml_from_array($response);
     exit();
 }
+
+if ($_POST['action'] == 'save_profile') {
+    $member = new Member($_POST['email_addr']);
+    
+    $data = array();
+    $data['firstname'] = sanitize($_POST['firstname']);
+    $data['lastname'] = sanitize($_POST['lastname']);
+    $data['phone_num'] = $_POST['phone_num'];
+    $data['zip'] = $_POST['zip'];
+    $data['country'] = $_POST['country'];
+    
+    if (!$member->update($data)) {
+        echo 'ko';
+        exit();
+    }
+    
+    // TODO: Update recommenders (TBD)
+    
+    echo 'ok';
+    exit();
+}
+
 
 if ($_POST['action'] == 'add_new_candidate') {
     $recommender_industries_adding_error = false;
