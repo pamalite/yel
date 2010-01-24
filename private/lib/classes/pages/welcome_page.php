@@ -26,12 +26,11 @@ class WelcomePage extends Page {
     private function generate_top_jobs() {
         $query = "SELECT jobs.id AS job_id, jobs.title AS position_title, jobs.salary AS salary_start, 
                   jobs.salary_end AS salary_end, jobs.potential_reward AS potential_reward, 
-                  currencies.symbol AS currency, employers.name AS employer
+                  branches.currency, employers.name AS employer
                   FROM jobs 
                   LEFT JOIN job_index ON job_index.job = jobs.id 
                   LEFT JOIN employers ON employers.id = jobs.employer 
                   LEFT JOIN branches ON branches.id = employers.branch 
-                  LEFT JOIN currencies ON currencies.country_code = branches.country 
                   WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() 
                   -- AND jobs.id NOT IN (SELECT DISTINCT job FROM job_extensions) 
                   ORDER BY jobs.salary DESC LIMIT 10";

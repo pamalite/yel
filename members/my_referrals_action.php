@@ -19,7 +19,7 @@ if (!isset($_POST['action'])) {
     }
     
     $query = "SELECT referrals.id, employers.name AS employer, jobs.id AS job_id, jobs.title, 
-              jobs.potential_reward, jobs.currency, member_referees.id AS referee_id, 
+              jobs.potential_reward, branches.currency, member_referees.id AS referee_id, 
               CONCAT(members.lastname, ', ', members.firstname) AS candidate, jobs.description, 
               DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
               DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y') AS formatted_acknowledged_on, 
@@ -28,6 +28,7 @@ if (!isset($_POST['action'])) {
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
+              LEFT JOIN branches ON branches.id = employers.branch 
               LEFT JOIN members ON members.email_addr = referrals.referee 
               LEFT JOIN member_referees ON member_referees.member = referrals.member AND 
               member_referees.referee = referrals.referee 
@@ -40,7 +41,7 @@ if (!isset($_POST['action'])) {
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') 
               UNION 
               SELECT '0', employers.name, jobs.id, jobs.title, 
-              jobs.potential_reward, jobs.currency, '0', 
+              jobs.potential_reward, branches.currency, '0', 
               member_invites.referee_email, jobs.description, 
               DATE_FORMAT(member_invites.invited_on, '%e %b, %Y'), 
               NULL, 
@@ -49,6 +50,7 @@ if (!isset($_POST['action'])) {
               FROM member_invites 
               LEFT JOIN jobs ON jobs.id = member_invites.referred_job 
               LEFT JOIN employers ON employers.id = jobs.employer 
+              LEFT JOIN branches ON branches.id = employers.branch 
               LEFT JOIN members ON members.email_addr = member_invites.referee_email 
               WHERE member_invites.member = '". $_POST['id']. "' AND 
               (member_invites.signed_up_on IS NULL OR member_invites.signed_up_on = '0000-00-00 00:00:00') 
@@ -87,7 +89,7 @@ if ($_POST['action'] == 'get_rewards') {
     }
     
     $query = "SELECT referrals.id, employers.name AS employer, jobs.id AS job_id, jobs.title, jobs.description, 
-              referrals.total_reward, currencies.symbol AS currency, member_referees.id AS referee_id, 
+              referrals.total_reward, branches.currency, member_referees.id AS referee_id, 
               CONCAT(members.lastname, ', ', members.firstname) AS candidate, 
               DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
               DATE_FORMAT(referrals.work_commence_on, '%e %b, %Y') AS formatted_work_commence_on, 
@@ -96,7 +98,7 @@ if ($_POST['action'] == 'get_rewards') {
               LEFT JOIN referral_rewards ON referral_rewards.referral = referrals.id 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
-              LEFT JOIN currencies ON currencies.country_code = employers.country 
+              LEFT JOIN branches ON branches.id = employers.branch 
               LEFT JOIN members ON members.email_addr = referrals.referee 
               LEFT JOIN member_referees ON member_referees.member = referrals.member AND 
               member_referees.referee = referrals.referee 
@@ -134,13 +136,13 @@ if ($_POST['action'] == 'get_rewards') {
 
 if ($_POST['action'] == 'get_total_rewards_earned') {
     $query = "SELECT IFNULL(SUM(referrals.total_reward), 0) AS reward_earned, 
-              currencies.symbol AS currency 
+              branches.currency 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
-              LEFT JOIN currencies ON currencies.country_code = employers.country
+              LEFT JOIN branches ON branches.id = employers.branch 
               WHERE referrals.member = '". $_POST['id']. "'
-              GROUP BY currencies.symbol 
+              GROUP BY branches.currency 
               ORDER BY reward_earned";
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
