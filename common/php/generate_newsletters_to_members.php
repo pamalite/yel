@@ -180,7 +180,7 @@ if (is_null($members) || count($members) <= 0) {
         $message = str_replace('%top_5_lucrative_jobs%', $top_five_lucrative_jobs, $message);
         $message = str_replace('%top_10_new_jobs%', $top_10_jobs, $message);
         $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
-        $message = str_replace('%root%', 'localhost/yel', $message);
+        $message = str_replace('%root%', $GLOBALS['root'], $message);
         
         $headers  = 'MIME-Version: 1.0' . "\n";
         $headers .= 'Content-type: text/html; charset=utf-8' . "\n";
