@@ -123,6 +123,7 @@ function get_suggested_candidates($_job_id, $_referral_id_only = false) {
               , ". $max_score_temp_table. "
               WHERE ". $match_against. " AND 
               referrals.job = ". $_POST['id']. " AND 
+              need_approval = 'N' AND 
               -- referrals.resume IN (". $non_file_resumes_list. ") AND
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
               (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
@@ -160,6 +161,7 @@ if (!isset($_POST['action'])) {
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN industries ON industries.id = jobs.industry 
               WHERE jobs.employer = '". $_POST['id']. "' AND 
+              need_approval = 'N' AND 
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
               (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
               -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
@@ -281,7 +283,8 @@ if ($_POST['action'] == 'get_referred_candidates') {
              LEFT JOIN members ON members.email_addr = referrals.member 
              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
              LEFT JOIN resumes ON resumes.id = referrals.resume 
-             WHERE referrals.job = ". $_POST['id']. " AND ". $filter_by. "
+             WHERE referrals.job = ". $_POST['id']. " AND ". $filter_by. " 
+             need_approval = 'N' AND 
              (resumes.deleted = 'N' AND resumes.private = 'N') AND 
              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
@@ -360,6 +363,7 @@ if ($_POST['action'] == 'get_shortlisted_candidates') {
              LEFT JOIN members ON members.email_addr = referrals.member 
              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
              WHERE referrals.job = ". $_POST['id']. " AND 
+             need_approval = 'N' AND 
              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
              -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 

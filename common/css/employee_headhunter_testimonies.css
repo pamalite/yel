@@ -1,0 +1,91 @@
+#div_testimonies {
+    padding-top: 10px;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.left {
+    text-align: left;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+input.button {
+    font-size: 10pt;
+}
+
+td.member, td.referee,
+td.job, td.testimony_title {
+    width: 20%;
+}
+
+td.testimony {
+    width: 20%;
+    text-align: center;
+}
+
+td.date {
+    width: 20%;
+}
+
+span.sort {
+    color: #0000FF;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+span.sort:hover {
+    color: #FF0000;
+}
+
+div.phone_num {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
+#div_blanket {
+    display: none;
+    background-color: #000000;
+    opacity: 0.5;
+    filter : alpha(opacity=50); /* for IE */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#div_testimony_form {
+    margin: 10px 10px 10px 10px;
+    display: none;
+    background-color: #FFFFFF;
+    border: 3px solid #0000FF;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 640px;
+    height: 325px;
+    overflow: auto;
+}
+
+#div_testimony_form #testimony {
+    width: 90%;
+    height: 235px;
+}
+
+#div_testimony_form p.button {
+    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+}
+
+
