@@ -17,7 +17,8 @@ $mysqli = Database::connect();
 
 log_activity('Getting the members who are active and wants newsletter...', 'yellowel_member_newsletter_generator.log');
 $query = "SELECT email_addr, firstname, lastname, filter_jobs, 
-          primary_industry, secondary_industry, tertiary_industry 
+          primary_industry, secondary_industry, tertiary_industry, 
+          CONCAT(firstname, lastname) AS fullname 
           FROM members 
           WHERE active = 'Y' AND like_newsletter = 'Y'";
 $members = $mysqli->query($query);
@@ -184,16 +185,16 @@ if (is_null($members) || count($members) <= 0) {
         
         $headers  = 'MIME-Version: 1.0' . "\n";
         $headers .= 'Content-type: text/html; charset=utf-8' . "\n";
-        $headers .= 'To: '.  htmlspecialchars_decode($member['lastname']. ', '. $member['firstname']). '<'. $member['email_addr']. ">\n";
+        $headers .= 'To: '.  htmlspecialchars_decode($member['fullname']). '<'. $member['email_addr']. ">\n";
         $headers .= 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         $subject = 'Week '. date('W'). ' newsletter from Yellow Elevator';
         
         log_activity('Sending e-mail to: '. $member['email_addr'], 'yellowel_member_newsletter_generator.log');
-        // mail($member['email_addr'], $subject, $message, $headers);
+        mail($member['email_addr'], $subject, $message, $headers);
         
-        $handle = fopen('/tmp/email_to_'. $member['email_addr']. '.txt', 'w');
-        fwrite($handle, $message);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_'. $member['email_addr']. '.txt', 'w');
+        // fwrite($handle, $message);
+        // fclose($handle);
     }
 }
 
