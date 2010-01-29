@@ -184,7 +184,7 @@ if (is_null($members) || count($members) <= 0) {
         
         $headers  = 'MIME-Version: 1.0' . "\n";
         $headers .= 'Content-type: text/html; charset=utf-8' . "\n";
-        $headers .= 'To: '.  $member_fullname. '<'. $member['email_addr']. ">\n";
+        $headers .= 'To: '.  htmlspecialchars_decode($member['lastname']. ', '. $member['firstname']). '<'. $member['email_addr']. ">\n";
         $headers .= 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         $subject = 'Week '. date('W'). ' newsletter from Yellow Elevator';
         
