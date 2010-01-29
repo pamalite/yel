@@ -52,7 +52,7 @@ if (is_null($members) || count($members) <= 0) {
               LIMIT 3";
     $result = $mysqli->query($query);
     $new_employers_list = '(No new employers this week.)';
-    if (!is_null($result[0]['name']) && !empty($result[0]['name'])) {
+    if (!is_null($result) && !empty($result)) {
         $new_employers_list = '<ul>'. "\n";
         foreach ($result as $employer) {
             $new_employers_list .= '<li><a href="%protocol%://%root%/search.php?industry=0&employer='. $employer['id']. '&keywords=">'. htmlspecialchars_decode(desanitize($employer['name'])). '</a></li>'. "\n";
@@ -154,7 +154,7 @@ if (is_null($members) || count($members) <= 0) {
                 $top_10_jobs .= '<td><font color="#0000ff" face="Tahoma" size="2"><a href="%protocol%://%root%/job/'. $job['id']. '">'. $job['title']. '</a></font></td>'. "\n";
                 $top_10_jobs .= '<td><font color="#666666" face="Tahoma" size="2">'. $job['employer']. '</font></td>'. "\n";
                 
-                if (is_null($jobs['salary_end']) || empty($jobs['salary_end'])) {
+                if (is_null($job['salary_end']) || empty($job['salary_end'])) {
                     $top_10_jobs .= '<td><font color="#666666" face="Tahoma" size="2">from '. $job['currency']. ' '. number_format($job['salary'], 2, '.', ','). '</font></td>'. "\n";
                 } else {
                     $top_10_jobs .= '<td><font color="#666666" face="Tahoma" size="2">'. $job['currency']. ' '. number_format($job['salary'], 2, '.', ','). ' - '. number_format($job['salary_end'], 2, '.', ','). '</font></td>'. "\n";
@@ -179,8 +179,8 @@ if (is_null($members) || count($members) <= 0) {
         $message = str_replace('%new_employers_list%', $new_employers_list, $message);
         $message = str_replace('%top_5_lucrative_jobs%', $top_five_lucrative_jobs, $message);
         $message = str_replace('%top_10_new_jobs%', $top_10_jobs, $message);
-        $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
-        $message = str_replace('%root%', $GLOBALS['root'], $message);
+        $message = str_replace('%protocol%', 'https', $message);
+        $message = str_replace('%root%', 'yellowelevator.com', $message);
         
         $headers  = 'MIME-Version: 1.0' . "\n";
         $headers .= 'Content-type: text/html; charset=utf-8' . "\n";
@@ -189,11 +189,11 @@ if (is_null($members) || count($members) <= 0) {
         $subject = 'Week '. date('W'). ' newsletter from Yellow Elevator';
         
         log_activity('Sending e-mail to: '. $member['email_addr'], 'yellowel_member_newsletter_generator.log');
-        mail($member['email_addr'], $subject, $new_message, $headers);
+        // mail($member['email_addr'], $subject, $message, $headers);
         
-        // $handle = fopen('/tmp/email_to_'. $member['email_addr']. '.txt', 'w');
-        // fwrite($handle, $message);
-        // fclose($handle);
+        $handle = fopen('/tmp/email_to_'. $member['email_addr']. '.txt', 'w');
+        fwrite($handle, $message);
+        fclose($handle);
     }
 }
 
