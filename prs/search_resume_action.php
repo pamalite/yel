@@ -114,6 +114,28 @@ if (!isset($_POST['action'])) {
     exit();
 }
 
+if ($_POST['action'] == 'preview_resume') {
+    $mysqli = Database::connect();
+    $query = "SELECT cover_note, qualification, work_summary, 
+              skill, technical_skill, file_text
+              FROM resume_index 
+              WHERE `resume` = ". $_POST['resume_id']. " LIMIT 1";
+    $result = $mysqli->query($query);
+    
+    $preview_text = '';
+    $preview_text .= (!empty($result[0]['cover_note']) && !is_null($result[0]['cover_note'])) ? $result[0]['cover_note']. "\n\n" : '';
+    $preview_text .= (!empty($result[0]['qualification']) && !is_null($result[0]['qualification'])) ? $result[0]['qualification']. "\n\n" : '';
+    $preview_text .= (!empty($result[0]['work_summary']) && !is_null($result[0]['work_summary'])) ? $result[0]['work_summary']. "\n\n" : '';
+    $preview_text .= (!empty($result[0]['skill']) && !is_null($result[0]['skill'])) ? $result[0]['skill']. "\n\n" : '';
+    $preview_text .= (!empty($result[0]['technical_skill']) && !is_null($result[0]['technical_skill'])) ? $result[0]['technical_skill']."\n\n" : '';
+    $preview_text .= (!empty($result[0]['file_text']) && !is_null($result[0]['file_text'])) ? $result[0]['file_text'] : '';
+    
+    $response = array('resume' => array('preview_text' => $preview_text));
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
 if ($_POST['action'] == 'get_available_industries') {
     $mysqli = Database::connect();
     $query = "SELECT DISTINCT industries.id, industries.industry FROM 

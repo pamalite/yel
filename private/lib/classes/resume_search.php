@@ -73,11 +73,11 @@ class ResumeSearch {
                   CONCAT(members.firstname, ', ', members.lastname) AS member, 
                   DATE_FORMAT(members.joined_on, '%e %b %Y') AS formatted_joined_on ";
         
-        if (!is_null($this->keywords) && !empty($this->keywords)) {
-            $query .= ", ". $match_against. " AS relevance, relevances.max_relevance ";
-        } else {
-            $query .= ", '1' AS relevance, '1' AS max_relevance ";
-        }
+        // if (!is_null($this->keywords) && !empty($this->keywords)) {
+        //     $query .= ", ". $match_against. " AS relevance, relevances.max_relevance ";
+        // } else {
+        //     $query .= ", '1' AS relevance, '1' AS max_relevance ";
+        // }
         
         $query .= "FROM resumes 
                    LEFT JOIN resume_index ON resume_index.resume = resumes.id 
@@ -87,13 +87,14 @@ class ResumeSearch {
                    LEFT JOIN countries ON countries.country_code = members.country 
                    LEFT JOIN recommender_industries ON recommender_industries.recommender = members.recommender ";
         
-       if (!is_null($this->keywords) && !empty($this->keywords)) {
-           $query .= ", (SELECT MAX(". $match_against. ") AS max_relevance FROM resume_index LIMIT 1) relevances ";
-           $query .= "WHERE ". $match_against. " AND ";
-       } else {
-           $query .= "WHERE ";
-       }
+       // if (!is_null($this->keywords) && !empty($this->keywords)) {
+       //     $query .= ", (SELECT MAX(". $match_against. ") AS max_relevance FROM resume_index LIMIT 1) relevances ";
+       //     $query .= "WHERE ". $match_against. " AND ";
+       // } else {
+       //     $query .= "WHERE ";
+       // }
        
+       $query .= "WHERE ";
        $query .= "(". $filter_industry. ") 
                   AND (". $filter_country. ") 
                   AND members.active <> 'S' ";
