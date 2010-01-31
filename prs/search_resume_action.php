@@ -3,6 +3,47 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 
 session_start();
 
+function highlight_keywords($_keyword_string, $_text, $_use_and_op = false) {
+    $punctuations = array(",", ".", ";", "\"", "'", "(", ")", "[", "]", "{", "}", "<", ">", 
+                          "|", "?", "!", "`", "~", "/", "\\", "&", "-");
+    $_keyword_string = str_replace($punctuations, '', trim($_keyword_string));
+    
+    $red = 'FF';
+    $green = 'FF';
+    $blue = '00';
+    
+    if ($_use_and_op) {
+        $non_characters = " ,.?!;\"'\\\/(){}<>\[\]~`\|\&-";
+        $_keyword_string = str_replace(' ', '['. $non_characters. ']*', $_keyword_string);
+        $color = '#'. $red. $green. $blue;
+        $_text = preg_replace('|('. $_keyword_string. ')|Ui', 
+                              '<span style="font-weight: bold; background-color: '. $color. ';">&nbsp;$1&nbsp;</span>', 
+                              $_text);
+    } else {
+        
+        $keywords = explode(' ', $_keyword_string);
+        foreach ($keywords as $word) {
+            $red = dechex(mt_rand(mt_rand(60, 100), mt_rand(200, 252)));
+            $green = dechex(mt_rand(mt_rand(60, 100), mt_rand(200, 252)));
+            $blue = dechex(mt_rand(mt_rand(60, 100), mt_rand(200, 252)));
+            
+            $bg_color = '#'. $red. $green. $blue;
+            $font_color = '#000000';
+            if (hexdec($red) <= 102 || 
+                hexdec($green) <= 153 || 
+                hexdec($blue) <= 153) {
+                $font_color = '#FFFFFF';
+            }
+            
+            $_text = preg_replace('|('. $word. ')|Ui', 
+                                  '<span style="font-weight: bold; background-color: '. $bg_color. '; color: '. $font_color. ';">&nbsp;$1&nbsp;</span>', 
+                                  $_text);
+        }
+    }
+    
+    return $_text;
+}
+
 $xml_dom = new XMLDOM();
 
 if (!isset($_POST['action'])) {
@@ -115,6 +156,8 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'preview_resume') {
+    $use_and_op = ($_POST['use_and'] == '1') ? true : false;
+    
     $mysqli = Database::connect();
     $query = "SELECT cover_note, qualification, work_summary, 
               skill, technical_skill, file_text
@@ -130,6 +173,8 @@ if ($_POST['action'] == 'preview_resume') {
     $preview_text .= (!empty($result[0]['technical_skill']) && !is_null($result[0]['technical_skill'])) ? $result[0]['technical_skill']."\n\n" : '';
     $preview_text .= (!empty($result[0]['file_text']) && !is_null($result[0]['file_text'])) ? $result[0]['file_text'] : '';
     
+    $preview_text = htmlspecialchars_decode(stripslashes($preview_text));
+    $preview_text = highlight_keywords($_POST['keywords'], $preview_text, $use_and_op);
     $response = array('resume' => array('preview_text' => $preview_text));
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
