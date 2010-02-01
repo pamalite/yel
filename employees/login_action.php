@@ -65,6 +65,13 @@ foreach ($_SESSION['yel']['employee']['business_groups'] as $i=>$group) {
     }
 }
 
+$root_items = explode('/', $GLOBALS['root']);
+foreach ($root_items as $value) {
+    if ($value == 'yel') {
+        $_SESSION['yel']['employee']['dev'] = true;
+    }
+}
+
 $response['login'] = array('status' => 'ok');
 echo $xml_dom->get_xml_from_array($response);
 //redirect_to('home.php');

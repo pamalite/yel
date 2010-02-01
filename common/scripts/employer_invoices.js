@@ -83,7 +83,10 @@ function show_new_invoices() {
                             type = 'Service Fee';
                             break;
                         case 'J':
-                            type = 'Job Publishing Fee';
+                            type = 'Subscription';
+                            break;
+                        case 'P':
+                            type = 'Job Posting';
                             break;
                     }
 
@@ -148,7 +151,10 @@ function show_paid_invoices() {
                             type = 'Service Fee';
                             break;
                         case 'J':
-                            type = 'Job Publishing Fee';
+                            type = 'Subscription';
+                            break;
+                        case 'P':
+                            type = 'Job Posting';
                             break;
                     }
 

@@ -36,10 +36,14 @@ class PrsPrivilegedResumesPage extends Page {
         echo '</script>'. "\n";
     }
     
-    private function generateCountries($selected = '') {
+    private function generateCountries($_for_profile = false, $selected = '') {
         $countries = Country::get_all();
         
-        echo '<select class="field" id="country" name="country">'. "\n";
+        if ($_for_profile) {
+            echo '<select class="field" id="profile.country" name="profile.country">'. "\n";
+        } else {
+            echo '<select class="field" id="country" name="country">'. "\n";
+        }
         
         if ($selected == '') {
             echo '<option value="0" selected>Please select a country</option>'. "\n";
@@ -172,30 +176,43 @@ class PrsPrivilegedResumesPage extends Page {
                     </tr>
                     <tr>
                         <td class="label">Firstnames:</td>
-                        <td class="field"><span id="profile.firstname">Loading...</span></td>
+                        <td class="field">
+                            <input type="text" class="field" id="profile.firstname" name="profile.firstname" value="" />
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">Lastnames:</td>
-                        <td class="field"><span id="profile.lastname">Loading...</span></td>
+                        <td class="field">
+                            <input type="text" class="field" id="profile.lastname" name="profile.lastname" value="" />
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">E-mail address:</td>
-                        <td class="field"><span id="profile.email_addr">Loading...</span></td>
+                        <td class="field">
+                            <input type="hidden" id="profile.email_addr" name="profile.email_addr" value="" />
+                            <span id="profile.email_addr_label">Loading...</span>
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">Telephone:</td>
-                        <td class="field"><span id="profile.phone_num">Loading...</span></td>
+                        <td class="field">
+                            <input type="text" class="field" id="profile.phone_num" name="profile.phone_num" value="" />
+                        </td>
                     </tr>
                     <tr>
                         <td class="title" colspan="2">Residence</td>
                     </tr>
                     <tr>
                         <td class="label">Country:</td>
-                        <td class="field"><span id="profile.country">Loading...</span></td>
+                        <td class="field">
+                            <?php $this->generateCountries(true); ?>
+                        </td>
                     </tr>
                     <tr>
                         <td class="label">Postal/Zip Code:</td>
-                        <td class="field"><span id="profile.zip">Loading...</span></td>
+                        <td class="field">
+                            <input type="text" class="field" id="profile.zip" name="profile.zip" value="" />
+                        </td>
                     </tr>
                     <tr>
                         <td class="title" colspan="2">Recommender</td>
@@ -221,6 +238,9 @@ class PrsPrivilegedResumesPage extends Page {
                     </tr>
                     <tr>
                         <td class="field" colspan="2" style="text-align: center;"><input type="text" class="remarks_field" name="profile.remarks" id="profile.remarks" value="" />&nbsp;<input type="button" value="Save" onClick="save_remark();" /></td>
+                    </tr>
+                    <tr>
+                        <td  class="buttons_bar" colspan="2"><input type="button" id="save_profile" value="Save Profile" /></td>
                     </tr>
                 </table>
             </div>

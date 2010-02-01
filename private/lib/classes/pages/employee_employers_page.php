@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
+require_once dirname(__FILE__). "/../../../config/subscriptions_rate.inc";
 
 class EmployeeEmployersPage extends Page {
     private $employee = NULL;
@@ -37,6 +38,10 @@ class EmployeeEmployersPage extends Page {
         $this->begin();
         $this->top_employee($this->employee->get_name(). " - My Employers");
         $this->menu_employee($this->clearances, 'employers');
+        
+        $subscriptions_rates = $GLOBALS['subscriptions_rates'];
+        $branch = $this->employee->get_branch();
+        $available_subscriptions = $subscriptions_rates[Currency::symbol_from_country_code($branch[0]['country_code'])];
         
         ?>
         <div id="div_status" class="status">
@@ -139,6 +144,13 @@ class EmployeeEmployersPage extends Page {
                             <td class="field"><span id="country_dropdown_list">Loading...</span></</td>
                         </tr>
                         <tr>
+                            <td class="label"><label for="website_url">Web-site URL:</label></td>
+                            <td class="field"><input class="field" type="text" id="website_url" name="website_url" value="" onChange="profile_is_dirty();" /></td>
+                        </tr>
+                        <tr>
+                            <td class="title" colspan="2">Payment &amp; Subscription Details</td>
+                        </tr>
+                        <tr>
                             <td class="label"><label for="working_months">Working Months:</label></td>
                             <td class="field"><input class="field_number" type="text" id="working_months" name="working_months" value="12" maxlength="2" onChange="profile_is_dirty();" /></td>
                         </tr>
@@ -157,12 +169,42 @@ class EmployeeEmployersPage extends Page {
                             </td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="slots">Default Job Postings:</label></td>
-                            <td class="field"><input class="field_number" type="text" id="slots" name="slots" value="1" maxlength="2" onChange="profile_is_dirty();" />&nbsp;<span id="slots_expiry" style="font-size: 9pt; color: #666666;"></span></td>
+                            <td class="label"><label for="subscription_period">Subscription:</label></td>
+                            <td class="field">
+                                <div><span id="subscription_period_label"></span></div>
+                                <table>
+                                    <tr>
+                                        <td><label for="subscription_period">Purchase:</label></td>
+                                        <td>
+                                            <select id="subscription_period" name="subscription_period"  onChange="profile_is_dirty();">
+                                                <option value="0">None</option>
+                                                <option value="0" disabled>&nbsp;</option>
+                                                <option value="1">1 month</option>
+                                            <?php
+                                            foreach ($available_subscriptions as $month => $price) {
+                                            ?>
+                                                <option value="<?php echo $month; ?>"><?php echo $month; ?> months</option>
+                                            <?php
+                                            }
+                                            ?>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="website_url">Web-site URL:</label></td>
-                            <td class="field"><input class="field" type="text" id="website_url" name="website_url" value="" onChange="profile_is_dirty();" /></td>
+                            <td class="label"><label for="free_postings">Free Job Postings:</label></td>
+                            <td class="field"><input class="field_number" type="text" id="free_postings" name="free_postings" value="1" maxlength="2" onChange="profile_is_dirty();" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="paid_postings">Paid Job Postings:</label></td>
+                            <td class="field">
+                                <span id="paid_postings_label">0</span>
+                                &nbsp;
+                                Add: 
+                                <input class="field_number" type="text" id="paid_postings" name="paid_postings" value="0" maxlength="2" onChange="profile_is_dirty();" />
+                            </td>
                         </tr>
                         <tr>
                             <td class="buttons_bar" colspan="2"><input type="button" id="save_profile_1" value="Save &amp; Update Profile" /></td>

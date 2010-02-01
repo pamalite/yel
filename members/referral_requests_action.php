@@ -19,7 +19,7 @@ if (!isset($_POST['action'])) {
     }
     
     $query = "SELECT referral_requests.id, employers.name AS employer, jobs.id AS job_id, jobs.title, 
-              jobs.potential_reward, jobs.currency, referral_requests.resume, 
+              jobs.potential_reward, branches.currency, referral_requests.resume, 
               referral_requests.member AS candidate_id, referral_requests.requested_on, 
               CONCAT(members.lastname, ', ', members.firstname) AS candidate, jobs.description, 
               DATE_FORMAT(referral_requests.requested_on, '%e %b, %Y') AS formatted_requested_on, 
@@ -28,6 +28,7 @@ if (!isset($_POST['action'])) {
               FROM referral_requests 
               LEFT JOIN jobs ON jobs.id = referral_requests.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
+              LEFT JOIN branches ON branches.id = employers.branch 
               LEFT JOIN members ON members.email_addr = referral_requests.member 
               LEFT JOIN member_referees ON member_referees.member = referral_requests.referrer AND 
               member_referees.referee = referral_requests.member
@@ -39,7 +40,7 @@ if (!isset($_POST['action'])) {
               AND (jobs.closed = 'N' AND jobs.expire_on >= NOW()) 
               UNION 
               SELECT referrals.id, employers.name, jobs.id, jobs.title, 
-              jobs.potential_reward, jobs.currency, referrals.resume, 
+              jobs.potential_reward, branches.currency, referrals.resume, 
               referrals.referee, referrals.referee_acknowledged_on, 
               CONCAT(referees.lastname, ', ', referees.firstname), jobs.description, 
               DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y'), 
@@ -48,6 +49,7 @@ if (!isset($_POST['action'])) {
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
+              LEFT JOIN branches ON branches.id = employers.branch 
               LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
               LEFT JOIN member_referees ON member_referees.member = referrals.member AND 
               member_referees.referee = referrals.referee

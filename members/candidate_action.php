@@ -183,12 +183,12 @@ if ($_POST['action'] == 'get_referee_contacts') {
 }
 
 if ($_POST['action'] == 'get_reward_earned') {
-    $query = "SELECT referrals.total_reward, currencies.symbol AS currency 
+    $query = "SELECT referrals.total_reward, branches.currency 
               FROM referrals 
               LEFT JOIN member_referees ON referrals.referee = member_referees.referee 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
-              LEFT JOIN currencies ON currencies.country_code = employers.country 
+              LEFT JOIN branches ON branches.id = employers.branch 
               AND referrals.member = member_referees.member 
               WHERE member_referees.id = ". $_POST['id']. " AND 
               (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')";
@@ -240,7 +240,7 @@ if ($_POST['action'] == 'get_candidate_histories') {
         $order_by = $_POST['order_by'];
     }
     
-    $query = "SELECT referrals.id, jobs.title, employers.name, currencies.symbol AS currency, 
+    $query = "SELECT referrals.id, jobs.title, employers.name, branches.currency, 
               DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
               DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y') AS formatted_referee_acknowledged_on, 
               DATE_FORMAT(referrals.referee_acknowledged_others_on, '%e %b, %Y') AS formatted_referee_acknowledged_others_on, 
@@ -252,7 +252,7 @@ if ($_POST['action'] == 'get_candidate_histories') {
               LEFT JOIN members ON members.email_addr = referrals.referee 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
-              LEFT JOIN currencies ON currencies.country_code = employers.country 
+              LEFT JOIN branches ON branches.id = employers.branch 
               LEFT JOIN member_referees ON referrals.member = member_referees.member AND 
               referrals.referee = member_referees.referee
               WHERE member_referees.id = ". $_POST['id']. " AND 
@@ -307,13 +307,13 @@ if ($_POST['action'] == 'get_testimony') {
 
 if ($_POST['action'] == 'get_total_rewards_earned') {
     $query = "SELECT IFNULL(SUM(referrals.total_reward), 0) AS reward_earned, 
-              currencies.symbol AS currency 
+              branches.currency 
               FROM referrals 
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN employers ON employers.id = jobs.employer 
-              LEFT JOIN currencies ON currencies.country_code = employers.country
+              LEFT JOIN branches ON branches.id = employers.branch 
               WHERE referrals.member = '". $_POST['id']. "'
-              GROUP BY currencies.symbol 
+              GROUP BY branches.currency 
               ORDER BY reward_earned";
     $mysqli = Database::connect();
     $result = $mysqli->query($query);

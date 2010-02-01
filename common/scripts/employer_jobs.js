@@ -215,16 +215,20 @@ function publish_job() {
                 set_status('New job successfully published.');
             } else if (txt == '-1') {
                 alert('Your account is not set up yet. Upon receiving the Welcome email from us, please allow up to the next 24 hours for your account to be active. <br/>If this message still shows up after 24 hours, please contact your account manager immediately.');
+                set_status('');
                 return false;
             } else if (txt == '-2') {
-                alert('You have no more job slots left to publish!' + "\n\nPlease save your job and publish it later after you have purchased enough job slots from the 'Job Slots' page.");
+                alert('Your subscription has expired/suspended. Please extend/renew it from the top of the page.');
+                set_status('');
                 return false;
             } else {
                 set_status('Sorry! We are not able to publish the new job at the moment. Please try again later.');
+                set_status('');
                 return false;
             }
             
             $('div_tabs').setStyle('display', 'block');
+            get_subscriptions_details();
             show_open_jobs();
         },
         onRequest: function(instance) {
@@ -326,10 +330,8 @@ function show_job(job_id) {
             
             var is_closed = closed[0].childNodes[0].nodeValue;
             if (is_closed == 'Y') {
-                // $('job.extend').set('html', '<a class="no_link" onClick="extend_job(\'' + job_id + '\');">Re-open this job for another 30 days</a>');
                 $('job.extend').set('html', '<input type="button" onClick="extend_job(\'' + job_id + '\');" value="Re-open this job for another 30 days" />');
             } else {
-                // $('job.extend').set('html', '<a class="no_link" onClick="extend_job(\'' + job_id + '\');">Extend this job for another 30 days</a>');
                 $('job.extend').set('html', '<input type="button" onClick="extend_job(\'' + job_id + '\');" value="Extend this job for another 30 days" />');
             }
             
@@ -691,7 +693,7 @@ function extend_job(job_id) {
         return;
     }
     
-    var params = 'job=' + job_id + '&action=extend';
+    var params = 'job=' + job_id + '&employer=' + id + '&action=extend';
     var uri = root + "/employers/job_action.php";
     var request = new Request({
         url: uri,
@@ -701,11 +703,12 @@ function extend_job(job_id) {
                 set_status('An error occured while extending job.');
                 return false;
             } else if (txt == '-2') {
-                alert('You have no more job slots left to publish!' + "\n\nPlease extend it later after you have purchased enough job slots from the 'Job Slots' page.");
+                alert('Your subscription has expired/suspended. Please extend/renew it from the top of this page.');
                 return false;
             }
             
             //show_job(job_id);
+            get_subscriptions_details();
             show_open_jobs();
             set_status('');
         },
@@ -896,15 +899,13 @@ function select_all_jobs() {
     }
 }
 
-function get_slots_left() {
-    $('num_slots').set('html', '(Free)');
-    $('num_slots').setStyle('color', '#1D3E6E');
-    $('slots_expiry').set('html', '(Not Applicable)');
-    $('slots_expiry').setStyle('color', '#666666');
-    $('buy_postings_button').disabled = true;
-    $('buy_postings_button').src = '../common/images/button_buy_now_disabled.gif';
+function get_subscriptions_details() {
+    $('subscriptions_expiry').set('html', 'Loading...');
+    $('subscriptions_expiry').setStyle('color', '#666666');
+    $('buy_subscriptions_button').disabled = true;
+    $('buy_subscriptions_button').src = '../common/images/button_buy_now_disabled.gif';
     
-    var params = 'id=' + id + '&action=get_slots_left';
+    var params = 'id=' + id + '&action=get_subscriptions_details';
     
     var uri = root + "/employers/slots_action.php";
     var request = new Request({
@@ -912,39 +913,42 @@ function get_slots_left() {
         method: 'post',
         onSuccess: function(txt, xml) {
             if (txt == 'ko') {
-                $('num_slots').set('html', '(Error)');
-                $('num_slots').setStyle('color', '#FF0000');
+                $('subscriptions_expiry').set('html', '(Error)');
+                $('subscriptions_expiry').setStyle('color', '#FF0000');
                 return false;
             }
             
             if (txt != '-1') {
-                var slots = xml.getElementsByTagName('slots');
                 var expired = xml.getElementsByTagName('expired');
-                var expire_on = xml.getElementsByTagName('expire_on');
+                var expire_on = xml.getElementsByTagName('formatted_expire_on');
+                var has_free_posting = xml.getElementsByTagName('has_free_postings');
+                var has_paid_posting = xml.getElementsByTagName('has_paid_postings');
+                var suspended = xml.getElementsByTagName('subscription_suspended');
                 
-                $('slots_expiry').set('html', expire_on[0].childNodes[0].nodeValue);
-
-                if (parseInt(expired[0].childNodes[0].nodeValue) < 0) {
-                    $('num_slots').set('html', '(All slots are expired.)');
-                    $('num_slots').setStyle('color', '#FF0000');
-                    $('slots_expiry').setStyle('color', '#FF0000');
+                if (suspended[0].childNodes[0].nodeValue == '1') {
+                    $('subscriptions_expiry').set('html', 'Your Subscription Has Been Suspended.');
+                    $('subscriptions_expiry').setStyle('color', '#FF0000');
                 } else {
-                    if (parseInt(slots[0].childNodes[0].nodeValue) == 0) {
-                        $('num_slots').set('html', '(You have no more slots left.)');
-                        $('num_slots').setStyle('color', '#FF0000');
-                    } else {
-                        if (parseInt(slots[0].childNodes[0].nodeValue) <= 2) {
-                            $('num_slots').set('html', slots[0].childNodes[0].nodeValue);
-                            $('num_slots').setStyle('color', '#FFAE00');
+                    if (has_free_posting[0].childNodes[0].nodeValue == '0') {
+                        $('buy_subscriptions_button').disabled = false;
+                        $('buy_subscriptions_button').src = '../common/images/button_buy_now.gif';
+
+                        if (parseInt(has_paid_posting[0].childNodes[0].nodeValue) > 0) {
+                            $('subscriptions_expiry').set('html', '(' + has_paid_posting[0].childNodes[0].nodeValue + ' Paid Job Posting(s) Left)');
+                            $('subscriptions_expiry').setStyle('color', '#666666');
                         } else {
-                            $('num_slots').set('html', slots[0].childNodes[0].nodeValue);
-                            $('num_slots').setStyle('color', '#079607');
+                            $('subscriptions_expiry').set('html', expire_on[0].childNodes[0].nodeValue);
+
+                            if (parseInt(expired[0].childNodes[0].nodeValue) < 0) {
+                                $('subscriptions_expiry').setStyle('color', '#FF0000');
+                            } else {
+                                $('subscriptions_expiry').setStyle('color', '#0D9C0D');
+                            }
                         }
+                    } else {
+                        $('subscriptions_expiry').set('html', '(' + has_free_posting[0].childNodes[0].nodeValue + ' Free Job Posting(s) Left)');
                     }
                 }
-                
-                $('buy_postings_button').disabled = false;
-                $('buy_postings_button').src = '../common/images/button_buy_now.gif';
             }
         }
     });
@@ -952,11 +956,11 @@ function get_slots_left() {
     request.send(params);
 }
 
-function show_buy_slots_form() {
+function show_buy_subscriptions_form() {
     var window_height = 0;
     var window_width = 0;
-    var div_height = parseInt($('div_buy_slots_form').getStyle('height'));
-    var div_width = parseInt($('div_buy_slots_form').getStyle('width'));
+    var div_height = parseInt($('div_buy_subscriptions_form').getStyle('height'));
+    var div_width = parseInt($('div_buy_subscriptions_form').getStyle('width'));
     
     if (typeof window.innerHeight != 'undefined') {
         window_height = window.innerHeight;
@@ -971,252 +975,84 @@ function show_buy_slots_form() {
     }
     
     if (window_height <= div_height) {
-        $('div_buy_slots_form').setStyle('height', window_height);
-        $('div_buy_slots_form').setStyle('top', 0);
+        $('div_buy_subscriptions_form').setStyle('height', window_height);
+        $('div_buy_subscriptions_form').setStyle('top', 0);
         window.scrollTo(0, 0);
     } else {
-        $('div_buy_slots_form').setStyle('top', ((window_height - div_height) / 2));
+        $('div_buy_subscriptions_form').setStyle('top', ((window_height - div_height) / 2));
     }
-    $('div_buy_slots_form').setStyle('left', ((window_width - div_width) / 2));
-    
-    if ($('payment_method_credit_card').disabled) {
-        add_admin_fee();
-    }
+    $('div_buy_subscriptions_form').setStyle('left', ((window_width - div_width) / 2));
     
     $('div_blanket').setStyle('display', 'block');
-    $('div_buy_slots_form').setStyle('display', 'block');
+    $('div_buy_subscriptions_form').setStyle('display', 'block');
 }
 
-function close_buy_slots_form() {
-    $('div_buy_slots_form').setStyle('display', 'none');
+function close_buy_subscriptions_form() {
+    $('div_buy_subscriptions_form').setStyle('display', 'none');
     $('div_blanket').setStyle('display', 'none');
 }
 
 function calculate_fee() {
-    var price = parseFloat($('price_per_slot').get('html'));
-    var qty = parseInt($('qty').value);
-    var discount = 0;
+    var price = parseFloat($('subscription').options[$('subscription').selectedIndex].value);
+    var admin_fee = 0.00;
     var amount = 0.00;
     
-    if (qty <= 0 || isEmpty($('qty').value) || isNaN($('qty').value)) {
-        $('total_amount').set('html', '0.00');
-        return;
-    } else if (qty >= 5 && qty <= 15) {
-        discount = 10;
-    } else if (qty > 15 && qty <= 25) {
-        discount = 15;
-    } else if (qty > 25 && qty <= 35) {
-        discount = 20;
-    } else if (qty > 35) {
-        discount = 25;
-    } 
-    
-    amount = (price * qty) - ((price * qty) * (discount / 100));
-    if (added_admin_fee) {
-        amount = amount + (amount * 0.05);
-    }
-    
-    $('discount').set('html', discount + '%');
-    $('total_amount').set('html', amount);
-}
-
-function add_admin_fee() {
-    if ($('payment_method_cheque').checked) {
-        added_admin_fee = true;
-        calculate_fee();
+    if (price <= 0.00) {
+        $('admin_fee').set('html', '0');
+        $('total_amount').set('html', '0');
+    } else {
+        admin_fee = price * 0.05;
+        amount = price + admin_fee;
+        $('admin_fee').set('html', admin_fee);
+        $('total_amount').set('html', amount);
     }
 }
 
-function remove_admin_fee() {
-    if (added_admin_fee) {
-        added_admin_fee = false;
-        calculate_fee();
-    }
-}
-
-function buy_slots() {
-    var qty = $('qty').value;
-    
-    if (isNaN(qty) || isEmpty(qty) || parseInt(qty) <= 0) {
-        alert('You must purchase at least 1 slot.');
+function buy_subscriptions() {
+    if ($('subscription').options[$('subscription').selectedIndex].value <= 0) {
+        alert('You must subscribe to at least 1 month of job posting.');
         return false;
     }
     
-    var is_confirmed = confirm('You are about to purchase ' + qty + ' slot(s) at ' + $('payment_currency').value + '$ ' + $('total_amount').get('html') + ".\n\nPlease click 'OK' to proceed to payment portal or 'Cancel' to continue using the available slots.");
+    var is_confirmed = confirm('You are about to subscribe to ' + $('subscription').options[$('subscription').selectedIndex].id + ' month(s) of job posting at ' + $('payment_currency').value + ' $' + $('total_amount').get('html') + ".\n\nPlease click 'OK' to to be invoiced or 'Cancel' to continue using the currennt subscription.");
     
     if (!is_confirmed) {
         set_status('');
-        close_buy_slots_form();
+        close_buy_subscriptions_form();
         return false;
     }
     
-    var payment_method = 'credit_card';
-    if ($('payment_method_cheque').checked) {
-        payment_method = 'cheque';
-    }
-    
-    if (payment_method == 'credit_card') {
-        var return_url = root + paypal_return_url_base;
-        var cancel_url = root + paypal_return_url_base;
-        
-        var paypal_inputs = new Hash({
-            'cmd': '_xclick',
-            'business': paypal_id,
-            'item_name': qty + ' Job Slots',
-            'amount': parseFloat($('total_amount').get('html')),
-            'currency_code': $('payment_currency').value, 
-            'custom': 'employer=' + id + '&price=' + parseFloat($('price_per_slot').get('html')) + '&qty=' + qty,
-            'return': root + paypal_return_url_base,
-            'cancel_return': root + paypal_return_url_base,
-            'notify_url': paypal_ipn_url
-        });
-        
-        close_buy_slots_form();
-        
-        div_height = parseInt($('div_paypal_progress').getStyle('height'));
-        div_width = parseInt($('div_paypal_progress').getStyle('width'));
-
-        if (typeof window.innerHeight != 'undefined') {
-            window_height = window.innerHeight;
-        } else {
-            window_height = document.documentElement.clientHeight;
-        }
-
-        if (typeof window.innerWidth != 'undefined') {
-            window_width = window.innerWidth;
-        } else {
-            window_width = document.documentElement.clientWidth;
-        }
-
-        if (window_height <= div_height) {
-            $('div_paypal_progress').setStyle('height', window_height);
-            $('div_paypal_progress').setStyle('top', 0);
-            window.scrollTo(0, 0);
-        } else {
-            $('div_paypal_progress').setStyle('top', ((window_height - div_height) / 2));
-        }
-        $('div_paypal_progress').setStyle('left', ((window_width - div_width) / 2));
-        $('div_blanket').setStyle('display', 'block');
-        $('div_paypal_progress').setStyle('display', 'block');
-        
-        post_to_paypal_with(paypal_inputs);
-        return;
-    }
-    
     var params = 'id=' + id;
-    params = params + '&action=buy_slots';
+    params = params + '&action=buy_subscriptions';
     params = params + '&currency=' + $('payment_currency').value;
-    params = params + '&price=' + parseFloat($('price_per_slot').get('html'));
-    params = params + '&qty=' + parseInt(qty);
+    params = params + '&period=' + parseInt($('subscription').options[$('subscription').selectedIndex].id);
+    params = params + '&price=' + parseFloat($('subscription').options[$('subscription').selectedIndex].value);
+    params = params + '&admin_fee=' + parseFloat($('admin_fee').get('html'));
     params = params + '&amount=' + parseFloat($('total_amount').get('html'));
-    params = params + '&payment_method=' + payment_method;
     
     var uri = root + "/employers/slots_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
             if (txt == 'ko') {
-                alert('An error occured while purchasing slots.');
+                alert('An error occured while subscribing.');
                 return false;
             }
             
-            if (txt == '-1') {
-                alert('A payment instruction has been send to your email account. Please follow the instruction to lodge your payment.');
-            }
-            
             set_status('');
-            close_buy_slots_form();
-            show_purchase_histories();
-            get_slots_left();
+            close_buy_subscriptions_form();
+            get_subscriptions_details();
         },
         onRequest: function(instance) {
-            set_status('Purchasing slots...');
+            set_status('Subscribing...');
         }
     });
     
     request.send(params);
 }
-
-function show_purchase_histories() {
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_purchase_histories').getStyle('height'));
-    var div_width = parseInt($('div_purchase_histories').getStyle('width'));
-    
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
-    } else {
-        window_height = document.documentElement.clientHeight;
-    }
-    
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
-    }
-    
-    if (window_height <= div_height) {
-        $('div_purchase_histories').setStyle('height', window_height);
-        $('div_purchase_histories').setStyle('top', 0);
-        window.scrollTo(0, 0);
-    } else {
-        $('div_purchase_histories').setStyle('top', ((window_height - div_height) / 2));
-    }
-    $('div_purchase_histories').setStyle('left', ((window_width - div_width) / 2));
-    
-    var params = 'id=' + id;
-    
-    var uri = root + "/employers/slots_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading slots purchase histories.');
-                return false;
-            }
-            
-            var html = '<table id="list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There is no past purchase of slots.</div>';
-            } else {
-                var price_per_slots = xml.getElementsByTagName('price_per_slot');
-                var number_of_slots = xml.getElementsByTagName('number_of_slot');
-                var total_amounts = xml.getElementsByTagName('total_amount');
-                var purchased_ons = xml.getElementsByTagName('formatted_purchased_on');
-                
-                for (var i=0; i < price_per_slots.length; i++) {
-                    html = html + '<tr onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="date">' + purchased_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="number_of_slots">' + number_of_slots[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="price_per_slot">' + price_per_slots[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="amount">' + total_amounts[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                }
-                
-                html = html + '</table>';
-            }
-            
-            $('div_purchases_list').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading slots purchase histories...');
-        }
-    });
-    
-    request.send(params);
-    
-    $('div_blanket').setStyle('display', 'block');
-    $('div_purchase_histories').setStyle('display', 'block');
-}
-
-function close_purchase_histories() {
-    $('div_purchase_histories').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
-}
-
 
 function set_mouse_events() {
     $('li_open').addEvent('mouseover', function() {
@@ -1267,7 +1103,7 @@ function onDomReady() {
     set_mouse_events();
     get_employer_referrals_count();
     
-    // get_slots_left();
+    get_subscriptions_details();
     
     $('li_open').addEvent('click', show_open_jobs);
     $('li_closed').addEvent('click', show_closed_jobs);

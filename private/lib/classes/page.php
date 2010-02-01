@@ -391,6 +391,7 @@ class Page {
         if (Employee::has_clearances_for('employers', $_clearances)) {
         ?>
                 <li <?php echo ($page == 'headhunters') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/headhunters.php">IRCs</a></li>
+                <li <?php echo ($page == 'headhunter_testimonies') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/headhunter_testimonies.php">IRC Testmonies</a></li>
         <?php
         }
         ?>
@@ -398,7 +399,6 @@ class Page {
         <?php
         if (Employee::has_clearances_for('admin_employers', $_clearances)) {
         ?>
-                <li <?php echo ($page == 'slots') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/slots.php">Slots</a></li>
                 <li <?php echo ($page == 'jobs') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/jobs.php">Jobs</a></li>
                 <li <?php echo ($page == 'applications') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/applications.php">Applications</a></li>
         <?php

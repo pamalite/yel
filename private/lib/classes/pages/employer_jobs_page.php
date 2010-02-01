@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
-require_once dirname(__FILE__). "/../../../config/postings_rate.inc";
+require_once dirname(__FILE__). "/../../../config/subscriptions_rate.inc";
 
 class EmployerJobsPage extends Page {
     private $employer = NULL;
@@ -99,46 +99,30 @@ class EmployerJobsPage extends Page {
         $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Job Ads</span>");
         $this->menu('employer', 'jobs');
         
-        $currency = Currency::symbol_from_country_code($this->employer->get_country_code());
-        
-        $query = "SELECT currencies.symbol 
-                  FROM currencies 
-                  LEFT JOIN branches ON currencies.country_code = branches.country 
-                  LEFT JOIN employers ON branches.id = employers.branch 
-                  WHERE employers.id = '". $this->employer->id(). "' LIMIT 1";
-        $mysqli = Database::connect();
-        $result = $mysqli->query($query);
-        $payment_currency = 'MYR';
-        if (count($result) > 0 && !is_null($result)) {
-            $payment_currency = $result[0]['symbol'];
-        }
-        
-        $posting_rates = $GLOBALS['posting_rates'];
-        $posting_rate = $posting_rates[$payment_currency];
-        if (!array_key_exists($payment_currency, $posting_rates)) {
+        $branch = $this->employer->get_branch();
+        $currency = Currency::symbol_from_country_code($branch[0]['country']);
+        $payment_currency = $currency;
+        $subscriptions_rates = $GLOBALS['subscriptions_rates'];
+        $subscriptions = $subscriptions_rates[$payment_currency];
+        if (!array_key_exists($payment_currency, $subscriptions_rates)) {
             $payment_currency = 'MYR';
-            $posting_rate = $posting_rates['MYR'];
+            $subscriptions = $subscriptions_rates['MYR'];
         }
         
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
-        <!--div id="div_slots_info">
-            <table class="slots_info">
+        <div id="div_subscriptions_info">
+            <table class="subscriptions_info">
                 <tr>
                     <td class="info">
-                        <div class="slots_details">
-                            Job Postings available: <span id="num_slots" style="font-weight: bold;">0</span>
-                            <br/>
-                            Expiring on: <span id="slots_expiry" style="font-weight: bold;"></span>
+                        <div class="subscriptions_details">
+                            Subscription Expiring On: <span id="subscriptions_expiry" style="font-weight: bold;"></span>
                         </div>
                     </td>
                     <td class="buy">
-                        <input type="image" id="buy_postings_button" onClick="show_buy_slots_form();" src="../common/images/button_buy_now_disabled.gif" disabled />
-                        <div style="font-size: 7pt; margin-top: -3px; text-align: center;">
-                            <a class="no_link" onClick="show_purchase_histories();">View Purchase History</a>
-                        </div>
+                        <input type="image" id="buy_subscriptions_button" onClick="show_buy_subscriptions_form();" src="../common/images/button_buy_now_disabled.gif" disabled />
                     </td>
                 </tr>
             </table>
@@ -332,74 +316,43 @@ class EmployerJobsPage extends Page {
         </div>
         
         <div id="div_blanket"></div>
-        <div id="div_buy_slots_form">
+        <div id="div_buy_subscriptions_form">
             <form onSubmit="return false;">
                 <input type="hidden" id="payment_currency" name="payment_currency" value="<?php echo $payment_currency; ?>" />
-                <table class="buy_slots_form">
+                <table class="buy_subscriptions_form">
                     <tr>
-                        <td class="label">Price:</td>
-                        <td><?php echo $payment_currency; ?>$&nbsp;<span id="price_per_slot"><?php echo $posting_rate; ?></span></td>
+                        <td class="label"><label for="subscription">Subscription:</label></td>
+                        <td>
+                            <select id="subscription" name="subscription" onChange="calculate_fee();">
+                                <option value="0" selected>Select a Subscription Period</option>
+                                <option value="0" disabled>&nbsp;</option>
+                        <?php
+                            foreach ($subscriptions as $period => $price) {
+                        ?>
+                                <option id="<?php echo $period; ?>" value="<?php echo $price; ?>"><?php echo $period. ' months ('. $payment_currency. ' $'. $price. ')'; ?></option>
+                        <?php
+                            }
+                        ?>
+                            </select>
+                        </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="qty">Number of postings:</label></td>
-                        <td><input type="text" class="field" id="qty" name="qty" value="3" onKeyUp="calculate_fee();" />&nbsp;<span style="font-size: 9pt; color: #888888;">discount: <span id="discount">0%</span></span></td>
+                        <td class="label">Admin Fee:</td>
+                        <td>
+                            <?php echo $payment_currency; ?> $<span id="admin_fee">0</span>
+                        </td>
                     </tr>
                     <tr>
                         <td style="font-weight: bold;" class="label">Amount:</td>
                         <td style="border-top: 1px solid #666666; border-bottom: 1px double #666666; font-weight: bold;">
-                            <?php echo $payment_currency; ?>$&nbsp;<span id="total_amount"><?php echo ($posting_rate * 3) ?></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">Payment Method:</td>
-                        <td>
-                            <table style="border: none; margin: auto; width: 100%; border-collapse: collapse;">
-                                <tr>
-                                    <td style="width: 10px;">
-                                        <input type="radio" name="payment_method" id="payment_method_credit_card" value="credit_card" onClick="remove_admin_fee();" <?php echo ($payment_currency != 'MYR') ? 'checked' : 'disabled'; ?> />
-                                    </td>
-                                    <td>
-                                        <label for="payment_method_credit_card">Credit Card/PayPal <span style="font-size: 7pt; color: #666666;">(via PayPal portal)</span></label>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="vertical-align: top;">
-                                        <input type="radio" name="payment_method" id="payment_method_cheque" value="cheque" onClick="add_admin_fee();" <?php echo ($payment_currency == 'MYR') ? 'checked' : ''; ?> />
-                                    </td>
-                                    <td>
-                                        <label for="payment_method_cheque">Cheque/Money Order/Bank Transfer <span style="font-size: 7pt; color: #666666;">(+5% admin fee)</span></label>
-                                    </td>
-                                </tr>
-                            </table>
+                            <?php echo $payment_currency; ?>&nbsp;$<span id="total_amount">0</span>
                         </td>
                     </tr>
                 </table>
-                <p class="button"><input type="button" value="Cancel" onClick="close_buy_slots_form();" />&nbsp;<input type="button" value="Buy Now" onClick="buy_slots();" /></p>
+                <p class="button"><input type="button" value="Cancel" onClick="close_buy_subscriptions_form();" />&nbsp;<input type="button" value="Buy Now" onClick="buy_subscriptions();" /></p>
             </form>
         </div>
         
-        <div id="div_purchase_histories">
-            <div id="purchase_histories">
-                <table class="header">
-                    <tr>
-                        <td class="date">Date of Purchase</td>
-                        <td class="number_of_slots_title">Number of Postings</td>
-                        <td class="price_per_slot_title">Price (<?php echo $payment_currency; ?>)</td>
-                        <td class="amount_title">Amount (<?php echo $payment_currency; ?>)</td>
-                    </tr>
-                </table>
-                <div id="div_purchases_list">
-                </div>
-            </div>
-            <p class="button"><input type="button" value="Close" onClick="close_purchase_histories();" /></p>
-        </div>
-        
-        <div id="div_paypal_progress">
-            <div style="text-align: center;">
-                Please wait while you are redirected to PayPal's payment portal...<br/><br/>
-                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
-            </div>
-        </div>
         <?php
     }
 }

@@ -609,7 +609,7 @@ class Member {
     }
     
     public function get_saved_jobs($_order_by = 'member_saved_jobs.saved_on DESC') {
-        $query = "SELECT jobs.id, jobs.title, jobs.description, currencies.symbol AS currency, 
+        $query = "SELECT jobs.id, jobs.title, jobs.description, branches.currency, 
                   industries.industry, employers.name AS employer, jobs.potential_reward, 
                   DATE_FORMAT(member_saved_jobs.saved_on, '%e %b, %Y') AS formatted_saved_on, 
                   DATE_FORMAT(jobs.created_on, '%e %b, %Y') AS formatted_created_on, 
@@ -618,7 +618,7 @@ class Member {
                   LEFT JOIN jobs ON jobs.id = member_saved_jobs.job 
                   LEFT JOIN industries ON industries.id = jobs.industry 
                   LEFT JOIN employers ON employers.id = jobs.employer 
-                  LEFT JOIN currencies ON currencies.country_code = employers.country 
+                  LEFT JOIN branches ON branches.id = employers.branch 
                   WHERE member_saved_jobs.member = '". $this->id. "' AND 
                   jobs.closed = 'N' 
                   ORDER BY ". $_order_by;
@@ -626,7 +626,7 @@ class Member {
     }
     
     public function get_saved_jobs_with_filter($_filter_by = '0') {
-        $query = "SELECT jobs.id, jobs.title, jobs.description, currencies.symbol AS currency, 
+        $query = "SELECT jobs.id, jobs.title, jobs.description, branches.currency, 
                   industries.industry, employers.name AS employer, jobs.potential_reward, 
                   DATE_FORMAT(member_saved_jobs.saved_on, '%e %b, %Y') AS formatted_saved_on, 
                   DATE_FORMAT(jobs.created_on, '%e %b, %Y') AS formatted_created_on, 
@@ -635,7 +635,7 @@ class Member {
                   LEFT JOIN jobs ON jobs.id = member_saved_jobs.job 
                   LEFT JOIN industries ON industries.id = jobs.industry 
                   LEFT JOIN employers ON employers.id = jobs.employer 
-                  LEFT JOIN currencies ON currencies.country_code = employers.country 
+                  LEFT JOIN branches ON branches.id = employers.branch 
                   WHERE member_saved_jobs.member = '". $this->id. "' AND 
                   jobs.closed = 'N' ";
         if ($_filter_by == '0') {
@@ -667,6 +667,17 @@ class Member {
         $query = "DELETE FROM member_saved_jobs WHERE member = '". $this->id. "' AND 
                   job = ". $_job_id;
         return $this->mysqli->execute($query);
+    }
+    
+    public function is_IRC() {
+        $query = "SELECT individual_headhunter FROM members WHERE 
+                  email_addr = '". $this->id(). "' LIMIT 1";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['individual_headhunter'] == '1') {
+            return true;
+        }
+        
+        return false;
     }
     
     public static function find($criteria, $db = "") {

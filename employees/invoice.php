@@ -19,6 +19,26 @@ if (!isset($_SESSION['yel']['employee']) ||
     exit();
 }
 
+if (isset($_SESSION['yel']['employee']['dev'])) {
+    if ($_SESSION['yel']['employee']['dev'] === true) {
+        $is_dev = false;
+        $root_items = explode('/', $GLOBALS['root']);
+        foreach ($root_items as $value) {
+            if ($value == 'yel') {
+                $is_dev = true;
+                break;
+            }
+        }
+
+        if (!$is_dev) {
+            ?>
+            <script type="text/javascript">alert('Please logout from your existing connection before proceeding.');</script>
+            <?php
+            exit();
+        }
+    }
+}
+
 $clearances = $_SESSION['yel']['employee']['security_clearances'];
 if (!Employee::has_clearance_for('invoices_view', $clearances)) {
     echo 'No permisison to view invoice.';
@@ -34,16 +54,8 @@ if (!$invoice) {
 }
 
 $employer = new Employer($invoice[0]['employer']);
-$query = "SELECT currencies.symbol 
-          FROM currencies 
-          LEFT JOIN employers ON currencies.country_code = employers.country 
-          WHERE employers.id = '". $employer->id(). "' LIMIT 1";
-$mysqli = Database::connect();
-$result = $mysqli->query($query);
-$currency = '???';
-if (count($result) > 0 && !is_null($result)) {
-    $currency = $result[0]['symbol'];
-}
+$branch = $employer->get_branch();
+$currency = Currency::symbol_from_country_code($branch[0]['country']);
 
 $amount_payable = 0.00;
 foreach($items as $i=>$item) {
@@ -52,7 +64,6 @@ foreach($items as $i=>$item) {
 }
 $amount_payable = number_format($amount_payable, 2, '.', ', ');
 $invoice_or_receipt = (is_null($invoice[0]['paid_on']) || empty($invoice[0]['paid_on'])) ? 'Invoice' : 'Receipt';
-$branch = $employer->get_branch();
 ?>
 
 <!DOCTYPE HTML>
@@ -83,7 +94,10 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
                 <?php
                     switch ($invoice[0]['type']) {
                         case 'J':
-                            echo "Job Advertisements Fee ". $invoice_or_receipt;
+                            echo "Subscription ". $invoice_or_receipt;
+                            break;
+                        case 'P':
+                            echo "Job Postings ". $invoice_or_receipt;
                             break;
                         case 'R':
                             echo "Service Fee ". $invoice_or_receipt;
@@ -107,7 +121,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
                         </tr>
                         <tr>
                             <td class="field">E-mail:</td>
-                            <td class="value">sales@yellowelevator.com</td>
+                            <td class="value">sales.<?php echo strtolower($branch[0]['country']); ?>@yellowelevator.com</td>
                         </tr>
                         <tr>
                             <td class="field">Mailing Address:</td>
@@ -210,7 +224,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
     <div class="payment_note">
         <span style="{font-weight: bold; text-decoration: underline}">Payment Notice</span>
         <ul>
-            <li>Payment shall be made payable to Yellow Elevator Sdn. Bhd.</li>
+            <li>Payment shall be made payable to <?php echo $branch[0]['branch']; ?>.</li>
             <li>To facilitate the processing of the payment, please write down the invoice number(s) on your cheque(s)/payment slip(s)</li>
             </ul>
     </div>

@@ -16,7 +16,7 @@ Payable To: Yellow Elevator Sdn Bhd
 Amount: %currency% $ %amount%
 Account Number: ???
 SWIFT Code: ???
-Bank (Branch): HSBC (Bayan Baru)
+Bank (Branch): OCBC Bank (Batu Maung)
 
 For Cheque/Money Order:
 -----------------------

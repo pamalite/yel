@@ -118,7 +118,7 @@ function today() {
 }
 
 function sql_date_add($date, $interval, $unit) {
-    $query = "SELECT DATE_ADD('". $date. "', INTERVAL ". $interval. " ". strtoupper($unit). ") AS new_date";
+    $query = "SELECT DATE_ADD('". $date. "', INTERVAL ". $interval. " ". strtoupper($unit). ") AS new_date";    
     $mysqli = Database::connect();
     $result = $mysqli->query($query);
     return $result[0]['new_date'];

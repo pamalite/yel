@@ -348,34 +348,88 @@ class Employer {
         return $this->mysqli->query($query);
     }
     
-    public function get_slots_left() {
-        $query = "SELECT slots, DATEDIFF(slots_expire_on, NOW()) AS expired, 
-                  DATE_FORMAT(slots_expire_on, '%e %b, %Y') AS formatted_expire_on 
+    public function get_subscriptions_details() {
+        $query = "SELECT DATEDIFF(subscription_expire_on, NOW()) AS expired, 
+                  DATE_FORMAT(subscription_expire_on, '%e %b, %Y') AS formatted_expire_on, 
+                  subscription_expire_on, subscription_suspended 
                   FROM employers 
                   WHERE id = '". $this->id. "' LIMIT 1";
         return $this->mysqli->query($query);
     }
     
-    public function add_slots($_new_slots = 0) {
-        if ($_new_slots > 0) {
-            $query = "UPDATE employers SET 
-                      slots = (slots + ". $_new_slots. "), 
-                      slots_expire_on = DATE_ADD(NOW(), INTERVAL 3 MONTH) 
-                      WHERE id = '". $this->id. "'";
+    public function extend_subscription($_period) {
+        if ($_period > 0) {
+            $result = $this->get_subscriptions_details();
+            $query = '';
+            
+            if ($result[0]['expired'] < 0) {
+                // extend from today
+                $query = "UPDATE employers SET 
+                          subscription_expire_on = DATE_ADD(NOW(), INTERVAL ". $_period. " MONTH) 
+                          WHERE id = '". $this->id. "'";
+            } else {
+                // extend from the expiry
+                $query = "UPDATE employers SET 
+                          subscription_expire_on = DATE_ADD(subscription_expire_on, INTERVAL ". $_period. " MONTH) 
+                          WHERE id = '". $this->id. "'";
+            }
+            
             return $this->mysqli->execute($query);
         }
         
-        return true;
+        return false;
     }
     
-    public function subtract_slots($_slots_to_sub = 0) {
-        if ($_slots_to_sub > 0) {
-            $query = "UPDATE employers SET slots = (slots - ". $_slots_to_sub. ") 
-                      WHERE id = '". $this->id. "'";
-            return $this->mysqli->execute($query);
+    public function unsuspend_subscription() {
+        $query = "UPDATE employers SET subscription_suspended = FALSE 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
+    public function suspend_subscription() {
+        $query = "UPDATE employers SET subscription_suspended = TRUE 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
+    public function has_free_job_postings() {
+        $query = "SELECT free_postings_left FROM employers 
+                  WHERE id = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['free_postings_left'] <= 0) {
+            return false;
         }
         
-        return true;
+        return $result[0]['free_postings_left'];
+    }
+    
+    public function used_free_job_posting() {
+        $query = "UPDATE employers SET free_postings_left = free_postings_left - 1 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
+    public function has_paid_job_postings() {
+        $query = "SELECT paid_postings_left FROM employers 
+                  WHERE id = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['paid_postings_left'] <= 0) {
+            return false;
+        }
+        
+        return $result[0]['paid_postings_left'];
+    }
+    
+    public function used_paid_job_posting() {
+        $query = "UPDATE employers SET paid_postings_left = paid_postings_left - 1 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
+    public function add_paid_job_posting($_postings) {
+        $query = "UPDATE employers SET paid_postings_left = paid_postings_left + $_postings 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
     }
     
     public function create_fee($data) {

@@ -9,6 +9,7 @@ $query = "SELECT COUNT(referrals.id) AS num_referrals
           LEFT JOIN jobs ON jobs.id = referrals.job 
           LEFT JOIN resumes ON resumes.id = referrals.resume 
           WHERE jobs.employer = '". $_SESSION['yel']['employer']['id']. "' AND 
+          need_approval = 'N' AND 
           (resumes.deleted = 'N' AND resumes.private = 'N') AND
           (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
           (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 

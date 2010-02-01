@@ -30,9 +30,10 @@ if (!isset($_POST['action'])) {
               DATE_FORMAT(invoices.paid_on, '%e %b, %Y') AS formatted_paid_on 
               FROM invoices 
               LEFT JOIN employers ON employers.id = invoices.employer 
+              LEFT JOIN branches ON branches.id = employers.branch 
               LEFT JOIN invoice_items ON invoice_items.invoice = invoices.id 
               LEFT JOIN employees ON employers.registered_by = employees.id 
-              LEFT JOIN currencies ON currencies.country_code = employers.country 
+              LEFT JOIN currencies ON currencies.country_code = branches.country 
               WHERE ". $paid_on_clause. " AND 
               employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. " 
               GROUP BY invoices.id 

@@ -202,7 +202,7 @@ class Referral {
         return $mysqli->query($query);
     }
     
-    public static function calculate_total_reward_from($_salary, $_employer) {
+    public static function calculate_total_reward_from($_salary, $_employer, $_irc_id = NULL) {
         if (empty($_salary) || $_salary < 0 || empty($_employer)) {
             return false;
         }
@@ -235,6 +235,13 @@ class Referral {
         }
         
         $reward_percentage = ($fees[0]['reward_percentage'] / 100.00);
+        if (!is_null($_irc_id)) {
+            $query = "SELECT headhunter_reward_percentage FROM members WHERE email_addr = '". $_irc_id. "'";
+            $result = $mysqli->query($query);
+            if ($result[0]['headhunter_reward_percentage'] > 0) {
+                $reward_percentage = $result[0]['headhunter_reward_percentage'] / 100.00;
+            }
+        }
         
         return (((($_salary * $total_fees) * $discount) + $charges) * $reward_percentage);
     }

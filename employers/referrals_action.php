@@ -123,6 +123,7 @@ function get_suggested_candidates($_job_id, $_referral_id_only = false) {
               , ". $max_score_temp_table. "
               WHERE ". $match_against. " AND 
               referrals.job = ". $_POST['id']. " AND 
+              need_approval = 'N' AND 
               -- referrals.resume IN (". $non_file_resumes_list. ") AND
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
               (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
@@ -160,6 +161,7 @@ if (!isset($_POST['action'])) {
               LEFT JOIN jobs ON jobs.id = referrals.job 
               LEFT JOIN industries ON industries.id = jobs.industry 
               WHERE jobs.employer = '". $_POST['id']. "' AND 
+              need_approval = 'N' AND 
               (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
               (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
               -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
@@ -281,7 +283,8 @@ if ($_POST['action'] == 'get_referred_candidates') {
              LEFT JOIN members ON members.email_addr = referrals.member 
              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
              LEFT JOIN resumes ON resumes.id = referrals.resume 
-             WHERE referrals.job = ". $_POST['id']. " AND ". $filter_by. "
+             WHERE referrals.job = ". $_POST['id']. " AND ". $filter_by. " 
+             need_approval = 'N' AND 
              (resumes.deleted = 'N' AND resumes.private = 'N') AND 
              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
@@ -360,6 +363,7 @@ if ($_POST['action'] == 'get_shortlisted_candidates') {
              LEFT JOIN members ON members.email_addr = referrals.member 
              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
              WHERE referrals.job = ". $_POST['id']. " AND 
+             need_approval = 'N' AND 
              (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
              (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
              -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
@@ -702,8 +706,9 @@ if ($_POST['action'] == 'employ_candidate') {
     $referee = new Member($result[0]['referee']);
     $job_title = $result[0]['title'];
     
-    $total_reward = Referral::calculate_total_reward_from($_POST['salary'], $_POST['employer']);
-    $total_token_reward = $total_reward * 0.05;
+    $irc_id = ($member->is_IRC()) ? $member->id() : NULL;
+    $total_reward = Referral::calculate_total_reward_from($_POST['salary'], $_POST['employer'], $irc_id);
+    $total_token_reward = $total_reward * 0.30;
     $total_reward_to_referrer = $total_reward - $total_token_reward;
     
     $data = array();
@@ -859,20 +864,11 @@ if ($_POST['action'] == 'employ_candidate') {
             
             Invoice::accompany_credit_note_with($previous_invoice, $invoice, $issued_on, $credit_amount);
             
-            $query = "SELECT currencies.symbol 
-                      FROM currencies 
-                      LEFT JOIN employers ON currencies.country_code = employers.country 
-                      WHERE employers.id = '". $employer->id(). "' LIMIT 1";
-            $mysqli = Database::connect();
-            $result = $mysqli->query($query);
-            $currency = '???';
-            if (count($result) > 0 && !is_null($result)) {
-                $currency = $result[0]['symbol'];
-            }
-            
             $branch = $employer->get_branch();
+            $sales = 'sales.'. strtolower($branch_raw[0]['country']). '@yellowelevator.com';
             $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
             $branch['address_lines'] = explode("\n", $branch[0]['address']);
+            $currency = Currency::symbol_from_country_code($branch[0]['country']);
             
             $pdf = new CreditNote();
             $pdf->AliasNbPages();
@@ -935,7 +931,7 @@ if ($_POST['action'] == 'employ_candidate') {
 
             $subject = "Balance Refund Notice of Invoice ". pad($previous_invoice, 11, '0');
             $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-            $headers .= 'Bcc: sales@yellowelevator.com'. "\n";
+            $headers .= 'Bcc: '. $sales. "\n";
             $headers .= 'MIME-Version: 1.0'. "\n";
             $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $filename. '";'. "\n\n";
 

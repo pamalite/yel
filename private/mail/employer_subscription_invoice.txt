@@ -1,0 +1,47 @@
+Hi %employer%,
+
+Thank you for choosing Yellow Elevator's %period%-month subscription package. 
+The sum total for the order confirmation received on %purchased_on% is 
+%currency% $%amount% (inclusive of 5% administration fee).
+
+Please find the invoice for the subscription attached. Kindly settle the 
+invoice as soon as possible (within 30 days starting from the date of the invoice) 
+to keep the billing process clean and simple for all parties.
+
+The various acceptable payment methods and their respective payment details are as 
+follows:
+
+For Bank Transfer:
+------------------
+Payable To: Yellow Elevator Sdn Bhd
+Amount: %currency% $ %amount%
+Account Number: ???
+SWIFT Code: ???
+Bank (Branch): OCBC Bank (Batu Maung)
+
+For Cheque/Money Order:
+-----------------------
+Payable To: Yellow Elevator (Sdn Bhd / Pty Ltd; depending on which branch you are
+sending the payment to.)
+Amount: %currency% $ %amount%
+Send it to the closest branches listed below:
+
+Malaysia
+--------
+Yellow Elevator Sdn. Bhd.
+1-12B-9, Suntech @ Penang Cybercity,
+Lintang Mayang Pasir 3, 
+11950 Penang, Malaysia.
+
+Australia
+---------
+Yellow Elevator Pty Ltd
+Suite 3, 22 Council St, 
+Hawthorn East, 
+VIC 3123, Australia.
+
+
+Thank you for choosing Yellow Elevator.
+
+Yellow Elevator
+Refer a job

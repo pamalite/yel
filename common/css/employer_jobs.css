@@ -80,7 +80,7 @@ td.industry {
 }
 
 td.date {
-    width: 50px;
+    width: 100px;
 }
 
 td.new_from {
@@ -168,8 +168,8 @@ table.job_form td.buttons_right {
     border: 1px dashed #FF0000;
 }
 
-/* job postings */
-#div_slots_info {
+/* subscriptions*/
+#div_subscriptions_info {
     margin: 10px 10px 25px 10px;
     padding-top: 5px;
     padding-bottom: 5px;
@@ -177,20 +177,20 @@ table.job_form td.buttons_right {
     border: 1px solid #CCCCCC;
 }
 
-table.slots_info {
+table.subscriptions_info {
     width: 97%;
     margin: auto;
 }
 
-table.slots_info td.info {
+table.subscriptions_info td.info {
     width: 90%;
 }
 
-table.slots_info td.buy {
+table.subscriptions_info td.buy {
     text-align: center;
 }
 
-div.slots_details {
+div.subscriptions_details {
     color: #666666;
 }
 
@@ -206,7 +206,7 @@ div.slots_details {
     height: 100%;
 }
 
-#div_buy_slots_form {
+#div_buy_subscriptions_form {
     margin: 10px 10px 10px 10px;
     display: none;
     background-color: #FFFFFF;
@@ -215,77 +215,33 @@ div.slots_details {
     left: 0;
     top: 0;
     width: 450px;
-    height: 209px;
+    height: 140px;
     overflow: auto;
 }
 
-#div_purchase_histories {
-    margin: 10px 10px 10px 10px;
-    display: none;
-    background-color: #FFFFFF;
-    border: 3px solid #0000FF;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 640px;
-    height: 480px;
-    overflow: auto;
-}
-
-#div_paypal_progress {
-    margin: 10px 10px 10px 10px;
-    display: none;
-    background-color: #FFFFFF;
-    border: 3px solid #0000FF;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 250px;
-    height: 100px;
-    overflow: auto;
-}
-
-#div_buy_slots_form input.field {
+#div_buy_subscriptions_form input.field {
     width: 20%;
 }
 
-#div_buy_slots_form p.button,
-#div_purchase_histories p.button {
+#div_buy_subscriptions_form p.button {
     background-color: #CCCCCC;
     padding-top: 3px;
     padding-bottom: 3px;
     text-align: center;
 }
 
-#div_buy_slots_form table.buy_slots_form {
+#div_buy_subscriptions_form table.buy_subscriptions_form {
     width: 99%;
     margin: auto;
     border-collapse: collapse;
 }
 
-#div_buy_slots_form table.buy_slots_form td {
+#div_buy_subscriptions_form table.buy_subscriptions_form td {
     padding: 5px 5px 5px 5px;
     font-size: 10pt;
 }
 
-#div_buy_slots_form table.buy_slots_form td.label {
+#div_buy_subscriptions_form table.buy_subscriptions_form td.label {
     text-align: right;
     width: 35%;
-}
-
-#div_purchase_histories #purchase_histories {
-    width: 100%;
-    height: 425px;
-    overflow: auto;
-}
-
-td.number_of_slots, td.price_per_slot, 
-td.amount, td.date, td.number_of_slots_title, td.price_per_slot_title, 
-td.amount_title {
-    width: 25%;
-}
-
-td.number_of_slots, td.price_per_slot, 
-td.amount {
-    text-align: right;
 }
