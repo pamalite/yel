@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../config/common.inc";
+require_once dirname(__FILE__). "/../config/stopwords.inc";
 require_once "geoip.inc";
 require_once "models.php";
 require_once "classes.php";

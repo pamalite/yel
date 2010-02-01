@@ -179,6 +179,7 @@ if (!isset($_POST['action'])) {
 
 if ($_POST['action'] == 'preview_resume') {
     $keywords = trim($_POST['keywords']);
+    $keywords = str_replace($GLOBALS['stopWords'], '', $keywords);
     $use_and_op = ($_POST['use_and'] == '1') ? true : false;
     
     $mysqli = Database::connect();

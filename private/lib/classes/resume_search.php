@@ -35,6 +35,20 @@ class ResumeSearch {
         return $out;
     }
     
+    private function remove_stop_words($_keywords) {
+        $out = array();
+        $stop_words = $GLOBALS['stopWords'];
+        $words = explode(' ', $_keywords);
+        
+        foreach ($words as $word) {
+            if (!in_array($word, $stop_words)) {
+                $out[] = $word;
+            }
+        }
+        
+        return implode(' ', $out);
+    }
+    
     private function make_query($with_limit = false) {
         $boolean_mode = '';
         $keywords = $this->keywords;
@@ -44,18 +58,26 @@ class ResumeSearch {
         if (!empty($keywords) && !is_null($keywords)) {
             if ($this->use_mode == 'or') {
                 // 'or' mode
-                $keywords = $this->insert_wildcard_to_keywords($keywords);
+                // $keywords = $this->insert_wildcard_to_keywords($keywords);
+                
+                $match_against = "MATCH (resume_index.cover_note, 
+                                         resume_index.skill, 
+                                         resume_index.technical_skill, 
+                                         resume_index.qualification, 
+                                         resume_index.work_summary, 
+                                         resume_index.file_text) 
+                                  AGAINST ('". $keywords. "' IN BOOLEAN MODE)";
             } else {
                 // 'and' mode
                 $keywords = '%'. $keywords. '%';
+                
+                $match_against = "resume_index.cover_note LIKE '". $keywords. "' OR 
+                                  resume_index.qualification LIKE '". $keywords. "' OR 
+                                  resume_index.work_summary LIKE '". $keywords. "' OR 
+                                  resume_index.skill LIKE '". $keywords. "' OR 
+                                  resume_index.technical_skill LIKE '". $keywords. "' OR 
+                                  resume_index.file_text LIKE '". $keywords. "'";
             }
-
-            $match_against = "resume_index.cover_note LIKE '". $keywords. "' OR 
-                              resume_index.qualification LIKE '". $keywords. "' OR 
-                              resume_index.work_summary LIKE '". $keywords. "' OR 
-                              resume_index.skill LIKE '". $keywords. "' OR 
-                              resume_index.technical_skill LIKE '". $keywords. "' OR 
-                              resume_index.file_text LIKE '". $keywords. "'";
         }
         
         // check should we use BOOLEAN MODE
@@ -147,7 +169,7 @@ class ResumeSearch {
         $keywords = sanitize(trim($_criterias['keywords']));
         if (!empty($keywords)) {
             $this->keywords = $this->remove_punctuations_from($keywords);
-            $this->keywords = str_replace($GLOBALS['stopWords'], '', $this->keywords);
+            $this->keywords = $this->remove_stop_words($this->keywords);
         }
         
         if (array_key_exists('country_code', $_criterias)) {
