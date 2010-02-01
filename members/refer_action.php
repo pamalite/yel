@@ -347,6 +347,28 @@ if ($_POST['action'] == 'make_referral') {
             fclose($handle);*/
         }
     }
+    
+    
+    if (isset($_POST['testimony'])) {
+        if ($member->is_IRC()) {
+            $query = "SELECT DISTINCT country FROM branches";
+            $result = $mysqli->query($query);
+            $available_branches = array();
+            foreach ($result as $row) {
+                $available_branches[] = $row['country'];
+            }
+
+            $team = 'team.my@yellowelevator.com';
+            if (in_array($member->get_country_code(), $available_branches)) {
+                $team = 'team.'. strtolower($member->get_country_code()). '@yellowelevator.com';
+            }
+            $message = 'IRC testimony alert. Please login to Employees account to check.';
+            $subject = 'IRC Testimony Alert';
+            $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+            mail($team, $subject, $message, $headers);
+        }
+    }
+    
     echo $return;
     exit();
 }

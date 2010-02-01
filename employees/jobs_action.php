@@ -165,7 +165,6 @@ if ($_POST['action'] == 'get_job') {
 if ($_POST['action'] == 'publish') {
     $mysqli = Database::connect();
     $employer = new Employer($_POST['employer']);
-    
     // check whether employer can use free job posting?
     if ($employer->has_free_job_postings() === false) {
         // check whether employer has paid job postings?

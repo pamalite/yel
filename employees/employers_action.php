@@ -391,7 +391,7 @@ if ($_POST['action'] == 'save_profile') {
 
         $issued_date = explode('-', $data['issued_on']);
         $issued_timestamp = $issued_date[0]. $issued_date[1]. $issued_date[2];
-        $message = str_replace('%purchased_on%', date('j M, Y', $issued_timestamp), $message);
+        $message = str_replace('%purchased_on%', date('j M', $issued_timestamp). ', '. $issued_date[0], $message);
 
         $body .= $message. "\n";
         $body .= '--yel_mail_sep_alt_'. $invoice. "--\n\n";
@@ -542,7 +542,7 @@ if ($_POST['action'] == 'save_profile') {
 
         $issued_date = explode('-', $data['issued_on']);
         $issued_timestamp = $issued_date[0]. $issued_date[1]. $issued_date[2];
-        $message = str_replace('%purchased_on%', date('j M, Y', $issued_timestamp), $message);
+        $message = str_replace('%purchased_on%', date('j M', $issued_timestamp). ', '. $issued_date[0], $message);
 
         $body .= $message. "\n";
         $body .= '--yel_mail_sep_alt_'. $invoice. "--\n\n";

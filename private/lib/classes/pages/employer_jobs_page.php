@@ -126,7 +126,7 @@ class EmployerJobsPage extends Page {
                     </td>
                 </tr>
             </table>
-        </div>
+        </div-->
         <div id="div_tabs">
             <ul>
                 <li id="li_open"><span id="open_back_arrow">&lt;&lt;&nbsp;</span>Currently Open</li>

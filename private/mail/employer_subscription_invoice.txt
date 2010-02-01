@@ -1,12 +1,15 @@
 Hi %employer%,
 
-Our systems had indicated that you have chosen to subscribe %period% of month(s) 
-at %currency% $%amount%, inclusive of 5% administrative fee, on %purchased_on%. 
+Thank you for choosing Yellow Elevator's %period%-month subscription package. 
+The sum total for the order confirmation received on %purchased_on% is 
+%currency% $%amount% (inclusive of 5% administration fee).
 
-Attached is the invoice of the subscription made. 
+Please find the invoice for the subscription attached. Kindly settle the 
+invoice as soon as possible (within 30 days starting from the date of the invoice) 
+to keep the billing process clean and simple for all parties.
 
-To proceed with payment, the following are the payment instructions and details 
-for your perusal:
+The various acceptable payment methods and their respective payment details are as 
+follows:
 
 For Bank Transfer:
 ------------------

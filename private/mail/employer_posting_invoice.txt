@@ -1,13 +1,15 @@
 Hi %employer%,
 
-Our systems had indicated that you have purchased %postings% of job posting(s) 
+Our systems had indicated that you have purchased %postings% job posting(s) 
 at %currency% $%price% a post, which amounts to %currency% $%amount%, on 
 %purchased_on%. 
 
-Attached is the invoice of the subscription made. 
+Please find the invoice for the subscription attached. Kindly settle the 
+invoice as soon as possible (within 30 days starting from the date of the invoice) 
+to keep the billing process clean and simple for all parties.
 
-To proceed with payment, the following are the payment instructions and details 
-for your perusal:
+The various acceptable payment methods and their respective payment details are as 
+follows:
 
 For Bank Transfer:
 ------------------
