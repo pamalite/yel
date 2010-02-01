@@ -262,7 +262,9 @@ class Page {
                                 &nbsp;
                                 <input id="mini_search_button" type="submit" value="Search Resumes">
                                 &nbsp;
-                                <input type="checkbox" name="use_exact" id="use_exact" value="1" /><label for="use_exact">Exact</label>
+                                <!--input type="checkbox" name="use_exact" id="use_exact" value="1" /><label for="use_exact">Exact</label-->
+                                <input type="radio" name="use_mode" id="or_mode" value="or" checked /><label for="or_mode">OR</label>
+                                <input type="radio" name="use_mode" id="and_mode" value="and" /><label for="and_mode">AND</label>
                             </div>
                         </form>
                     </td>

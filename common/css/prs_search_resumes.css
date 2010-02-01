@@ -87,3 +87,34 @@ td.action {
     width: 98%;
     height: 290px;
 }
+
+#div_resume_preview {
+    display: none;
+    background-color: #FFFFFF;
+    position: fixed;
+    border: 3px solid #0000FF;
+    text-align: center;
+    width: 800px;
+    height: 600px;
+    overflow: auto;
+}
+
+#div_resume_preview p {
+    font-size: 10pt;
+    margin: 3px 3px 3px 3px;
+}
+
+#div_resume_preview p.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    text-align: center;
+    background-color: #CCCCCC;
+}
+
+#div_resume_preview div.preview_text {
+    width: 98%;
+    height: 85%;
+    padding: 5px 5px 5px 5px;
+    border: 1px solid #666666;
+    overflow: auto;
+}

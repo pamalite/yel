@@ -1,3 +1,5 @@
+<?php 
+
 $stopWords = array("a","able","about","above","according","accordingly","across","actually","after","afterwards",
 "again","against","ain't","all","allow","allows","almost","alone","along","already","also","although","always",
 "am","among","amongst","an","and","another","any","anybody","anyhow","anyone","anything","anyway","anyways",
@@ -40,3 +42,4 @@ $stopWords = array("a","able","about","above","according","accordingly","across"
 "which","while","whither","who","who's","whoever","whole","whom","whose","why","will","willing","wish","with","within",
 "without","won't","wonder","would","would","wouldn't","yes","yet","you","you'd","you'll","you're","you've","your",
 "yours","yourself","yourselves","zero");
+?>

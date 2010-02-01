@@ -5,14 +5,15 @@ class ResumeSearch {
     private $industry = 0;
     private $keywords = '';
     private $country_code = '';
-    private $order_by = 'relevance desc';
+    private $order_by = 'members.joined_on desc';
     private $limit = '';
     private $offset = 0;
     private $punctuations = array(",", ".",";","\"","\'","(",")","[","]","{","}","<",">");
     private $total = 0;
     private $pages = 1;
     private $changed_country_code = false;
-    private $use_exact = false;
+    // private $use_exact = false;
+    private $use_mode = 'or'; // 'or' or 'and'
     
     function __construct() {
         $this->country_code = $GLOBALS['default_country_code'];
@@ -23,12 +24,12 @@ class ResumeSearch {
         return str_replace($this->punctuations, ' ', $keywords);
     }
     
-    private function insert_wildcard_to_keywords() {
-        $keywords = explode(" ", trim($keywords));
+    private function insert_wildcard_to_keywords($_keywords) {
+        $keywords = explode(' ', trim($_keywords));
         $out = '%';
 
-        foreach ($keywords as $str) {
-            $out .= trim($str). '%';
+        foreach ($keywords as $word) {
+            $out .= trim($word). '%';
         }
 
         return $out;
@@ -38,22 +39,41 @@ class ResumeSearch {
         $boolean_mode = '';
         $keywords = $this->keywords;
         
+        // check what mode should we use
+        $match_against = '';
+        if (!empty($keywords) && !is_null($keywords)) {
+            if ($this->use_mode == 'or') {
+                // 'or' mode
+                $keywords = $this->insert_wildcard_to_keywords($keywords);
+            } else {
+                // 'and' mode
+                $keywords = '%'. $keywords. '%';
+            }
+
+            $match_against = "resume_index.cover_note LIKE '". $keywords. "' OR 
+                              resume_index.qualification LIKE '". $keywords. "' OR 
+                              resume_index.work_summary LIKE '". $keywords. "' OR 
+                              resume_index.skill LIKE '". $keywords. "' OR 
+                              resume_index.technical_skill LIKE '". $keywords. "' OR 
+                              resume_index.file_text LIKE '". $keywords. "'";
+        }
+        
         // check should we use BOOLEAN MODE
-        if (str_word_count($this->keywords) <= 3 || $this->use_exact) {
-            $boolean_mode = ' IN BOOLEAN MODE';
-        }
-        
-        if ($this->use_exact) {
-            $keywords = '"'. $this->keywords. '"';
-        }
-        
-        $match_against = "MATCH (resume_index.cover_note, 
-                                 resume_index.skill, 
-                                 resume_index.technical_skill, 
-                                 resume_index.qualification, 
-                                 resume_index.work_summary, 
-                                 resume_index.file_text) 
-                          AGAINST ('". $keywords. "'". $boolean_mode. ")";
+        // if (str_word_count($this->keywords) <= 3 || $this->use_exact) {
+        //     $boolean_mode = ' IN BOOLEAN MODE';
+        // }
+        // 
+        // if ($this->use_exact) {
+        //     $keywords = '"'. $this->keywords. '"';
+        // }
+        // 
+        // $match_against = "MATCH (resume_index.cover_note, 
+        //                          resume_index.skill, 
+        //                          resume_index.technical_skill, 
+        //                          resume_index.qualification, 
+        //                          resume_index.work_summary, 
+        //                          resume_index.file_text) 
+        //                   AGAINST ('". $keywords. "'". $boolean_mode. ")";
         
         $filter_industry = "members.primary_industry IS NOT NULL OR members.primary_industry IS NULL";
         if ($this->industry > 0) {
@@ -87,24 +107,24 @@ class ResumeSearch {
                    LEFT JOIN countries ON countries.country_code = members.country 
                    LEFT JOIN recommender_industries ON recommender_industries.recommender = members.recommender ";
         
-       // if (!is_null($this->keywords) && !empty($this->keywords)) {
-       //     $query .= ", (SELECT MAX(". $match_against. ") AS max_relevance FROM resume_index LIMIT 1) relevances ";
-       //     $query .= "WHERE ". $match_against. " AND ";
-       // } else {
-       //     $query .= "WHERE ";
-       // }
+        if (!is_null($this->keywords) && !empty($this->keywords)) {
+            // $query .= ", (SELECT MAX(". $match_against. ") AS max_relevance FROM resume_index LIMIT 1) relevances ";
+            // $query .= "WHERE ". $match_against. " AND ";
+            $query .= "WHERE (". $match_against. ") AND ";
+        } else {
+            $query .= "WHERE ";
+        }
        
-       $query .= "WHERE ";
-       $query .= "(". $filter_industry. ") 
-                  AND (". $filter_country. ") 
-                  AND members.active <> 'S' ";
+        $query .= "(". $filter_industry. ") 
+                   AND (". $filter_country. ") 
+                   AND members.active <> 'S' ";
        
-       if ($with_limit) {
-           $query .= "ORDER BY ". $this->order_by. " 
-                      LIMIT ". $this->offset. ", ". $this->limit; 
-       }
+        if ($with_limit) {
+            $query .= "ORDER BY ". $this->order_by. " 
+                       LIMIT ". $this->offset. ", ". $this->limit; 
+        }
        
-       return $query;
+        return $query;
     }
     
     public function total_results() {
@@ -127,6 +147,7 @@ class ResumeSearch {
         $keywords = sanitize(trim($_criterias['keywords']));
         if (!empty($keywords)) {
             $this->keywords = $this->remove_punctuations_from($keywords);
+            $this->keywords = str_replace($GLOBALS['stopWords'], '', $this->keywords);
         }
         
         if (array_key_exists('country_code', $_criterias)) {
@@ -145,7 +166,8 @@ class ResumeSearch {
             $this->offset = $_criterias['offset'];
         }
         
-        $this->use_exact = $_criterias['use_exact'];
+        // $this->use_exact = $_criterias['use_exact'];
+        $this->use_mode = $_criterias['use_mode'];
         
         $query = $this->make_query();
         $mysqli = Database::connect();
@@ -170,14 +192,16 @@ class ResumeSearch {
             return 0;
         }
         
-        $result = $mysqli->query($this->make_query(true));
+        $query = $this->make_query(true);
+        $result = $mysqli->query($query);
+        
         if ($result === false) {
             return false;
         }
         
-        foreach($result as $i=>$row) {
-            $result[$i]['match_percentage'] = number_format((($row['relevance'] / $row['max_relevance']) * 100.00), 0, '.', ', ');
-        }
+        // foreach($result as $i=>$row) {
+        //     $result[$i]['match_percentage'] = number_format((($row['relevance'] / $row['max_relevance']) * 100.00), 0, '.', ', ');
+        // }
         
         return $result;
     }

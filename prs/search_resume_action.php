@@ -56,7 +56,8 @@ if (!isset($_POST['action'])) {
     $criteria['limit'] = $GLOBALS['default_results_per_page'];
     $criteria['offset'] = 0;
     $criteria['keywords'] = $_POST['keywords'];
-    $criteria['use_exact'] = (isset($_POST['use_exact'])) ? true : false;
+    // $criteria['use_exact'] = (isset($_POST['use_exact'])) ? true : false;
+    $criteria['use_mode'] = $_POST['use_mode'];
     $_SESSION['yel']['prs']['resume_search']['criteria'] = array();
     $_SESSION['yel']['prs']['resume_search']['criteria']['order_by'] = 'relevance desc';
     $_SESSION['yel']['prs']['resume_search']['criteria']['industry'] = 0;
@@ -64,7 +65,8 @@ if (!isset($_POST['action'])) {
     $_SESSION['yel']['prs']['resume_search']['criteria']['limit'] = $GLOBALS['default_results_per_page'];
     $_SESSION['yel']['prs']['resume_search']['criteria']['offset'] = 0;
     $_SESSION['yel']['prs']['resume_search']['criteria']['keywords'] = $_POST['keywords'];
-    $_SESSION['yel']['prs']['resume_search']['criteria']['use_exact'] = $criteria['use_exact'];
+    // $_SESSION['yel']['prs']['resume_search']['criteria']['use_exact'] = $criteria['use_exact'];
+    $_SESSION['yel']['prs']['resume_search']['criteria']['use_mode'] = $criteria['use_mode'];
     
     if (isset($_POST['order_by'])) {
         $criteria['order_by'] = $_POST['order_by'];
@@ -93,22 +95,40 @@ if (!isset($_POST['action'])) {
     
     $result = $resume_search->search_using($criteria);
     if ($result == 0) {
-        if ($criteria['use_exact']) {
-            echo "01";
+        if ($criteria['use_mode'] == 'or') {
+            echo '0.or';
         } else {
-            echo "0";
+            echo '0.and';
         }
         exit();
     }
-
+    
     if (!$result) {
-        if ($criteria['use_exact']) {
-            echo "ko1";
+        if ($criteria['use_mode'] == 'or') {
+            echo "ko.or";
         } else {
-            echo "ko";
+            echo "ko.and";
         }
         exit();
     }
+    
+    // if ($result == 0) {
+    //     if ($criteria['use_exact']) {
+    //         echo "01";
+    //     } else {
+    //         echo "0";
+    //     }
+    //     exit();
+    // }
+    // 
+    // if (!$result) {
+    //     if ($criteria['use_exact']) {
+    //         echo "ko1";
+    //     } else {
+    //         echo "ko";
+    //     }
+    //     exit();
+    // }
     
     $total_results = $resume_search->total_results();
     $current_page = '1';
@@ -126,11 +146,13 @@ if (!isset($_POST['action'])) {
         $result[$i]['total_results'] = $total_results;
         $result[$i]['current_page'] = $current_page;
         
-        if ($criteria['use_exact']) {
-            $result[$i]['use_exact'] = '1';
-        } else {
-            $result[$i]['use_exact'] = '0';
-        }
+        // if ($criteria['use_exact']) {
+        //     $result[$i]['use_exact'] = '1';
+        // } else {
+        //     $result[$i]['use_exact'] = '0';
+        // }
+        
+        $result[$i]['use_mode'] = $criteria['use_mode'];
         
         if (is_null($result[$i]['added_by']) || empty($result[$i]['added_by'])) {
             $result[$i]['added_by'] = '-1';
@@ -156,14 +178,24 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'preview_resume') {
+    $keywords = trim($_POST['keywords']);
     $use_and_op = ($_POST['use_and'] == '1') ? true : false;
     
     $mysqli = Database::connect();
-    $query = "SELECT cover_note, qualification, work_summary, 
-              skill, technical_skill, file_text
+    $query = "SELECT resume_index.cover_note, resume_index.qualification, resume_index.work_summary, 
+              resume_index.skill, resume_index.technical_skill, resume_index.file_text, 
+              members.email_addr, 
+              CONCAT(members.lastname, ', ', members.firstname) AS member 
               FROM resume_index 
-              WHERE `resume` = ". $_POST['resume_id']. " LIMIT 1";
+              INNER JOIN resumes ON resumes.id = resume_index.resume 
+              INNER JOIN members ON members.email_addr = resumes.member 
+              WHERE resume_index.resume = ". $_POST['resume_id']. " LIMIT 1";
     $result = $mysqli->query($query);
+    
+    if (is_null($result) || empty($result)) {
+        echo 'ko';
+        exit();
+    }
     
     $preview_text = '';
     $preview_text .= (!empty($result[0]['cover_note']) && !is_null($result[0]['cover_note'])) ? $result[0]['cover_note']. "\n\n" : '';
@@ -173,9 +205,23 @@ if ($_POST['action'] == 'preview_resume') {
     $preview_text .= (!empty($result[0]['technical_skill']) && !is_null($result[0]['technical_skill'])) ? $result[0]['technical_skill']."\n\n" : '';
     $preview_text .= (!empty($result[0]['file_text']) && !is_null($result[0]['file_text'])) ? $result[0]['file_text'] : '';
     
+    $preview_text = trim($preview_text);
+    if (is_null($preview_text) || empty($preview_text)) {
+        echo '-1';
+        exit();
+    }
+    
     $preview_text = htmlspecialchars_decode(stripslashes($preview_text));
-    $preview_text = highlight_keywords($_POST['keywords'], $preview_text, $use_and_op);
-    $response = array('resume' => array('preview_text' => $preview_text));
+    if (!is_null($keywords) && !empty($keywords)) {
+        $preview_text = highlight_keywords($_POST['keywords'], $preview_text, $use_and_op);
+    }
+    
+    $response = array('resume' => array(
+        'member' => htmlspecialchars_decode($result[0]['member']), 
+        'email_addr' => $result[0]['email_addr'],
+        'preview_text' => $preview_text
+        )
+    );
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
     exit();

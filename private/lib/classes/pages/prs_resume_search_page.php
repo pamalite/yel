@@ -40,10 +40,16 @@ class PrsResumeSearchPage extends Page {
         echo 'var industry = "'. $this->criterias['industry']. '";'. "\n";
         echo 'var keywords = "'. $this->criterias['keywords']. '";'. "\n";
         
-        if ($this->criterias['use_exact'] == '1') {
-            echo 'var use_exact = true;'. "\n";
+        // if ($this->criterias['use_exact'] == '1') {
+        //     echo 'var use_exact = true;'. "\n";
+        // } else {
+        //     echo 'var use_exact = false;'. "\n";
+        // }
+        
+        if ($this->criterias['use_mode'] == 'or') {
+            echo "var use_mode = 'or';\n";
         } else {
-            echo 'var use_exact = false;'. "\n";
+            echo "var use_mode = 'and';\n";
         }
         
         $limit = (isset($this->criterias['limit'])) ? $this->criterias['limit'] : $GLOBALS['default_results_per_page'];
@@ -72,7 +78,7 @@ class PrsResumeSearchPage extends Page {
             </div>
             <table class="header">
                 <tr>
-                    <td class="match_percentage"><span class="sort" id="sort_match_percentage">Match</span></td>
+                    <!-- td class="match_percentage"><span class="sort" id="sort_match_percentage">Match</span></td -->
                     <td class="date"><span class="sort" id="sort_joined_on">Joined On</span></td>
                     <td class="member"><span class="sort" id="sort_member">Candidate</span></td>
                     <td class="industry"><span class="sort" id="sort_primary_industry">Specialization 1</span></td>
@@ -127,6 +133,14 @@ class PrsResumeSearchPage extends Page {
             </form>
         </div>
         
+        <div id="div_resume_preview">
+            <div style="width: 98%; text-align: center; padding: 5px 5px 5px 5px; margin: 5px 5px 5px 5px;">
+                Preview of <span id="member_label" style="font-weight: bold;"></span>'s resume.
+            </div>
+            <div id="preview_text" class="preview_text">
+            </div>
+            <p class="button"><input type="button" value="Close" onClick="close_resume_preview();" />&nbsp;<span id="open_resume_panel"></span></p>
+        </div>
         <?php
     }
 }

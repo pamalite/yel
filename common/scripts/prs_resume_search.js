@@ -1,4 +1,4 @@
-var order_by = 'relevance';
+var order_by = 'members.joined_on';
 var order = 'desc';
 //var offset = 0;
 var current_page = 1;
@@ -221,8 +221,13 @@ function show_resumes() {
     var params = 'industry=' + industry;
     params = params + '&country_code=' + country_code;
     params = params + '&keywords=' + keywords;
-    if (use_exact) {
-        params = params + '&use_exact=1';
+    // if (use_exact) {
+    //     params = params + '&use_exact=1';
+    // }
+    if (use_mode == 'or') {
+        params = params + '&use_mode=or';
+    } else {
+        params = params + '&use_mode=and';
     }
     params = params + '&offset=' + offset;
     params = params + '&limit=' + limit;
@@ -233,31 +238,46 @@ function show_resumes() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            if (txt == 'ko1' || txt == '01') {
-                txt = txt.substr(0, (txt.length - 1));
-                $('use_exact').checked = true;
+            if (xml == null) {
+                var responses = txt.split('.');
+                var mode = responses[1];
+                txt = responses[0];
+                if (mode == 'and') {
+                    $('and_mode').checked = true;
+                    $('or_mode').checked = false;
+                } else {
+                    $('and_mode').checked = false;
+                    $('or_mode').checked = true;
+                }
+
+                if (txt == 'ko') {
+                    set_status('An error occured while searching resumes.');
+                    return false;
+                }
+
+                if (txt == '0') {
+                    set_status('No resume with the criteria.');
+                    $('div_list').set('html', '');
+                    $('current_page').set('html', '0');
+                    $('total_page').set('html', '0');
+                    $('current_page_1').set('html', '0');
+                    $('total_page_1').set('html', '0');
+                    show_limit_dropdown();
+                    return false;
+                }
             } else {
-                $('use_exact').checked = false;
-            }
-            
-            if (txt == 'ko') {
-                set_status('An error occured while searching resumes.');
-                return false;
-            }
-            
-            if (txt == '0') {
-                set_status('No resume with the criteria.');
-                $('div_list').set('html', '');
-                $('current_page').set('html', '0');
-                $('total_page').set('html', '0');
-                $('current_page_1').set('html', '0');
-                $('total_page_1').set('html', '0');
-                show_limit_dropdown();
-                return false;
+                var use_mode = xml.getElementsByTagName('use_mode');
+                if (use_mode[0].childNodes[0].nodeValue == 'and') {
+                    $('and_mode').checked = true;
+                    $('or_mode').checked = false;
+                } else {
+                    $('and_mode').checked = false;
+                    $('or_mode').checked = true;
+                }
             }
             
             var ids = xml.getElementsByTagName('resume_id');
-            var matches = xml.getElementsByTagName('match_percentage');
+            // var matches = xml.getElementsByTagName('match_percentage');
             var members = xml.getElementsByTagName('member');
             var primary_industries = xml.getElementsByTagName('prime_industry');
             var secondary_industries = xml.getElementsByTagName('second_industry');
@@ -296,7 +316,7 @@ function show_resumes() {
                 var resume_id = ids[i].childNodes[0].nodeValue;
                 
                 html = html + '<tr id="'+ resume_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                html = html + '<td class="match_percentage"><img src="' + root + '/common/images/match_bar.jpg" style="height: 4px; width: ' + Math.floor(matches[i].childNodes[0].nodeValue / 100 * 50) + 'px; vertical-align: middle;" /></td>' + "\n";
+                // html = html + '<td class="match_percentage"><img src="' + root + '/common/images/match_bar.jpg" style="height: 4px; width: ' + Math.floor(matches[i].childNodes[0].nodeValue / 100 * 50) + 'px; vertical-align: middle;" /></td>' + "\n";
                 html = html + '<td class="date">' + joined_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
                 
                 var active = '';
@@ -313,9 +333,9 @@ function show_resumes() {
                 html = html + '<td class="industry">' + secondary_industries[i].childNodes[0].nodeValue + '</td>' + "\n";
                 
                 if (file_hashes[i].childNodes.length > 0) {
-                    html = html + '<td class="title"><span class="reupload"><a href="resume.php?id=' + resume_id + '&member=' + email_addrs[i].childNodes[0].nodeValue + '">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="title"><span class="reupload"><a class="no_link" onClick="show_resume_preview(\'' + resume_id + '\', true)">Preview</a> | <a href="resume.php?id=' + resume_id + '&member=' + email_addrs[i].childNodes[0].nodeValue + '" target="_new">Download</a></td>' + "\n";
                 } else {
-                    html = html + '<td class="label"><a class="no_link" onClick="show_resume_page(\'' + resume_id + '\')">' + labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
+                    html = html + '<td class="label"><a class="no_link" onClick="show_resume_preview(\'' + resume_id + '\', false)">Preview</a> | <a class="no_link" onClick="show_resume_page(\'' + resume_id + '\')">View</a></td>' + "\n";
                 }
                 
                 html = html + '<td class="country">' + countries[i].childNodes[0].nodeValue + '</td>' + "\n";
@@ -435,6 +455,79 @@ function show_email_add_form(_candidate_email) {
     show_mailing_lists();
 }
 
+function close_resume_preview() {
+    $('div_resume_preview').setStyle('display', 'none');
+    $('div_blanket').setStyle('display', 'none');
+    set_status('');
+}
+
+function show_resume_preview(_resume_id, _is_file) {
+    var window_height = 0;
+    var window_width = 0;
+    var div_height = parseInt($('div_resume_preview').getStyle('height'));
+    var div_width = parseInt($('div_resume_preview').getStyle('width'));
+    
+    if (typeof window.innerHeight != 'undefined') {
+        window_height = window.innerHeight;
+    } else {
+        window_height = document.documentElement.clientHeight;
+    }
+    
+    if (typeof window.innerWidth != 'undefined') {
+        window_width = window.innerWidth;
+    } else {
+        window_width = document.documentElement.clientWidth;
+    }
+    
+    $('div_resume_preview').setStyle('top', ((window_height - div_height) / 2));
+    $('div_resume_preview').setStyle('left', ((window_width - div_width) / 2));
+    
+    var use_and = 0;
+    if (use_mode == 'and') {
+        use_and = 1;
+    }
+    var params = 'resume_id=' + _resume_id + '&action=preview_resume';
+    params = params + '&keywords=' + keywords;
+    params = params + '&use_and=' + use_and;
+    
+    var uri = root + '/prs/search_resume_action.php';
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('The resume does not exist. What you are looking at may just be residual data.');
+                return;
+            }
+            
+            if (txt == '-1') {
+                alert('No resume entered.');
+                return;
+            }
+            
+            var member = xml.getElementsByTagName('member');
+            var email_addr = xml.getElementsByTagName('email_addr');
+            var preview_text = xml.getElementsByTagName('preview_text');
+            
+            $('member_label').set('html', member[0].childNodes[0].nodeValue);
+            $('preview_text').set('html', preview_text[0].childNodes[0].nodeValue);
+            
+            var link = '';
+            if (_is_file) {
+                link = '<a href="resume.php?id=' + _resume_id + '&member=' + email_addr[0].childNodes[0].nodeValue + '" target="_new">Download</a>'
+            } else {
+                link = '<a class="no_link" onClick="show_resume_page(\'' + _resume_id + '\')">View</a>';
+            }
+            $('open_resume_panel').set('html', link);
+            
+            $('div_blanket').setStyle('display', 'block');
+            $('div_resume_preview').setStyle('display', 'block');
+        }
+    });
+    
+    request.send(params);
+}
+
 function onDomReady() {
     set_root();
     list_available_industries(industry);
@@ -444,11 +537,11 @@ function onDomReady() {
         $('mini_keywords').value = keywords;
     }
     
-    $('sort_match_percentage').addEvent('click', function() {
-        order_by = 'relevance';
-        ascending_or_descending();
-        show_resumes();
-    });
+    // $('sort_match_percentage').addEvent('click', function() {
+    //     order_by = 'relevance';
+    //     ascending_or_descending();
+    //     show_resumes();
+    // });
     
     $('sort_primary_industry').addEvent('click', function() {
         order_by = 'prime_industry';
