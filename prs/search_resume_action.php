@@ -44,6 +44,20 @@ function highlight_keywords($_keyword_string, $_text, $_use_and_op = false) {
     return $_text;
 }
 
+function remove_stop_words($_keywords) {
+    $out = array();
+    $stop_words = $GLOBALS['stopWords'];
+    $words = explode(' ', $_keywords);
+    
+    foreach ($words as $word) {
+        if (!in_array($word, $stop_words)) {
+            $out[] = $word;
+        }
+    }
+    
+    return implode(' ', $out);
+}
+
 $xml_dom = new XMLDOM();
 
 if (!isset($_POST['action'])) {
@@ -179,7 +193,7 @@ if (!isset($_POST['action'])) {
 
 if ($_POST['action'] == 'preview_resume') {
     $keywords = trim($_POST['keywords']);
-    $keywords = str_replace($GLOBALS['stopWords'], '', $keywords);
+    $keywords = remove_stop_words($keywords);
     $use_and_op = ($_POST['use_and'] == '1') ? true : false;
     
     $mysqli = Database::connect();
