@@ -15,9 +15,9 @@ For Bank Transfer:
 ------------------
 Payable To: Yellow Elevator Sdn Bhd
 Amount: %currency% $%amount%
-Account Number: ???
-SWIFT Code: ???
-Bank (Branch): OCBC Bank (Batu Maung)
+Account Number: 730-114592-7
+SWIFT Code: N/A
+Bank (Branch): OCBC Bank
 
 For Cheque/Money Order:
 -----------------------

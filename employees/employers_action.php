@@ -414,7 +414,7 @@ if ($_POST['action'] == 'save_profile') {
     if ($_POST['subscription_period'] > 0) {
         $single_subscription_prices = array(
             'MYR' => 1000,
-            'SGD' => 500
+            'SGD' => 1000
         );
         
         // 0. get the job postings pricing and currency

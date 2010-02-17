@@ -65,7 +65,7 @@ class ContactPage extends Page {
                             </ul>
                         </div>
                     </td>
-                    <td rowspan="1" style="padding-left: 20px; border-left: 1px dashed #CCCCCC;">
+                    <!-- td rowspan="1" style="padding-left: 20px; border-left: 1px dashed #CCCCCC;">
                         <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/AU.gif" />
                     </td>
                     <td>
@@ -90,6 +90,35 @@ class ContactPage extends Page {
                                 <li>
                                     <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
                                     billing.au@yellowelevator.com
+                                </li>
+                            </ul>
+                        </div>
+                    </td -->
+                    <td rowspan="1">
+                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/SG.gif" />
+                    </td>
+                    <td style="padding-right: 20px;">
+                        <div>
+                            <span style="font-weight: bold;">Singapore</span><br/>
+                            Yellow Elevator Sdn. Bhd.<br/>
+                            1-12B-9, Suntech @ Penang Cybercity,<br/>
+                            Lintang Mayang Pasir 3, <br/>
+                            11950 Penang, Malaysia.
+                        </div>
+                        <div style="padding-top: 10px;">
+                            <span style="font-weight: bold;">Tel:</span> +6 04 640 6363<br/>
+                            <span style="font-weight: bold;">Fax:</span> +6 04 640 6366<br/>
+                        </div>
+                        <div style="padding-top: 10px;">
+                            <span style="font-weight: bold;">E-mail addresses:</span>
+                            <ul style="margin-top: 3px; margin-left: -20px;">
+                                <li>
+                                    <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
+                                    sales.sg@yellowelevator.com
+                                </li>
+                                <li>
+                                    <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
+                                    billing.sg@yellowelevator.com
                                 </li>
                             </ul>
                         </div>
