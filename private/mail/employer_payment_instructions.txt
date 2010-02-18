@@ -15,7 +15,6 @@ For Bank Transfer:
 Payable To: Yellow Elevator Sdn Bhd
 Amount: %currency% $ %amount%
 Account Number: 730-114592-7
-SWIFT Code: N/A
 Bank (Branch): OCBC Bank
 
 For Cheque/Money Order:
@@ -25,19 +24,12 @@ sending the payment to.)
 Amount: %currency% $ %amount%
 Send it to the closest branches listed below:
 
-Malaysia
---------
+Malaysia / Singapore
+--------------------
 Yellow Elevator Sdn. Bhd.
 1-12B-9, Suntech @ Penang Cybercity,
 Lintang Mayang Pasir 3, 
 11950 Penang, Malaysia.
-
-Australia
----------
-Yellow Elevator Pty Ltd
-Suite 3, 22 Council St, 
-Hawthorn East, 
-VIC 3123, Australia.
 
 
 Thank you for choosing Yellow Elevator.

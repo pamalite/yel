@@ -42,11 +42,17 @@ if (!is_null($cover[0]['file_name'])) {
     if ($has_photo) {
         ?>
             <div style="text-align: center;">
-                <?php if (file_exists($resume_file)) { ?>
+                <?php 
+                if (file_exists($resume_file)) { 
+                ?>
                 <a href="http://<?php echo $GLOBALS['root']. '/employers/resume_download.php?id='. $_GET['id'] ?>">
                     Click here to download the resume.
                 </a>
-                <?php } else { echo 'Sorry, the resume file seemed to be missing. Please contact us at <a href="mailto: support@yellowelevator.com">support@yellowelevator.com</a>.' } ?>
+                <?php 
+                } else { 
+                    echo 'Sorry, the resume file seemed to be missing. Please contact us at <a href="mailto: support@yellowelevator.com">support@yellowelevator.com</a>.';
+                } 
+                ?>
             </div>
             <br/>
             <div style="text-align: center;">
@@ -56,11 +62,17 @@ if (!is_null($cover[0]['file_name'])) {
     } else {
         ?>
             <div style="text-align: center;">
-                <?php if (file_exists($resume_file)) { ?>
+                <?php 
+                if (file_exists($resume_file)) { 
+                ?>
                 <a href="http://<?php echo $GLOBALS['root']. '/employers/resume_download.php?id='. $_GET['id'] ?>">
                     Click here to download the resume.
                 </a>
-                <?php } else { echo 'Sorry, the resume file seemed to be missing. Please contact us at <a href="mailto: support@yellowelevator.com">support@yellowelevator.com</a>.' } ?>
+                <?php 
+                } else { 
+                    echo 'Sorry, the resume file seemed to be missing. Please contact us at <a href="mailto: support@yellowelevator.com">support@yellowelevator.com</a>.'; 
+                } 
+                ?>
             </div>
         <?php
     }
