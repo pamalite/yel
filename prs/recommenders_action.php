@@ -192,8 +192,8 @@ if ($_POST['action'] == 'get_candidates') {
         $order_by = $_POST['order_by'];
     }
     
-    $recommender = new Recommender($_POST['recommender']);
-    $result = $recommender->get_recommended_candidates($_POST['id'], $order_by);
+    $recommender = new Recommender($_POST['id']);
+    $result = $recommender->get_recommended_candidates($order_by);
     if (count($result) <= 0 || is_null($result)) {
         echo '0';
         exit();

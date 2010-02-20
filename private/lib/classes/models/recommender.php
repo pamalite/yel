@@ -194,19 +194,14 @@ class Recommender {
         return $all_success;
     }
     
-    public function get_recommended_candidates($_added_by, $_order = '') {
-        if (empty($_added_by) || is_null($_added_by)) {
-            return false;
-        }
-        
+    public function get_recommended_candidates($_order = '') {
         if (empty($_order)) {
             $_order = 'joined_on DESC';
         }
         $query = "SELECT email_addr, CONCAT(firstname, ', ', lastname) AS member, phone_num, 
                   DATE_FORMAT(joined_on, '%e %b, %Y') AS formatted_joined_on 
                   FROM members 
-                  WHERE recommender = '". $this->id(). "' AND 
-                  added_by = '". $_added_by. "' 
+                  WHERE recommender = '". $this->id(). "' 
                   ORDER BY ". $_order;
                   
         return $this->mysqli->query($query);

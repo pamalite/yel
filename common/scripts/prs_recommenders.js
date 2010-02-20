@@ -393,7 +393,7 @@ function show_candidates(_recommender_email_addr) {
     $('recommender_name').set('html', current_recommender_name);
     update_recommender_industries();
     
-    var params = 'id=' + id + '&recommender=' + current_recommender_email_addr + '&action=get_candidates';
+    var params = 'id=' + current_recommender_email_addr + '&action=get_candidates';
     params = params + '&order_by=' + candidates_order_by + ' ' + candidates_order;
     
     var uri = root + "/prs/recommenders_action.php";
