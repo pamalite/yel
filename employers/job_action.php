@@ -271,33 +271,6 @@ if ($_POST['action'] == 'close') {
 if ($_POST['action'] == 'extend') {
     $mysqli = Database::connect();
     
-<<<<<<< HEAD
-    // check enough job slots to be used?
-    // $employer = new Employer($_POST['employer']);
-    // $query = "SELECT YEAR(joined_on) AS joined_year, MONTH(joined_on) AS joined_month 
-    //           FROM employers WHERE id = '". $_POST['employer']. "'";
-    // $result = $mysqli->query($query);
-    // 
-    // $is_prior = false;
-    // $is_expired = false;
-    // if ($result[0]['joined_year'] < 2010) {
-    //     $is_prior = true;
-    //     $query = "SELECT DATEDIFF(NOW(), DATE_ADD(joined_on, INTERVAL 1 YEAR)) AS expired 
-    //               FROM employers WHERE id = '". $_POST['employer']. "'";
-    //     $result = $mysqli->query($query);
-    //     if ($result[0]['expired'] > 0) {
-    //         $is_expired = true;
-    //     }
-    // } 
-    // 
-    // if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
-    //     $result = $employer->get_slots_left();
-    //     if ($result[0]['expired'] < 0 || $result[0]['slots'] <= 0) {
-    //         echo '-2';
-    //         exit();
-    //     }
-    // }
-=======
     // check whether subscription has expired
     $employer = new Employer($_POST['employer']);
     
@@ -316,7 +289,6 @@ if ($_POST['action'] == 'extend') {
     } else {
         $employer->used_free_job_posting();
     }
->>>>>>> subscription
     
     $query = "INSERT INTO job_extensions 
               SELECT 0, id, created_on, expire_on, for_replacement, invoiced FROM jobs WHERE id = ". $_POST['job'];
@@ -344,13 +316,6 @@ if ($_POST['action'] == 'extend') {
         echo "ko";
         exit();
     }
-    
-    // if (($is_prior && $is_expired) || (!$is_prior && !$is_expired)) {
-    //     if ($employer->subtract_slots(1) === false) {
-    //         echo 'ko';
-    //         exit();
-    //     }
-    // }
     
     echo "ok";
     exit();

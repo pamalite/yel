@@ -362,7 +362,9 @@ class Employer {
             $result = $this->get_subscriptions_details();
             $query = '';
             
-            if ($result[0]['expired'] < 0) {
+            if ($result[0]['expired'] < 0 || 
+                is_null($result[0]['expired']) ||
+                empty($result[0]['expired'])) {
                 // extend from today
                 $query = "UPDATE employers SET 
                           subscription_expire_on = DATE_ADD(NOW(), INTERVAL ". $_period. " MONTH) 
