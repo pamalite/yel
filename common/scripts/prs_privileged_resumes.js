@@ -743,7 +743,7 @@ function show_job_select_form(_resume_id) {
 }
 
 function set_filter() {
-    filter_by = $('job_industry_filter').options[$('job_industry_filter').selectedIndex].value;
+    filter_by = $('job_employer_filter').options[$('job_employer_filter').selectedIndex].value;
     show_available_jobs();
 }
 

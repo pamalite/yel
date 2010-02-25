@@ -865,7 +865,7 @@ if ($_POST['action'] == 'employ_candidate') {
             Invoice::accompany_credit_note_with($previous_invoice, $invoice, $issued_on, $credit_amount);
             
             $branch = $employer->get_branch();
-            $sales = 'sales.'. strtolower($branch_raw[0]['country']). '@yellowelevator.com';
+            $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
             $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
             $branch['address_lines'] = explode("\n", $branch[0]['address']);
             $currency = Currency::symbol_from_country_code($branch[0]['country']);

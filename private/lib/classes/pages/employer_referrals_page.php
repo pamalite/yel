@@ -54,8 +54,10 @@ class EmployerReferralsPage extends Page {
         $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Resumes</span>");
         $this->menu('employer', 'referrals');
         
-        $query = "SELECT currencies.symbol FROM currencies 
-                  LEFT JOIN employers ON currencies.country_code = employers.country 
+        $query = "SELECT branches.currency 
+                  FROM employers 
+                  LEFT JOIN employees ON employees.id = employers.registered_by
+                  LEFT JOIN branches ON branches.id = employees.branch
                   WHERE employers.id = '". $this->employer->id(). "' LIMIT 1";
         $mysqli = Database::connect();
         $result = $mysqli->query($query);

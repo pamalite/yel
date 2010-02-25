@@ -202,7 +202,7 @@ if ($_POST['action'] == 'add_new_candidate') {
         $member_data['zip'] = $_POST['member_zip'];
         $member_data['country'] = $_POST['member_country'];
         $member_data['joined_on'] = $joined_on;
-        $member_data['active'] = 'N';
+        $member_data['active'] = 'Y';
         $member_data['invites_available'] = '10';
         $member_data['remarks'] = sanitize($_POST['member_remarks']);
         $member_data['like_newsletter'] = 'Y';
@@ -212,12 +212,12 @@ if ($_POST['action'] == 'add_new_candidate') {
         
         if ($member->create($member_data)) {
             // Create activation token and email
-            $activation_id = microtime(true);
-            $query = "INSERT INTO member_activation_tokens SET 
-                      id = '". $activation_id. "', 
-                      member = '". $_POST['member_email_addr']. "', 
-                      joined_on = '". $joined_on. "'";
-            if ($mysqli->execute($query)) {
+            // $activation_id = microtime(true);
+            // $query = "INSERT INTO member_activation_tokens SET 
+            //           id = '". $activation_id. "', 
+            //           member = '". $_POST['member_email_addr']. "', 
+            //           joined_on = '". $joined_on. "'";
+            // if ($mysqli->execute($query)) {
                 $mail_lines = file('../private/mail/member_activation_with_password.txt');
                 $message = '';
                 foreach ($mail_lines as $line) {
@@ -227,7 +227,6 @@ if ($_POST['action'] == 'add_new_candidate') {
                 $recommender = htmlspecialchars_decode($_POST['recommender_firstname']). ', '. htmlspecialchars_decode($_POST['recommender_lastname']);
                 $message = str_replace('%recommender%', $recommender, $message);
                 $message = str_replace('%recommender_email_addr%', $_POST['recommender_email_addr'], $message);
-                $message = str_replace('%activation_id%', $activation_id, $message);
                 $message = str_replace('%password%', $new_password, $message);
                 $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
                 $message = str_replace('%root%', $GLOBALS['root'], $message);
@@ -257,10 +256,10 @@ if ($_POST['action'] == 'add_new_candidate') {
                 if (!$mysqli->transact($query)) {
                     $default_contact_adding_error = true;
                 }
-            } else {
-                echo '-4';  // failed to create token
-                exit();
-            }
+            // } else {
+            //     echo '-4';  // failed to create token
+            //     exit();
+            // }
         } else {
             echo '-3'; // failed to create member
             exit();
@@ -338,9 +337,9 @@ if ($_POST['action'] == 'get_jobs') {
               LEFT JOIN employers ON employers.id = jobs.employer 
               WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW()";
     if ($_POST['filter_by'] != '0') {
-        $query .= " AND (jobs.industry = ". $_POST['filter_by'] ." OR industries.parent_id = ". $_POST['filter_by']. ")";
+        // $query .= " AND (jobs.industry = ". $_POST['filter_by'] ." OR industries.parent_id = ". $_POST['filter_by']. ")";
+        $query .= " WHERE jobs.employer = '". $_POST['filter_by']. "'";
     }
-    
     $result = $mysqli->query($query);
     if (is_null($result) || empty($result)) {
         echo '0';
@@ -435,9 +434,9 @@ if ($_POST['action'] == 'make_referral') {
     $data['referee_acknowledged_on'] = $today;
     
     // check whether do we have consent to refer now
-    $query = "SELECT active FROM members WHERE email_addr = '". $_POST['referee']. "' LIMIT 1";
-    $result = $mysqli->query($query);
-    if ($result[0]['active'] == 'Y') {
+    // $query = "SELECT active FROM members WHERE email_addr = '". $_POST['referee']. "' LIMIT 1";
+    // $result = $mysqli->query($query);
+    //if ($result[0]['active'] == 'Y') {
         // has consent - refer it
         if (!Referral::create($data)) {
             echo 'ko';
@@ -468,30 +467,30 @@ if ($_POST['action'] == 'make_referral') {
             // fwrite($handle, $message);
             // fclose($handle);
         }
-    } else {
-        // no consent - buffer it
-        $query = "INSERT INTO privileged_referral_buffers SET ";
-        $i = 0;
-        foreach ($data as $key=>$value) {
-            if (!is_numeric($value)) {
-                $value = "'". $value. "'";
-            }
-            
-            if ($key != 'member_rejected_on') {
-                if ($i == 0) {
-                    $query .= "`". $key. "` = ". $value;
-                } else {
-                    $query .= ", `". $key. "` = ". $value;
-                }
-                $i++;
-            }
-        }
-        
-        if (!$mysqli->execute($query)) {
-            echo 'ko';
-            exit();
-        }
-    }
+    // } else {
+    //     // no consent - buffer it
+    //     $query = "INSERT INTO privileged_referral_buffers SET ";
+    //     $i = 0;
+    //     foreach ($data as $key=>$value) {
+    //         if (!is_numeric($value)) {
+    //             $value = "'". $value. "'";
+    //         }
+    //         
+    //         if ($key != 'member_rejected_on') {
+    //             if ($i == 0) {
+    //                 $query .= "`". $key. "` = ". $value;
+    //             } else {
+    //                 $query .= ", `". $key. "` = ". $value;
+    //             }
+    //             $i++;
+    //         }
+    //     }
+    //     
+    //     if (!$mysqli->execute($query)) {
+    //         echo 'ko';
+    //         exit();
+    //     }
+    // }
     
     $position = '- '. $job['job']. ' at '. $job['employer'];
     $lines = file(dirname(__FILE__). '/../private/mail/privileged_member_referred.txt');

@@ -100,6 +100,24 @@ class PrsPrivilegedResumesPage extends Page {
         echo '</select>'. "\n";
     }
     
+    private function generateJobEmployers() {
+        $mysqli = Database::connect();
+        $query = "SELECT DISTINCT employers.id, employers.name 
+                  FROM jobs
+                  LEFT JOIN employers ON employers.id = jobs.employer 
+                  WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW()";
+        $result = $mysqli->query($query);
+        
+        echo '<select id="job_employer_filter" name="job_employer_filter" onChange="set_filter();">'. "\n";
+        echo '<option value="0" selected>all employers</option>'. "\n";
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        
+        foreach ($result as $row) {
+            echo '<option value="'. $row['id']. '">'. $row['name']. '</option>'. "\n";
+        }
+        
+        echo '</select>'. "\n";
+    }
     private function generateJobIndustries() {
         $mysqli = Database::connect();
         $query = "SELECT DISTINCT industries.id, industries.industry 
@@ -418,7 +436,7 @@ class PrsPrivilegedResumesPage extends Page {
                     </tr>
                     <tr>
                         <td class="left">
-                            <span class="filter">[ Show jobs from <?php $this->generateJobIndustries(); ?> ]</span><br/>
+                            <span class="filter">[ Show jobs from <?php $this->generateJobEmployers(); ?> ]</span><br/>
                             <div class="jobs" id="jobs" name="jobs"></div>
                         </td>
                         <td class="separator"></td>
