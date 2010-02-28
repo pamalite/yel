@@ -1,23 +1,37 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
 
-class Referral {
+class Referral implements Model {
     private $mysqli = NULL;
+    private $id = 0;
     
-    public static function create($data) {
-        $mysqli = Database::connect();
+    public function __construct($_id = "") {
+        if (!is_a($this->mysqli, "MySQLi")) {
+            $this->mysqli = Database::connect();
+        }
         
-        if (is_null($data) || !is_array($data)) {
+        $this->id = 0;
+        if (!empty($_id)) {
+            $this->id = sanitize($_id);
+        }
+    }
+    
+    private function hasData($_data) {
+        if (is_null($_data) || !is_array($_data)) {
             return false;
         }
         
-        if (!array_key_exists('member', $data) || 
-            !array_key_exists('referee', $data) || 
-            !array_key_exists('job', $data)) {
+        return true;
+    }
+    
+    public function create($_data) {
+        if (!array_key_exists('member', $_data) || 
+            !array_key_exists('referee', $_data) || 
+            !array_key_exists('job', $_data)) {
             return false;
         }
         
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $query = "INSERT INTO referrals SET ";                
         $i = 0;
         foreach ($data as $key => $value) {
@@ -42,31 +56,175 @@ class Referral {
             $i++;
         }
         
-        if (($id = $mysqli->execute($query, true)) > 0) {
-            return $id;
+        if (($this->id = $this->mysqli->execute($query, true)) > 0) {
+            return $this->id;
         }
         
         return false;
     }
     
-    public static function create_multiple($data) {
-        $mysqli = Database::connect();
-        
-        if (is_null($data) || !is_array($data)) {
+    public function update($_data) {
+        if ($this->id <= 0) {
             return false;
         }
         
-        if (!array_key_exists('member', $data) || 
-            !array_key_exists('referee', $data) || 
-            !array_key_exists('job', $data)) {
+        $data = sanitize($_data);
+        $query = "UPDATE referrals SET ";
+        $i = 0;
+        foreach ($data as $key => $value) {
+            if (strtoupper($key) != "ID") {
+                if (is_string($value)) {
+                    if (strtoupper($value) == "NULL") {
+                        $query .= "`". $key. "` = NULL";
+                    } else {
+                        $query .= "`". $key. "` = '". $value. "'";
+                    }
+                } else if (is_null($value) || empty($value)) {
+                    $query .= "`". $key. "` = ''";
+                } else {
+                    $query .= "`". $key. "` = ". $value;
+                }
+
+                if ($i < count($data) - 1) {
+                    $query .= ", ";
+                } else {
+                    $query .= " ";
+                }
+            }
+            
+            $i++;
+        }
+        $query .= "WHERE id = '". $this->id. "'";
+    
+        return $this->mysqli->execute($query);
+    }
+    
+    public function delete() {
+        // Reserved for future use.
+    }
+    
+    public function find($_criteria) {
+        if (!$this->hasData($_criteria)) {
             return false;
         }
         
-        if (is_null($data['job']) || !is_array($data['job'])) {
+        $columns = '*';
+        $joins = '';
+        $order = '';
+        $group = '';
+        $limit = '';
+        $match = '';
+        
+        foreach ($_criteria as $key => $clause) {
+            switch (strtoupper($key)) {
+                case 'COLUMNS':
+                    $columns = trim($clause);
+                    break;
+                case 'JOINS':
+                    $conditions = explode(',', $clause);
+                    $i = 0;
+                    foreach ($conditions as $condition) {
+                        $joins .= "LEFT JOIN ". trim($condition);
+
+                        if ($i < count($conditions)-1) {
+                            $joins .= " ";
+                        }
+                        $i++;
+                    }
+                    break;
+                case 'ORDER':
+                    $order = "ORDER BY ". trim($clause);
+                    break;
+                case 'GROUP':
+                    $group = "GROUP BY ". trim($clause);
+                    break;
+                case 'LIMIT':
+                    $limit = "LIMIT ". trim($clause);
+                    break;
+                case 'MATCH':
+                    $match = "WHERE ". trim($clause);
+                    break;
+            }
+        }
+        
+        $query = "SELECT ". $columns. " FROM referrals ". $joins. 
+                  " ". $match. " ". $group. " ". $order. " ". $limit;
+        return $this->mysqli->query($query);
+    }
+    
+    public function get() {
+        $query = "SELECT * FROM referrals WHERE id = '". $this->id. "' LIMIT 1";
+        return $this->mysqli->query($query);
+    }
+    
+    public function getId() {
+        return $this->id;
+    }
+    
+    public function calculateRewardFrom($_salary, $_irc_id = NULL) {
+        if (empty($_salary) || $_salary <= 0) {
             return false;
         }
         
-        $data = sanitize($data);
+        if ($this->id <= 0) {
+            return false;
+        }
+        
+        $query = "SELECT jobs.employer 
+                  FROM referrals 
+                  INNER JOIN jobs ON jobs.id = referrals.job
+                  WHERE referrals.id = ". $this->id;
+        $result = $this->mysqli->query($query);
+        if (is_null($result[0]['employer']) || empty($result[0]['employer'])) {
+            return false;
+        }
+        $employer = $result[0]['employer'];
+        
+        $query = "SELECT service_fee, discount, reward_percentage 
+                  FROM employer_fees 
+                  WHERE employer = '". $employer. "' AND 
+                  salary_start <= ". $_salary. " AND 
+                  (salary_end >= ". $_salary. " OR (salary_end = 0 OR salary_end = NULL)) LIMIT 1";
+        $fees = $this->mysqli->query($query);
+        
+        $total_fees = $discount = $reward_percentage = 0.00;
+        if (!$fees || empty($fees)) {
+            return false;
+        } else {
+            $total_fees = ($fees[0]['service_fee'] / 100.00);
+            $discount = (1.00 - ($fees[0]['discount'] / 100.00));
+        }
+        
+        $reward_percentage = ($fees[0]['reward_percentage'] / 100.00);
+        if (!is_null($_irc_id)) {
+            $query = "SELECT headhunter_reward_percentage 
+                      FROM members 
+                      WHERE email_addr = '". $_irc_id. "'";
+            $result = $this->mysqli->query($query);
+            if ($result[0]['headhunter_reward_percentage'] > 0) {
+                $reward_percentage = $result[0]['headhunter_reward_percentage'] / 100.00;
+            }
+        }
+        
+        return ((($_salary * $total_fees) * $discount) * $reward_percentage);
+    }
+    
+    public function createMultiple($_data) {
+        if (!$this->hasData($_data)) {
+            return false;
+        }
+        
+        if (!array_key_exists('member', $_data) || 
+            !array_key_exists('referee', $_data) || 
+            !array_key_exists('job', $_data)) {
+            return false;
+        }
+        
+        if (is_null($_data['job']) || !is_array($_data['job'])) {
+            return false;
+        }
+        
+        $data = sanitize($_data);
         $query = '';
         $j = 0;
         foreach ($data['job'] as $job) {
@@ -105,148 +263,75 @@ class Referral {
             $j++;
         }
         
-        if ($mysqli->transact($query)) {
+        if ($this->mysqli->transact($query)) {
             return true;
         }
         
         return false;
     }
     
-    public static function update($data) {
-        $mysqli = Database::connect();
-        
-        if (is_null($data) || !is_array($data)) {
+    public function getGuaranteeExpiryDateWith($_salary, $_today) {
+        if (empty($_salary) || $_salary < 0 || empty($_today)) {
             return false;
         }
         
-        if (!array_key_exists('id', $data)) {
+        if ($this->id <= 0) {
             return false;
         }
         
-        $data = sanitize($data);
-        $query = "UPDATE referrals SET ";
-        $i = 0;
-        foreach ($data as $key => $value) {
-            if (strtoupper($key) != "ID") {
-                if (is_string($value)) {
-                    if (strtoupper($value) == "NULL") {
-                        $query .= "`". $key. "` = NULL";
-                    } else {
-                        $query .= "`". $key. "` = '". $value. "'";
-                    }
-                } else if (is_null($value) || empty($value)) {
-                    $query .= "`". $key. "` = ''";
-                } else {
-                    $query .= "`". $key. "` = ". $value;
-                }
-
-                if ($i < count($data) - 1) {
-                    $query .= ", ";
-                } else {
-                    $query .= " ";
-                }
-            }
-            
-            $i++;
+        $query = "SELECT jobs.employer 
+                  FROM referrals 
+                  INNER JOIN jobs ON jobs.id = referrals.job 
+                  WHERE referrals.id = ". $this->id. " LIMIT 1";
+        $result = $this->mysqli->query($query);
+        if (is_null($result[0]['employer']) || empty($result[0]['employer'])) {
+            return false;
         }
-    
-        $query .= "WHERE id = '". $data['id']. "'";
-    
-         return $mysqli->execute($query);
+        $employer = $result[0]['employer'];
+        
+        $query = "SELECT DATE_ADD('". $_today. "', INTERVAL guarantee_months MONTH) AS expiry_date 
+                  FROM employer_fees 
+                  WHERE employer = '". $employer. "' AND 
+                  salary_start <= ". $_salary. " AND 
+                  (salary_end >= ". $_salary. " OR (salary_end = 0 OR salary_end IS NULL)) LIMIT 1";
+        $result = $this->mysqli->query($query);
+        
+        return $result[0]['expiry_date'];
     }
     
-    public static function get($_id) {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM referrals WHERE id = '". $_id. "' LIMIT 1";
-        
-        return $mysqli->query($query);
-    }
-    
-    public static function get_by($criteria) {
-        if (is_null($criteria) || !is_array($criteria)) {
+    public function closeSimilarReferrals() {
+        if ($this->id <= 0) {
             return false;
         }
         
-        $condition = "";
-        $i = 0;
-        foreach ($criteria as $key => $value) {
-            switch (strtoupper($key)) {
-                case 'MEMBER':
-                    $condition .= "member = '". $criteria['member']. "'";
-                    break;
-                case 'REFEREE':
-                    $condition .= "referee = '". $criteria['referee']. "'";
-                    break;
-                case 'JOB':
-                    $condition .= "job = ". $criteria['job'];
-                    break;
-            }
-            
-            if ($i < count($criteria)-1) {
-                $condition .= " AND ";
-            }
-            
-            $i++;
-        }
-        
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM referrals WHERE ". $condition;
-        
-        return $mysqli->query($query);
-    }
-    
-    public static function get_all() {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM referrals";
-        
-        return $mysqli->query($query);
-    }
-    
-    public static function calculate_total_reward_from($_salary, $_employer, $_irc_id = NULL) {
-        if (empty($_salary) || $_salary < 0 || empty($_employer)) {
-            return false;
-        }
-        
-        $mysqli = Database::connect();
-        $query = "SELECT service_fee, premier_fee, discount, reward_percentage FROM employer_fees 
-                  WHERE employer = '". $_employer. "' AND 
-                  salary_start <= ". $_salary. " AND (salary_end >= ". $_salary. " OR (salary_end = 0 OR salary_end = NULL)) LIMIT 1";
-        $fees = $mysqli->query($query);
-        //print_r($fees);
-        $query = "SELECT SUM(charges) AS extras FROM employer_extras WHERE employer = '". $_employer. "'";
-        $extras = $mysqli->query($query);
-        //print_r($extras);
-        $total_fees = $discount = $reward_percentage = 0.00;
-        if (!$fees || empty($fees)) {
-            return false;
-        } else {
-            //$total_fees = (($fees[0]['service_fee'] + $fees[0]['premier_fee']) / 100.00);
-            $total_fees = ($fees[0]['service_fee'] / 100.00);
-            $discount = (1.00 - ($fees[0]['discount'] / 100.00));
-        }
-        
-        $charges = 0.00;
-        if ($extras == false) {
-            return false;
-        } else {
-            if (!empty($extras)) {
-                $charges = $extras[0]['extras'];
+        $query = "SELECT id FROM referrals WHERE 
+                  id <> ". $this->id. " AND 
+                  job = (SELECT job FROM referrals WHERE id = ". $this->id. " LIMIT 1) AND 
+                  referee = (SELECT referee FROM referrals WHERE id = ". $this->d. " LIMIT 1) AND 
+                  (referee_acknowledged_on IS NULL OR referee_acknowledged_on = '0000-00-00 00:00:00') AND 
+                  (referee_acknowledged_others_on IS NULL OR referee_acknowledged_others_on = '0000-00-00 00:00:00')";
+        $result = $this->mysqli->query($query);
+        $id_string = '';
+        foreach ($result as $i => $id) {
+            $id_string .= $id['id'];
+            if ($i < count($result)-1) {
+                $id_string .= ',';
             }
         }
         
-        $reward_percentage = ($fees[0]['reward_percentage'] / 100.00);
-        if (!is_null($_irc_id)) {
-            $query = "SELECT headhunter_reward_percentage FROM members WHERE email_addr = '". $_irc_id. "'";
-            $result = $mysqli->query($query);
-            if ($result[0]['headhunter_reward_percentage'] > 0) {
-                $reward_percentage = $result[0]['headhunter_reward_percentage'] / 100.00;
-            }
+        if (!empty($id_string)) {
+            $query = "UPDATE referrals SET
+                      referee_acknowledged_others_on = '". now(). "' 
+                      WHERE id IN (". $id_string. ") AND 
+                      (referee_acknowledged_on IS NULL OR referee_acknowledged_on = '0000-00-00 00:00:00') AND 
+                      (referee_acknowledged_others_on IS NULL OR referee_acknowledged_others_on = '0000-00-00 00:00:00')";
+            return $this->mysqli->execute($query);
         }
         
-        return (((($_salary * $total_fees) * $discount) + $charges) * $reward_percentage);
+        return true;
     }
     
-    public static function serialize_testimony($_testimony) {
+    public static function serializeTestimony($_testimony) {
         if (!is_array($_testimony)) {
             return false;
         }
@@ -266,57 +351,9 @@ class Referral {
         return $out;
     }
     
-    public static function get_guarantee_expiry_date_from($_salary, $_employer, $_today) {
-        if (empty($_salary) || $_salary < 0 || empty($_employer) || empty($_today)) {
-            return false;
-        }
-        
-        $mysqli = Database::connect();
-        $query = "SELECT DATE_ADD('". $_today. "', INTERVAL guarantee_months MONTH) AS expiry_date 
-                  FROM employer_fees 
-                  WHERE employer = '". $_employer. "' AND 
-                  salary_start <= ". $_salary. " AND (salary_end >= ". $_salary. " OR (salary_end = 0 OR salary_end IS NULL)) LIMIT 1";
-        $result = $mysqli->query($query);
-        
-        return $result[0]['expiry_date'];
-    }
-    
-    public static function close_similar_referrals_with_id($_id) {
-        if (empty($_id) || $_id <= 0) {
-            return false;
-        }
-        
-        $mysqli = Database::connect();
-        $query = "SELECT id FROM referrals WHERE 
-                  id <> ". $_id. " AND 
-                  job = (SELECT job FROM referrals WHERE id = ". $_id. " LIMIT 1) AND 
-                  referee = (SELECT referee FROM referrals WHERE id = ". $_id. " LIMIT 1) AND 
-                  (referee_acknowledged_on IS NULL OR referee_acknowledged_on = '0000-00-00 00:00:00') AND 
-                  (referee_acknowledged_others_on IS NULL OR referee_acknowledged_others_on = '0000-00-00 00:00:00')";
-        $result = $mysqli->query($query);
-        $id_string = '';
-        foreach ($result as $i => $id) {
-            $id_string .= $id['id'];
-            if ($i < count($result)-1) {
-                $id_string .= ',';
-            }
-        }
-        
-        if (!empty($id_string)) {
-            $query = "UPDATE referrals SET
-                      referee_acknowledged_others_on = '". now(). "' 
-                      WHERE id IN (". $id_string. ") AND 
-                      (referee_acknowledged_on IS NULL OR referee_acknowledged_on = '0000-00-00 00:00:00') AND 
-                      (referee_acknowledged_others_on IS NULL OR referee_acknowledged_others_on = '0000-00-00 00:00:00')";
-            return $mysqli->execute($query);
-        }
-        
-        return true;
-    }
-    
-    public static function already_referred($_member, $_candidate, $_job) {
+    public static function isAlreadyReferred($_member, $_candidate, $_job) {
         if (empty($_member) || empty($_candidate) || empty($_job) || $_job <= 0) {
-            return false;
+            return NULL;
         }
         
         $mysqli = Database::connect();

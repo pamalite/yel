@@ -20,7 +20,7 @@ if ($_POST['security_code'] != $_SESSION['security_code']) {
 }
 
 $fullname = desanitize($_SESSION['yel']['feedback']['firstname']. ', '. $_SESSION['yel']['feedback']['lastname']);
-$country = Country::country_from_code($_SESSION['yel']['feedback']['country']);
+$country = Country::getCountryFrom($_SESSION['yel']['feedback']['country']);
 
 // Send email to feedback@yellowelevator.com
 $mail_lines = file('private/mail/feedback.txt');

@@ -145,7 +145,7 @@ class JobPage extends Page {
     }
     
     private function generateCountriesDropdown($_for_quick_upload = false, $_for_referrer = false) {
-        $countries = Country::get_all();
+        $countries = Country::getAll();
         
         $prefix = ($_for_quick_upload) ? 'qu' : 'qr';
         $prefix .= ($_for_referrer) ? '_referrer' : '_candidate';

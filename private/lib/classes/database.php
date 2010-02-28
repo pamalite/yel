@@ -6,7 +6,7 @@ class Database {
     private static $instance = NULL;
     
     public static function connect($driver = 'MYSQL') {
-        if (!isset(self::$instance)) {
+        if (is_null(self::$instance)) {
             switch($driver) {
                 default: 
                     self::$instance = new DatabaseMySQL($GLOBALS['DB_HOST'], 

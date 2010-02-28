@@ -303,7 +303,7 @@ if ($data['individual_headhunter'] == 'Y') {
     $message .= 'Primary Industry: '. Industry::get_industry_from_id($data['primary_industry']). "\n";
     $message .= 'Secondary Industry: '. Industry::get_industry_from_id($data['secondary_industry']). "\n";
     $message .= 'Tertiary Industry: '. Industry::get_industry_from_id($data['tertiary_industry']). "\n";
-    $message .= 'Country: '. Country::country_from_code($data['country']). "\n";
+    $message .= 'Country: '. Country::getCountryFrom($data['country']). "\n";
     $subject = 'New IRC: '. $data['firstname']. ', '. $data['lastname']. "\n";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>'. "\n". 'Reply-To: '. $data['email_addr'];
     

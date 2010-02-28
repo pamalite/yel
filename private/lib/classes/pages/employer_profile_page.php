@@ -31,7 +31,7 @@ class EmployerProfilePage extends Page {
     }
     
     private function generateCountries($selected) {
-        $countries = Country::get_all();
+        $countries = Country::getAll();
         
         echo '<select class="field" id="country" name="country">'. "\n";
         

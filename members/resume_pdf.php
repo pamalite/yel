@@ -93,7 +93,7 @@ class ResumePdf extends FPDF {
         $this->SetFont('Times','B',10);
         $this->Cell(75,5,'Country:',0,0,'R');
         $this->SetFont('Times','',10);
-        $this->Cell(0,5,Country::country_from_code($_contacts[0]['country']),0,1,'L');
+        $this->Cell(0,5,Country::getCountryFrom($_contacts[0]['country']),0,1,'L');
         
         $this->SetFont('Times','B',10);
         $this->Cell(75,5,'Postal Code:',0,0,'R');
@@ -176,7 +176,7 @@ class ResumePdf extends FPDF {
                 $this->SetFont('Times','B',10);
                 $this->Cell(75,5,'Country:',0,0,'R');
                 $this->SetFont('Times','',10);
-                $this->Cell(0,5,Country::country_from_code($education['country']),0,1,'L');
+                $this->Cell(0,5,Country::getCountryFrom($education['country']),0,1,'L');
                 
                 $this->Ln();
             }

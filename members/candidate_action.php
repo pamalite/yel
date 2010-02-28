@@ -207,7 +207,7 @@ if ($_POST['action'] == 'get_reward_earned') {
     }
     
     $member = new Member($_POST['member']);
-    $to_currency = Currency::symbol_from_country_code($member->get_country_code());
+    $to_currency = Currency::getSymbolFromCountryCode($member->get_country_code());
     $total = 0.00;
     foreach ($result as $row) {
         $from_currency = $row['currency'];
@@ -222,7 +222,7 @@ if ($_POST['action'] == 'get_reward_earned') {
 
 if ($_POST['action'] == 'get_currency_symbol') {
     $member = new Member($_POST['member']);
-    if ($symbol = Currency::symbol_from_country_code($member->get_country_code())) {
+    if ($symbol = Currency::getSymbolFromCountryCode($member->get_country_code())) {
         header('Content-type: text/xml');
         echo $xml_dom->get_xml_from_array(array('symbol' => $symbol));
         exit();

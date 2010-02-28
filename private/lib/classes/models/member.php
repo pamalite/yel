@@ -1,16 +1,33 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
 
-class Member {
+class Member implements Model {
     private $id = 0;
     private $seed_id = 0;
     private $mysqli = NULL;
+    private $by_admin = false;
     
     function __construct($_id = "", $_seed_id = "") {
-        $this->set($_id, $_seed_id);
+        if (!is_a($this->mysqli, "MySQLi")) {
+            $this->mysqli = Database::connect();
+        }
+        
+        $this->initializeWith($_id, $_seed_id);
     }
     
-    private function get_password() {
+    // function __destruct() {
+    //     $this->mysqli->close();
+    // }
+    
+    private function hasData($_data) {
+        if (is_null($_data) || !is_array($_data)) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    private function getPasswordHash() {
         $query = "SELECT password FROM members WHERE email_addr = '". $this->id. "'";
         
         if ($passwords = $this->mysqli->query($query)) {
@@ -20,173 +37,69 @@ class Member {
         return false;
     }
     
-    public static function simple_authenticate(&$_mysqli, $_id, $_password_md5) {
-        $query = "SELECT COUNT(*) AS exist FROM members 
-                  WHERE email_addr = '". $_id. "' AND password = '". $_password_md5. "' LIMIT 1";
-
-        if ($result = $_mysqli->query($query)) {
-            if ($result[0]['exist'] == "1") {
-                return true;
-            } 
+    private function resetSessionWithNewPassword($_password_md5) {
+        if ($_password_md5 != sanitize($_password_md5)) {
+            return false; // A hacking attempt occured?
         }
         
-        return false;
-    }
-    
-    public static function get_member_name_from_id(&$_mysqli, $_id) {
-        $query = "SELECT CONCAT(firstname, ' ', lastname) AS name FROM members 
-                  WHERE email_addr = '". $_id. "' LIMIT 1";
-
-        if ($result = $_mysqli->query($query)) {
-            return $result[0]['name'];
-        }
+        $query = "SELECT COUNT(member) AS exist FROM member_sessions 
+                  WHERE member = '". $this->id. "' LIMIT 1";
         
-        return false;
-    }
-    
-    public function set($_id = "", $_seed_id = "") {
-        if (is_a($this->mysqli, "MySQLi")) {
-            $this->mysqli->close();
-        }
-        
-        $this->mysqli = Database::connect();
-        $this->id = 0;
-        $this->seed_id = 0;
-        
-        if (!empty($_id)) {
-            $this->id = sanitize($_id);
-        }
-        
-        if (!empty($_seed_id)) {
-            $this->seed_id = sanitize($_seed_id);
-        } 
-    }
-    
-    public function reset() {
-        $this->set();
-    }
-    
-    public function seed_id() {
-        return $this->seed_id;
-    }
-    
-    public function id() {
-        return $this->id;
-    }
-    
-    public function is_registered($_sha1) {
-        if ($this->seed_id == 0) {
-            return false;
-        } else {
-            if ($_sha1 != sanitize($_sha1)) return false; // A hacking attempt occured.
-        }
-        
-        $query = "SELECT seed FROM seeds WHERE id = ". $this->seed_id;
-        if ($result = $this->mysqli->query($query)) {
-            $seed = $result[0]['seed'];
-            $sha1 = sha1($this->id. $this->get_password(). $seed);
-            if ($sha1 == $_sha1) {
-                return true;
+        if ($sessions = $this->mysqli->query($query)) {
+            if ($sessions[0]['exist'] == "1") {
+                $query = "SELECT seed FROM seeds WHERE id = ". $this->seed_id;
+                if ($seed = $this->mysqli->query($query)) {
+                    $sha1 = sha1($this->id. $_password_md5. $seed[0]['seed']);
+                    $query = "UPDATE member_sessions SET sha1 = '". $sha1. "'
+                              WHERE member = '". $this->id. "'";
+                    return $this->mysqli->execute($query);
+                }
             }
         }
         
         return false;
     }
     
-    public function is_active() {
-        $query = "SELECT active FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
-        if ($result = $this->mysqli->query($query)) {
-            if ($result[0]['active'] == 'Y') {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    public function is_logged_in($_sha1) {
-        if ($_sha1 != sanitize($_sha1)) return false; // A hacking attempt occured.
-        
-        $query = "SELECT sha1 FROM member_sessions WHERE member = '". $this->id. "'";
-        
-        if ($result = $this->mysqli->query($query)) {
-            return ($result[0]['sha1'] == $_sha1);
-        }
-        
-        return false;
-    }
-    
-    public function get_name() {
-        $query = "SELECT CONCAT(firstname, ' ', lastname) AS name FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
-        if ($name = $this->mysqli->query($query)) {
-            return $name[0]['name'];
-        }
-        
-        return false;
-    }
-    
-    public function get_country() {
-        $query = "SELECT countries.country FROM members 
-                  LEFT JOIN countries ON members.country = countries.country_code 
-                  WHERE members.email_addr = '". $this->id. "' LIMIT 1";
-        if ($name = $this->mysqli->query($query)) {
-            return $name[0]['country'];
-        }
-        
-        return false;
-    }
-    
-    public function get_country_code() {
-        $query = "SELECT country FROM members WHERE members.email_addr = '". $this->id. "' LIMIT 1";
-        if ($code = $this->mysqli->query($query)) {
-            return $code[0]['country'];
-        }
-        
-        return false;
-    }
-    
-    public function set_active($_active = true) {
-        $_active = ($_active == true) ? 'Y' : 'N';
-        $query = "UPDATE members SET active = '". $_active. "' WHERE member = '". $this->id. "' ";
-        return $this->mysqli->query($query);
-    }
-    
-    public function get() {
-        $query = "SELECT * FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
-        
-        return $this->mysqli->query($query);
-    }
-    
-    public static function get_all() {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM members";
-        
-        return $mysqli->query($query);
-    }
-    
-    public static function get_all_with_limit($limit, $offset = 0) {
-         if (empty($limit) || $limit <= 0) {
-                return false;
-            }
-
-            $mysqli = Database::connect();
-            $query = "SELECT * FROM members ";
-
-            if ($offset > 0) {
-                $query .= "LIMIT ". $offset. ", ". $limit;
-            } else {
-                $query .= "LIMIT ". $limit;
-            }
-
-            return $mysqli->query($query);
-    }
-    
-    public function create($data) {
-        if (is_null($data) || !is_array($data)) {
+    private function createBankAccount($_bank, $_account) {
+        if (empty($_bank) || empty($_account)) {
             return false;
         }
         
-        $data = sanitize($data);
+        $query = "INSERT INTO member_banks SET 
+                  member = '". $this->id. "', 
+                  bank = '". $_bank. "',
+                  account =  '". $_account. "' ";
+        return $this->mysqli->execute($query);
+    }
+    
+    private function updateBankAccount($_id, $_bank, $_account) {
+        if (empty($_id) || empty($_bank) || empty($_account)) {
+            return false;
+        }
+        
+        $query = "UPDATE member_banks SET 
+                  bank = '". $_bank. "',
+                  account =  '". $_account. "' 
+                  WHERE id = '". $_id. "' ";
+        return $this->mysqli->execute($query);
+    }
+    
+    // No longer in use
+    // private function deleteBankAccount($_id) {
+    //     if (empty($_id)) {
+    //         return false;
+    //     }
+    //     
+    //     $query = "DELETE FROM member_banks WHERE id = '". $_id. "' ";
+    //     return $this->mysqli->execute($query);
+    // }
+    
+    public function create($_data) {
+        if (!$this->hasData($_data)) {
+            return false;
+        }
+        
+        $data = sanitize($_data);
         $query = "INSERT INTO members SET ";
         $i = 0;
         foreach ($data as $key => $value) {
@@ -230,12 +143,12 @@ class Member {
         return false;
     }
     
-    public function update($data, $_new_member = false) {
-        if (is_null($data) || !is_array($data)) {
+    public function update($_data) {
+        if (!$this->hasData($_data)) {
             return false;
         }
         
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $password_updated = false;
         $query = "UPDATE members SET ";
         $i = 0;
@@ -272,8 +185,8 @@ class Member {
     
         $query .= "WHERE `email_addr` = '". $this->id. "'";
         if ($this->mysqli->execute($query)) {
-            if ($password_updated && !$_new_member) {
-                return $this->session_reset($data['password']);
+            if ($password_updated && !$this->by_admin) {
+                return $this->resetSessionWithNewPassword($data['password']);
             }
             return true;
         }
@@ -282,20 +195,201 @@ class Member {
     }
     
     public function delete() {
-        // TODO: Check all dependencies before deleting the entry
+        // Reserved for future use.
     }
     
-    public function get_approved_photos() {
-        $query = "SELECT * FROM member_photos WHERE member = '". $this->id. "' AND approved = 'Y'";
+    public function get() {
+        $query = "SELECT * FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
         return $this->mysqli->query($query);
     }
     
-    public function get_photos() {
-        $query = "SELECT * FROM member_photos WHERE member = '". $this->id. "'";
+    public function find($_criteria) {
+        if (!$this->hasData($_criteria)) {
+            return false;
+        }
+        
+        $columns = '*';
+        $joins = '';
+        $order = '';
+        $group = '';
+        $limit = '';
+        $match = '';
+        
+        foreach ($_criteria as $key => $clause) {
+            switch (strtoupper($key)) {
+                case 'COLUMNS':
+                    $columns = trim($clause);
+                    break;
+                case 'JOINS':
+                    $conditions = explode(',', $clause);
+                    $i = 0;
+                    foreach ($conditions as $condition) {
+                        $joins .= "LEFT JOIN ". trim($condition);
+
+                        if ($i < count($conditions)-1) {
+                            $joins .= " ";
+                        }
+                        $i++;
+                    }
+                    break;
+                case 'ORDER':
+                    $order = "ORDER BY ". trim($clause);
+                    break;
+                case 'GROUP':
+                    $group = "GROUP BY ". trim($clause);
+                    break;
+                case 'LIMIT':
+                    $limit = "LIMIT ". trim($clause);
+                    break;
+                case 'MATCH':
+                    $match = "WHERE ". trim($clause);
+                    break;
+            }
+        }
+        
+        $query = "SELECT ". $columns. " FROM members ". $joins. 
+                  " ". $match. " ". $group. " ". $order. " ". $limit;
+        
         return $this->mysqli->query($query);
     }
     
-    public function create_photo($_file_data) {
+    public function initializeWith($_id = "", $_seed_id = "") {
+        $this->id = 0;
+        $this->seed_id = 0;
+        
+        if (!empty($_id)) {
+            $this->id = sanitize($_id);
+        }
+        
+        if (!empty($_seed_id)) {
+            $this->seed_id = sanitize($_seed_id);
+        } 
+    }
+    
+    public function reset() {
+        $this->initializeWith();
+    }
+    
+    public function setAdmin($_by_admin) {
+        $this->by_admin = $_by_admin;
+    }
+    
+    public function getSeedId() {
+        return $this->seed_id;
+    }
+    
+    public function getId() {
+        return $this->id;
+    }
+    
+    public function isRegistered($_sha1) {
+        if ($this->seed_id == 0) {
+            return false;
+        } else {
+            if ($_sha1 != sanitize($_sha1)) return false; // A hacking attempt occured.
+        }
+        
+        $query = "SELECT seed FROM seeds WHERE id = ". $this->seed_id;
+        if ($result = $this->mysqli->query($query)) {
+            $seed = $result[0]['seed'];
+            $sha1 = sha1($this->id. $this->getPasswordHash(). $seed);
+            if ($sha1 == $_sha1) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public function isActive() {
+        $query = "SELECT active FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
+        if ($result = $this->mysqli->query($query)) {
+            if ($result[0]['active'] == 'Y') {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public function isLoggedIn($_sha1) {
+        if ($_sha1 != sanitize($_sha1)) return false; // A hacking attempt occured.
+        
+        $query = "SELECT sha1 FROM member_sessions WHERE member = '". $this->id. "'";
+        
+        if ($result = $this->mysqli->query($query)) {
+            return ($result[0]['sha1'] == $_sha1);
+        }
+        
+        return false;
+    }
+    
+    public function setSessionWith($_sha1) {
+        if (empty($_sha1)) {
+            return false;
+        } else {
+            if ($_sha1 != sanitize($_sha1)) return false; // A hacking attempt occured?
+        }
+        
+        $query = "SELECT COUNT(member) AS exist FROM member_sessions 
+                  WHERE member = '". $this->id. "' LIMIT 1";
+                  
+        if ($sessions = $this->mysqli->query($query)) {
+          if ($sessions[0]['exist'] == "1") {
+              $query = "UPDATE member_sessions SET 
+                        sha1 = '". $_sha1. "', 
+                        last_login = NOW() 
+                        WHERE member = '". $this->id. "'";
+          } else {
+              $query = "INSERT INTO member_sessions SET 
+                        member = '". $this->id. "', 
+                        sha1 = '". $_sha1. "', 
+                        last_login = NOW()"; 
+          }
+          
+          return $this->mysqli->execute($query);
+        }
+        
+        return false;
+    }
+    
+    public function getFullName() {
+        $query = "SELECT CONCAT(firstname, ' ', lastname) AS name 
+                  FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
+        if ($name = $this->mysqli->query($query)) {
+            return $name[0]['name'];
+        }
+        
+        return false;
+    }
+    
+    public function getCountry() {
+        $query = "SELECT members.country, countries.country AS country_name 
+                  FROM members 
+                  LEFT JOIN countries ON members.country = countries.country_code 
+                  WHERE members.email_addr = '". $this->id. "' LIMIT 1";
+        if ($name = $this->mysqli->query($query)) {
+            return $name[0]['country'];
+        }
+        
+        return false;
+    }
+    
+    public function setActive($_active = true) {
+        $_active = ($_active == true) ? 'Y' : 'N';
+        $query = "UPDATE members SET active = '". $_active. "' 
+                  WHERE email_addr = '". $this->id. "' ";
+        return $this->mysqli->query($query);
+    }
+    
+    public function getApprovedPhotoURL() {
+        $query = "SELECT * FROM member_photos 
+                  WHERE member = '". $this->id. "' AND approved = 'Y' 
+                  LIMIT 1";
+        return $this->mysqli->query($query);
+    }
+    
+    public function savePhoto($_file_data) {
         $type = $_file_data['FILE']['type'];
         $size = $_file_data['FILE']['size'];
         $temp = $_file_data['FILE']['tmp_name'];
@@ -334,7 +428,7 @@ class Member {
         return false;
     }
     
-    public function delete_photo($_id) {
+    public function deletePhoto($_id) {
         if (empty($_id)) {
             return false;
         }
@@ -351,264 +445,50 @@ class Member {
         return true;
     }
     
-    public static function approve_photo($_id) {
+    public function approvePhoto($_id) {
         if (empty($_id)) {
             return false;
         }
         
-        $query = "UPDATE member_photos SET approved = 'Y' WHERE id = ". $_id;
-        $mysqli = Database::connect();
-        return $mysqli->execute($query);
-    }
-    
-    private function session_reset($_password_md5) {
-        if ($_password_md5 != sanitize($_password_md5)) {
-            return false; // A hacking attempt occured?
+        if ($this->by_admin) {
+            $query = "UPDATE member_photos SET approved = 'Y' WHERE id = ". $_id;
+            $mysqli = Database::connect();
+            return $mysqli->execute($query);
         }
         
-        $query = "SELECT COUNT(member) AS exist FROM member_sessions 
+        return false;
+    }
+    
+    public function getBankAccount() {
+        $query = "SELECT * FROM member_banks 
                   WHERE member = '". $this->id. "' LIMIT 1";
-        
-        if ($sessions = $this->mysqli->query($query)) {
-            if ($sessions[0]['exist'] == "1") {
-                $query = "SELECT seed FROM seeds WHERE id = ". $this->seed_id;
-                if ($seed = $this->mysqli->query($query)) {
-                    $sha1 = sha1($this->id. $_password_md5. $seed[0]['seed']);
-                    $query = "UPDATE member_sessions SET sha1 = '". $sha1. "'
-                              WHERE member = '". $this->id. "'";
-                    return $this->mysqli->execute($query);
-                }
+        return $this->mysqli->query($query);
+    }
+    
+    public function saveBankAccount($_bank, $_account, $_id = 0) {
+        if ($_id == 0) {
+            // check whether a bank account is already available
+            $result = $this->getBankAccount();
+            if (count($result) > 0 && !is_null($result) && !empty($result)) {
+                // update
+                $_id = $result[0]['id'];
+                return $this->updateBankAccount($_id, $_bank, $_account);
             }
-        }
-        
-        return false;
-    }
-    
-    public function session_set($sha1) {
-        if (empty($sha1)) {
-            return false;
+                        
+            // create
+            return $this->createBankAccount($_bank, $_account);
         } else {
-            if ($sha1 != sanitize($sha1)) return false; // A hacking attempt occured?
+            // update
+            return $this->updateBankAccount($_id, $_bank, $_account);
         }
-        
-        $query = "SELECT COUNT(member) AS exist FROM member_sessions 
-                  WHERE member = '". $this->id. "' LIMIT 1";
-                  
-        if ($sessions = $this->mysqli->query($query)) {
-          if ($sessions[0]['exist'] == "1") {
-              $query = "UPDATE member_sessions SET 
-                        sha1 = '". $sha1. "', 
-                        last_login = NOW() 
-                        WHERE member = '". $this->id. "'";
-          } else {
-              $query = "INSERT INTO member_sessions SET 
-                        member = '". $this->id. "', 
-                        sha1 = '". $sha1. "', 
-                        last_login = NOW()"; 
-          }
-          
-          return $this->mysqli->execute($query);
-        }
-        
-        return false;
     }
     
-    public function get_banks() {
-        $query = "SELECT * FROM member_banks WHERE member = '". $this->id. "'";
-        return $this->mysqli->query($query);
-    }
-    
-    public function create_bank($_bank, $_account) {
-        if (empty($_bank) || empty($_account)) {
-            return false;
+    public function getSavedJobs($_order_by = '', $_filter_by = '0') {
+        $order_by = 'member_saved_jobs.saved_on DESC';
+        if (!empty($_order_by) && !is_null($_order_by)) {
+            $order_by = $_order_by;
         }
         
-        $query = "INSERT INTO member_banks SET 
-                  member = '". $this->id. "', 
-                  bank = '". $_bank. "',
-                  account =  '". $_account. "' ";
-        return $this->mysqli->execute($query);
-    }
-    
-    public function update_bank($_id, $_bank, $_account) {
-        if (empty($_id) || empty($_bank) || empty($_account)) {
-            return false;
-        }
-        
-        $query = "UPDATE member_banks SET 
-                  bank = '". $_bank. "',
-                  account =  '". $_account. "' 
-                  WHERE id = '". $_id. "' ";
-        return $this->mysqli->execute($query);
-    }
-    
-    public function delete_bank($_id) {
-        if (empty($_id)) {
-            return false;
-        }
-        
-        $query = "DELETE FROM member_banks WHERE id = '". $_id. "' ";
-        return $this->mysqli->execute($query);
-    }
-    
-    public function get_referees($_order_by = "member_referees.referred_on DESC", $_filter_by = '0') {
-        $query = "";
-        
-        if ($_filter_by <= 0) {
-            $query = "SELECT member_referees.*, CONCAT(members.lastname, ', ', members.firstname) AS referee_name 
-                      FROM member_referees 
-                      LEFT JOIN members ON members.email_addr = member_referees.referee 
-                      WHERE member_referees.member = '". $this->id. "' AND 
-                      member_referees.referee NOT LIKE 'team.%yellowelevator.com' AND 
-                      member_referees.approved = 'Y' ORDER BY ". $_order_by;
-        } else {
-            $query = "SELECT member_referees.*, CONCAT(members.lastname, ', ', members.firstname) AS referee_name 
-                      FROM member_referees 
-                      LEFT JOIN member_networks_referees ON member_referees.id = member_networks_referees.referee 
-                      LEFT JOIN members ON members.email_addr = member_referees.referee 
-                      WHERE member_referees.member = '". $this->id. "' AND 
-                      member_referees.referee NOT LIKE 'team.%yellowelevator.com' AND 
-                      member_referees.approved = 'Y' AND member_networks_referees.network = " . $_filter_by . " ORDER BY ". $_order_by;
-        }
-        return $this->mysqli->query($query);
-    }
-    
-    public function create_referee($_referee) {
-        if (empty($_referee)) {
-            return false;
-        }
-        
-        if (strtoupper($_referee) == strtoupper($this->id)) {
-            return false;
-        }
-        
-        $query = "INSERT INTO member_referees SET 
-                  member = '". $this->id. "', 
-                  referee = '". $_referee. "',
-                  referred_on =  NOW() ";
-        
-        return $this->mysqli->execute($query);
-    }
-    
-    public function delete_referee($_referee) {
-        if (empty($_referee)) {
-            return false;
-        }
-        
-        $query = "DELETE FROM member_networks_referees WHERE referee = ". $_referee. ";  
-                  DELETE FROM member_referees WHERE id = ". $_referee;
-        return $this->mysqli->transact($query);
-    }
-    
-    public function hide_referee($_referee, $_hide = false) {
-        if (empty($_referee)) {
-            return false;
-        }
-        
-        $_hide = ($_hide == true) ? 'Y' : 'N';
-        
-        $query = "UPDATE member_referees SET hidden = '". $_hide. "' WHERE 
-                  member = '". $this->id. "' AND referee = '". $_referee. "'";
-        return $this->mysqli->execute($query);
-    }
-    
-    public function get_unapproved_references() {
-        $query = "SELECT * FROM member_referees WHERE referee = '". $this->id. "' AND approved = 'N'";
-        return $this->mysqli->query($query);
-    }
-    
-    public function approve_reference($_id) {
-        if (empty($_id)) {
-            return false;
-        }
-        
-        $query = "UPDATE member_referees SET approved = 'Y' WHERE id = ". $_id;
-        return $this->mysqli->execute($query);
-    }
-    
-    public function get_networks() {
-        $query = "SELECT member_networks.id, industries.industry FROM member_networks 
-                  LEFT JOIN industries ON industries.id = member_networks.industry 
-                  WHERE member_networks.member = '". $this->id. "' ORDER BY industries.industry";
-        return $this->mysqli->query($query);
-    }
-    
-    public function create_network($_industry) {
-        if (empty($_industry)) {
-            return false;
-        }
-        
-        $query = "SELECT COUNT(id) AS is_exists FROM member_networks WHERE 
-                  member = '". $this->id. "' AND industry = '". $_industry. "' ";
-        $result = $this->mysqli->query($query);
-        if ($result[0]['is_exists'] > 0) {
-            return true;
-        }
-        
-        $query = "INSERT INTO member_networks SET 
-                  member = '". $this->id. "', 
-                  industry = '". $_industry. "' ";
-        
-        return $this->mysqli->execute($query, true);
-    }
-    
-    public function delete_network($_network) {
-        if (empty($_network)) {
-            return false;
-        }
-        
-        $query = "DELETE FROM member_networks_referees WHERE network = ". $_network. ";
-                  DELETE FROM member_networks WHERE id = ". $_network;
-        return $this->mysqli->transact($query);
-    }
-    
-    public function get_referees_from_network($_network) {
-        if (empty($_network)) {
-            return false;
-        }
-        
-        $query = "SELECT members.email_addr, CONCAT(members.lastname, ', ', members.firstname) AS referee_name 
-                  FROM member_networks_referees 
-                  LEFT JOIN member_referees ON member_referees.id = member_networks_referees.referee 
-                  LEFT JOIN members ON members.email_addr = member_referees.referee 
-                  WHERE member_networks_referees.network = ". $_network;
-        return $this->mysqli->query($query);
-    }
-    
-    public function add_referee_into_network($_referee, $_network) {
-        if (empty($_referee) || empty($_network)) {
-            return false;
-        }
-        
-        $query = "INSERT INTO member_networks_referees SET 
-                  network = ". $_network. ", 
-                  referee = ". $_referee;
-        return $this->mysqli->execute($query);
-    }
-    
-    public function delete_referee_from_network($_referee, $_network) {
-        if (empty($_referee) || empty($_network)) {
-            return false;
-        }
-        
-        $query = "DELETE FROM member_networks_referees WHERE referee = ". $_referee. " AND network = ". $_network;
-        return $this->mysqli->execute($query);
-    }
-    
-    public function get_referee_id_from_member_id($_member_id) {
-        if (empty($_member_id)) {
-            return false;
-        }
-        
-        $query = "SELECT id FROM member_referees WHERE member = '". $this->id. "' AND referee = '". $_member_id. "'";
-        if ($result = $this->mysqli->query($query)) {
-            return $result[0]['id'];
-        }
-        
-        return false;
-    }
-    
-    public function get_saved_jobs($_order_by = 'member_saved_jobs.saved_on DESC') {
         $query = "SELECT jobs.id, jobs.title, jobs.description, branches.currency, 
                   industries.industry, employers.name AS employer, jobs.potential_reward, 
                   DATE_FORMAT(member_saved_jobs.saved_on, '%e %b, %Y') AS formatted_saved_on, 
@@ -620,34 +500,17 @@ class Member {
                   LEFT JOIN employers ON employers.id = jobs.employer 
                   LEFT JOIN branches ON branches.id = employers.branch 
                   WHERE member_saved_jobs.member = '". $this->id. "' AND 
-                  jobs.closed = 'N' 
-                  ORDER BY ". $_order_by;
-        return $this->mysqli->query($query);
-    }
-    
-    public function get_saved_jobs_with_filter($_filter_by = '0') {
-        $query = "SELECT jobs.id, jobs.title, jobs.description, branches.currency, 
-                  industries.industry, employers.name AS employer, jobs.potential_reward, 
-                  DATE_FORMAT(member_saved_jobs.saved_on, '%e %b, %Y') AS formatted_saved_on, 
-                  DATE_FORMAT(jobs.created_on, '%e %b, %Y') AS formatted_created_on, 
-                  DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS formatted_expire_on
-                  FROM member_saved_jobs 
-                  LEFT JOIN jobs ON jobs.id = member_saved_jobs.job 
-                  LEFT JOIN industries ON industries.id = jobs.industry 
-                  LEFT JOIN employers ON employers.id = jobs.employer 
-                  LEFT JOIN branches ON branches.id = employers.branch 
-                  WHERE member_saved_jobs.member = '". $this->id. "' AND 
                   jobs.closed = 'N' ";
-        if ($_filter_by == '0') {
-            $query .= "ORDER BY jobs.title";
-        } else {
-            $query .= "AND jobs.industry = ". $_filter_by. " ORDER BY jobs.title";
+        
+        if ($_filter_by > 0) {
+            $query .= "AND jobs.industry = ". $_filter_by. ' ';
         }
         
+        $query .= "ORDER BY ". $_order_by;
         return $this->mysqli->query($query);
     }
     
-    public function add_to_saved_jobs($_job_id) {
+    public function addToSavedJobs($_job_id) {
         if (empty($_job_id)) {
             return false;
         }
@@ -659,7 +522,7 @@ class Member {
         return $this->mysqli->execute($query);
     }
     
-    public function remove_from_saved_jobs($_job_id) {
+    public function removeFromSavedJobs($_job_id) {
         if (empty($_job_id)) {
             return false;
         }
@@ -669,7 +532,7 @@ class Member {
         return $this->mysqli->execute($query);
     }
     
-    public function is_IRC() {
+    public function isIRC() {
         $query = "SELECT individual_headhunter FROM members WHERE 
                   email_addr = '". $this->id(). "' LIMIT 1";
         $result = $this->mysqli->query($query);
@@ -678,57 +541,6 @@ class Member {
         }
         
         return false;
-    }
-    
-    public static function find($criteria, $db = "") {
-        if (is_null($criteria) || !is_array($criteria)) {
-            return false;
-        }
-        
-        $columns = "*";
-        if (array_key_exists('columns', $criteria)) {
-            $columns = trim($criteria['columns']);
-        }
-        
-        $joins = "";
-        if (array_key_exists('joins', $criteria)) {
-            $conditions = explode(",", $criteria['joins']);
-            $i = 0;
-            foreach ($conditions as $condition) {
-                $joins .= "LEFT JOIN ". trim($condition);
-                
-                if ($i < count($conditions)-1) {
-                    $joins .= " ";
-                }
-                $i++;
-            }
-        }
-        
-        $order = "";
-        if (array_key_exists('order', $criteria)) {
-            $order = "ORDER BY ". trim($criteria['order']);
-        }
-        
-        $group = "";
-        if (array_key_exists('GROUP', $criteria)) {
-            $order = "GROUP BY ". trim($criteria['group']);
-        }
-        
-        $limit = "";
-        if (array_key_exists('limit', $criteria)) {
-            $limit = "LIMIT ". trim($criteria['limit']);
-        }
-        
-        $match = "";
-        if (array_key_exists('match', $criteria)) {
-            $match = "WHERE ". trim($criteria['match']);
-        }
-        
-        $query = "SELECT ". $columns. " FROM members ". $joins. 
-                  " ". $match. " ". $group. " ". $order. " ". $limit;
-                  
-        $mysqli = Database::connect();
-        return $mysqli->query($query);
     }
 }
 ?>

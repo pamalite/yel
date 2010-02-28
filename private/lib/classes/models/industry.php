@@ -4,10 +4,10 @@ require_once dirname(__FILE__). "/../../utilities.php";
 class Industry {
     private $mysqli = NULL;
     
-    public static function create($data) {
+    public static function create($_data) {
         $mysqli = Database::connect();
         
-        if (is_null($data) || !is_array($data)) {
+        if (is_null($_data) || !is_array($d_ata)) {
             return false;
         }
         

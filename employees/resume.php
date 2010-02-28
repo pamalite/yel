@@ -183,7 +183,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
         </tr>
         <tr>
             <td class="label">Country:</td>
-            <td class="field"><?php echo Country::country_from_code($contacts[0]['country']) ?></td>
+            <td class="field"><?php echo Country::getCountryFrom($contacts[0]['country']) ?></td>
         </tr>
         <tr>
             <td class="label">Postal Code:</td>
@@ -290,7 +290,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
                 </tr>
                 <tr>
                     <td class="label">Country:</td>
-                    <td class="field"><?php echo Country::country_from_code($education['country']) ?></td>
+                    <td class="field"><?php echo Country::getCountryFrom($education['country']) ?></td>
                 </tr>
             <?php
                     if ($i < count($educations) - 1) {

@@ -35,7 +35,7 @@ class EmployerJobsPage extends Page {
     }
     
     private function generateCountries($selected = '') {
-        $countries = Country::get_all_with_display();
+        $countries = Country::getAllWithDisplay();
         
         echo '<select class="field" id="country" name="country">'. "\n";
         
@@ -78,7 +78,7 @@ class EmployerJobsPage extends Page {
     }
     
     private function generate_currency_list() {
-        $currencies = Currency::get_all();
+        $currencies = Currency::getAll();
         
         echo '<select class="field" id="currency" name="currency">'. "\n";
         
@@ -100,7 +100,7 @@ class EmployerJobsPage extends Page {
         $this->menu('employer', 'jobs');
         
         $branch = $this->employer->get_branch();
-        $currency = Currency::symbol_from_country_code($branch[0]['country']);
+        $currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
         $payment_currency = $currency;
         $subscriptions_rates = $GLOBALS['subscriptions_rates'];
         $subscriptions = $subscriptions_rates[$payment_currency];

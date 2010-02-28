@@ -48,7 +48,7 @@ $resume_data['resume']['contacts']['telephone_number'] = $contacts[0]['phone_num
 $resume_data['resume']['contacts']['email_address'] = $contacts[0]['email_addr'];
 $resume_data['resume']['contacts']['address'] = $contacts[0]['address'];
 $resume_data['resume']['contacts']['state'] = $contacts[0]['state'];
-$resume_data['resume']['contacts']['country'] = Country::country_from_code($contacts[0]['country']);
+$resume_data['resume']['contacts']['country'] = Country::getCountryFrom($contacts[0]['country']);
 
 $resume_data['resume']['work_experiences'] = array();
 if (count($experiences) > 0) {
@@ -74,7 +74,7 @@ if (count($educations) > 0) {
         $resume_data['resume']['educations']['education'][$i]['qualification'] = $education['qualification'];
         $resume_data['resume']['educations']['education'][$i]['completion_year'] = $education['completed_on'];
         $resume_data['resume']['educations']['education'][$i]['institution'] = $education['institution'];
-        $resume_data['resume']['educations']['education'][$i]['country'] = Country::country_from_code($education['country']);
+        $resume_data['resume']['educations']['education'][$i]['country'] = Country::getCountryFrom($education['country']);
         
         $i++;
     }

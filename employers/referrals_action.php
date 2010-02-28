@@ -868,7 +868,7 @@ if ($_POST['action'] == 'employ_candidate') {
             $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
             $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
             $branch['address_lines'] = explode("\n", $branch[0]['address']);
-            $currency = Currency::symbol_from_country_code($branch[0]['country']);
+            $currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
             
             $pdf = new CreditNote();
             $pdf->AliasNbPages();

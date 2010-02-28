@@ -1,17 +1,14 @@
-<?php
+<?php 
 require_once dirname(__FILE__). "/../../utilities.php";
 
 class Branch {
-    private $mysqli = NULL;
-    
-    public static function create($data) {
-        $mysqli = Database::connect();
-        
-        if (is_null($data) || !is_array($data)) {
+    public static function create($_data) {
+        if (is_null($_data) || !is_array($_data)) {
             return false;
         }
         
-        $data = sanitize($data);
+        $mysqli = Database::connect();
+        $data = sanitize($_data);
         $query = "INSERT INTO branches SET ";                
         $i = 0;
         foreach ($data as $key => $value) {
@@ -37,24 +34,24 @@ class Branch {
         }
         
         if (($id = $mysqli->execute($query, true)) > 0) {
-            return $id;
+            $this->id = $id;
+            return true;
         }
         
         return false;
     }
     
-    public static function update($data) {
+    public static function update($_data) {
+        if (is_null($_data) || !is_array($_data)) {
+            return false;
+        }
+        
+        if (!array_key_exists('id', $_data)) {
+            return false;
+        }
+        
         $mysqli = Database::connect();
-        
-        if (is_null($data) || !is_array($data)) {
-            return false;
-        }
-        
-        if (!array_key_exists('id', $data)) {
-            return false;
-        }
-        
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $query = "UPDATE branches SET ";
         $i = 0;
         foreach ($data as $key => $value) {
@@ -83,21 +80,112 @@ class Branch {
     
         $query .= "WHERE id = '". $data['id']. "'";
     
-         return $mysqli->execute($query);
+        return $mysqli->execute($query);
+    }
+    
+    public static function find($_criteria) {
+        if (is_null($_criteria) || !is_array($_criteria)) {
+            return false;
+        }
+        
+        $mysqli = Database::connect();
+        
+        $columns = '*';
+        $joins = '';
+        $order = '';
+        $group = '';
+        $limit = '';
+        $match = '';
+        
+        foreach ($_criteria as $key => $clause) {
+            switch (strtoupper($key)) {
+                case 'COLUMNS':
+                    $columns = trim($clause);
+                    break;
+                case 'JOINS':
+                    $conditions = explode(',', $clause);
+                    $i = 0;
+                    foreach ($conditions as $condition) {
+                        $joins .= "LEFT JOIN ". trim($condition);
+
+                        if ($i < count($conditions)-1) {
+                            $joins .= " ";
+                        }
+                        $i++;
+                    }
+                    break;
+                case 'ORDER':
+                    $order = "ORDER BY ". trim($clause);
+                    break;
+                case 'GROUP':
+                    $group = "GROUP BY ". trim($clause);
+                    break;
+                case 'LIMIT':
+                    $limit = "LIMIT ". trim($clause);
+                    break;
+                case 'MATCH':
+                    $match = "WHERE ". trim($clause);
+                    break;
+            }
+        }
+        
+        $query = "SELECT ". $columns. " FROM branches ". $joins. 
+                  " ". $match. " ". $group. " ". $order. " ". $limit;
+        return $mysqli->query($query);
+    }
+    
+    public static function delete() {
+        // Reserved for future use.
+    }
+    
+    public static function getAll($_offset = 0, $_limit = 0, $_order_by = '') {
+        $criteria = array();
+        $criteria['columns'] = '*';
+        
+        if ($_offset <= 0 && $_limit > 0) {
+            $criteria['limit'] = $_limit;
+        } else if ($_offset > 0 && $_limit > 0) {
+            $criteria['limit'] = $_offset. ', '. $_limit;
+        }
+        
+        if (!empty($_order_by)) {
+            $criteria['order'] = $_order_by;
+        }
+        
+        return self::find($criteria);
     }
     
     public static function get($_id) {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM branches WHERE id = '". $_id. "' LIMIT 1";
+        if (!is_null($_id)) {
+            $criteria = array(
+                'match' => "id = '". $_id. "'", 
+                'limit' => '1'
+            );
         
-        return $mysqli->query($query);
+            $result = self::find($criteria);
+            if (!is_null($result) && count($result) > 0) {
+                return $result[0];
+            }
+        }
+        
+        return false;
     }
     
-    public static function get_all() {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM branches";
+    public static function getCurrency($_id) {
+        if (!is_null($_id)) {
+            $criteria = array(
+                'match' => "id = '". $_id. "'", 
+                'columns' => 'currency', 
+                'limit' => '1'
+            );
         
-        return $mysqli->query($query);
+            $result = self::find($criteria);
+            if (!is_null($result) && count($result) > 0) {
+                return $result[0];
+            }
+        }
+        
+        return false;
     }
 }
 ?>

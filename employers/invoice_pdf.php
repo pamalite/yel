@@ -29,10 +29,10 @@ if (!$invoice) {
 }
 
 $employer = new Employer($invoice[0]['employer']);
-$branch = $employer->get_branch();
+$branch = $employer->getAssociatedBranch();
 $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
 $branch['address_lines'] = explode("\n", $branch[0]['address']);
-$currency = Currency::symbol_from_country_code($branch[0]['country']);
+$currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
 $amount_payable = 0.00;
 foreach($items as $i=>$item) {
     $amount_payable += $item['amount'];
@@ -109,7 +109,7 @@ class InvoicePdf extends FPDF   {
             }
             $this->Cell(5, 3, $line, 0, 2);
         }
-        $this->Cell(5, 3, $this->branch[0]['zip']. " ". $this->branch[0]['state']. ", ". $this->branch[0]['country_name']. ". ", 0, 2);
+        $this->Cell(5, 3, $this->branch[0]['zip']. " ". $this->branch[0]['state']. ", ". $this->branch[0]['mailing_country_name']. ". ", 0, 2);
         
         $this->SetFont('Arial','',12);
         //Line break

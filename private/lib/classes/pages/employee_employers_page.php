@@ -41,7 +41,7 @@ class EmployeeEmployersPage extends Page {
         
         $subscriptions_rates = $GLOBALS['subscriptions_rates'];
         $branch = $this->employee->get_branch();
-        $available_subscriptions = $subscriptions_rates[Currency::symbol_from_country_code($branch[0]['country_code'])];
+        $available_subscriptions = $subscriptions_rates[Currency::getSymbolFromCountryCode($branch[0]['country_code'])];
         
         ?>
         <div id="div_status" class="status">

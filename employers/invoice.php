@@ -29,7 +29,7 @@ if (!$invoice) {
 
 $employer = new Employer($invoice[0]['employer']);
 $branch = $employer->get_branch();
-$currency = Currency::symbol_from_country_code($branch[0]['country']);
+$currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
 
 $amount_payable = 0.00;
 foreach($items as $i=>$item) {

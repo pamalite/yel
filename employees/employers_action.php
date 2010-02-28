@@ -278,7 +278,7 @@ if ($_POST['action'] == 'save_profile') {
         $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
         $branch['address_lines'] = explode("\n", $branch[0]['address']);
         $posting_rates = $GLOBALS['postings_rates'];
-        $currency = Currency::symbol_from_country_code($branch[0]['country']);
+        $currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
         $price = $posting_rates[$currency];
         
         // 1. generate invoice in the system
@@ -423,7 +423,7 @@ if ($_POST['action'] == 'save_profile') {
         $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
         $branch['address_lines'] = explode("\n", $branch[0]['address']);
         $subscriptions_rates = $GLOBALS['subscriptions_rates'];
-        $currency = Currency::symbol_from_country_code($branch[0]['country']);
+        $currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
         $amount = $subscriptions_rates[$currency][$_POST['subscription_period']];
         if ($_POST['subscription_period'] == 1) {
             $amount = $single_subscription_prices[$currency];

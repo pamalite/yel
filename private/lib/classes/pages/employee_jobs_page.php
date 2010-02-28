@@ -37,7 +37,7 @@ class EmployeeJobsPage extends Page {
     }
     
     private function generateCountries($selected = '') {
-        $countries = Country::get_all_with_display();
+        $countries = Country::getAllWithDisplay();
         
         echo '<select class="field" id="country" name="country">'. "\n";
         
@@ -80,7 +80,7 @@ class EmployeeJobsPage extends Page {
     }
     
     private function generate_currency_list() {
-        $currencies = Currency::get_all();
+        $currencies = Currency::getAll();
         
         echo '<select class="field" id="currency" name="currency">'. "\n";
         
