@@ -185,7 +185,7 @@ class Resume implements Model{
         return false;
     }
     
-    public static function find($_criteria) {
+    public function find($_criteria) {
         if (!$this->hasData($_criteria)) {
             return false;
         }

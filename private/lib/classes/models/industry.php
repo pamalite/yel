@@ -198,6 +198,7 @@ class Industry {
             $main_industries[$i]['job_count'] += $sub_total;
         }
         
-    }   return $main_industries;
+        return $main_industries;
+    }
 }
 ?>
