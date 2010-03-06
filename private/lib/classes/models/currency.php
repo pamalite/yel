@@ -83,12 +83,54 @@ class Currency {
         return false;
     }
     
-    public static function getAll() {
-        $mysqli = Database::connect();
-        $query = "SELECT currencies.symbol, currencies.currency, countries.country 
-                  FROM currencies 
-                  LEFT JOIN countries ON countries.country_code = currencies.country_code";
+    public static function find($_criteria) {
+        if (is_null($_criteria) || !is_array($_criteria)) {
+            return false;
+        }
         
+        $mysqli = Database::connect();
+        
+        $columns = '*';
+        $joins = '';
+        $order = '';
+        $group = '';
+        $limit = '';
+        $match = '';
+        
+        foreach ($_criteria as $key => $clause) {
+            switch (strtoupper($key)) {
+                case 'COLUMNS':
+                    $columns = trim($clause);
+                    break;
+                case 'JOINS':
+                    $conditions = explode(',', $clause);
+                    $i = 0;
+                    foreach ($conditions as $condition) {
+                        $joins .= "LEFT JOIN ". trim($condition);
+
+                        if ($i < count($conditions)-1) {
+                            $joins .= " ";
+                        }
+                        $i++;
+                    }
+                    break;
+                case 'ORDER':
+                    $order = "ORDER BY ". trim($clause);
+                    break;
+                case 'GROUP':
+                    $group = "GROUP BY ". trim($clause);
+                    break;
+                case 'LIMIT':
+                    $limit = "LIMIT ". trim($clause);
+                    break;
+                case 'MATCH':
+                    $match = "WHERE ". trim($clause);
+                    break;
+            }
+        }
+        
+        $query = "SELECT ". $columns. " FROM currencies ". $joins. 
+                  " ". $match. " ". $group. " ". $order. " ". $limit;
         return $mysqli->query($query);
     }
 }

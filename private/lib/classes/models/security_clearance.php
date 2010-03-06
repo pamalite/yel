@@ -2,16 +2,13 @@
 require_once dirname(__FILE__). "/../../utilities.php";
 
 class SecurityClearance {
-    private $mysqli = NULL;
-    
-    public static function create($data) {
-        $mysqli = Database::connect();
-        
-        if (is_null($data) || !is_array($data)) {
+    public static function create($_data) {
+        if (is_null($_data) || !is_array($_data)) {
             return false;
         }
         
-        $data = sanitize($data);
+        $mysqli = Database::connect();
+        $data = sanitize($_data);
         $query = "INSERT INTO security_clearances SET ";                
         $i = 0;
         foreach ($data as $key => $value) {
@@ -43,18 +40,17 @@ class SecurityClearance {
         return false;
     }
     
-    public static function update($data) {
+    public static function update($_data) {
+        if (is_null($_data) || !is_array($_data)) {
+            return false;
+        }
+        
+        if (!array_key_exists('id', $_data)) {
+            return false;
+        }
+        
         $mysqli = Database::connect();
-        
-        if (is_null($data) || !is_array($data)) {
-            return false;
-        }
-        
-        if (!array_key_exists('id', $data)) {
-            return false;
-        }
-        
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $query = "UPDATE security_clearances SET ";
         $i = 0;
         foreach ($data as $key => $value) {
@@ -93,14 +89,14 @@ class SecurityClearance {
         return $mysqli->query($query);
     }
     
-    public static function get_all() {
+    public static function getAll() {
         $mysqli = Database::connect();
         $query = "SELECT * FROM security_clearances";
         
         return $mysqli->query($query);
     }
     
-    public static function grant_all($_id) {
+    public static function grantAll($_id) {
         if (empty($_id) || $_id <= 0) {
             return false;
         }
@@ -135,7 +131,7 @@ class SecurityClearance {
          return $mysqli->execute($query);
     }
     
-    public static function revoke_all($_id) {
+    public static function revokeAll($_id) {
         if (empty($_id) || $_id <= 0) {
             return false;
         }

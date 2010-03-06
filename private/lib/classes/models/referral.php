@@ -25,6 +25,10 @@ class Referral implements Model {
     }
     
     public function create($_data) {
+        if (!$this->hasData($_data)) {
+            return false;
+        }
+        
         if (!array_key_exists('member', $_data) || 
             !array_key_exists('referee', $_data) || 
             !array_key_exists('job', $_data)) {
@@ -64,6 +68,10 @@ class Referral implements Model {
     }
     
     public function update($_data) {
+        if (!$this->hasData($_data)) {
+            return false;
+        }
+        
         if ($this->id <= 0) {
             return false;
         }

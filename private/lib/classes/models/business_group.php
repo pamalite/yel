@@ -84,6 +84,57 @@ class BusinessGroup {
         return $mysqli->execute($query);
     }
     
+    public static function find($_criteria) {
+        if (is_null($_criteria) || !is_array($_criteria)) {
+            return false;
+        }
+        
+        $mysqli = Database::connect();
+        
+        $columns = '*';
+        $joins = '';
+        $order = '';
+        $group = '';
+        $limit = '';
+        $match = '';
+        
+        foreach ($_criteria as $key => $clause) {
+            switch (strtoupper($key)) {
+                case 'COLUMNS':
+                    $columns = trim($clause);
+                    break;
+                case 'JOINS':
+                    $conditions = explode(',', $clause);
+                    $i = 0;
+                    foreach ($conditions as $condition) {
+                        $joins .= "LEFT JOIN ". trim($condition);
+
+                        if ($i < count($conditions)-1) {
+                            $joins .= " ";
+                        }
+                        $i++;
+                    }
+                    break;
+                case 'ORDER':
+                    $order = "ORDER BY ". trim($clause);
+                    break;
+                case 'GROUP':
+                    $group = "GROUP BY ". trim($clause);
+                    break;
+                case 'LIMIT':
+                    $limit = "LIMIT ". trim($clause);
+                    break;
+                case 'MATCH':
+                    $match = "WHERE ". trim($clause);
+                    break;
+            }
+        }
+        
+        $query = "SELECT ". $columns. " FROM business_groups ". $joins. 
+                  " ". $match. " ". $group. " ". $order. " ". $limit;
+        return $mysqli->query($query);
+    }
+    
     public static function getSecurityClearance($_id) {
         $mysqli = Database::connect();
         $query = "SELECT security_clearance FROM business_groups WHERE id = ". $_id. " LIMIT 1";
@@ -99,13 +150,6 @@ class BusinessGroup {
     public static function get($_id) {
         $mysqli = Database::connect();
         $query = "SELECT * FROM business_groups WHERE id = '". $_id. "' LIMIT 1";
-        
-        return $mysqli->query($query);
-    }
-    
-    public static function getAll() {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM business_groups";
         
         return $mysqli->query($query);
     }

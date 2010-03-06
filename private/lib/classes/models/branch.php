@@ -138,23 +138,6 @@ class Branch {
         // Reserved for future use.
     }
     
-    public static function getAll($_offset = 0, $_limit = 0, $_order_by = '') {
-        $criteria = array();
-        $criteria['columns'] = '*';
-        
-        if ($_offset <= 0 && $_limit > 0) {
-            $criteria['limit'] = $_limit;
-        } else if ($_offset > 0 && $_limit > 0) {
-            $criteria['limit'] = $_offset. ', '. $_limit;
-        }
-        
-        if (!empty($_order_by)) {
-            $criteria['order'] = $_order_by;
-        }
-        
-        return self::find($criteria);
-    }
-    
     public static function get($_id) {
         if (!is_null($_id)) {
             $criteria = array(
