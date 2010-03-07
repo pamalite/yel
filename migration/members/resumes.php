@@ -2,6 +2,9 @@
 require_once dirname(__FILE__). "/../../private/lib/utilities.php";
 require_once dirname(__FILE__). "/../../private/lib/classes/fpdf.php";
 
+$path_to_copy = $GLOBALS['data_path']. '/migrated_resumes/';
+// $path_to_copy = $GLOBALS['resume_dir'];
+
 class ResumePdf extends FPDF {
     function make_title($title) {
         $this->SetFont('Times', 'B');
@@ -235,8 +238,7 @@ function generate_pdf_file($_contacts, $_cover_note, $_educations,
     $pdf->show_cover_note($_cover_note);
     
     $pdf->Close();
-    $pdf->Output($GLOBALS['data_path']. '/migrated_resumes/'. $file, 'F');
-    // $pdf->Output($GLOBALS['data_path']. '/resumes/'. $file, 'F');
+    $pdf->Output($GLOBALS['path_to_copy']. $file, 'F');
     
     return $hash;
 }
@@ -247,8 +249,7 @@ $mysqli = Database::connect();
 
 // 1. get all online resumes
 $query = "SELECT id FROM resumes
-          WHERE (file_hash IS NULL OR file_hash = '') AND 
-          deleted = 'N'";
+          WHERE (file_hash IS NULL OR file_hash = '')";
 
 $result = $mysqli->query($query);
 if (is_null($result) || empty($result)) {
@@ -336,8 +337,7 @@ foreach ($resumes as $resume) {
     echo 'Written resume: '. $file. '.pdf <br/>';
     
     // 2.7 update the resume with file hash
-    $url = $GLOBALS['data_path']. '/migrated_resumes/'. $file;
-    // $url = $GLOBALS['data_path']. '/resumes/'. $file;
+    $url = $path_to_copy. $file;
     $query = "UPDATE resumes SET 
               file_name = 'my_resume.pdf', 
               file_hash = '". $hash. "', 
@@ -369,52 +369,62 @@ foreach ($resumes as $resume) {
     echo '<br/>';
 }
 
-// 3. mark extra resumes as deleted
-$query = "SELECT members.email_addr 
-          FROM members
-          LEFT JOIN resumes ON members.email_addr = resumes.member AND 
-          resumes.deleted = 'N' 
-          GROUP BY members.email_addr
-          HAVING COUNT(resumes.id) > 1";
-$result = $mysqli->query($query);
+// 3. Remove 'deleted' resumes
+// 3.1 Remove referrals with resumes marked deleted
 
-if (is_null($result) || empty($result)) {
-    echo 'No extra resumes found.<br/>';
+$query = "DELETE FROM referrals 
+          WHERE `resume` IN (SELECT id FROM resumes WHERE deleted = 'Y')";
+if ($mysqli->execute($query) === false) {
+    echo 'Failed to remove related referrals. <br/><br/>';
     exit();
 }
 
-$members = $result;
-foreach ($members as $member) {
-    $id = $member['email_addr'];
-    
-    // 3.1 get all the resumes of the member
-    $query = "SELECT id FROM resumes 
-              WHERE member = '". $id. "' 
-              ORDER BY modified_on DESC";
-    $resumes = $mysqli->query($query);
-    
-    // 3.2 mark the 2nd and below extra resumes as deleted
-    $count = 0;
-    $resumes_to_be_marked = '';
-    foreach ($resumes as $i => $resume) {
-        $resume_id = $resume['id'];
-        
-        if ($count >= 1) {
-            $resumes_to_be_marked .= $resume_id;
-            
-            if ($i < count($resumes)-1) {
-                $resumes_to_be_marked .= ', ';
-            }
-        } 
-        
-        $count++;
+// 3.2 Remove the resumes marked deleted
+
+$query = "SELECT id, file_hash FROM resumes WHERE deleted = 'Y'";
+$result = $mysqli->query($query);
+if (is_null($result) || empty($result)) {
+    echo 'No resumes marked for deletion. <br/><br/>';
+    exit();
+}
+
+$resumes = $result;
+foreach ($resumes as $resume) {
+    $failed = false;
+    if (is_null($resume['file_hash']) || empty($resume['file_hash'])) {
+        // delete online
+        $query = "DELETE FROM resume_technical_skills WHERE resume = ". $resume['id']. "; 
+                  DELETE FROM resume_skills WHERE resume = ". $resume['id']. "; 
+                  DELETE FROM resume_work_experiences WHERE resume = ". $resume['id']. "; 
+                  DELETE FROM resume_educations WHERE resume = ". $resume['id'];
+        echo $query. '<br/>';
+        if ($mysqli->transact($query) === false) {
+            echo '<br/>Cannot delete sections of resume ID: '. $resume['id']. '<br/><br/>';
+            $failed = true;
+        } else {
+            echo 'Deleted sections resume ID: '. $resume['id']. '<br/>';
+        }
+    } else {
+        // delete file
+        $file_path = $path_to_copy. '/'. $resume['id']. '.'. $resume['file_hash'];
+        echo 'unlink '. $file_path. '<br/>';
+        if (unlink($file_path) === false) {
+            echo '<br/>Cannot delete resume file: '. $file_path. '<br/><br/>';
+            $failed = true;
+        } else {
+            echo 'Deleted resume file: '. $file_path. '<br/>';
+        }        
     }
     
-    $query = "UPDATE resumes SET 
-              deleted = 'Y' 
-              WHERE id IN (". $resumes_to_be_marked. ")";
-    $mysqli->execute($query);
-    echo $query. '<br/><br/>';
+    if (!$failed) {
+        $query = "DELETE FROM resumes WHERE id = ". $resume['id'];
+        echo $query. '<br/>';
+        if ($mysqli->execute($query) === false) {
+            echo '<br/>Cannot delete resume ID: '. $resume['id']. '<br/><br/>';
+        } else {
+            echo 'Deleted resume ID: '. $resume['id']. '<br/>';
+        }
+    }
 }
 
 echo 'Finish';
