@@ -2,6 +2,8 @@
 require_once dirname(__FILE__). "/../../private/lib/utilities.php";
 require_once dirname(__FILE__). "/../../private/lib/classes/fpdf.php";
 
+// flatten online resumes to PDF files and re-index them
+
 $path_to_copy = $GLOBALS['data_path']. '/migrated_resumes/';
 // $path_to_copy = $GLOBALS['resume_dir'];
 
@@ -406,7 +408,7 @@ foreach ($resumes as $resume) {
         }
     } else {
         // delete file
-        $file_path = $path_to_copy. '/'. $resume['id']. '.'. $resume['file_hash'];
+        $file_path = $GLOBALS['resume_dir']. '/'. $resume['id']. '.'. $resume['file_hash'];
         echo 'unlink '. $file_path. '<br/>';
         if (unlink($file_path) === false) {
             echo '<br/>Cannot delete resume file: '. $file_path. '<br/><br/>';

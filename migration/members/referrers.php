@@ -107,7 +107,7 @@ if ($keys === false) {
               DROP COLUMN primary_industry,
               DROP COLUMN secondary_industry,
               DROP COLUMN tertiary_industry";
-    echo $query. '</pre><br/><br/>';
+    echo $query. '<br/><br/>';
 } else {
     $query = "ALTER TABLE members ";
     $i = 0;
@@ -121,6 +121,7 @@ if ($keys === false) {
         $i++;
     }
     
+    echo $query. '<br/><br/>';
     if ($mysqli->execute($query) === false) {
         echo 'Failed to drop columns. Drop it manually<br/><pre>'. $query. '</pre><br/><br/>';
     } else {
@@ -207,6 +208,34 @@ if (!is_null($result) && !empty($result)) {
     echo 'All recommenders are not members.<br/><br/>';
 }
 
+// 2.3.1 move the recommender industries to member_industries
+if (!is_null($result) && !empty($result)) {
+    $recommenders = $result;
+    foreach ($recommenders as $recommender) {
+        $query = "SELECT industry FROM recommender_industries 
+                  WHERE recommender = '". $recommender['email_addr']. "'";
+        $result = $mysqli->query($query);
+        if (is_null($result) || empty($result)) {
+            echo 'No industries set for recommender: '. $recommender['email_addr']. '<br/><br/>';
+        } else {
+            $industries = $result;
+            foreach ($industries as $industry) {
+                $query = "INSERT INTO member_industries SET 
+                          member = '". $new_member. "', 
+                          industry = ". $industry['industry'];
+                echo $query. '<br/>';
+                if ($mysqli->execute($query) === false) {
+                    echo 'failed: possibly duplication.<br/>';
+                } else {
+                    echo 'success<br/>';
+                }
+            }
+        }
+    }
+} else {
+    echo 'All recommenders are not members.<br/><br/>';
+}
+
 // 2.4 make references between recommenders and members in member_referees
 $query = "INSERT INTO member_referees 
           SELECT recommender, email_addr FROM members 
@@ -221,15 +250,44 @@ if ($mysqli->transact($query) === false) {
     echo 'success<br/>';
 }
 
-// 2.5 drop the recommender tables as we no longer need it, manually
-echo '<br/>Remember to drop the recommender tables, manually.<br/><pre>';
-$query = "ALTER TABLE members 
-          DROP FOREIGN KEY ??members_ibfk_4??, 
-          DROP COLUMN recommender;
-          DROP TABLE recommender_industries;
-          DROP TABLE recommender_tokens; 
-          DROP TABLE recommenders";
-echo $query. '</pre><br/>';
+// 2.5 drop the recommender tables as we no longer need it
+$columns = array('recommender');
+$keys = drop_columns_from_table($columns, 'members');
+if ($keys === false) {
+    echo '<br/>Remember to drop the recommender tables, manually.<br/><pre>';
+    $query = "ALTER TABLE members 
+              DROP FOREIGN KEY ??members_ibfk_4??, 
+              DROP COLUMN recommender;
+              DROP TABLE recommender_industries;
+              DROP TABLE recommender_tokens; 
+              DROP TABLE recommenders";
+    echo $query. '</pre><br/>';
+} else {
+    $query = "ALTER TABLE members ";
+    $i = 0;
+    foreach ($keys as $col=>$key) {
+        $query .= "DROP FOREIGN KEY `". $key. "`, 
+                   DROP COLUMN `". $col. "`";
+        if ($i < count($keys) - 1) {
+            $query .= ", ";
+        }
+        
+        $i++;
+    }
+    
+    // drop the tables as well
+    $query .= ";
+               DROP TABLE recommender_industries;
+               DROP TABLE recommender_tokens; 
+               DROP TABLE recommenders";
+    echo $query. '<br/><br/>';
+    if ($mysqli->transact($query) === false) {
+        echo 'Failed to drop columns. Drop it manually<br/><pre>'. $query. '</pre><br/><br/>';
+    } else {
+        echo 'successfully dropped columns and tables.<br/>';
+    }
+    
+}
 
 echo 'Finish';
 ?>

@@ -1,6 +1,8 @@
 <?php
 require_once dirname(__FILE__). "/../../private/lib/utilities.php";
 
+// purge resumes that are old
+
 $mysqli = Database::connect();
 
 // 1. Get all referrals and their age
