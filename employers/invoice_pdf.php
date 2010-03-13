@@ -195,14 +195,14 @@ $pdf->Ln(6);
 $pdf->SetTextColor(0, 0, 0);
 $pdf->Cell(60, 5, pad($_GET['id'], 11, '0'),1,0,'C');
 $pdf->Cell(1);
-$pdf->Cell(33, 5, $invoice[0]['issued_on'],1,0,'C');
+$pdf->Cell(33, 5, $invoice[0]['formatted_issued_on'],1,0,'C');
 $pdf->Cell(1);
 
 if (is_null($invoice[0]['paid_on']) || empty($invoice[0]['paid_on']))
 {
-    $pdf->Cell(33, 5, $invoice[0]['payable_by'],1,0,'C');
+    $pdf->Cell(33, 5, $invoice[0]['formatted_payable_by'],1,0,'C');
 } else {
-    $pdf->Cell(33, 5, $invoice[0]['paid_on'],1,0,'C');
+    $pdf->Cell(33, 5, $invoice[0]['formatted_paid_on'],1,0,'C');
 }
 
 $pdf->Cell(1);
