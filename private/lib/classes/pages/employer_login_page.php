@@ -25,41 +25,18 @@ class EmployerLoginPage extends Page {
     
     public function show($_error = "") {
         $this->begin();
-        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Employers</span>");
+        $this->top('Employer Sign In');
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
+        
         <table class="content">
             <tr>
-                <td class="content">
-                    <div class="content">
-                        <table class="description">
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/employer_login/01.jpg" /></td>
-                                <td>Create and manage your job ads</td>
-                            </tr>
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/employer_login/02.jpg" /></td>
-                                <td>Manage and track resumes of referred candidates</td>
-                            </tr>
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/employer_login/03.jpg" /></td>
-                                <td>Keep track of successful employments</td>
-                            </tr>
-                            <tr>
-                                <td style="padding-top: 25px;" colspan="2">&quot;Identifying better candidates for your organization through the power of job referrals.&quot;</td>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
                 <td class="login_form">
                     <form method="post" id="login_form" onSubmit="return false">
                         <div class="login">
                             <table class="login">
-                                <tr>
-                                    <td class="title">Employer Sign In</td>
-                                </tr>
                                 <tr>
                                     <td><label for="id">User ID:</label><br/>
                                     <input type="text" id="id" name="id" value=""></td>

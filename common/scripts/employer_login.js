@@ -35,7 +35,7 @@ function login() {
             var status = xml.getElementsByTagName('status');
             
             if (status[0].childNodes[0].nodeValue == 'ok') {
-                location.replace(root + '/employers/home.php');
+                location.replace(root + '/employers/resumes.php');
             }
         },
         onRequest: function(instance) {

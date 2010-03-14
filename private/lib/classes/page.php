@@ -135,7 +135,7 @@ class Page {
         <?php
     }
     
-    protected function top($page_title) {
+    protected function top($_page_title) {
         ?>
         <div class="top">
             <table class="top">
@@ -146,20 +146,12 @@ class Page {
                     !empty($_SESSION['yel']['employer']['hash'])) {
                 ?>
                 <tr>
-                    <td rowspan="2" class="logo">
+                    <td class="logo">
                         <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/index.php">
                             <img name="logo" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/top.jpg" />
                         </a>
                     </td>
-                    <td><div class="page_title"><?php echo $page_title ?></div></td>
-                </tr>
-                <tr>
-                    <td>
-                        <img style="vertical-align: middle; float: left; border: none;" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/warning.jpg"/>
-                        <div class="reminder" style="padding-left: 25px;">
-                            Always remember to submit your newly employed candidate's details by clicking on <strong>'Confirm Employed'</strong> in the <a href="referrals.php"><strong>Resumes</strong></a> section, and fax/scan over a copy of the signed Letter of Offer of every newly employed candidate.
-                        </div>
-                    </td>
+                    <td><div class="page_title"><?php echo $_page_title ?></div></td>
                 </tr>
                 <?php
                 } else {
@@ -170,7 +162,7 @@ class Page {
                             <img name="logo" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/top.jpg" />
                         </a>
                     </td>
-                    <td><div class="page_title"><?php echo $page_title ?></div></td>
+                    <td><div class="page_title"><?php echo $_page_title ?></div></td>
                 </tr>
                 <?php
                 } 
@@ -180,7 +172,40 @@ class Page {
         <?php
     }
     
-    protected function top_search($page_title) {
+    protected function top_search($_page_title) {
+        // get the employers
+        $criteria = array(
+            'columns' => 'employers.id, employers.name', 
+            'joins' => 'jobs ON employers.id = jobs.employer',
+            'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'order' => 'employers.name ASC'
+        );
+        $employer = new Employer();
+        $employers = $employer->find($criteria);
+        if ($employers === false) {
+            $employers = array();
+        }
+        
+        // get the industries
+        $industries = array();
+        $main_industries = Industry::getMain(true);
+        $i = 0;
+        foreach ($main_industries as $main) {
+            $industries[$i]['id'] = $main['id'];
+            $industries[$i]['name'] = $main['industry'];
+            $industries[$i]['job_count'] = $main['job_count'];
+            $industries[$i]['is_main'] = true;
+            $subs = Industry::getSubIndustriesOf($main['id'], true);
+            foreach ($subs as $sub) {
+                $i++;
+
+                $industries[$i]['id'] = $sub['id'];
+                $industries[$i]['name'] = $sub['industry'];
+                $industries[$i]['job_count'] = $sub['job_count'];
+                $industries[$i]['is_main'] = false;
+            }
+            $i++;
+        }
         ?>
         <div class="top">
             <table class="top">
@@ -190,30 +215,50 @@ class Page {
                             <img name="logo" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/top.jpg" />
                         </a>
                     </td>
-                    <td><div class="page_title"><?php echo desanitize($page_title) ?></div></td>
+                    <td><div class="page_title"><?php echo desanitize($_page_title) ?></div></td>
                 </tr>
                 <tr>
                     <td>
                         <form method="post" action="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/search.php" onSubmit="return verify_mini();">
                             <div class="mini_search">
-                                <span id="mini_employer_drop_down"></span>
+                                <select id="mini_employer" name="employer">
+                                    <option value="0">Any Employer</option>
+                                    <option value="0" disabled>&nbsp;</option>
+                                    <?php
+                                    foreach ($employers as $emp) {
+                                    ?>
+                                    <option value="<?php echo $emp['id'] ?>">
+                                        <?php echo desanitize($emp['name']); ?>
+                                    </option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>
                                 &nbsp;
-                                <span id="mini_industry_drop_down"></span>
+                                <select id="mini_industry" name="industry">
+                                    <option value="0">Any Specialization</option>
+                                    <option value="0" disabled>&nbsp;</option>
+                                    <?php
+                                    foreach ($industries as $industry) {
+                                        if ($industry['is_main']) {
+                                            echo '<option value="'. $industry['id']. '" class="main_industry">';
+                                            echo $industry['name'];
+                                        } else {
+                                            echo '<option value="'. $industry['id']. '">';
+                                            echo '&nbsp;&nbsp;&nbsp;&nbsp;'. $industry['name'];
+                                        }
+                                        
+                                        if ($industry['job_count'] > 0) {
+                                            echo '&nbsp;('. $industry['job_count']. ')';
+                                        }
+                                        echo '</option>' + "\n";
+                                    }
+                                    ?>
+                                </select>
                                 &nbsp;
                                 <input type="text" name="keywords" id="mini_keywords" value="Job title or keywords">
                                 &nbsp;
                                 <input id="mini_search_button" type="submit" value="Search Jobs">
-                                &nbsp;
-                                <?php
-                                if (isset($_SESSION['yel']['member']) &&
-                                    !empty($_SESSION['yel']['member']['id']) && 
-                                    !empty($_SESSION['yel']['member']['sid']) && 
-                                    !empty($_SESSION['yel']['member']['hash'])) {
-                                ?>
-                                <!--span style="font-size: 10pt; position: absolute; right: 20px"><a target="_new" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/help/members/">Help</a></span-->
-                                <?php    
-                                }
-                                ?>
                             </div>
                         </form>
                     </td>
@@ -228,7 +273,7 @@ class Page {
                     <td>
                         <img style="vertical-align: middle; float: left;" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/warning.jpg"/>
                         <div class="reminder" style="padding-left: 25px;">
-                            Always remember to click on the <strong>'I'm Employed'</strong> button in the <strong>Jobs Applied</strong> section whenever you are employed by an employer.
+                            Always remember to click on the <strong>'I'm Employed'</strong> button in the <strong>Jobs Applications</strong> section whenever you are employed by an employer.
                         </div>
                     </td>
                 </tr>
@@ -275,19 +320,18 @@ class Page {
     }
     
     protected function menu($type, $page = '') {
-        $style = 'style="border: 1px solid #0000FF;"';
+        $style = 'style="border: 1px solid #666666;"';
         
         if ($type == 'employer') {
             ?>
             <div class="menu">
                 <ul class="menu">
-                    <li <?php echo ($page == 'home') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/home.php">Home</a></li>
-                    <li <?php echo ($page == 'profile') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/profile.php">Profile</a></li>
-                    <li <?php echo ($page == 'jobs') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/jobs.php">Job Postings</a></li>
-                    <li <?php echo ($page == 'referrals') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/referrals.php">Resumes</a><span style="color: #666666; font-size: 9pt; font-weight: bold;" id="emp_referrals_count"></span></li>
-                    <li <?php echo ($page == 'employments') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/employments.php">Employment Records</a></li>
-                    <li <?php echo ($page == 'invoices') ? $style : '';?>><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/invoices.php">Invoices &amp; Receipts</a></li>
-                    <li><a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/logout.php">Logout</a></li>
+                    <li <?php echo ($page == 'resumes') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/resumes.php">Resumes</a></li>
+                    <li <?php echo ($page == 'jobs') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/jobs.php">Job Postings</a></li>
+                    <li <?php echo ($page == 'invoices') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/invoices.php">Invoices &amp; Receipts</a></li>
+                    <li <?php echo ($page == 'profile') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/profile.php">Profile</a></li>
+                    <li <?php echo ($page == 'resources') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/resources.php">Resources</a></li>
+                    <li><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/logout.php">Logout</a></li>
                 </ul>
             </div>
             <?php
@@ -495,7 +539,7 @@ class Page {
             
             if (!empty($_employer_id)) {
                 $employer = new Employer($_employer_id);
-                $branch = $employer->get_branch();
+                $branch = $employer->getAssociatedBranch();
                 
                 $phone_number = $branch[0]['phone'];
                 $fax_number = $branch[0]['fax'];

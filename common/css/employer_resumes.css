@@ -1,0 +1,39 @@
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+.referred_jobs {
+    margin: auto;
+    width: 99%;
+    border-collapse: collapse;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #DDDDDD;
+    border-top: 1px solid #BBBBBB;
+    border-bottom: 1px solid #BBBBBB;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.resumes_column {
+    text-align: center;
+    font-weight: bolder;
+    font-size: 12pt;
+}
+
+.cell:hover {
+    background-color: #B7F3CF;
+}
+
+.referred_jobs tr:hover {
+    background-color: #F8F897;
+}
