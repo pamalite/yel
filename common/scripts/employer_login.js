@@ -126,33 +126,11 @@ function drop_contact_now() {
 }
 
 function close_contact_drop_form() {
-    $('div_contact_drop_form').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
+    close_window('contact_drop_form');
 }
 
 function show_contact_drop_form() {
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_contact_drop_form').getStyle('height'));
-    var div_width = parseInt($('div_contact_drop_form').getStyle('width'));
-    
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
-    } else {
-        window_height = document.documentElement.clientHeight;
-    }
-    
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
-    }
-    
-    $('div_contact_drop_form').setStyle('top', ((window_height - div_height) / 2));
-    $('div_contact_drop_form').setStyle('left', ((window_width - div_width) / 2));
-    
-    $('div_blanket').setStyle('display', 'block');
-    $('div_contact_drop_form').setStyle('display', 'block');
+    show_window('contact_drop_form');
 }
 
 function onDomReady() {

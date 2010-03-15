@@ -14,9 +14,9 @@
 .header {
     padding: 5px 5px 5px 5px;
     font-weight: bold;
-    background-color: #DDDDDD;
-    border-top: 1px solid #BBBBBB;
-    border-bottom: 1px solid #BBBBBB;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
 }
 
 .cell {
@@ -31,9 +31,17 @@
 }
 
 .cell:hover {
-    background-color: #B7F3CF;
+    background-color: #BBFCA1;
 }
 
 .referred_jobs tr:hover {
-    background-color: #F8F897;
+    background-color: #FFFF00;
+}
+
+.inline_job_desc {
+    margin: 10px 10px 10px 10px;
+    padding: 5px 5px 5px 5px;
+    border: 1px dashed #CCCCCC;
+    display: none;
+    overflow: auto;
 }

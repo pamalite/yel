@@ -33,7 +33,8 @@ class EmployerResumesPage extends Page {
     private function get_referred_jobs() {
         $criteria = array(
             'columns' => "industries.industry, jobs.id, jobs.title, COUNT(referrals.id) AS num_referrals, 
-                          DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS formatted_expire_on", 
+                          DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS formatted_expire_on, 
+                          jobs.description", 
             'joins' => 'jobs ON jobs.id = referrals.job, 
                         industries ON industries.id = jobs.industry', 
             'match' => "jobs.employer = '". $this->employer->getId(). "' AND 
@@ -120,25 +121,30 @@ class EmployerResumesPage extends Page {
             <table class="referred_jobs">
                 <tr>
                     <td class="header">
-                        <a class="no_link" onClick="sort_by('industries.industry');">
+                        <a class="sortable" onClick="sort_by('industries.industry');">
                             Specialization
                         </a>
                     </td>
                     <td class="header">
-                        <a class="no_link" onClick="sort_by('jobs.title');">Job</a>
+                        <a class="sortable" onClick="sort_by('jobs.title');">Job</a>
                     </td>
                     <td class="header">
-                        <a class="no_link" onClick="sort_by('jobs.expire_on');">Expire On</span>
+                        <a class="sortable" onClick="sort_by('jobs.expire_on');">Expire On</span>
                     </td>
-                    <td class="header"><a class="no_link" onClick="sort_by('num_referrals');">Resumes</a></td>
+                    <td class="header">
+                        <a class="sortable" onClick="sort_by('num_referrals');">Resumes</a>
+                    </td>
                 </tr>
         <?php
-                foreach ($referred_jobs as $referred_job) {
+                foreach ($referred_jobs as $i=>$referred_job) {
         ?>
                 <tr>
                     <td class="cell"><?php echo $referred_job['industry']; ?></td>
                     <td class="cell">
-                        <a class="no_link" onClick="show_job_description('<?php echo $referred_job['id']; ?>');"><?php echo $referred_job['title']; ?></a>
+                        <a class="no_link" onClick="toggle_job_description('<?php echo $i; ?>');"><?php echo $referred_job['title']; ?></a>
+                        <div id="inline_job_desc_<?php echo $i; ?>" class="inline_job_desc">
+                            <?php echo $referred_job['description']; ?>
+                        </div>
                     </td>
                     <td class="cell"><?php echo $referred_job['formatted_expire_on']; ?></td>
                     <td class="cell resumes_column">

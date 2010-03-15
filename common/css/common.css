@@ -67,6 +67,11 @@ a.no_link {
     color: #0000FF;
 }
 
+a.sortable {
+    cursor: pointer;
+    color: #666666;
+}
+
 a {
     color: #0000FF;
     text-decoration: none;
@@ -86,13 +91,8 @@ a.menu {
     text-decoration: none;
 }
 
-a.menu:link, a.menu:visited {
-    color: #666666;
-}
-
 a.menu:active, a.menu:hover {
-    color: #999999;
-    text-decoration: underline;
+    color: #FFFFFF;
 }
 
 img {
@@ -216,7 +216,7 @@ ul.menu li {
 }
 
 ul.menu li:hover {
-    border: 1px solid #666666;
+    background-color: #CCCCCC;
 }
 
 div.support {

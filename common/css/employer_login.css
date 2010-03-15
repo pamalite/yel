@@ -1,89 +1,43 @@
-table.content {
-    border: none;
+.login_form {
     width: 500px;
     margin: auto;
-    padding-top: 25px;
-    padding-bottom: 5px;
-}
-
-table.content td {
-    vertical-align: top;
-}
-
-table.content td.content {
-    width: 70%;
-}
-
-div.content {
-    font-size: 10pt;
-    text-align: center;
-}
-
-div.content p {
-    margin-left: 25px;
-    margin-right: 15px;
-    font-size: 10pt;
-}
-
-table.description {
-    border: none;
-    margin: auto;
-    width: 75%;
-}
-
-table.description td {
-    vertical-align: middle;
-    color: #666666;
-    font-size: 10pt;
-}
-
-table.description td.icons {
-    text-align: center;
-    padding-right: 25px;
-}
-
-#div_blanket {
-    display: none;
-    background-color: #000000;
-    opacity: 0.5;
-    filter : alpha(opacity=50); /* for IE */
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#div_contact_drop_form {
-    margin: 10px 10px 10px 10px;
-    display: none;
-    background-color: #FFFFFF;
-    border: 3px solid #0000FF;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 640px;
-    height: 235px;
-    overflow: auto;
-    text-align: center;
-}
-
-div.login {
-    text-align: center;
-    padding-top: 5px;
-}
-
-table.login {
-    /*border: 1px solid #6699FF;*/
     border: 1px solid #CCCCCC;
-    width: 95%;
-    margin: auto;
-    border-collapse: collapse;
+    padding: 5px 3px 35px 5px;
 }
 
-table.login td {
+.contact_drop {
+    margin-top: 10px;
+    text-align: center;
     padding: 5px 5px 5px 5px;
-    vertical-align: middle;
+}
+
+.button_bar {
+    margin-top: 5px;
+    width: 50%;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+    text-align: right;
+}
+
+#contact_drop_form {
+    display: none;
+    width: 500px;
+}
+
+.popup_window {
+    border: 5px solid #CCCCCC;
+    padding: 5px 5px 5px 5px;
+    left: 0;
+    top: 0;
+    position: absolute;
+    background-color: #FFFFFF;
+    overflow: auto;
 }
 
 table.drop_contact {

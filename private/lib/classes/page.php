@@ -320,7 +320,7 @@ class Page {
     }
     
     protected function menu($type, $page = '') {
-        $style = 'style="border: 1px solid #666666;"';
+        $style = 'style="background-color: #CCCCCC;"';
         
         if ($type == 'employer') {
             ?>

@@ -31,76 +31,62 @@ class EmployerLoginPage extends Page {
             <span id="span_status" class="status"></span>
         </div>
         
-        <table class="content">
-            <tr>
-                <td class="login_form">
-                    <form method="post" id="login_form" onSubmit="return false">
-                        <div class="login">
-                            <table class="login">
-                                <tr>
-                                    <td><label for="id">User ID:</label><br/>
-                                    <input type="text" id="id" name="id" value=""></td>
-                                </tr>
-                                <tr>
-                                    <td><label for="password">Password:</label><br/>
-                                    <input type="password" id="password" name="password"></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <input type="submit" class="login" id="login" value="Sign In">
-                                        &nbsp;
-                                        <span class="forgot_password"><a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/contact.php">Forgot Password? Call Support.</a></span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </form>
-                    <div class="login">
-                        <table class="login">
-                            <tr>
-                                <td style="text-align: center; font-weight: bold; font-size: 12pt; padding-bottom: 5px;">
-                                    <a href="#" class="signup" onClick="show_contact_drop_form();"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/contact_sign_up.jpg" /></a>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-        </table>
+        <div class="login_form">
+            <form method="post" onSubmit="return false;">
+                <label for="id">User ID:</label><br/>
+                <input type="text" id="id" name="id" value="" />
+                <br/><br/>
+                <label for="password">Password:</label><br/>
+                <input type="password" id="password" name="password" />
+                <div class="button_bar left">
+                    <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/contact.php">Forgot Password? Call Support.</a>
+                </div>
+                <div class="button_bar right">
+                    <input type="submit" class="login" id="login" value="Sign In" />
+                </div>
+            </form>
+        </div>
+        <div class="login_form contact_drop">
+            <a href="#" class="signup" onClick="show_contact_drop_form();"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/contact_sign_up.jpg" /></a>
+        </div>
         
-        <div id="div_blanket"></div>
-        <div id="div_contact_drop_form">
-            <form method="post" id="contact_drop_form" onSubmit="return false;">
+        <div id="contact_drop_form" class="popup_window">
+            <form method="post" onSubmit="return false;">
                 <table class="drop_contact">
                     <tr>
                         <td colspan="2" class="title">Drop Us Your Contact</td>
                     </tr>
                     <tr>
                         <td class="label"><label for="company">Company Name:</label></td>
-                        <td><input type="text" id="company" name="company" value=""></td>
+                        <td><input type="text" id="company" name="company" value="" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="phone">Contact Number:</label></td>
-                        <td><input type="text" id="phone" name="phone" value=""></td>
+                        <td><input type="text" id="phone" name="phone" value="" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="email">E-mail Address:</label></td>
-                        <td><input type="text" id="email" name="email" value=""></td>
+                        <td><input type="text" id="email" name="email" value="" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="contact">Contact Person:</label></td>
-                        <td><input type="text" id="contact" name="contact" value=""></td>
+                        <td><input type="text" id="contact" name="contact" value="" /></td>
                     </tr>
                     <tr>
                         <td class="buttons" colspan="2">
-                            <input type="button" class="drop" onClick="close_contact_drop_form();" value="Cancel">
+                            <input type="button" class="drop" onClick="close_contact_drop_form();" value="Cancel" />
                             &nbsp;
-                            <input type="button" class="drop" id="drop" value="Drop My Contact Now">
+                            <input type="button" class="drop" id="drop" value="Drop My Contact Now" />
                         </td>
                     </tr>
                 </table>
             </form>
         </div>
+        
+        <!--div id="div_blanket"></div>
+        <div id="div_contact_drop_form">
+            
+        </div-->
         <?php
     }
 }
