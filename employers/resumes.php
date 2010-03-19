@@ -18,12 +18,12 @@ if (!isset($_SESSION['yel']['employer']) ||
     redirect_to('login.php');
 }
 
-$home = new EmployerResumesPage($_SESSION['yel']['employer']);
-$home->header(array('root_dir' => '../', 
+$page = new EmployerResumesPage($_SESSION['yel']['employer']);
+$page->header(array('root_dir' => '../', 
                     'title' => 'Resumes'));
-$home->insert_employer_resumes_css();
-$home->insert_employer_resumes_scripts();
-$home->insert_inline_scripts();
-$home->show();
-$home->footer();
+$page->insert_employer_resumes_css();
+$page->insert_employer_resumes_scripts();
+$page->insert_inline_scripts();
+$page->show();
+$page->footer();
 ?>

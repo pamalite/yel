@@ -45,3 +45,9 @@
     display: none;
     overflow: auto;
 }
+
+.resumes {
+    margin: auto;
+    width: 99%;
+    border-collapse: collapse;
+}

@@ -1,5 +1,6 @@
 <?php
-require_once dirname(__FILE__). "/../../utilities.php";
+require_once dirname(__FILE__). '/../../utilities.php';
+require_once dirname(__FILE__). '/../htmltable.php';
 
 class EmployerResumesPage extends Page {
     private $employer = NULL;
@@ -21,7 +22,8 @@ class EmployerResumesPage extends Page {
     public function insert_employer_resumes_scripts() {
         $this->insert_scripts();
         
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employer_resumes_page.js"></script>'. "\n";
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employer_resumes.js"></script>'. "\n";
     }
     
     public function insert_inline_scripts() {
@@ -58,7 +60,6 @@ class EmployerResumesPage extends Page {
             $result[$i]['new_referrals_count'] = '0';
         }
         
-        $criteria = '';
         $criteria = array(
             'columns' => 'jobs.id, COUNT(referrals.id) AS num_new_referrals', 
             'joins' => 'jobs ON jobs.id = referrals.job, 
@@ -117,54 +118,37 @@ class EmployerResumesPage extends Page {
             <div class="empty_results">No applications found for all job posts at this moment.</div>
         <?php
             } else {
-        ?>
-            <table class="referred_jobs">
-                <tr>
-                    <td class="header">
-                        <a class="sortable" onClick="sort_by('industries.industry');">
-                            Specialization
-                        </a>
-                    </td>
-                    <td class="header">
-                        <a class="sortable" onClick="sort_by('jobs.title');">Job</a>
-                    </td>
-                    <td class="header">
-                        <a class="sortable" onClick="sort_by('jobs.expire_on');">Expire On</span>
-                    </td>
-                    <td class="header">
-                        <a class="sortable" onClick="sort_by('num_referrals');">Resumes</a>
-                    </td>
-                </tr>
-        <?php
+                $jobs_table = new HTMLTable('referred_jobs_table', 'referred_jobs');
+                
+                $jobs_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'industries.industry');\">Specialization</a>", '', 'header');
+                $jobs_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'jobs.title');\">Job</a>", '', 'header');
+                $jobs_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'jobs.expire_on');\">Expire On</a>", '', 'header');
+                $jobs_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'num_referrals');\">Resumes</a>", '', 'header');
+                
                 foreach ($referred_jobs as $i=>$referred_job) {
-        ?>
-                <tr>
-                    <td class="cell"><?php echo $referred_job['industry']; ?></td>
-                    <td class="cell">
-                        <a class="no_link" onClick="toggle_job_description('<?php echo $i; ?>');"><?php echo $referred_job['title']; ?></a>
-                        <div id="inline_job_desc_<?php echo $i; ?>" class="inline_job_desc">
-                            <?php echo $referred_job['description']; ?>
-                        </div>
-                    </td>
-                    <td class="cell"><?php echo $referred_job['formatted_expire_on']; ?></td>
-                    <td class="cell resumes_column">
-                        <a class="no_link" onClick="show_resumes_of('<?php echo $referred_job['id']; ?>');">
-                            <?php 
-                                echo $referred_job['num_referrals'];
-                                if ($referred_job['new_referrals_count'] > 0) {
-                                    echo '&nbsp;<span style="vertical-align: top; font-size: 7pt;">[ '. $referred_job['new_referrals_count']. ' new ]</span>';
-                                }
-                            ?>
-                        </a>
-                    </td>
-                </tr>
-        <?php
+                    $jobs_table->set($i+1, 0, $referred_job['industry'], '', 'cell');
+                    
+                    $job_title = "<a class=\"no_link\" onClick=\"toggle_job_description('". $i. "');\">". $referred_job['title']. "</a>";
+                    $job_title .= "<div id=\"inline_job_desc_". $i. "\" class=\"inline_job_desc\">". $referred_job['description']. "</div>";
+                    $jobs_table->set($i+1, 1, $job_title, '', 'cell');
+                    
+                    $jobs_table->set($i+1, 2, $referred_job['formatted_expire_on'], '', 'cell');
+                    
+                    $resumes = "<a class=\"no_link\" onClick=\"show_resumes_of('". $referred_job['id']. "');\">". $referred_job['num_referrals'];
+                    if ($referred_job['new_referrals_count'] > 0) {
+                        $resumes .= "&nbsp;<span style=\"vertical-align: top; font-size: 7pt;\">[ ". $referred_job['new_referrals_count']. " new ]</span>";
+                    }
+                    $resumes .= "</a>";
+                    $jobs_table->set($i+1, 3, $resumes, '', 'cell resumes_column');
                 }
-        ?>
-            </table>
-        <?php
+                
+                echo $jobs_table->get_html();
             }
         ?>
+        </div>
+        
+        <div id="div_resumes" class="resumes">
+            
         </div>
         <?php
     }
