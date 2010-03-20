@@ -119,6 +119,7 @@ function show_resumes_of(_job_id, _job_title) {
                 header.set(4, new Cell('&nbsp;', '', 'header'));
                 resumes_table.set(0, header);
                 
+                candidates = new Array();
                 for (var i=0; i < referral_ids.length; i++) {
                     candidates[i] = new Candidate();
                     candidates[i].name = candidate_names[i].childNodes[0].nodeValue;
@@ -140,9 +141,9 @@ function show_resumes_of(_job_id, _job_title) {
                     var candidate_details = '';
                     if (is_agreed_terms) {
                         candidate_details = candidates[i].name;
-                        candidate_details = candidate_details + '<div class="mini_contacts">Tel: ' + candidates[i].phone_num + '<br/>Email: <a href="mailto: ' + candidates[i].email_addr + '">' + candidates[i].email_addr + '</a></div>';
+                        candidate_details = candidate_details + '<div class="mini_contacts">Tel: ' + candidates[i].phone_num + '<br/>Email: <a href="mailto: ' + candidates[i].email_addr + '">' + candidates[i].email_addr + '</a></div></div>';
                     } else {
-                        candidate_details = candidates[i].name;
+                        candidate_details = '<div id="candidate_' + i + '">' + candidates[i].name + '</div>';
                     }
                     row.set(1, new Cell(candidate_details, '', 'cell'));
                     
@@ -150,13 +151,15 @@ function show_resumes_of(_job_id, _job_title) {
                     if (is_agreed_terms) {
                         agreed_terms = 'true';
                     }
-                    row.set(2, new Cell('<a class="no_link" onClick="download_resume(' + referral_ids[i].childNodes[0].nodeValue + ', ' + resume_ids[i].childNodes[0].nodeValue + ', ' + agreed_terms + ');">Download</a>', '', 'cell actions_column'));
+                    row.set(2, new Cell('<a class="no_link" onClick="download_resume(' + referral_ids[i].childNodes[0].nodeValue + ', ' + resume_ids[i].childNodes[0].nodeValue + ', ' + i + ', ' + agreed_terms + ');">Download</a>', '', 'cell actions_column'));
                     
                     row.set(3, new Cell('<a class="no_link" onClick="show_testimony_poup(' + i + ');">View</a>', '', 'cell actions_column'));
                     
                     var actions = '';
                     if (employed_ons[i].childNodes.length > 0) {
                         actions = 'Employed on ' + employed_ons[i].childNodes[0].nodeValue;
+                    } else if (!is_agreed_terms) {
+                        actions = 'Resume not viewed yet.';
                     } else {
                         // TODO: get the referrals.rating
                         var stars = 0;
@@ -267,8 +270,8 @@ function show_resume_page(_resume_id) {
     }
 }
 
-function agree_terms(_referral_id, _resume_id) {
-    var params = 'id=' + _referral_id + '&action=agree_terms';
+function agree_terms(_referral_id, _resume_id, _candidate_idx) {
+    var params = 'id=' + _referral_id + '&action=agreed_terms';
     
     var uri = root + "/employers/resumes_action.php";
     var request = new Request({
@@ -280,19 +283,23 @@ function agree_terms(_referral_id, _resume_id) {
                 return false;
             }
             
-            show_resume_page()
+            show_resume_page();
+            
+            var html = $('candidate_' + _candidate_idx).get('html');
+            html = html + '<div class="mini_contacts">Tel: ' + candidates[_candidate_idx].phone_num + '<br/>Email: <a href="mailto: ' + candidates[_candidate_idx].email_addr + '">' + candidates[_candidate_idx].email_addr + '</a></div>';
+            $('candidate_' + _candidate_idx).set('html', html);
         }
     });
     
     request.send(params);
 }
 
-function download_resume(_referral_id, _resume_id, _is_agreed_terms) {
+function download_resume(_referral_id, _resume_id, _candidate_idx, _is_agreed_terms) {
     if (!_is_agreed_terms) {
         var agree = confirm('Please confirm that you wish to view the whole resume.\n\nClick "OK" to confirm or "Cancel" to decline.');
         
         if (agree) {
-            agree_terms(_referral_id, _resume_id);
+            agree_terms(_referral_id, _resume_id, _candidate_idx);
         }
     } else {
         show_resume_page();

@@ -190,6 +190,61 @@ if ($_POST['action'] == 'get_job_description') {
     exit();
 }
 
+if ($_POST['action'] == 'agreed_terms') {
+    $data = array();
+    $data['employer_agreed_terms_on'] = now();
+    
+    $referral = new Referral($_POST['id']);
+    if ($referral->update($data) === true) {
+        $criteria = array(
+            'columns' => "referrals.referee AS email, jobs.title AS job_title, 
+                          employers.name AS employer_name, resumes.name AS resume_name, 
+                          members.phone_num, 
+                          CONCAT(members.lastname,', ', members.firstname) AS referee", 
+            'joins' => "members ON members.email_addr = referrals.referee, 
+                        jobs ON jobs.id = referrals.job, 
+                        employers ON employers.id = jobs.employer, 
+                        resumes ON resumes.id = referrals.resume", 
+            'match' => "referrals.id = ". $_POST['id'], 
+            'limit' => "1"
+        );
+        
+        $result = $referral->find($criteria);
+        $referee_email = $result[0]['email'];
+        $referee_name = $result[0]['referee'];
+        $employer = $result[0]['employer_name'];
+        $job = $result[0]['job_title'];
+        $resume = $result[0]['resume_name'];
+        
+        $lines = file(dirname(__FILE__). '/../private/mail/employer_viewed_resume.txt');
+        $message = '';
+        foreach($lines as $line) {
+           $message .= $line;
+        }
+        
+        $message = str_replace('%referee%', htmlspecialchars_decode(desanitize($referee_name)), $message);
+        $message = str_replace('%employer%', htmlspecialchars_decode(desanitize($employer)), $message);
+        $message = str_replace('%job%', htmlspecialchars_decode(desanitize($job)), $message);
+        $message = str_replace('%resume%', htmlspecialchars_decode(desanitize($resume)), $message);
+        $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+        $message = str_replace('%root%', $GLOBALS['root'], $message);
+        $subject = desanitize($employer). " has viewed your resume";
+        $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+        //mail($referee_email, $subject, $message, $headers);
+        
+        $handle = fopen('/tmp/email_to_'. $referee_email. '.txt', 'w');
+        fwrite($handle, 'Subject: '. $subject. "\n\n");
+        fwrite($handle, $message);
+        fclose($handle);
+        
+        echo 'ok';
+        exit();
+    }
+    
+    echo 'ko';
+    exit();
+}
+
 if ($_POST['action'] == 'get_salary') {
     $query = "SELECT salary FROM jobs WHERE id = ". $_POST['id'];
     $mysqli = Database::connect();
@@ -366,58 +421,6 @@ if ($_POST['action'] == 'get_verify_resume_viewing') {
         echo '1';
         exit();
     } 
-    
-    echo "ko";
-    exit();
-}
-
-if ($_POST['action'] == 'set_verify_resume_viewing') {
-    $data = array();
-    $data['id'] = $_POST['id'];
-    $data['employer_agreed_terms_on'] = now();
-    
-    if (Referral::update($data)) {
-        $query = "SELECT referrals.referee AS email, jobs.title AS job_title, employers.name AS employer_name, 
-                  resumes.name AS resume_name, 
-                  CONCAT(members.lastname,', ', members.firstname) AS referee 
-                  FROM referrals 
-                  LEFT JOIN members ON members.email_addr = referrals.referee 
-                  LEFT JOIN jobs ON jobs.id = referrals.job 
-                  LEFT JOIN employers ON employers.id = jobs.employer 
-                  LEFT JOIN resumes ON resumes.id = referrals.resume 
-                  WHERE referrals.id = ". $data['id']. " LIMIT 1";
-        $mysqli = Database::connect();
-        $result = $mysqli->query($query);
-        $referee_email = $result[0]['email'];
-        $referee_name = $result[0]['referee'];
-        $employer = $result[0]['employer_name'];
-        $job = $result[0]['job_title'];
-        $resume = $result[0]['resume_name'];
-        
-        $lines = file(dirname(__FILE__). '/../private/mail/employer_viewed_resume.txt');
-        $message = '';
-        foreach($lines as $line) {
-           $message .= $line;
-        }
-        
-        $message = str_replace('%referee%', htmlspecialchars_decode(desanitize($referee_name)), $message);
-        $message = str_replace('%employer%', htmlspecialchars_decode(desanitize($employer)), $message);
-        $message = str_replace('%job%', htmlspecialchars_decode(desanitize($job)), $message);
-        $message = str_replace('%resume%', htmlspecialchars_decode(desanitize($resume)), $message);
-        $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
-        $message = str_replace('%root%', $GLOBALS['root'], $message);
-        $subject = desanitize($employer). " has viewed your resume";
-        $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-        mail($referee_email, $subject, $message, $headers);
-        
-        /*$handle = fopen('/tmp/email_to_'. $referee_email. '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $message);
-        fclose($handle);*/
-           
-        echo "ok";
-        exit();
-    }
     
     echo "ko";
     exit();
