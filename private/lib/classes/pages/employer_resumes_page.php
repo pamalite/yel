@@ -134,7 +134,7 @@ class EmployerResumesPage extends Page {
                     
                     $jobs_table->set($i+1, 2, $referred_job['formatted_expire_on'], '', 'cell');
                     
-                    $resumes = "<a class=\"no_link\" onClick=\"show_resumes_of('". $referred_job['id']. "');\">". $referred_job['num_referrals'];
+                    $resumes = "<a class=\"no_link\" onClick=\"show_resumes_of('". $referred_job['id']. "', '". addslashes($referred_job['title']). "');\">". $referred_job['num_referrals'];
                     if ($referred_job['new_referrals_count'] > 0) {
                         $resumes .= "&nbsp;<span style=\"vertical-align: top; font-size: 7pt;\">[ ". $referred_job['new_referrals_count']. " new ]</span>";
                     }
@@ -147,9 +147,42 @@ class EmployerResumesPage extends Page {
         ?>
         </div>
         
-        <div id="div_resumes" class="resumes">
+        <div id="div_resumes">
+            <div class="resumes_top">
+                <span class="back">
+                    <a class="no_link" onClick="show_referred_jobs();">&lt;&lt; Back to Jobs</a>
+                </span>
+                <br/>
+                <div class="job_title">
+                    <span id="job_title"></span>
+                </div>
+            </div>
             
+            <div style="width: 99%; margin: auto; text-align: right;">
+                Show
+                <select id="filter" onChange="show_resumes_of(current_job_id, current_job_title);">
+                    <option value="" selected>All</option>
+                    <option value="" disabled>&nbsp;</option>
+                    <option value="no_star">No Star</option>
+                    <option value="1_star">1 Star</option>
+                    <option value="2_star">2 Stars</option>
+                    <option value="3_star">3 Stars</option>
+                    <option value="4_star">4 Stars</option>
+                    <option value="5_star">5 Stars</option>
+                    <option value="hired">Hired</option>
+                </select>
+            </div>
+            <div id="resumes_list">
+            </div>
         </div>
+        
+        <!-- popups goes here -->
+        <div id="job_description_window" class="popup_window">
+            <div id="window_job_title"></div>
+            <div id="window_description"></div>
+            <div class="buttons_bar"><input type="button" value="Close" onClick="close_job_description_popup();" /></div>
+        </div>
+        
         <?php
     }
 }

@@ -376,3 +376,13 @@ div.reminder {
     font-style: italic;
     width: 70%;
 }
+
+.popup_window {
+    border: 5px solid #CCCCCC;
+    padding: 5px 5px 5px 5px;
+    left: 0;
+    top: 0;
+    position: absolute;
+    background-color: #FFFFFF;
+    overflow: auto;
+}

@@ -1,3 +1,7 @@
+#div_resumes {
+    display: none;
+}
+
 .empty_results {
     text-align: center;
     color: #666666;
@@ -34,7 +38,8 @@
     background-color: #BBFCA1;
 }
 
-.referred_jobs tr:hover {
+#referred_jobs_table tr:hover, 
+#resumes_table tr:hover  {
     background-color: #FFFF00;
 }
 
@@ -50,4 +55,64 @@
     margin: auto;
     width: 99%;
     border-collapse: collapse;
+}
+
+.resumes_top {
+    text-align: center;
+    margin: auto;
+    padding: 5px 5px 5px 5px;
+}
+
+.back {
+    border: 1px solid #0000FF;
+    padding: 3px 3px 3px 3px;
+}
+
+.job_title {
+    text-align: center;
+    margin-top: 15px;
+    padding-bottom: 15px;
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+.actions_column {
+    text-align: center;
+}
+
+.mini_contacts {
+    padding-top: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
+#job_description_window {
+    display: none;
+    width: 800px;
+}
+
+#window_job_title {
+    width: 99%;
+    background-color: #CCCCCC;
+    margin: auto;
+    text-align: center;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    font-weight: bold;
+}
+
+#window_description {
+    width: 99%;
+    height: 550px;
+    margin: auto;
+    overflow: auto;
+}
+
+.buttons_bar {
+    width: 99%;
+    border-top: 1px solid #CCCCCC;
+    margin: auto;
+    text-align: right;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }

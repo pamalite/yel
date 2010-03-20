@@ -30,16 +30,6 @@
     width: 500px;
 }
 
-.popup_window {
-    border: 5px solid #CCCCCC;
-    padding: 5px 5px 5px 5px;
-    left: 0;
-    top: 0;
-    position: absolute;
-    background-color: #FFFFFF;
-    overflow: auto;
-}
-
 table.drop_contact {
     /*border: 1px solid #6699FF;*/
     /*border: 1px solid #C3E0FA;*/

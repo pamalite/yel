@@ -50,6 +50,7 @@ class EmployerLoginPage extends Page {
             <a href="#" class="signup" onClick="show_contact_drop_form();"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/contact_sign_up.jpg" /></a>
         </div>
         
+        <!-- popup goes here -->
         <div id="contact_drop_form" class="popup_window">
             <form method="post" onSubmit="return false;">
                 <table class="drop_contact">

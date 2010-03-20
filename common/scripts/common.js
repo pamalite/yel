@@ -248,7 +248,7 @@ function show_window(_id) {
         window_width = document.documentElement.clientWidth;
     }
     
-    // readjust the height if the screen is too small
+    // readjust the height and width if the screen is too small
     if (window_height - div_height <= 0) {
         div_height = window_height;
     }

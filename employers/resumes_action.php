@@ -96,6 +96,36 @@ if ($_POST['action'] == 'get_resumes') {
         $order_by = $_POST['order_by'];
     }
     
+    $filter_by = '';
+    if (isset($_POST['filter_by'])) {
+        if (!empty($_POST['filter_by'])) {
+            $filter_by = "AND ";
+            switch ($_POST['filter_by']) {
+                case 'no_star':
+                    $filter_by .= "referrals.rating <= 0";
+                    break;
+                case '1_star':
+                    $filter_by .= "referrals.rating = 1";
+                    break;
+                case '2_star':
+                    $filter_by .= "referrals.rating = 2";
+                    break;
+                case '3_star':
+                    $filter_by .= "referrals.rating = 3";
+                    break;
+                case '4_star':
+                    $filter_by .= "referrals.rating = 4";
+                    break;
+                case '5_star':
+                    $filter_by .= "referrals.rating = 5";
+                    break;
+                case 'hired':
+                    $filter_by .= "(referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00')";
+                    break;
+            }
+        }
+    }
+    
     $criteria = array(
         "columns" => "CONCAT(members.lastname,', ', members.firstname) AS referrer, 
                       CONCAT(referees.lastname,', ', referees.firstname) AS candidate,
@@ -114,9 +144,9 @@ if ($_POST['action'] == 'get_resumes') {
                     referrals.need_approval = 'N' AND 
                     (resumes.deleted = 'N' AND resumes.private = 'N') AND 
                     (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
-                     (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
-                     referrals.employer_removed_on IS NULL AND 
-                     (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')", 
+                    (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
+                    referrals.employer_removed_on IS NULL AND 
+                    (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') ". $filter_by, 
         "order" => $order_by
     );
     
@@ -146,13 +176,13 @@ if ($_POST['action'] == 'get_resumes') {
     exit();
 }
 
-if ($_POST['action'] == 'get_description') {
+if ($_POST['action'] == 'get_job_description') {
     $job = new Job($_POST['id']);
     $result = $job->get();
     $response = array(
         'job' => array(
             'title' => $result[0]['title'],
-            'description' => htmlspecialchars_decode($result[0]['description'])
+            'description' => htmlspecialchars_decode(desanitize($result[0]['description']))
         )
     );
     header('Content-type: text/xml');
