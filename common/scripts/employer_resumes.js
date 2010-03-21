@@ -10,6 +10,7 @@ function Candidate() {
     this.email_addr = '';
     this.phone_num = '';
     this.testimony = '';
+    this.employer_remarks = '';
 }
 var candidates = new Array();
 
@@ -108,6 +109,7 @@ function show_resumes_of(_job_id, _job_title) {
                 var referrer_phone_nums = xml.getElementsByTagName('referrer_phone_num');
                 var candidate_phone_nums = xml.getElementsByTagName('candidate_phone_num');
                 var testimonies = xml.getElementsByTagName('testimony');
+                var remarks = xml.getElementsByTagName('employer_remarks');
                 
                 var resumes_table = new FlexTable('resumes_table', 'resumes');
                 
@@ -115,7 +117,7 @@ function show_resumes_of(_job_id, _job_title) {
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'candidate');\">Candidate</a>", '', 'header'));
                 header.set(2, new Cell("Resume", '', 'header'));
-                header.set(3, new Cell("Testimony", '', 'header'));
+                header.set(3, new Cell("Remarks", '', 'header'));
                 header.set(4, new Cell('&nbsp;', '', 'header'));
                 resumes_table.set(0, header);
                 
@@ -125,9 +127,16 @@ function show_resumes_of(_job_id, _job_title) {
                     candidates[i].name = candidate_names[i].childNodes[0].nodeValue;
                     candidates[i].email_addr = candidate_emails[i].childNodes[0].nodeValue;
                     candidates[i].phone_num = candidate_phone_nums[i].childNodes[0].nodeValue
-                    candidates[i].testimony = 'No testimony found.';
+                    candidates[i].testimony = '';
+                    var has_testimony = false;
                     if (testimonies[i].childNodes.length > 0) {
+                        has_testimony = true;
                         candidates[i].testimony = testimonies[i].childNodes[0].nodeValue;
+                    }
+                    
+                    candidates[i].employer_remarks = '';
+                    if (remarks[i].childNodes.length > 0) {
+                        candidates[i].employer_remarks = remarks[i].childNodes[0].nodeValue;
                     }
                     
                     var is_agreed_terms = false;
@@ -151,12 +160,22 @@ function show_resumes_of(_job_id, _job_title) {
                     if (is_agreed_terms) {
                         agreed_terms = 'true';
                     }
-                    row.set(2, new Cell('<a class="no_link" onClick="download_resume(' + referral_ids[i].childNodes[0].nodeValue + ', ' + resume_ids[i].childNodes[0].nodeValue + ', ' + i + ', ' + agreed_terms + ');">Download</a>', '', 'cell actions_column'));
                     
-                    row.set(3, new Cell('<a class="no_link" onClick="show_testimony_poup(' + i + ');">View</a>', '', 'cell actions_column'));
+                    var resume_link = '<a class="no_link" onClick="download_resume(' + referral_ids[i].childNodes[0].nodeValue + ', ' + resume_ids[i].childNodes[0].nodeValue + ', ' + i + ', ' + agreed_terms + ');">Download</a>';
+                    
+                    if (has_testimony) {
+                        resume_link = resume_link + '<br/><a class="no_link testimony_link" onClick="show_testimony_popup(' + i + ');">(View Testimony)</a>';
+                    }
+                    row.set(2, new Cell(resume_link, '', 'cell actions_column'));
+                    
+                    var remarks_link = '<span style="font-style: italic; color: #CCCCCC;">Disabled</span>';
+                    if (is_agreed_terms) {
+                        remarks_link = '<a class="no_link" onClick="show_remarks_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">View/Update</a>';
+                    }
+                    row.set(3, new Cell(remarks_link, '', 'cell actions_column'));
                     
                     var actions = '';
-                    if (employed_ons[i].childNodes.length > 0) {
+                    if (employed_ons[i].childNodes.length < 0) {
                         actions = 'Employed on ' + employed_ons[i].childNodes[0].nodeValue;
                     } else if (!is_agreed_terms) {
                         actions = 'Resume not viewed yet.';
@@ -170,7 +189,7 @@ function show_resumes_of(_job_id, _job_title) {
                         actions = actions + '<br/>';
                         actions = actions + '<a class="no_link" onClick="employ(' + referral_ids[i].childNodes[0].nodeValue + ');">Hired</a>';
                         actions = actions + '&nbsp;|&nbsp;';
-                        actions = actions + '<a class="no_link" onClick="show_notify_popup(' + i + ');">Notify</a>';
+                        actions = actions + '<a class="no_link" onClick="show_notify_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Notify</a>';
                     }
                     row.set(4, new Cell(actions, '', 'cell actions_column'));
                     resumes_table.set((parseInt(i)+1), row);
@@ -332,8 +351,89 @@ function show_job_description_popup() {
     request.send(params);
 }
 
-function show_notify_popup(_candidate_idx) {
+function close_testimony_popup() {
+    close_window('testimony_window');
+}
+
+function show_testimony_popup(_candidate_idx) {
+    $('window_testimony_candidate').set('html', 'Testimony for' + candidates[_candidate_idx].name);
+    $('window_testimony').set('html', candidates[_candidate_idx].testimony);
     
+    show_window('testimony_window');
+}
+
+function close_remarks_popup(_needs_saving) {
+    if (_needs_saving) {
+        if (isEmpty($('txt_remarks').value)) {
+            close_window('remarks_window');
+            return;
+        }
+        
+        var params = 'id=' + $('referral_id').value + '&action=save_remarks';
+        params = params + '&remarks=' + encodeURIComponent($('txt_remarks').value);
+
+        var uri = root + "/employers/resumes_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('Unable to save remarks. Please try again later.');
+                    return;
+                }
+            }
+        });
+
+        request.send(params);
+    }
+    
+    close_window('remarks_window');
+    candidates[$('candidate_idx').value].employer_remarks = $('txt_remarks').value;
+}
+
+function show_remarks_popup(_referral_id, _candidate_idx) {
+    $('referral_id').value = _referral_id;
+    $('candidate_idx').value = _candidate_idx;
+    $('window_remarks_candidate').set('html', 'Remarks saved for ' + candidates[_candidate_idx].name);
+    $('txt_remarks').value = candidates[_candidate_idx].employer_remarks;
+    
+    show_window('remarks_window');
+}
+
+function close_notify_popup(_needs_sending) {
+    if (_needs_sending) {
+        if (isEmpty($('txt_message').value)) {
+            close_window('notify_window');
+            return;
+        }
+        
+        var params = 'id=' + $('referral_id').value + '&action=notify_candidate';
+        params = params + '&job=' + current_job_title;
+        params = params + '&job_id=' + current_job_id;
+        params = params + '&candidate_email_addr=' + candidates[$('candidate_idx').value].email_addr;
+        params = params + '&candidate_name=' + candidates[$('candidate_idx').value].name;
+        params = params + '&message=' + encodeURIComponent($('txt_message').value);
+
+        var uri = root + "/employers/resumes_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                alert('Notification send.');
+            }
+        });
+
+        request.send(params);
+    }
+    
+    close_window('notify_window');
+}
+
+function show_notify_popup(_referral_id, _candidate_idx) {
+    $('referral_id').value = _referral_id;
+    $('candidate_idx').value = _candidate_idx;
+    $('window_notify_candidate').set('html', 'A message to ' + candidates[_candidate_idx].name + ' about ' + current_job_title);
+    show_window('notify_window');
 }
 
 function toggle_job_description(_idx) {

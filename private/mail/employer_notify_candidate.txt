@@ -1,0 +1,15 @@
+Hi %candidate%,
+
+%employer% would like to inform you about the application status of the 
+%job% position:
+
+=== Message Begin ===
+
+%message%
+
+=== Message End ===
+
+We hope that you are well-informed.
+
+Yellow Elevator
+Refer a job

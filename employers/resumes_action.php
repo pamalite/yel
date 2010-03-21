@@ -136,7 +136,8 @@ if ($_POST['action'] == 'get_resumes') {
                       referrals.resume, referrals.id, referrals.testimony, referrals.shortlisted_on,
                       referrals.employer_agreed_terms_on, members.email_addr AS referrer_email_addr, 
                       referees.email_addr AS candidate_email_addr, members.phone_num AS referrer_phone_num, 
-                      referees.phone_num AS candidate_phone_num", 
+                      referees.phone_num AS candidate_phone_num, 
+                      referrals.employer_remarks", 
         "joins" => "members ON members.email_addr = referrals.member, 
                     members AS referees ON referees.email_addr = referrals.referee, 
                     resumes ON resumes.id = referrals.resume", 
@@ -164,6 +165,7 @@ if ($_POST['action'] == 'get_resumes') {
     
     foreach ($result as $i=>$row) {
         $result[$i]['testimony'] = htmlspecialchars_decode(desanitize($row['testimony']));
+        $result[$i]['employer_remarks'] = stripslashes(desanitize($row['employer_remarks']));
         if (is_null($row['employer_agreed_terms_on']) || 
             $row['employer_agreed_terms_on'] == '0000-00-00 00:00:00') {
             $result[$i]['employer_agreed_terms_on'] = '-1';
@@ -244,6 +246,55 @@ if ($_POST['action'] == 'agreed_terms') {
     echo 'ko';
     exit();
 }
+
+if ($_POST['action'] == 'save_remarks') {
+    if (!empty($_POST['remarks'])) {
+        $referral = new Referral($_POST['id']);
+        $data = array('employer_remarks' => sanitize($_POST['remarks']));
+        
+        if ($referral->update($data) === false) {
+            echo 'ko';
+        } else {
+            echo 'ok';
+        }
+    }
+    exit();
+}
+
+if ($_POST['action'] == 'notify_candidate') {
+    $job = new Job();
+    $criteria = array(
+        'columns' => 'employers.name AS employer', 
+        'joins' => 'employers ON employers.id = jobs.employer',
+        'match' => 'jobs.id = '. $_POST['job_id'], 
+        'limit' => '1'
+    );
+    $result = $job->find($criteria);
+    $employer = $result[0]['employer'];
+    
+    $lines = file(dirname(__FILE__). '/../private/mail/employer_notify_candidate.txt');
+    $message = '';
+    foreach($lines as $line) {
+       $message .= $line;
+    }
+    
+    $message = str_replace('%candidate%', htmlspecialchars_decode(desanitize($_POST['candidate_name'])), $message);
+    $message = str_replace('%employer%', desanitize($employer), $message);
+    $message = str_replace('%job%', desanitize($_POST['job']), $message);
+    $message = str_replace('%message%', desanitize($_POST['message']), $message);
+    $subject = "A message from ". desanitize($employer);
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    //mail($_POST['candidate_email_addr'], $subject, $message, $headers);
+    
+    $handle = fopen('/tmp/email_to_'. $_POST['candidate_email_addr']. '.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);
+    
+    exit();
+}
+
+// ---
 
 if ($_POST['action'] == 'get_salary') {
     $query = "SELECT salary FROM jobs WHERE id = ". $_POST['id'];
@@ -965,16 +1016,6 @@ if ($_POST['action'] == 'employ_candidate') {
     exit();
 }
 
-if ($_POST['action'] == 'save_remarks') {
-    if (!empty($_POST['remarks'])) {
-        $query = "UPDATE referrals 
-                  SET employer_remarks = '". sanitize($_POST['remarks']). "' 
-                  WHERE id = ". $_POST['id'];
-        $mysqli = Database::connect();
-        $mysqli->execute($query);
-    }
-    exit();
-}
 
 if ($_POST['action'] == 'get_remark') {
     $mysqli = Database::connect();

@@ -183,6 +183,45 @@ class EmployerResumesPage extends Page {
             <div class="buttons_bar"><input type="button" value="Close" onClick="close_job_description_popup();" /></div>
         </div>
         
+        <div id="testimony_window" class="popup_window">
+            <div id="window_testimony_candidate"></div>
+            <div id="window_testimony"></div>
+            <div class="buttons_bar">
+                <div class="instructions_label">
+                    (Tip: Drag and select all to copy by pressing Ctrl + C or Command + C.)
+                </div>
+                <input type="button" value="Close" onClick="close_testimony_popup();" />
+            </div>
+        </div>
+        
+        <div id="remarks_window" class="popup_window">
+            <div id="window_remarks_candidate"></div>
+            <textarea id="txt_remarks" class="txt_remarks"></textarea>
+            <div class="buttons_bar">
+                <input type="hidden" id="referral_id" value="0" />
+                <input type="hidden" id="candidate_idx" value="-1" />
+                <input type="button" value="Save &amp; Close" onClick="close_remarks_popup(true);" />
+                <input type="button" value="Close" onClick="close_remarks_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="notify_window" class="popup_window">
+            <div id="window_notify_candidate"></div>
+            <textarea id="txt_message" class="txt_message">
+Instructions
+-------------
+1. Type your message here. 
+2. Click the 'Send E-mail &amp; Close' button. 
+
+Tip: The system will automatically include the job's title.
+            </textarea>
+            <div class="buttons_bar">
+                <input type="hidden" id="referral_id" value="0" />
+                <input type="hidden" id="candidate_idx" value="-1" />
+                <input type="button" value="Send E-mail &amp; Close" onClick="close_notify_popup(true);" />
+                <input type="button" value="Close" onClick="close_notify_popup(false);" />
+            </div>
+        </div>
         <?php
     }
 }
