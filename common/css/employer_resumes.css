@@ -94,15 +94,21 @@
 #job_description_window, 
 #testimony_window, 
 #remarks_window,
-#notify_window {
+#notify_window, 
+#employment_window {
     display: none;
     width: 800px;
+}
+
+#employment_window {
+    width: 395px;
 }
 
 #window_job_title, 
 #window_testimony_candidate, 
 #window_remarks_candidate, 
-#window_notify_candidate {
+#window_notify_candidate, 
+#window_employment_title {
     width: 99%;
     background-color: #CCCCCC;
     margin: auto;
@@ -120,6 +126,16 @@
     height: 550px;
     margin: auto;
     overflow: auto;
+}
+
+.employment_form {
+    width: 99%;
+    margin: auto;
+}
+
+.employment_form_table {
+    width: 100%;
+    margin: auto;
 }
 
 .txt_remarks, 

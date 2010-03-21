@@ -198,8 +198,8 @@ class EmployerResumesPage extends Page {
             <div id="window_remarks_candidate"></div>
             <textarea id="txt_remarks" class="txt_remarks"></textarea>
             <div class="buttons_bar">
-                <input type="hidden" id="referral_id" value="0" />
-                <input type="hidden" id="candidate_idx" value="-1" />
+                <input type="hidden" id="remarks_referral_id" value="0" />
+                <input type="hidden" id="remarks_candidate_idx" value="-1" />
                 <input type="button" value="Save &amp; Close" onClick="close_remarks_popup(true);" />
                 <input type="button" value="Close" onClick="close_remarks_popup(false);" />
             </div>
@@ -216,10 +216,44 @@ Instructions
 Tip: The system will automatically include the job's title.
             </textarea>
             <div class="buttons_bar">
-                <input type="hidden" id="referral_id" value="0" />
-                <input type="hidden" id="candidate_idx" value="-1" />
+                <input type="hidden" id="notify_referral_id" value="0" />
+                <input type="hidden" id="notify_candidate_idx" value="-1" />
                 <input type="button" value="Send E-mail &amp; Close" onClick="close_notify_popup(true);" />
                 <input type="button" value="Close" onClick="close_notify_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="employment_window" class="popup_window">
+            <div id="window_employment_title"></div>
+            <div class="employment_form">
+                <table class="employment_form_table">
+                    <tr>
+                        <td class="label">Work Commencement:</td>
+                        <td class="field">
+                        <?php
+                            $today = date('Y-m-d');
+                            $date_components = explode('-', $today);
+                            $year = $date_components[0];
+                            $month = $date_components[1];
+                            $day = $date_components[2];
+                            
+                            echo generate_dropdown('day', '', 1, 31, $day, 2, 'Day');
+                            echo generate_month_dropdown('month', '', $month);
+                            echo '<span id="year_label">'. $year. '</span>'. "\n";
+                        ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">Annual Salary:</td>
+                        <td class="field"><span id="currency"><?php echo $currency; ?></span>$&nbsp;<input type="text" class="field" id="salary" name="salary" value="1.00" /></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="buttons_bar">
+                <input type="hidden" id="employment_referral_id" value="0" />
+                <input type="hidden" id="employment_candidate_idx" value="-1" />
+                <input type="button" value="Confirm &amp; Close" onClick="close_employment_popup(true);" />
+                <input type="button" value="Close" onClick="close_employment_popup(false);" />
             </div>
         </div>
         <?php

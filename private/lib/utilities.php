@@ -129,6 +129,112 @@ function set_session($_session_variables) {
     }
 }
 
+function generate_dropdown($_id, $_css_class, $_min, $_max, 
+                           $_selected = '', $_maxlength = 0, 
+                           $_default_option = '') {
+    if ($_min == $_max || $_max < $_min) {
+        return '';
+    }
+    
+    $html = '<select id="'. $_id. '" class="'. $_css_class. '">'. "\n";
+    
+    if (!empty($_default_option)) {
+        if (empty($_selected)) {
+            $html .= '<option value="" selected>'. $_default_option. '</option>'. "\n";
+        } else {
+            $html .= '<option value="">'. $_default_option. '</option>'. "\n";
+        }
+        
+        $html .= '<option value="" disabled>&nbsp;</option>'. "\n";
+    }
+    
+    for($i = $_min; $i <= $_max; $i++) {
+        $value = $i;
+        if ($_maxlength > 0) {
+            $zeros_needed = $_maxlength - strlen($value);
+            for ($zero = 1; $zero <= $zeros_needed; $zero++) {
+                $value = '0'. $value;
+            }
+        }
+        
+        if ($value == $_selected) {
+            $html .= '<option value="'. $value. '" selected>'. $value. '</option>'. "\n";
+        } else {
+            $html .= '<option value="'. $value. '">'. $value. '</option>'. "\n";
+        }
+    }
+    $html .= '</select>';
+    
+    return $html;
+}
+
+function generate_month_dropdown($_id, $_css_class, $_selected = '') {
+    $html = '<select id="'. $_id. '" class="'. $_css_class. '">'. "\n";
+    if (empty($_selected)) {
+        $html .= '<option value="" selected>Month</option>'. "\n";
+    } else {
+        $html .= '<option value="">Month</option>'. "\n";
+    }
+    
+    $html .= '<option value="" disabled>&nbsp;</option>'. "\n";
+    
+    for($i = 1; $i <= 12; $i++) {
+        $value = $i;
+        if ($value < 10) {
+            $value = '0'. $value;
+        }
+        
+        $month = '';
+        switch ($value) {
+            case '01':
+                $month = 'January';
+                break;
+            case '02':
+                $month = 'February';
+                break;
+            case '03':
+                $month = 'March';
+                break;
+            case '04':
+                $month = 'April';
+                break;
+            case '05':
+                $month = 'May';
+                break;
+            case '06':
+                $month = 'June';
+                break;
+            case '07':
+                $month = 'July';
+                break;
+            case '08':
+                $month = 'August';
+                break;
+            case '09':
+                $month = 'September';
+                break;
+            case '10':
+                $month = 'October';
+                break;
+            case '11':
+                $month = 'November';
+                break;
+            case '12':
+                $month = 'December';
+                break;
+        }
+        
+        if ($value == $_selected) {
+            $html .= '<option value="'. $value. '" selected>'. $month. '</option>'. "\n";
+        } else {
+            $html .= '<option value="'. $value. '">'. $month. '</option>'. "\n";
+        }
+    }
+    $html .= '</select>';
+    
+    return $html;
+}
+
 function log_activity($_message, $_file_name) {
     $log_file = '/var/log/'. $_file_name;
     

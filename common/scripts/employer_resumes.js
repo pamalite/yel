@@ -13,6 +13,7 @@ function Candidate() {
     this.employer_remarks = '';
 }
 var candidates = new Array();
+var is_year_changed = false;
 
 function rate_stars_for(_referral_id, _stars) {
     // TODO: save the ratings
@@ -187,7 +188,7 @@ function show_resumes_of(_job_id, _job_title) {
                         actions = actions + get_display_stars_for(referral_ids[i].childNodes[0].nodeValue, stars);
                         actions = actions + '</span>';
                         actions = actions + '<br/>';
-                        actions = actions + '<a class="no_link" onClick="employ(' + referral_ids[i].childNodes[0].nodeValue + ');">Hired</a>';
+                        actions = actions + '<a class="no_link" onClick="show_employment_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Hired</a>';
                         actions = actions + '&nbsp;|&nbsp;';
                         actions = actions + '<a class="no_link" onClick="show_notify_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Notify</a>';
                     }
@@ -278,10 +279,6 @@ function show_referred_jobs() {
     request.send(params);
 }
 
-function employ(_referral_id) {
-    
-}
-
 function show_resume_page(_resume_id) {
     var popup = window.open('resume.php?id=' + _resume_id, '', 'scrollbars');
     if (!popup) {
@@ -369,7 +366,7 @@ function close_remarks_popup(_needs_saving) {
             return;
         }
         
-        var params = 'id=' + $('referral_id').value + '&action=save_remarks';
+        var params = 'id=' + $('remarks_referral_id').value + '&action=save_remarks';
         params = params + '&remarks=' + encodeURIComponent($('txt_remarks').value);
 
         var uri = root + "/employers/resumes_action.php";
@@ -392,12 +389,41 @@ function close_remarks_popup(_needs_saving) {
 }
 
 function show_remarks_popup(_referral_id, _candidate_idx) {
-    $('referral_id').value = _referral_id;
-    $('candidate_idx').value = _candidate_idx;
+    $('remarks_referral_id').value = _referral_id;
+    $('remarks_candidate_idx').value = _candidate_idx;
     $('window_remarks_candidate').set('html', 'Remarks saved for ' + candidates[_candidate_idx].name);
     $('txt_remarks').value = candidates[_candidate_idx].employer_remarks;
     
     show_window('remarks_window');
+}
+
+function close_employment_popup(_to_confirm) {
+    if (_to_confirm) {
+        if (is_year_changed) {
+            var proceed = prompt('Are you sure to proceed for an employment made in ' + $('year_label').get('html') + '?');
+            if (!proceed) {
+                return;
+            }
+        }
+        
+        var params = 'id=' + $('employment_referral_id').value + '&action=confirm_employed';
+        params = params + '&job=' + current_job_title;
+        params = params + '&job_id=' + current_job_id;
+        params = params + '&candidate_email_addr=' + candidates[$('employment_candidate_idx').value].email_addr;
+        params = params + '&candidate_name=' + candidates[$('employment_candidate_idx').value].name;
+        params = params + '&work_commence_on=' + $('year_label').get('html') + '-' + $('month').options[$('month').selectedIndex].value + '-' + $('day').options[$('day').selectedIndex].value;
+        params = params + '&salary=' + $('salary').value;
+    }
+    
+    close_window('employment_window');
+}
+
+function show_employment_popup(_referral_id, _candidate_idx) {
+    $('employment_referral_id').value = _referral_id;
+    $('employment_candidate_idx').value = _candidate_idx;
+    $('window_employment_title').set('html', 'Employment Confirmation of ' + candidates[_candidate_idx].name + ' for ' + current_job_title);
+    
+    show_window('employment_window');
 }
 
 function close_notify_popup(_needs_sending) {
@@ -407,11 +433,11 @@ function close_notify_popup(_needs_sending) {
             return;
         }
         
-        var params = 'id=' + $('referral_id').value + '&action=notify_candidate';
+        var params = 'id=' + $('notify_referral_id').value + '&action=notify_candidate';
         params = params + '&job=' + current_job_title;
         params = params + '&job_id=' + current_job_id;
-        params = params + '&candidate_email_addr=' + candidates[$('candidate_idx').value].email_addr;
-        params = params + '&candidate_name=' + candidates[$('candidate_idx').value].name;
+        params = params + '&candidate_email_addr=' + candidates[$('notify_candidate_idx').value].email_addr;
+        params = params + '&candidate_name=' + candidates[$('notify_candidate_idx').value].name;
         params = params + '&message=' + encodeURIComponent($('txt_message').value);
 
         var uri = root + "/employers/resumes_action.php";
@@ -430,8 +456,8 @@ function close_notify_popup(_needs_sending) {
 }
 
 function show_notify_popup(_referral_id, _candidate_idx) {
-    $('referral_id').value = _referral_id;
-    $('candidate_idx').value = _candidate_idx;
+    $('notify_referral_id').value = _referral_id;
+    $('notify_candidate_idx').value = _candidate_idx;
     $('window_notify_candidate').set('html', 'A message to ' + candidates[_candidate_idx].name + ' about ' + current_job_title);
     show_window('notify_window');
 }
@@ -444,8 +470,58 @@ function toggle_job_description(_idx) {
     }
 }
 
+function update_year() {
+    var today = new Date();
+    var month = parseInt(today.get('month')) + 1;
+    var day = today.get('date');
+    var selected_month = $('month').options[$('month').selectedIndex].value;
+    var selected_day = $('day').options[$('day').selectedIndex].value;
+    
+    if (selected_month.substr(0, 1) == '0') {
+        selected_month = parseInt(selected_month.substr(1));
+    } else {
+        selected_month = parseInt(selected_month);
+    }
+    
+    if (selected_day.substr(0, 1) == '0') {
+        selected_day = parseInt(selected_day.substr(1));
+    } else {
+        selected_day = parseInt(selected_day);
+    }
+    
+    if (selected_month > month || 
+        selected_month == month && selected_day > day) {
+        $('year_label').set('html', (today.get('year') - 1));
+        is_year_changed = true;
+    } else {
+        $('year_label').set('html', today.get('year'));
+        is_year_changed = false;
+    }
+    
+    if (!today.isLeapYear() && selected_month == 2 &&
+        selected_day > 28) {
+        $('day').selectedIndex = 29;
+    } else if (selected_month == 2 && selected_day > 29) {
+        $('day').selectedIndex = 30;
+    } else {
+        switch (selected_month) {
+            case 4:
+            case 6:
+            case 9:
+            case 11:
+                if (selected_day > 30) {
+                    $('day').selectedIndex = 31;
+                }
+                break;
+        }
+    }
+}
+
 function onDomReady() {
     set_root();
+    
+    $('month').addEvent('change', update_year);
+    $('day').addEvent('change', update_year);
 }
 
 window.addEvent('domready', onDomReady);
