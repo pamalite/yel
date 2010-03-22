@@ -207,14 +207,13 @@ class EmployerResumesPage extends Page {
         
         <div id="notify_window" class="popup_window">
             <div id="window_notify_candidate"></div>
-            <textarea id="txt_message" class="txt_message">
-Instructions
--------------
-1. Type your message here. 
-2. Click the 'Send E-mail &amp; Close' button. 
-
-Tip: The system will automatically include the job's title.
-            </textarea>
+            <div class="message_options">
+                Choose a message to send, and enter any extras below.<br/><br/>
+                <input type="radio" name="message" id="good" checked /><label for="good">&quot;You have been shortlisted.&quot;&nbsp;
+                <input type="radio" name="message" id="bad" /><label for="bad">&quot;You have been KIVed.&quot;
+                <br/><br/>
+            </div>
+            <textarea id="txt_message" class="txt_message"></textarea>
             <div class="buttons_bar">
                 <input type="hidden" id="notify_referral_id" value="0" />
                 <input type="hidden" id="notify_candidate_idx" value="-1" />

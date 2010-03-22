@@ -272,6 +272,11 @@ if ($_POST['action'] == 'notify_candidate') {
     $result = $job->find($criteria);
     $employer = $result[0]['employer'];
     
+    $news = 'Congratulations! Your application has been shortlisted. We will contact you for further arrangements.';
+    if ($_POST['is_good'] == '0') {
+        $news = 'We are sorry that your application did not meet our requirements, and your resume has been kept for future use.';
+    }
+    
     $lines = file(dirname(__FILE__). '/../private/mail/employer_notify_candidate.txt');
     $message = '';
     foreach($lines as $line) {
@@ -281,6 +286,7 @@ if ($_POST['action'] == 'notify_candidate') {
     $message = str_replace('%candidate%', htmlspecialchars_decode(desanitize($_POST['candidate_name'])), $message);
     $message = str_replace('%employer%', desanitize($employer), $message);
     $message = str_replace('%job%', desanitize($_POST['job']), $message);
+    $message = str_replace('%news%', $news, $message);
     $message = str_replace('%message%', desanitize($_POST['message']), $message);
     $subject = "A message from ". desanitize($employer);
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
@@ -294,446 +300,45 @@ if ($_POST['action'] == 'notify_candidate') {
     exit();
 }
 
-// ---
-
-if ($_POST['action'] == 'get_salary') {
-    $query = "SELECT salary FROM jobs WHERE id = ". $_POST['id'];
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array(array('job' => array('salary' => number_format($result[0]['salary'], 2, '.', ','))));
-    exit();
-}
-
-if ($_POST['action'] == 'get_referred_candidates') {
-    $order_by = 'referred_on desc';
-    $filter_by = '';
-    
-    if (isset($_POST['order_by'])) {
-        $order_by = $_POST['order_by'];
-    }
-    
-    if (isset($_POST['filter_by'])) {
-        $filter_by = 'resumes.file_hash IS '. $_POST['filter_by']. ' AND ';
-    }
-    
-    $result = get_suggested_candidates($_POST['id'], true);
-    $recommended_query = '';
-    $recommended = '';
-    foreach ($result as $i=>$referral_id) {
-        $recommended .= $referral_id['id'];
-        
-        if ($i < (count($result)-1)) {
-            $recommended .= ',';
-        }
-    }
-    
-    if (!empty($recommended)) {
-        $recommended_query = "AND referrals.id NOT IN (". $recommended. ") ";
-    }
-    
-    $query= "SELECT CONCAT(members.lastname,', ', members.firstname) AS referrer, 
-             CONCAT(referees.lastname,', ', referees.firstname) AS candidate,
-             DATE_FORMAT(referrals.member_confirmed_on, '%e %b, %Y') AS formatted_referred_on, 
-             DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y') AS formatted_acknowledged_on, 
-             DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
-             DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
-             referrals.resume, referrals.id, referrals.testimony, referrals.shortlisted_on, referrals.used_suggested,
-             referrals.employer_agreed_terms_on, members.email_addr AS referrer_email_addr, 
-             referees.email_addr AS candidate_email_addr, members.phone_num AS referrer_phone_num, 
-             referees.phone_num AS candidate_phone_num 
-             FROM referrals 
-             LEFT JOIN members ON members.email_addr = referrals.member 
-             LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
-             LEFT JOIN resumes ON resumes.id = referrals.resume 
-             WHERE referrals.job = ". $_POST['id']. " AND ". $filter_by. " 
-             need_approval = 'N' AND 
-             (resumes.deleted = 'N' AND resumes.private = 'N') AND 
-             (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
-             (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
-             -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-             referrals.employer_removed_on IS NULL AND 
-             (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') ". $recommended_query. " 
-             ORDER BY ". $order_by;
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    if (count($result) <= 0 || is_null($result)) {
-        echo "0";
-        exit();
-    }
-    
-    if (!$result) {
-        echo "ko";
-        exit();
-    }
-    
-    foreach ($result as $i=>$row) {
-        $result[$i]['testimony'] = htmlize(desanitize($row['testimony']));
-        if (is_null($row['employer_agreed_terms_on']) || $row['employer_agreed_terms_on'] == '0000-00-00 00:00:00') {
-            $result[$i]['employer_agreed_terms_on'] = '-1';
-        }
-    }
-    
-    $response = array('referrals' => array('referral' => $result));
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array($response);
-    exit();
-}
-
-if ($_POST['action'] == 'get_suggested_candidates') {
-    $result = get_suggested_candidates($_POST['id']);
-    if (count($result) <= 0 || is_null($result)) {
-        echo "0";
-        exit();
-    }
-
-    if (!$result) {
-        echo "ko";
-        exit();
-    }
-    
-    foreach ($result as $key => $row) {
-        $result[$key]['score_percentage'] = ($row['score'] / $row['max_score']) * 100;
-        if (is_null($row['employer_agreed_terms_on']) || $row['employer_agreed_terms_on'] == '0000-00-00 00:00:00') {
-            $result[$key]['employer_agreed_terms_on'] = '-1';
-        }
-    }
-    
-    $response = array('referrals' => array('referral' => $result));
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array($response);
-    exit();
-}
-
-if ($_POST['action'] == 'get_shortlisted_candidates') {
-    $order_by = 'referrals.shortlisted_on desc';
-
-    if (isset($_POST['order_by'])) {
-        $order_by = $_POST['order_by'];
-    }
-    
-    $query= "SELECT CONCAT(members.lastname,', ', members.firstname) AS referrer, 
-             CONCAT(referees.lastname,', ', referees.firstname) AS candidate,
-             DATE_FORMAT(referrals.member_confirmed_on, '%e %b, %Y') AS formatted_referred_on, 
-             DATE_FORMAT(referrals.referee_acknowledged_on, '%e %b, %Y') AS formatted_acknowledged_on, 
-             DATE_FORMAT(referrals.shortlisted_on, '%e %b, %Y') AS formatted_shortlisted_on, 
-             DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
-             referrals.resume, referrals.id, referrals.testimony, referrals.shortlisted_on, referrals.used_suggested, 
-             referrals.employer_agreed_terms_on, members.email_addr AS referrer_email_addr, 
-             referees.email_addr AS candidate_email_addr, members.phone_num AS referrer_phone_num, 
-             referees.phone_num AS candidate_phone_num 
-             FROM referrals 
-             LEFT JOIN members ON members.email_addr = referrals.member 
-             LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
-             WHERE referrals.job = ". $_POST['id']. " AND 
-             need_approval = 'N' AND 
-             (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
-             (referrals.member_confirmed_on IS NOT NULL AND referrals.member_confirmed_on <> '0000-00-00 00:00:00') AND 
-             -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-             (referrals.shortlisted_on IS NOT NULL AND referrals.shortlisted_on <> '0000-00-00 00:00:00') AND
-             referrals.employer_removed_on IS NULL AND referrals.employer_rejected_on IS NULL AND 
-             (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')
-             ORDER BY ". $order_by;
-             
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    if (count($result) <= 0 || is_null($result)) {
-        echo '0';
-        exit();
-    }
-    
-    if (!$result) {
-        echo 'ko';
-        exit();
-    }
-    
-    foreach ($result as $i=>$row) {
-        $result[$i]['testimony'] = htmlspecialchars_decode($row['testimony']);
-        if (is_null($row['employer_agreed_terms_on']) || $row['employer_agreed_terms_on'] == '0000-00-00 00:00:00') {
-            $result[$i]['employer_agreed_terms_on'] = '-1';
-        }
-    }
-    
-    $response = array('referrals' => array('referral' => $result));
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array($response);
-    exit();
-}
-
-if ($_POST['action'] == 'get_verify_resume_viewing') {
-    $query = "SELECT employer_agreed_terms_on FROM referrals WHERE id = ". $_POST['id'];
-    $mysqli = Database::connect();
-    if ($result = $mysqli->query($query)) {
-        if (is_null($result[0]['employer_agreed_terms_on'])) {
-            echo '0';
-            exit();
-        }
-        
-        echo '1';
-        exit();
-    } 
-    
-    echo "ko";
-    exit();
-}
-
-if ($_POST['action'] == 'remove_candidates') {
-    if (!isset($_POST['payload'])) {
-        echo "ko";
-        exit();
-    }
-    
-    $xml_dom->load_from_xml($_POST['payload']);
-    $candidates = $xml_dom->get('id');
-    $query = "UPDATE referrals SET employer_removed_on = NOW() WHERE id IN (";
-    if ($_POST['used_suggested'] == 'Y') {
-        $query = "UPDATE referrals SET employer_removed_on = NOW(), used_suggested = 'Y' WHERE id IN (";
-    }
-    $i = 0;
-    foreach ($candidates as $candidate) {
-        $query .= $candidate->nodeValue;
-        
-        if ($i < $candidates->length-1) {
-            $query .= ", ";
-        }
-        
-        $i++;
-    }
-    $query .= ")";
-    
-    $mysqli = Database::connect();
-    
-    if (!$mysqli->execute($query)) {
-        echo "ko";
-        exit();
-    }
-    
-    echo "ok";
-    exit();
-}
-
-
-if ($_POST['action'] == 'reject_candidate') {
-    $query = "UPDATE referrals SET employer_rejected_on = NOW(), shortlisted_on = NULL ";
-    if ($_POST['used_suggested'] == 'Y') {
-        $query .= ", used_suggested = 'Y' ";
-    }
-    $query .= "WHERE id = ". $_POST['id'];
-    
-    $mysqli = Database::connect();
-    if (!$mysqli->execute($query)) {
-        echo "ko";
-        exit();
-    }
-    
-    $query = "SELECT referrals.member AS member_email_addr, referrals.referee AS candidate_email_addr, 
-              jobs.title AS job_title, employers.name AS employer, 
-              CONCAT(members.lastname,', ', members.firstname) AS referrer, 
-              CONCAT(referees.lastname,', ', referees.firstname) AS candidate 
-              FROM referrals 
-              LEFT JOIN members ON members.email_addr = referrals.member 
-              LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
-              LEFT JOIN jobs ON jobs.id = referrals.job 
-              LEFT JOIN employers ON employers.id = jobs.employer 
-              WHERE referrals.id = ". $_POST['id']. " LIMIT 1";
-    $result = $mysqli->query($query);
-    $member_email_addr = $result[0]['member_email_addr'];
-    $candidate_email_addr = $result[0]['candidate_email_addr'];
-    $referrer = $result[0]['referrer'];
-    $candidate = $result[0]['candidate'];
-    $job = $result[0]['job_title'];
-    $employer = $result[0]['employer'];
-    
-    $lines = file('../private/mail/employer_rejection_to_referrer.txt');
-    $message = '';
-    foreach ($lines as $line) {
-        $message .= $line;
-    }
-
-    $message = str_replace('%employer%', htmlspecialchars_decode($employer), $message);
-    $message = str_replace('%job%', htmlspecialchars_decode($job), $message);
-    $message = str_replace('%referrer%', htmlspecialchars_decode($referrer), $message);
-    $message = str_replace('%candidate%', htmlspecialchars_decode($candidate), $message);
-    $message = str_replace('%candidate_email%', $candidate_email_addr, $message);
-    $subject = htmlspecialchars_decode($candidate). ' is not shortlisted for the job '. htmlspecialchars_decode($job);
-    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    mail($member_email_addr, $subject, $message, $headers);
-    
-    /*$handle = fopen('/tmp/email_to_'. $member_email_addr. '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);*/
-    
-    $lines = file('../private/mail/employer_rejection_to_candidate.txt');
-    $message = '';
-    foreach ($lines as $line) {
-        $message .= $line;
-    }
-
-    $message = str_replace('%employer%', htmlspecialchars_decode($employer), $message);
-    $message = str_replace('%job%', htmlspecialchars_decode($job), $message);
-    $message = str_replace('%candidate%', htmlspecialchars_decode($candidate), $message);
-    $subject = 'Status for your application to the '. htmlspecialchars_decode($job). 'position';
-    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    mail($candidate_email_addr, $subject, $message, $headers);
-    
-    /*$handle = fopen('/tmp/email_to_'. $candidate_email_addr. '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);*/
-    
-    echo "ok";
-    exit();
-}
-
-if ($_POST['action'] == 'unreject_candidate') {
-    $query = "UPDATE referrals SET employer_rejected_on = NULL ";
-    if ($_POST['used_suggested'] == 'Y') {
-        $query .= ", used_suggested = 'Y' ";
-    }
-    $query .= "WHERE id = ". $_POST['id'];
-    
-    $mysqli = Database::connect();
-    if (!$mysqli->execute($query)) {
-        echo "ko";
-        exit();
-    }
-    
-    echo "ok";
-    exit();
-}
-
-
-if ($_POST['action'] == 'shortlist_referral') {
-    $data = array();
-    $data['id'] = $_POST['id'];
-    $data['shortlisted_on'] = now();
-    $data['used_suggested'] = $_POST['used_suggested'];
-    
-    if (!Referral::update($data)) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'unshortlist_referral') {
-    $data = array();
-    $data['id'] = $_POST['id'];
-    $data['shortlisted_on'] = 'NULL';
-    
-    if (!Referral::update($data)) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'get_suggested_candidates_count') {
-    $result = get_suggested_candidates($_POST['id'], true);
-    echo (($result === false) ? '0' : count($result));
-    exit();
-}
-
-if ($_POST['action'] == 'get_referred_candidates_count') {
-    $result = get_suggested_candidates($_POST['id'], true);
-    $recommended_query = '';
-    $recommended = '';
-    if (count($result) > 0 && $result !== false ) {
-        foreach ($result as $i=>$referral_id) {
-            $recommended .= $referral_id['id'];
-
-            if ($i < (count($result)-1)) {
-                $recommended .= ',';
-            }
-        }
-    }
-    
-    if (!empty($recommended)) {
-        $recommended_query = "AND referrals.id NOT IN (". $recommended. ") ";
-    }
-    
-    $query= "SELECT COUNT(referrals.id) AS number_of_referred 
-             FROM referrals 
-             LEFT JOIN members ON members.email_addr = referrals.member 
-             LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
-             LEFT JOIN resumes ON resumes.id = referrals.resume 
-             WHERE referrals.job = ". $_POST['id']. " AND 
-             (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
-             -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-             referrals.employer_removed_on IS NULL AND 
-             (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') ". $recommended_query;
-             
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    echo (($result === false) ? '0' : $result[0]['number_of_referred']);
-    exit();
-}
-
-if ($_POST['action'] == 'get_shortlisted_candidates_count') {
-    $query= "SELECT COUNT(referrals.id) AS number_of_shortlisted 
-             FROM referrals 
-             LEFT JOIN members ON members.email_addr = referrals.member 
-             LEFT JOIN members AS referees ON referees.email_addr = referrals.referee 
-             WHERE referrals.job = ". $_POST['id']. " AND 
-             (referrals.referee_acknowledged_on IS NOT NULL AND referrals.referee_acknowledged_on <> '0000-00-00 00:00:00') AND 
-             -- (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00 00:00:00') AND 
-             (referrals.shortlisted_on IS NOT NULL AND referrals.shortlisted_on <> '0000-00-00 00:00:00') AND
-             referrals.employer_removed_on IS NULL AND 
-             (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')";
-             
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    echo (($result === false) ? '0' : $result[0]['number_of_shortlisted']);
-    exit();
-}
-
-if ($_POST['action'] == 'employ_candidate') {
-    $today = $_POST['commence'];
-    $mysqli = Database::connect();
+if ($_POST['action'] == 'confirm_employed') {
+    $work_commence_on = $_POST['work_commence_on'];
     $is_replacement = false;
     $is_free_replacement = false;
     $previous_referral = '0';
     $previous_invoice = '0';
     
     // 1. Update the referral to employed
-    $query = "SELECT referrals.employer_agreed_terms_on, 
-              referrals.member, referrals.referee, jobs.title 
-              FROM referrals 
-              LEFT JOIN jobs ON jobs.id = referrals.job 
-              WHERE referrals.id = ". $_POST['id'];
-    $not_agreed_terms_yet = false;
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    if (empty($result[0]['employer_agreed_terms_on']) || is_null($result[0]['employer_agreed_terms_on'])) {
-        $not_agreed_terms_yet = true;
-    }
+    $referral = new Referral($_POST['id']);
+    $employer = new Employer($_POST['employer']);
+    $candidate = new Member($_POST['candidate_email_addr']);
     
+    // get the referrer
+    $criteria = array(
+        'columns' => 'member', 
+        'match' => 'id = '. $referral->getId(),
+        'limit' => '1'
+    );
+    $result = $referral->find($criteria);
     $member = new Member($result[0]['member']);
-    $referee = new Member($result[0]['referee']);
-    $job_title = $result[0]['title'];
     
-    $irc_id = ($member->is_IRC()) ? $member->id() : NULL;
-    $total_reward = Referral::calculate_total_reward_from($_POST['salary'], $_POST['employer'], $irc_id);
+    $job = array(
+        'id' => $_POST['job_id'],
+        'title' => $_POST['job']
+    );
+    
+    $salary = $_POST['salary'];
+    $irc_id = ($member->isIRC()) ? $member->getId() : NULL;
+    $total_reward = $referral->calculateRewardFrom($salary, $irc_id);
     $total_token_reward = $total_reward * 0.30;
     $total_reward_to_referrer = $total_reward - $total_token_reward;
     
     $data = array();
-    $data['id'] = $_POST['id'];
     $data['employed_on'] = now();
-    $data['work_commence_on'] = $_POST['commence'];
-    $data['salary_per_annum'] = $_POST['salary'];
+    $data['work_commence_on'] = $work_commence_on;
+    $data['salary_per_annum'] = $salary;
     $data['total_reward'] = $total_reward_to_referrer;
     $data['total_token_reward'] = $total_token_reward;
-    $data['used_suggested'] = $_POST['used_suggested'];
-    $data['guarantee_expire_on'] = Referral::get_guarantee_expiry_date_from($_POST['salary'], $_POST['employer'], $today);
-    if ($not_agreed_terms_yet) {
-        $data['employer_agreed_terms_on'] = $data['employed_on'];
-    }
+    $data['guarantee_expire_on'] = $referral->getGuaranteeExpiryDateWith($salary, $work_commence_on);
     
     // 1.1 Check whether the reward is 0.00 or NULL. If it is, then the employer account is not ready. 
     if ($data['total_reward'] <= 0.00 || 
@@ -743,66 +348,55 @@ if ($_POST['action'] == 'employ_candidate') {
         exit();
     }
     
-    if (!Referral::update($data)) {
-        echo "ko";
+    if ($referral->update($data) === false) {
+        echo 'ko';
         exit();
     }
     
     // 2. Generate an Reference Invoice
     // 2.1 Check whether this job is a replacement for a previous failed referral. 
-    // 2.1.1 Get the job details.
-    $query = "SELECT referrals.job, jobs.title 
-              FROM referrals 
-              LEFT JOIN jobs ON jobs.id = referrals.job 
-              WHERE referrals.id = ". $_POST['id'];
-    $job = $mysqli->query($query);
+    $criteria = array(
+        'columns' => 'id',
+        'match' => "job = ". $job['id']. " AND 
+                    (replacement_authorized_on IS NOT NULL AND replacement_authorized_on <> '0000-00-00 00:00:00') AND 
+                    (replaced_on IS NULL OR replaced_on = '0000-00-00 00:00:00') AND 
+                    replaced_referral IS NULL", 
+        'limit' => '1'
+    );
+    $result = $referral->find($criteria);
     
-    // 2.1.2 Check for replacement.
-    $query = "SELECT id 
-              FROM referrals 
-              WHERE job = ". $job[0]['job']. " AND 
-              (replacement_authorized_on IS NOT NULL AND replacement_authorized_on <> '0000-00-00 00:00:00') AND 
-              (replaced_on IS NULL OR replaced_on = '0000-00-00 00:00:00') AND 
-              replaced_referral IS NULL 
-              LIMIT 1";
-    $result = $mysqli->query($query);
     if (count($result) > 0 && !is_null($result)) {
         $is_replacement = true;
         $previous_referral = $result[0]['id'];
     }
     
     // 2.2 Get all the fees, discounts and extras and calculate accordingly.
-    $employer = new Employer($_POST['employer']);
-    $fees = $employer->get_fees();
-    $extras = $employer->get_extras();
-    $payment_terms_days = $employer->get_payment_terms_days();
+    $fees = $employer->getFees();
+    $payment_terms_days = $employer->getPaymentTermsInDays();
     
     $subtotal = $discount = $extra_charges = 0.00;
     foreach($fees as $fee) {
-        if ($_POST['salary'] >= $fee['salary_start'] && ($_POST['salary'] <= $fee['salary_end'] || $fee['salary_end'] == 0)) {
-            $discount = -($_POST['salary'] * ($fee['discount'] / 100.00));
-            //$subtotal = ($_POST['salary'] * (($fee['service_fee'] + $fee['premier_fee']) / 100.00));
-            $subtotal = ($_POST['salary'] * ($fee['service_fee'] / 100.00));
+        if ($salary >= $fee['salary_start'] && 
+            ($salary <= $fee['salary_end'] || $fee['salary_end'] == 0)) {
+            $discount = -($salary * ($fee['discount'] / 100.00));
+            $subtotal = ($salary * ($fee['service_fee'] / 100.00));
             break;
         }
     }
+    $new_total_fee = $subtotal + $discount;
     
-    foreach($extras as $extra) {
-        $extra_charges = $extra_charges + $extra['charges'];
-    }
-    
-    $new_total_fee = $subtotal + $discount + $extra_charges;
-    $credit_amount = 0;
     // 2.2.1 If this is a replacement, re-calculate accordingly by taking the previously invoiced amount.
+    $credit_amount = 0;
     if ($is_replacement) {
         // 2.2.1a If it is a replacement, get the previously invoiced amount.
-        $query = "SELECT invoices.id, SUM(invoice_items.amount) AS amount_payable 
-                  FROM invoices 
-                  LEFT JOIN invoice_items ON invoice_items.invoice = invoices.id 
-                  WHERE invoices.type = 'R' AND 
-                  invoice_items.item = ". $previous_referral. " 
-                  GROUP BY invoices.id";
-        $result = $mysqli->query($query);
+        $criteria = array(
+            'columns' => 'invoices.id, SUM(invoice_items.amount) AS amount_payable', 
+            'joins' => 'invoice_items ON invoice_items.invoice = invoices.id', 
+            'match' => "invoices.type ='R' AND 
+                        invoice_items.item = ". $previous_referral, 
+            'group' => 'invoices.id'
+        );
+        $result = Invoice::find($query);
         $amount_payable = $result[0]['amount_payable'];
         $previous_invoice = $result[0]['id'];
         
@@ -821,10 +415,11 @@ if ($_POST['action'] == 'employ_candidate') {
     }
     
     // 2.3 Generate the invoice
+    $issued_on = date('j M, Y');
     $data = array();
-    $data['issued_on'] = today();
+    $data['issued_on'] = $issued_on;
     $data['type'] = 'R';
-    $data['employer'] = $_POST['employer'];
+    $data['employer'] = $employer->getId();
     $data['payable_by'] = sql_date_add($data['issued_on'], $payment_terms_days, 'day');
     
     if ($is_free_replacement) {
@@ -835,11 +430,11 @@ if ($_POST['action'] == 'employ_candidate') {
     
     $invoice = Invoice::create($data);
     if (!$invoice) {
-        echo "ko";
+        echo 'ko';
         exit();
     }
     
-    $referral_desc = 'Reference fee for ['. $job[0]['job']. '] '. $job[0]['title'];
+    $referral_desc = 'Reference fee for ['. $job['id']. '] '. $job['title'];
     if ($is_free_replacement) {
         $referral_desc = 'Free replacement for Invoice: '. pad($previous_invoice, 11, '0');
     } 
@@ -848,20 +443,20 @@ if ($_POST['action'] == 'employ_candidate') {
         $referral_desc = 'Replacement fee for Invoice: '. pad($previous_invoice, 11, '0');
     }
     
-    $item_added = Invoice::add_item($invoice, $subtotal, $_POST['id'], $referral_desc);
+    $item_added = Invoice::addItem($invoice, $subtotal, $referral->getId(), $referral_desc);
     if (!$item_added) {
         echo "ko";
         exit();
     }
     
     if (!$is_free_replacement) {
-        $item_added = Invoice::add_item($invoice, $discount, $_POST['id'], 'Discount');
+        $item_added = Invoice::addItem($invoice, $discount, $referral->getId(), 'Discount');
         if (!$item_added) {
             echo "ko";
             exit();
         }
 
-        $item_added = Invoice::add_item($invoice, $extra_charges, $_POST['id'], 'Extra charges');
+        $item_added = Invoice::addItem($invoice, $extra_charges, $referral->getId(), 'Extra charges');
         if (!$item_added) {
             echo "ko";
             exit();
@@ -870,12 +465,11 @@ if ($_POST['action'] == 'employ_candidate') {
         if ($credit_amount > 0) {
             $credit_note_desc = 'Refund of balance for Invoice: '. pad($previous_invoice, 11, '0');
             $filename = generate_random_string_of(8). '.'. generate_random_string_of(8);
-            $issued_on = today();
             $expire_on = sql_date_add($issued_on, 30, 'day');
             
-            Invoice::accompany_credit_note_with($previous_invoice, $invoice, $issued_on, $credit_amount);
+            Invoice::accompanyCreditNoteWith($previous_invoice, $invoice, $issued_on, $credit_amount);
             
-            $branch = $employer->get_branch();
+            $branch = $employer->getBranch();
             $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
             $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
             $branch['address_lines'] = explode("\n", $branch[0]['address']);
@@ -916,9 +510,9 @@ if ($_POST['action'] == 'employ_candidate') {
             $pdf->Cell(0, 5, "Employer Name",1,0,'C',1);
             $pdf->Ln(6);
             $pdf->SetTextColor(0, 0, 0);
-            $pdf->Cell(60, 5, $employer->id(),1,0,'C');
+            $pdf->Cell(60, 5, $employer->getId(),1,0,'C');
             $pdf->Cell(1);
-            $pdf->Cell(0, 5, $employer->get_name(),1,0,'C');
+            $pdf->Cell(0, 5, $employer->getName(),1,0,'C');
             $pdf->Ln(10);
             
             $table_header = array("No.", "Item", "Amount (". $currency. ")");
@@ -930,7 +524,7 @@ if ($_POST['action'] == 'employ_candidate') {
             $pdf->Ln(6);
             $pdf->Cell(0, 5, "Refund Notice",'LTR',0,'C');
             $pdf->Ln();
-            $pdf->Cell(0, 5, "- Refund will be made payable to ". $employer->get_name(). ". ", 'LR', 0, 'C');
+            $pdf->Cell(0, 5, "- Refund will be made payable to ". $employer->getName(). ". ", 'LR', 0, 'C');
             $pdf->Ln();
             $pdf->Cell(0, 5, "- To facilitate the refund process, please inform us of any discrepancies.", 'LBR', 0, 'C');
             $pdf->Ln(10);
@@ -958,7 +552,7 @@ if ($_POST['action'] == 'employ_candidate') {
                 $message .= $line;
             }
 
-            $message = str_replace('%company%', $employer->get_name(), $message);
+            $message = str_replace('%company%', $employer->getName(), $message);
             $message = str_replace('%previous_invoice%', pad($previous_invoice, 11, '0'), $message);
             $message = str_replace('%new_invoice%', pad($invoice, 11, '0'), $message);
             $message = str_replace('%job_title%', $job_title, $message);
@@ -971,7 +565,7 @@ if ($_POST['action'] == 'employ_candidate') {
             $body .= 'Content-Disposition: attachment'. "\n";
             $body .= $attachment. "\n";
             $body .= '--yel_mail_sep_'. $filename. "--\n\n";
-            mail($employer->get_email_address(), $subject, $body, $headers);
+            mail($employer->getEmailAddress(), $subject, $body, $headers);
 
             unlink($GLOBALS['data_path']. '/credit_notes/'. $filename. '.pdf');
         }
@@ -979,16 +573,17 @@ if ($_POST['action'] == 'employ_candidate') {
     
     // 2.4 If it is a replacement, update both referrals to disable future replacements.
     if ($is_replacement) {
+        $mysqli = Database::connect();
         $queries = "UPDATE referrals SET 
                     replaced_on = '". now(). "', 
-                    replaced_referral = ". $_POST['id']. " 
+                    replaced_referral = ". $referral->getId(). " 
                     WHERE id = ". $previous_referral. "; 
                     UPDATE referrals SET 
-                    guarantee_expire_on = '". $today. "', 
+                    guarantee_expire_on = '". $work_commence_on. "', 
                     replacement_authorized_on = NULL, 
                     replaced_on = '". now(). "', 
-                    replaced_referral = ". $_POST['id']. " 
-                    WHERE id = ". $_POST['id'];
+                    replaced_referral = ". $referral->getId(). " 
+                    WHERE id = ". $referral->getId();
         if (!$mysqli->transact($queries)) {
             echo 'ko';
             exit();
@@ -1002,38 +597,17 @@ if ($_POST['action'] == 'employ_candidate') {
         $message .= $line;
     }
 
-    $message = str_replace('%member_name%', $member->get_name(), $message);
-    $message = str_replace('%referee_name%', $referee->get_name(), $message);
-    $message = str_replace('%employer%', $employer->get_name(), $message);
-    $message = str_replace('%job_title%', $job_title, $message);
+    $message = str_replace('%member_name%', $member->getFullName(), $message);
+    $message = str_replace('%referee_name%', $candidate->getFullName(), $message);
+    $message = str_replace('%employer%', $employer->getName(), $message);
+    $message = str_replace('%job_title%', $job['title'], $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
-    $subject = desanitize($referee->get_name()). " was successfully employed!";
+    $subject = desanitize($candidate->getFullName()). " was successfully employed!";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    mail($member->id(), $subject, $message, $headers);
+    // mail($member->getId(), $subject, $message, $headers);
     
-    echo "ok";
-    exit();
-}
-
-
-if ($_POST['action'] == 'get_remark') {
-    $mysqli = Database::connect();
-    $query = "SELECT jobs.title, CONCAT(members.firstname, ', ', members.lastname) AS candidate, 
-              referrals.employer_remarks AS remark 
-              FROM referrals 
-              INNER JOIN jobs ON jobs.id = referrals.job 
-              INNER JOIN members ON members.email_addr = referrals.referee 
-              WHERE referrals.id = ". $_POST['id']. " LIMIT 1";
-    $result = $mysqli->query($query);
-    
-    $result[0]['remark'] = htmlspecialchars_decode(desanitize($result[0]['remark']));
-    $result[0]['job_title'] = htmlspecialchars_decode(desanitize($result[0]['title']));
-    $result[0]['candidate'] = htmlspecialchars_decode(desanitize($result[0]['candidate']));
-    
-    $response = array('referrals' => array('referral' => $result));
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array($response);
+    echo 'ok';
     exit();
 }
 

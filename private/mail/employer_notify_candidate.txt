@@ -5,6 +5,8 @@ Hi %candidate%,
 
 === Message Begin ===
 
+%news%
+
 %message%
 
 === Message End ===

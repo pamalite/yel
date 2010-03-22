@@ -100,6 +100,10 @@
     width: 800px;
 }
 
+#notify_window {
+    width: 550px;
+}
+
 #employment_window {
     width: 395px;
 }
@@ -144,7 +148,13 @@
 }
 
 .txt_message {
-    height: 250px;
+    height: 150px;
+}
+
+.message_options {
+    margin: auto;
+    text-align: center;
+    width: 99%;
 }
 
 .buttons_bar {

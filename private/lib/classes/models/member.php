@@ -534,7 +534,7 @@ class Member implements Model {
     
     public function isIRC() {
         $query = "SELECT individual_headhunter FROM members WHERE 
-                  email_addr = '". $this->id(). "' LIMIT 1";
+                  email_addr = '". $this->id. "' LIMIT 1";
         $result = $this->mysqli->query($query);
         if ($result[0]['individual_headhunter'] == '1') {
             return true;

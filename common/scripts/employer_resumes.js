@@ -176,7 +176,7 @@ function show_resumes_of(_job_id, _job_title) {
                     row.set(3, new Cell(remarks_link, '', 'cell actions_column'));
                     
                     var actions = '';
-                    if (employed_ons[i].childNodes.length < 0) {
+                    if (employed_ons[i].childNodes.length > 0) {
                         actions = 'Employed on ' + employed_ons[i].childNodes[0].nodeValue;
                     } else if (!is_agreed_terms) {
                         actions = 'Resume not viewed yet.';
@@ -399,20 +399,37 @@ function show_remarks_popup(_referral_id, _candidate_idx) {
 
 function close_employment_popup(_to_confirm) {
     if (_to_confirm) {
+        var is_confirmed = confirm('Are you sure all the employment details provided are correct?');
+        if (!is_confirmed) {
+            return;
+        }
+        
         if (is_year_changed) {
-            var proceed = prompt('Are you sure to proceed for an employment made in ' + $('year_label').get('html') + '?');
+            var proceed = confirm('Are you sure to proceed for an employment made in ' + $('year_label').get('html') + '?');
             if (!proceed) {
                 return;
             }
         }
         
         var params = 'id=' + $('employment_referral_id').value + '&action=confirm_employed';
+        params = params + '&employer=' + id;
         params = params + '&job=' + current_job_title;
         params = params + '&job_id=' + current_job_id;
         params = params + '&candidate_email_addr=' + candidates[$('employment_candidate_idx').value].email_addr;
         params = params + '&candidate_name=' + candidates[$('employment_candidate_idx').value].name;
         params = params + '&work_commence_on=' + $('year_label').get('html') + '-' + $('month').options[$('month').selectedIndex].value + '-' + $('day').options[$('day').selectedIndex].value;
         params = params + '&salary=' + $('salary').value;
+        
+        var uri = root + "/employers/resumes_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                show_resumes_of(current_job_id, current_job_title);
+            }
+        });
+
+        request.send(params);
     }
     
     close_window('employment_window');
@@ -428,12 +445,13 @@ function show_employment_popup(_referral_id, _candidate_idx) {
 
 function close_notify_popup(_needs_sending) {
     if (_needs_sending) {
-        if (isEmpty($('txt_message').value)) {
-            close_window('notify_window');
-            return;
+        var is_good = '1';
+        if ($('bad').checked) {
+            is_good = '0';
         }
         
         var params = 'id=' + $('notify_referral_id').value + '&action=notify_candidate';
+        params = params + '&is_good=' + is_good;
         params = params + '&job=' + current_job_title;
         params = params + '&job_id=' + current_job_id;
         params = params + '&candidate_email_addr=' + candidates[$('notify_candidate_idx').value].email_addr;
