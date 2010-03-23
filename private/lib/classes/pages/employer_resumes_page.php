@@ -208,12 +208,21 @@ class EmployerResumesPage extends Page {
         <div id="notify_window" class="popup_window">
             <div id="window_notify_candidate"></div>
             <div class="message_options">
-                Choose a message to send, and enter any extras below.<br/><br/>
+                Choose a message to send, and enter any further communications below.<br/><br/>
                 <input type="radio" name="message" id="good" checked /><label for="good">&quot;You have been shortlisted.&quot;&nbsp;
                 <input type="radio" name="message" id="bad" /><label for="bad">&quot;You have been KIVed.&quot;
                 <br/><br/>
             </div>
             <textarea id="txt_message" class="txt_message"></textarea>
+            <table class="reply_to_area">
+                <tr>
+                    <td style="width: 25%;">Reply To Email:</td>
+                    <td>
+                        <input type="text" class="field" id="reply_to" value="" /><br/>
+                        <span style="font-size: 7pt; color: #666666;">Tip: If this is left empty, the default email will be used for the candidate to reply to.</span>
+                    </td>
+                </tr>
+            </table>
             <div class="buttons_bar">
                 <input type="hidden" id="notify_referral_id" value="0" />
                 <input type="hidden" id="notify_candidate_idx" value="-1" />

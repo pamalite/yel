@@ -16,10 +16,27 @@ var candidates = new Array();
 var is_year_changed = false;
 
 function rate_stars_for(_referral_id, _stars) {
-    // TODO: save the ratings
+    var params = 'id=' + _referral_id + '&action=rate_candidate';
+    params = params + '&rating=' + _stars;
     
-    var html = get_display_stars_for(_referral_id, _stars);
-    $('referral_' + _referral_id).set('html', html);
+    var uri = root + "/employers/resumes_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            //set_status('<pre>' + txt + '</pre>');
+            //return;
+            if (txt == 'ko') {
+                alert('An error rating candidate.');
+                return false;
+            }
+            
+            var html = get_display_stars_for(_referral_id, _stars);
+            $('referral_' + _referral_id).set('html', html);
+        }
+    });
+    
+    request.send(params);
 }
 
 function get_display_stars_for(_referral_id, _stars) {
@@ -111,6 +128,7 @@ function show_resumes_of(_job_id, _job_title) {
                 var candidate_phone_nums = xml.getElementsByTagName('candidate_phone_num');
                 var testimonies = xml.getElementsByTagName('testimony');
                 var remarks = xml.getElementsByTagName('employer_remarks');
+                var ratings = xml.getElementsByTagName('rating');
                 
                 var resumes_table = new FlexTable('resumes_table', 'resumes');
                 
@@ -176,13 +194,15 @@ function show_resumes_of(_job_id, _job_title) {
                     row.set(3, new Cell(remarks_link, '', 'cell actions_column'));
                     
                     var actions = '';
-                    if (employed_ons[i].childNodes.length > 0) {
+                    if (employed_ons[i].childNodes.length < 0) {
                         actions = 'Employed on ' + employed_ons[i].childNodes[0].nodeValue;
                     } else if (!is_agreed_terms) {
                         actions = 'Resume not viewed yet.';
                     } else {
-                        // TODO: get the referrals.rating
                         var stars = 0;
+                        if (parseInt(ratings[i].childNodes[0].nodeValue) > 0) {
+                            stars = parseInt(ratings[i].childNodes[0].nodeValue);
+                        }
                         
                         actions = '<span id="referral_' + referral_ids[i].childNodes[0].nodeValue + '">'
                         actions = actions + get_display_stars_for(referral_ids[i].childNodes[0].nodeValue, stars);
@@ -445,12 +465,20 @@ function show_employment_popup(_referral_id, _candidate_idx) {
 
 function close_notify_popup(_needs_sending) {
     if (_needs_sending) {
+        if (!isEmpty($('reply_to').value)) {
+            if (!isEmail($('reply_to').value)) {
+                alert('The Reply To Email must be:\n\n1. An email address.\n2. Single email address only.');
+                return;
+            }
+        }
+        
         var is_good = '1';
         if ($('bad').checked) {
             is_good = '0';
         }
         
         var params = 'id=' + $('notify_referral_id').value + '&action=notify_candidate';
+        params = params + '&reply_to=' + $('reply_to').value;
         params = params + '&is_good=' + is_good;
         params = params + '&job=' + current_job_title;
         params = params + '&job_id=' + current_job_id;

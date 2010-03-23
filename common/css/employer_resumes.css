@@ -173,3 +173,12 @@
     font-size: 7pt;
     color: #666666;
 }
+
+.reply_to_area {
+    width: 99%;
+    margin: auto;
+}
+
+.field {
+    width: 100%;
+}

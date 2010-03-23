@@ -136,8 +136,8 @@ if ($_POST['action'] == 'get_resumes') {
                       referrals.resume, referrals.id, referrals.testimony, referrals.shortlisted_on,
                       referrals.employer_agreed_terms_on, members.email_addr AS referrer_email_addr, 
                       referees.email_addr AS candidate_email_addr, members.phone_num AS referrer_phone_num, 
-                      referees.phone_num AS candidate_phone_num, 
-                      referrals.employer_remarks", 
+                      referees.phone_num AS candidate_phone_num, referrals.employer_remarks, 
+                      referrals.rating", 
         "joins" => "members ON members.email_addr = referrals.member, 
                     members AS referees ON referees.email_addr = referrals.referee, 
                     resumes ON resumes.id = referrals.resume", 
@@ -264,13 +264,19 @@ if ($_POST['action'] == 'save_remarks') {
 if ($_POST['action'] == 'notify_candidate') {
     $job = new Job();
     $criteria = array(
-        'columns' => 'employers.name AS employer', 
+        'columns' => 'employers.name AS employer, email_addr', 
         'joins' => 'employers ON employers.id = jobs.employer',
         'match' => 'jobs.id = '. $_POST['job_id'], 
         'limit' => '1'
     );
     $result = $job->find($criteria);
     $employer = $result[0]['employer'];
+    $email_addr = $result[0]['email_addr'];
+    
+    $reply_to = $email_addr;
+    if (!empty($_POST['reply_to'])) {
+        $reply_to = $_POST['reply_to'];
+    }
     
     $news = 'Congratulations! Your application has been shortlisted. We will contact you for further arrangements.';
     if ($_POST['is_good'] == '0') {
@@ -290,10 +296,12 @@ if ($_POST['action'] == 'notify_candidate') {
     $message = str_replace('%message%', desanitize($_POST['message']), $message);
     $subject = "A message from ". desanitize($employer);
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    $headers .= 'Reply-To: '. $reply_to. "\n";
     //mail($_POST['candidate_email_addr'], $subject, $message, $headers);
     
     $handle = fopen('/tmp/email_to_'. $_POST['candidate_email_addr']. '.txt', 'w');
     fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, 'Headers: '. $headers. "\n\n");
     fwrite($handle, $message);
     fclose($handle);
     
@@ -611,4 +619,17 @@ if ($_POST['action'] == 'confirm_employed') {
     exit();
 }
 
+if ($_POST['action'] == 'rate_candidate') {
+    $data = array();
+    $data['rating'] = $_POST['rating'];
+    
+    $referral = new Referral($_POST['id']);
+    if ($referral->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
 ?>
