@@ -21,7 +21,7 @@ if (!isset($_SESSION['yel']['employer']) ||
 
 
 $invoice = Invoice::get($_GET['id']);
-$items = Invoice::get_items_of($_GET['id']);
+$items = Invoice::getItems($_GET['id']);
 
 if (!$invoice) {
     echo "Invoice not found.";
@@ -30,9 +30,8 @@ if (!$invoice) {
 
 $employer = new Employer($invoice[0]['employer']);
 $branch = $employer->getAssociatedBranch();
-$branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
-$branch['address_lines'] = explode("\n", $branch[0]['address']);
-$currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
+$currency = $branch[0]['currency'];
+
 $amount_payable = 0.00;
 foreach($items as $i=>$item) {
     $amount_payable += $item['amount'];
@@ -103,8 +102,11 @@ class InvoicePdf extends FPDF   {
         
         $this->Cell(5, 3, "Mailing Address:", 0, 0);
         $this->Cell(11);
-        foreach ($this->branch['address_lines'] as $i=>$line) {
-            if ($i == count($this->branch['address_lines']) - 1) {
+        
+        $this->branch[0]['address_lines'] = explode(',', $this->branch[0]['address']);
+        foreach ($this->branch[0]['address_lines'] as $i=>$line) {
+            $line = trim($line);
+            if ($i == count($this->branch[0]['address_lines']) - 1) {
                 $line = $line. ", ";
             }
             $this->Cell(5, 3, $line, 0, 2);
@@ -195,14 +197,14 @@ $pdf->Ln(6);
 $pdf->SetTextColor(0, 0, 0);
 $pdf->Cell(60, 5, pad($_GET['id'], 11, '0'),1,0,'C');
 $pdf->Cell(1);
-$pdf->Cell(33, 5, $invoice[0]['issued_on'],1,0,'C');
+$pdf->Cell(33, 5, $invoice[0]['formatted_issued_on'],1,0,'C');
 $pdf->Cell(1);
 
 if (is_null($invoice[0]['paid_on']) || empty($invoice[0]['paid_on']))
 {
-    $pdf->Cell(33, 5, $invoice[0]['payable_by'],1,0,'C');
+    $pdf->Cell(33, 5, $invoice[0]['formatted_payable_by'],1,0,'C');
 } else {
-    $pdf->Cell(33, 5, $invoice[0]['paid_on'],1,0,'C');
+    $pdf->Cell(33, 5, $invoice[0]['formatted_paid_on'],1,0,'C');
 }
 
 $pdf->Cell(1);
@@ -216,7 +218,7 @@ $pdf->Ln(6);
 $pdf->SetTextColor(0, 0, 0);
 $pdf->Cell(60, 5, $invoice[0]['employer'],1,0,'C');
 $pdf->Cell(1);
-$pdf->Cell(0, 5, $employer->get_name(),1,0,'C');
+$pdf->Cell(0, 5, $employer->getName(),1,0,'C');
 $pdf->Ln(10);
 
 $table_header = array("No.", "Item", "Amount (". $currency. ")");

@@ -96,7 +96,11 @@ class Invoice {
         }
         
         $mysqli = Database::connect();
-        $query = "SELECT * FROM invoices WHERE id = '". $_id. "' LIMIT 1";
+        $query = "SELECT *, 
+                  DATE_FORMAT(issued_on, '%e %b, %Y') AS formatted_issued_on, 
+                  DATE_FORMAT(payable_by, '%e %b, %Y') AS formatted_payable_by,
+                  DATE_FORMAT(paid_on, '%e %b, %Y') AS formatted_paid_on 
+                  FROM invoices WHERE id = '". $_id. "' LIMIT 1";
         
         return $mysqli->query($query);
     }
