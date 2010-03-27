@@ -253,7 +253,7 @@ class EmployerResumesPage extends Page {
                     </tr>
                     <tr>
                         <td class="label">Annual Salary:</td>
-                        <td class="field"><span id="currency"><?php echo $currency; ?></span>$&nbsp;<input type="text" class="field" id="salary" name="salary" value="1.00" /></td>
+                        <td class="field"><span id="currency"><?php echo $currency; ?></span>$&nbsp;<input type="text" class="salary_field" id="salary" name="salary" value="1.00" /></td>
                     </tr>
                 </table>
             </div>

@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
 require_once dirname(__FILE__). "/../../../config/subscriptions_rate.inc";
+require_once dirname(__FILE__). '/../htmltable.php';
 
 class EmployerJobsPage extends Page {
     private $employer = NULL;
@@ -22,86 +23,38 @@ class EmployerJobsPage extends Page {
     public function insert_employer_jobs_scripts() {
         $this->insert_scripts();
         
-        //echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/ggEdit.js"></script>'. "\n";
-        echo '<script src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/freerte/js/richtext.js" type="text/javascript" language="javascript"></script>';
-        echo '<script src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/freerte/js/config.js" type="text/javascript" language="javascript"></script>';
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employer_jobs.js"></script>'. "\n";
     }
     
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employer->id(). '";'. "\n";
+        echo 'var id = "'. $this->employer->getId(). '";'. "\n";
         echo '</script>'. "\n";
     }
     
-    private function generateCountries($selected = '') {
-        $countries = Country::getAllWithDisplay();
+    private function get_jobs() {
+        $job = new Job();
         
-        echo '<select class="field" id="country" name="country">'. "\n";
+        $criteria = array(
+            'columns' => "id, title, 
+                          DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on, 
+                          DATE_FORMAT(created_on, '%e %b, %Y') AS formatted_created_on", 
+            'match' => "employer = '". $this->employer->getId(). "'",
+            'order' => "created_on DESC"
+        );
         
-        if ($selected == '') {
-            echo '<option value="0" selected>Please select a country</option>'. "\n";
-            echo '<option value="0" disabled>&nbsp;</option>'. "\n";
-        }
-        
-        foreach ($countries as $country) {
-            if ($country['country_code'] != $selected) {
-                echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
-            } else {
-                echo '<option value="'. $country['country_code']. '" selected>'. $country['country']. '</option>'. "\n";
-            }
-        }
-        
-        echo '</select>'. "\n";
-    }
-    
-    private function generate_all_industry_list() {
-        $industries = Industry::get_main();
-        
-        echo '<select class="field" id="industry" name="industry">'. "\n";
-        
-        if ($selected == '') {
-            echo '<option value="0" selected>Please select an industry</option>'. "\n";
-        }
-        
-        foreach ($industries as $industry) {
-            echo '<option class="main_industry" value="'. $industry['id']. '">'. $industry['industry']. '</option>'. "\n";
-            
-            $sub_industries = Industry::get_sub_industries_of($industry['id']);
-            foreach ($sub_industries as $sub_industry) {
-                echo '<option value="'. $sub_industry['id']. '">&nbsp;&nbsp;&nbsp;'. $sub_industry['industry']. '</option>'. "\n";
-            }
-            
-        }
-        
-        echo '</select>'. "\n";
-    }
-    
-    private function generate_currency_list() {
-        $currencies = Currency::getAll();
-        
-        echo '<select class="field" id="currency" name="currency">'. "\n";
-        
-        if ($selected == '') {
-            echo '<option value="0" selected>Please select a currency</option>'. "\n";
-        }
-        
-        foreach ($currencies as $currency) {
-            echo '<option value="'. $currency['symbol']. '">'. $currency['currency']. ' ('. $currency['symbol']. ')</option>'. "\n";
-        }
-        
-        echo '</select>'. "\n";
+        return $job->find($criteria);
     }
     
     public function show() {
         $this->begin();
-        $this->support();
-        $this->top($this->employer->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Job Ads</span>");
+        $this->support($this->employer->getId());
+        $this->top('Job Postings');
         $this->menu('employer', 'jobs');
         
-        $branch = $this->employer->get_branch();
-        $currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
-        $payment_currency = $currency;
+        $branch = $this->employer->getAssociatedBranch();
+        $currency = $branch[0]['currency'];
         $subscriptions_rates = $GLOBALS['subscriptions_rates'];
         $subscriptions = $subscriptions_rates[$payment_currency];
         if (!array_key_exists($payment_currency, $subscriptions_rates)) {
@@ -109,250 +62,161 @@ class EmployerJobsPage extends Page {
             $subscriptions = $subscriptions_rates['MYR'];
         }
         
+        $subscription = $this->employer->getSubscriptionsDetails();
+        $subscription_is_expired = false;
+        if ($subscription[0]['expired'] <= 0) {
+            $subscription_is_expired = true;
+        }
+        
+        $job_postings_left = $this->employer->hasPaidJobPostings();
+        if ($job_postings_left === false) {
+            $job_postings_left = 0;
+        }
+        
+        $free_postings_left = $this->employer->hasFreeJobPostings();
+        if ($free_postings_left === false) {
+            $free_postings_left = 0;
+        }
+        
+        $jobs = $this->get_jobs();
+        
         ?>
+        <div style="padding-bottom: 25px;">
+            <table class="top_banner">
+                <tr>
+                    <td class="item">
+                        <div class="jobs_publishing_instructions">
+                            Follow the easy steps below to get your jobs published:
+                            <ol>
+                                <li>Prepare your job description in a Word (*.doc), PDF or Text file.</li>
+                                <li>Attach the file, or files if you have many, to an email using your email software of choice.</li>
+                                <li>Set the subject of the email to <span style="font-weight: bold;">"Publish Job Description"</span></li>
+                                <li>Enter any special instructions you need us to follow as an email.</li>
+                                <li>Send it to <a href="mailto: sales.<?php echo strtolower($branch[0]['country']); ?>@yellowelevator.com">sales.<?php echo strtolower($branch[0]['country']); ?>@yellowelevator.com</a></li>
+                            </ol>
+                        </div>
+                    </td>
+                    <td class="item">
+                        <div class="subscriptions_details">
+                            <table class="subscriptions_info">
+                                <tr>
+                                    <td>Subscription Expires On: </td>
+
+                                    <td>
+                                        <?php $expired_html = ($subscription_is_expired) ? 'color: #FF0000;' : 'color: #000000;'; ?>
+                                        <span id="subscriptions_expiry" style="font-weight: bold; <?php echo $expired_html; ?>">
+                                            <?php echo $subscription[0]['formatted_expire_on'] ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Job Posts Left: </td>
+                                    <td>
+                                        <span id="subscriptions_job_postings" style="font-weight: bold;">
+                                            <?php echo $job_postings_left; ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Free Posts Left: </td>
+                                    <td>
+                                        <span id="subscriptions_free_postings" style="font-weight: bold;">
+                                            <?php echo $free_postings_left; ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="buy">
+                                            Contact us to renew your subscriptions or buy job posts with the <span style="font-weight: bold;">Billing</span> contact details listed above.
+                                            <br/><br/>
+                                            You can contact us to extend your expired published jobs as well.
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
-        <div id="div_subscriptions_info">
-            <table class="subscriptions_info">
-                <tr>
-                    <td class="info">
-                        <div class="subscriptions_details">
-                            Subscription Expiring On: <span id="subscriptions_expiry" style="font-weight: bold;"></span>
-                        </div>
-                    </td>
-                    <td class="buy">
-                        <input type="image" id="buy_subscriptions_button" onClick="show_buy_subscriptions_form();" src="../common/images/button_buy_now_disabled.gif" disabled />
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <div id="div_tabs">
-            <ul>
-                <li id="li_open"><span id="open_back_arrow">&lt;&lt;&nbsp;</span>Currently Open</li>
-                <li id="li_closed"><span id="closed_back_arrow">&lt;&lt;&nbsp;</span>Already Closed</li>
-            </ul>
-        </div>
-        <div id="div_open">
-            <p class="note">[&bull;] indicates that you have made 'Confirm Employed' submission/s in the Referrals section.</p>
-            <table class="buttons">
-                <tr>
-                    <td class="left"><input class="button" type="button" id="close_jobs" name="close_jobs" value="Close Selected Jobs" /></td>
-                    <td class="right"><input class="button" type="button" id="add_new_job" name="add_new_job" value="Create New Job Ad" /></td>
-                </tr>
-            </table>
-            <table class="header">
-                <tr>
-                    <td class="checkbox"><input type="checkbox" id="close_all" /></td>
-                    <!--td class="id">&nbsp;</td-->
-                    <td class="industry"><span class="sort" id="sort_industry">Specialization</span></td>
-                    <td class="title"><span class="sort" id="sort_title">Title</span></td>
-                    <td class="date"><span class="sort" id="sort_created_on">Created On</span></td>
-                    <td class="date"><span class="sort" id="sort_expire_on">Expire On</span></td>
-                    <td class="new_from">&nbsp;</td>
-                </tr>
-            </table>
-            <div id="div_list">
+        
+        <div>
+            <div id="div_jobs" class="jobs">
+            <?php
+                if (empty($jobs)) {
+            ?>
+                <div class="empty_results">No job published at this moment.</div>
+            <?php
+                } else {
+                    $jobs_table = new HTMLTable('jobs_table', 'jobs');
+                
+                    $jobs_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('jobs', 'created_on');\">Created On</a>", '', 'header');
+                    $jobs_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('jobs', 'title');\">Job</a>", '', 'header');
+                    $jobs_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('jobs', 'expire_on');\">Expire On</a>", '', 'header');
+                
+                    foreach ($jobs as $i=>$job) {
+                        $jobs_table->set($i+1, 0, $job['formatted_created_on'], '', 'cell');
+                    
+                        $job_title = "<a class=\"no_link\" onClick=\"show_job_description(". $job['id']. ");\">". $job['title']. "</a>";
+                        $jobs_table->set($i+1, 1, $job_title, '', 'cell');
+                    
+                        $jobs_table->set($i+1, 2, $job['formatted_expire_on'], '', 'cell');
+                    }
+                
+                    echo $jobs_table->get_html();
+                }
+            ?>
             </div>
-            <table class="buttons">
-                <tr>
-                    <td class="left"><input class="button" type="button" id="close_jobs_1" name="close_jobs_1" value="Close Selected Jobs" /></td>
-                    <td class="right"><input class="button" type="button" id="add_new_job_1" name="add_new_job_1" value="Create New Job Ad" /></td>
-                </tr>
-            </table>
-            <p class="note">[&bull;] indicates that you have made 'Confirm Employed' submission/s in the Referrals section.</p>
-        </div>
-        
-        <div id="div_closed">
-            <table class="header">
-                <tr>
-                    <!--td class="id">&nbsp;</td-->
-                    <td class="industry"><span class="sort" id="sort_industry_closed">Specialization</span></td>
-                    <td class="title"><span class="sort" id="sort_title_closed">Title</span></td>
-                    <td class="date"><span class="sort" id="sort_created_on_closed">Created On</span></td>
-                    <td class="date"><span class="sort" id="sort_expire_on_closed">Expire On</span></td>
-                    <td class="new_from">&nbsp;</td>
-                </tr>
-            </table>
-            <div id="div_closed_list">
-            </div>
-        </div>
-        
-        <div id="div_job_form">
-            <div id="div_tabs_1">
-                <ul>
-                    <li id="li_back">&lt;&lt; Back to Job Ads</li>
-                </ul>
-            </div>
-            <form method="post"onSubmit="return false;">
-                <input type="hidden" id="job_id" value="0" />
-                <table id="job_form" class="job_form">
+            
+            <div id="div_job_desc" class="job_desc">
+                <div class="back">
+                    <a class="no_link" onClick="show_jobs();">
+                        &lt;&lt; Back to Job Postings
+                    </a>
+                </div>
+                
+                <table class="job">
                     <tr>
-                        <td colspan="2" class="title"><span id="form_title">Add a New Job</span></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="title">Title:</label></td>
-                        <td class="field"><input class="field" type="text" id="title" name="title" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="industry">Specialization:</label></td>
-                        <td class="field"><?php $this->generate_all_industry_list(); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="country">Country:</label></td>
-                        <td class="field"><?php $this->generateCountries(); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="state">State/Province/Area:</label></td>
-                        <td class="field"><input type="text" class="field" id="state" name="state" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="salary">Monthly Salary:</label></td>
-                        <td class="field">
-                            <input type="hidden" id="currency" name="currency" value="<?php echo $currency; ?>" />
-                            <?php echo $currency; ?>$ <input class="salary" type="text" id="salary" name="salary" />&nbsp;-&nbsp;<input class="salary" type="text" id="salary_end" name="salary_end" /><br>
-                            <input type="checkbox" id="salary_negotiable" name="salary_negotiable" /> <label for="salary_negotiable">Negotiable</label><br/>
-                            <p class="small_notes">This account allows you to create job ads with salary in <?php echo $currency; ?> only. If you wish to create job ads with salary in other currencies, please log into the relevant accounts.</p>
+                        <td colspan="2" class="title">
+                            <span id="job.title"></span>
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">Send Alert:</td>
-                        <td class="field">
-                            To: <span id="contact">Loading</span><br/>
-                            Cc: <input type="text" class="carbon_copy" id="contact_carbon_copy" name="contact_carbon_copy" />
-                        </td>
+                        <td class="label">Specialization:</td>
+                        <td><span id="job.specialization"></span></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="description">Description:</label></td>
-                        <!--td class="field"><textarea id="description" name="description"></textarea></td-->
-                        <!--td class="field">
-                            <div id="description" class="description_field">
-                            </div><br/><br/>
-                        </td-->
-                        <td class="field">
-                            <div id="description">
-                                <script>initRTE('', root + '/common/freerte/examples/example.css');</script>
-                            </div><br/><br/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">Accept Resumes of:</td>
-                        <td class="field">
-                            <select class="field" id="acceptable_resume_type">
-                                <option value="A" selected>Any Kind</option>
-                                <option value="O">Online Submission Only</option>
-                                <option value="F">File Upload Only</option>
-                            </select>
-                            <p class="small_notes">Only resumes of online submission will go through our matching system. So, to use our matching system, please choose either <b>Any Kind</b> or <b>Online Submission Only</b>.</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="buttons_left"><input class="button" type="button" id="cancel_job" name="cancel_job" value="Cancel" /></td>
-                        <td class="buttons_right"><input class="button" type="button" id="save_job" name="save_job" value="Save" />&nbsp;<input class="button" type="button" id="publish_job" name="publish_job" value="Publish" /></td>
-                    </tr>    
-                </table>
-            </form>
-        </div>
-        
-        <div id="div_job_info">
-            <table id="job_info" class="job_info">
-                <tr>
-                    <td colspan="2" class="title"><span id="job.title">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Specialization:</td>
-                    <td class="field"><span id="job.industry">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Country:</td>
-                    <td class="field"><span id="job.country">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">State/Province/Area:</td>
-                    <td class="field"><span id="job.state">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Monthly Salary:</td>
-                    <td class="field"><?php echo $currency; ?>$ <span id="job.salary">Loading</span>&nbsp;<span id="job.salary_end">Loading</span>&nbsp;[<span id="job.salary_negotiable">Loading</span>]</td>
-                </tr>
-                <tr>
-                    <td class="label">Send Alert:</td>
-                    <td class="field">
-                        <table style="width: 100%; border: none; margin:auto;">
-                            <tr>
-                                <td style="width: 25px;">To:</td>
-                                <td><span id="job.contact">Loading</span></td>
-                            </tr>
-                            <tr>
-                                <td style="vertical-align: top;">Cc:</td>
-                                <td><span id="job.contact_carbon_copy">Loading</span></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label">Description:</td>
-                    <td class="field"><span id="job.description">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Created On:</td>
-                    <td class="field"><span id="job.created_on">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Expires On:</td>
-                    <td class="field">
-                        <span id="job.expire_on">Loading</span>&nbsp;<span id="job.extend"></span><br/><br/>
-                        <div id="job_extend_note" style="padding: 3px 3px 3px 3px;">NOTE: By clicking the "Extend" or "Re-open" button, you are automatically in agreement with our Terms and Agreement to be billed this job as a new post.</div><br/>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="label">Accept Resumes of:</td>
-                    <td class="field"><span id="job.acceptable_resume_type">Loading</span></td>
-                </tr>
-                <tr>
-                    <td id="job_buttons" colspan="2" style="text-align: center;"></td>
-                </tr>
-            </table>
-        </div>
-        
-        <div id="div_blanket"></div>
-        <div id="div_buy_subscriptions_form">
-            <form onSubmit="return false;">
-                <input type="hidden" id="payment_currency" name="payment_currency" value="<?php echo $payment_currency; ?>" />
-                <table class="buy_subscriptions_form">
-                    <tr>
-                        <td class="label"><label for="subscription">Subscription:</label></td>
+                        <td class="label">Salary Range:</td>
                         <td>
-                            <select id="subscription" name="subscription" onChange="calculate_fee();">
-                                <option value="0" selected>Select a Subscription Period</option>
-                                <option value="0" disabled>&nbsp;</option>
-                        <?php
-                            foreach ($subscriptions as $period => $price) {
-                        ?>
-                                <option id="<?php echo $period; ?>" value="<?php echo $price; ?>"><?php echo $period. ' months ('. $payment_currency. ' $'. $price. ')'; ?></option>
-                        <?php
-                            }
-                        ?>
-                            </select>
+                            <?php echo $currency; ?>&nbsp;$<span id="job.salary_range"></span>
+                            &nbsp;
+                            [ <span id="job.salary_negotiable"></span> ]
                         </td>
                     </tr>
                     <tr>
-                        <td class="label">Admin Fee:</td>
-                        <td>
-                            <?php echo $payment_currency; ?> $<span id="admin_fee">0</span>
-                        </td>
+                        <td class="label">Location:</td>
+                        <td><span id="job.state"></span></td>
                     </tr>
                     <tr>
-                        <td style="font-weight: bold;" class="label">Amount:</td>
-                        <td style="border-top: 1px solid #666666; border-bottom: 1px double #666666; font-weight: bold;">
-                            <?php echo $payment_currency; ?>&nbsp;$<span id="total_amount">0</span>
-                        </td>
+                        <td class="label">Description:</td>
+                        <td><div id="job.description" class="job_description"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Created On:</td>
+                        <td><span id="job.created_on"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Expired On:</td>
+                        <td><span id="job.expired_on"></span></td>
                     </tr>
                 </table>
-                <p class="button"><input type="button" value="Cancel" onClick="close_buy_subscriptions_form();" />&nbsp;<input type="button" value="Buy Now" onClick="buy_subscriptions();" /></p>
-            </form>
+            </div>
         </div>
-        
         <?php
     }
 }

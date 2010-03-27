@@ -389,6 +389,32 @@ class Member implements Model {
         return $this->mysqli->query($query);
     }
     
+    public function hasPhoto() {
+        $query = "SELECT COUNT(*) AS has_photo 
+                  FROM member_photos 
+                  WHERE member = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['has_photo'] > 0) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public function getPhotoFileInfo() {
+        $photo = array();
+        $query = "SELECT id, photo_hash, photo_type 
+                  FROM member_photos WHERE member = '". $this->id. "' LIMIT 1";
+        $result = $this->mysqli->query($query);
+        if (!is_null($result) && !empty($result) && $result !== false) {
+            $photo['id'] = $result[0]['id'];
+            $photo['photo_hash'] = $result[0]['photo_hash'];
+            $photo['photo_type'] = $result[0]['photo_type'];
+        }
+        
+        return $photo;
+    }
+    
     public function savePhoto($_file_data) {
         $type = $_file_data['FILE']['type'];
         $size = $_file_data['FILE']['size'];
@@ -406,19 +432,33 @@ class Member implements Model {
             
             foreach ($GLOBALS['allowable_photo_types'] as $mime_type) {
                 if ($type == $mime_type) {
-                    $query = "INSERT INTO member_photos SET 
-                              member = '". $this->id. "',
-                              photo_hash = 'new', photo_type = 'new'";
-                    if (($id = $this->mysqli->execute($query, true)) > 0) {
-                        $hash = generate_random_string_of(6);
-                        $new_name = $id. ".". $hash;
-                        if (move_uploaded_file($temp, $GLOBALS['photo_dir']. "/". $new_name)) {
+                    if ($this->hasPhoto()) {
+                        $query = "SELECT id, photo_hash FROM member_photos WHERE member = '". $this->id. "' LIMIT 1";
+                        $result = $this->mysqli->query($query);
+                        $file_name = $result[0]['id']. ".". $result[0]['photo_hash'];
+                        if (move_uploaded_file($temp, $GLOBALS['photo_dir']. "/". $file_name)) {
                             $query = "UPDATE member_photos SET 
                                       photo_hash = '". $hash. "',
                                       photo_type = '". $type. "', 
                                       approved = 'N' 
                                       WHERE id = ". $id;
                             return $this->mysqli->execute($query);
+                        }
+                    } else {
+                        $query = "INSERT INTO member_photos SET 
+                                  member = '". $this->id. "',
+                                  photo_hash = 'new', photo_type = 'new'";
+                        if (($id = $this->mysqli->execute($query, true)) > 0) {
+                            $hash = generate_random_string_of(6);
+                            $new_name = $id. ".". $hash;
+                            if (move_uploaded_file($temp, $GLOBALS['photo_dir']. "/". $new_name)) {
+                                $query = "UPDATE member_photos SET 
+                                          photo_hash = '". $hash. "',
+                                          photo_type = '". $type. "', 
+                                          approved = 'N' 
+                                          WHERE id = ". $id;
+                                return $this->mysqli->execute($query);
+                            }
                         }
                     }
                 }

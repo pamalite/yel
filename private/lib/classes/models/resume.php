@@ -246,6 +246,23 @@ class Resume implements Model{
         return $this->id;
     }
     
+    public function getFileInfo() {
+        $resume = array();
+        $query = "SELECT member, file_name, file_hash, file_size, file_type
+                  FROM resumes 
+                  WHERE id = ". $this->id. " LIMIT 1";
+        $result = $this->mysqli->query($query);
+        if (!is_null($result) && !empty($result) && $result !== false) {
+            $resume['member'] = $result[0]['member'];
+            $resume['file_name'] = $result[0]['file_name'];
+            $resume['file_hash'] = $result[0]['file_hash'];
+            $resume['file_size'] = $result[0]['file_size'];
+            $resume['file_type'] = $result[0]['file_type'];
+        }
+        
+        return $resume;
+    }
+    
     public function reset() {
         $this->initializeWith();
     }

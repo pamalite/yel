@@ -194,7 +194,7 @@ function show_resumes_of(_job_id, _job_title) {
                     row.set(3, new Cell(remarks_link, '', 'cell actions_column'));
                     
                     var actions = '';
-                    if (employed_ons[i].childNodes.length < 0) {
+                    if (employed_ons[i].childNodes.length > 0) {
                         actions = 'Employed on ' + employed_ons[i].childNodes[0].nodeValue;
                     } else if (!is_agreed_terms) {
                         actions = 'Resume not viewed yet.';
@@ -319,7 +319,7 @@ function agree_terms(_referral_id, _resume_id, _candidate_idx) {
                 return false;
             }
             
-            show_resume_page();
+            show_resume_page(_resume_id);
             
             var html = $('candidate_' + _candidate_idx).get('html');
             html = html + '<div class="mini_contacts">Tel: ' + candidates[_candidate_idx].phone_num + '<br/>Email: <a href="mailto: ' + candidates[_candidate_idx].email_addr + '">' + candidates[_candidate_idx].email_addr + '</a></div>';
@@ -338,7 +338,7 @@ function download_resume(_referral_id, _resume_id, _candidate_idx, _is_agreed_te
             agree_terms(_referral_id, _resume_id, _candidate_idx);
         }
     } else {
-        show_resume_page();
+        show_resume_page(_resume_id);
     }
 }
 

@@ -232,12 +232,12 @@ if ($_POST['action'] == 'agreed_terms') {
         $message = str_replace('%root%', $GLOBALS['root'], $message);
         $subject = desanitize($employer). " has viewed your resume";
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-        //mail($referee_email, $subject, $message, $headers);
+        mail($referee_email, $subject, $message, $headers);
         
-        $handle = fopen('/tmp/email_to_'. $referee_email. '.txt', 'w');
+        /*$handle = fopen('/tmp/email_to_'. $referee_email. '.txt', 'w');
         fwrite($handle, 'Subject: '. $subject. "\n\n");
         fwrite($handle, $message);
-        fclose($handle);
+        fclose($handle);*/
         
         echo 'ok';
         exit();
@@ -297,13 +297,13 @@ if ($_POST['action'] == 'notify_candidate') {
     $subject = "A message from ". desanitize($employer);
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     $headers .= 'Reply-To: '. $reply_to. "\n";
-    //mail($_POST['candidate_email_addr'], $subject, $message, $headers);
+    mail($_POST['candidate_email_addr'], $subject, $message, $headers);
     
-    $handle = fopen('/tmp/email_to_'. $_POST['candidate_email_addr']. '.txt', 'w');
+    /*$handle = fopen('/tmp/email_to_'. $_POST['candidate_email_addr']. '.txt', 'w');
     fwrite($handle, 'Subject: '. $subject. "\n\n");
     fwrite($handle, 'Headers: '. $headers. "\n\n");
     fwrite($handle, $message);
-    fclose($handle);
+    fclose($handle);*/
     
     exit();
 }
@@ -613,7 +613,7 @@ if ($_POST['action'] == 'confirm_employed') {
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     $subject = desanitize($candidate->getFullName()). " was successfully employed!";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    // mail($member->getId(), $subject, $message, $headers);
+    mail($member->getId(), $subject, $message, $headers);
     
     echo 'ok';
     exit();

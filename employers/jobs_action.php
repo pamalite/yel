@@ -3,70 +3,80 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 
 session_start();
 
-if (!isset($_POST['id']) || !isset($_POST['closed'])) {
+if (!isset($_POST['id'])) {
     echo "ko";
     exit();
-    //redirect_to('login.php');
 }
 
 $xml_dom = new XMLDOM();
-$order_by = 'created_on desc';
-$closed = 'jobs.closed <> \'Y\'';
 
-if (isset($_POST['order_by'])) {
-    $order_by = $_POST['order_by'];
+if (!isset($_POST['action'])) {
+    redirect_to('jobs.php');
 }
 
-if (isset($_POST['closed'])) {
-    if ($_POST['closed'] <> 'N') {
-        $closed = 'jobs.closed = \'Y\'';
+if ($_POST['action'] == 'get_jobs') {
+    $order_by = "created_on DESC";
+    if (isset($_POST['order_by'])) {
+        $order_by = $_POST['order_by'];
     }
+    
+    $job = new Job();
+    
+    $criteria = array(
+        'columns' => "id, title, 
+                      DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on, 
+                      DATE_FORMAT(created_on, '%e %b, %Y') AS formatted_created_on", 
+        'match' => "employer = '". $_POST['id']. "'",
+        'order' => $order_by
+    );
+    
+    $result = $job->find($criteria);
+    if ($result === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    if (is_null($result) || empty($result)) {
+        echo '0';
+        exit();
+    }
+    
+    $response = array('jobs' => array('job' => $result));
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
 }
 
-$criteria = array(
-    'columns' => 'jobs.id, industries.industry AS industry, jobs.title, jobs.closed, 
-                  DATE_FORMAT(jobs.created_on, \'%e %b, %Y\') AS created_on, 
-                  DATE_FORMAT(jobs.expire_on, \'%e %b, %Y\') AS expire_on',
-    'joins' => 'industries ON industries.id = jobs.industry', 
-    'order' => $order_by,
-    'match' => $closed. ' AND jobs.employer = \''. $_POST['id']. '\''
-);
-
-$jobs = Job::find($criteria);
-
-foreach ($jobs as $i=>$job) {
-    $jobs[$i]['is_referred'] = 'N';
-}
-
-// Check whether the job has already employments
-$today = now();
-//$today = '0000-00-00 00:00:00'; // use this to temporarily bypass the date
-$query = "SELECT DISTINCT jobs.id 
-          FROM referrals 
-          LEFT JOIN jobs ON jobs.id = referrals.job 
-          WHERE jobs.employer = '". $_POST['id']. "' AND 
-          (jobs.expire_on >= '". $today. "' OR jobs.closed = 'N') AND 
-          (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
-          referrals.employer_removed_on IS NULL AND 
-          (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00')";
-$mysqli = Database::connect();
-$result = $mysqli->query($query);
-
-if ($result !== false) {
-    foreach ($jobs as $i=>$job) {
-        foreach ($result as $id) {
-            if ($job['id'] == $id['id']) {
-                $jobs[$i]['is_referred'] = 'Y';
-                break;
+if ($_POST['action'] == 'get_job_desc') {
+    $job = new Job();
+    
+    $criteria = array(
+        'columns' => "jobs.title, jobs.state, jobs.salary, jobs.salary_end, jobs.salary_negotiable, 
+                      industries.industry, jobs.description, jobs.contact_carbon_copy, 
+                      DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on, 
+                      DATE_FORMAT(created_on, '%e %b, %Y') AS formatted_created_on", 
+        'joins' => "industries ON industries.id = jobs.industry", 
+        'match' => "jobs.id = ". $_POST['id']
+    );
+    
+    $result = $job->find($criteria);
+    foreach ($result[0] as $key=>$value) {
+        if ($key == 'description') {
+            $result[0][$key] = htmlspecialchars_decode(desanitize($value));
+        }
+        
+        if ($key == 'salary' || $key == 'salary_end') {
+            $result[0][$key] = number_format($value, 2, '.', ',');
+            
+            if (is_null($value) || empty($value) || $value <= 0) {
+                $result[0][$key] = null;
             }
         }
     }
+    
+    $response = array('job' => $result[0]);
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
 }
-
-$response = array(
-    'jobs' => array('job' => $jobs)
-);
-
-header('Content-type: text/xml');
-echo $xml_dom->get_xml_from_array($response);
 ?>

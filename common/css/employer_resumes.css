@@ -49,6 +49,7 @@
     border: 1px dashed #CCCCCC;
     display: none;
     overflow: auto;
+    height: 250px;
 }
 
 .resumes {
@@ -181,4 +182,8 @@
 
 .field {
     width: 100%;
+}
+
+.salary_field {
+    width: 80%;
 }

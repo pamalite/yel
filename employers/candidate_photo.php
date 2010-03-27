@@ -20,11 +20,11 @@ if (!isset($_SESSION['yel']['employer']) ||
 
 
 $member = new Member($_GET['id']);
-$photos = $member->get_photos();
-
-if (count($photos) > 0 && $photos != false) {
+if ($member->hasPhoto()) {
+    $photo = $member->getPhotoFileInfo();
+    
     $extension = '';
-    switch ($photos[0]['photo_type']) {
+    switch ($photo['photo_type']) {
         case 'image/jpeg':
             $extension = 'jpg';
             break;
@@ -40,11 +40,10 @@ if (count($photos) > 0 && $photos != false) {
         default:
             $extension = 'bmp';
     }
-    header('Content-type: '. $photos[0]['photo_type']);
-    header('Content-Disposition: attachment; filename="'. $member->get_name(). '.'. $extension. '"');
+    header('Content-type: '. $photo['photo_type']);
+    header('Content-Disposition: attachment; filename="'. $member->getFullName(). '.'. $extension. '"');
 
-    readfile($GLOBALS['photo_dir']. "/". $photos[0]['id']. ".". $photos[0]['photo_hash']);
-    exit();
+    readfile($GLOBALS['photo_dir']. "/". $photo['id']. ".". $photo['photo_hash']);
 } else {
     echo "No photo was uploaded by this candidate.";
 }

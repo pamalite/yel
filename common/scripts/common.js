@@ -227,8 +227,10 @@ function generate_random_string_of(length) {
 }
 
 function show_window(_id) {
-    // make the invisible layer appear
-    $(_id).setStyle('display', 'block');
+    // make the invisible layer appear for non-IE
+    if (!Browser.Engine.Trident) {
+        $(_id).setStyle('display', 'block');
+    }
     
     // calculate the size
     var window_height = 0;
@@ -260,6 +262,11 @@ function show_window(_id) {
     // re-position layer
     $(_id).setStyle('top', ((window_height - div_height) / 4));
     $(_id).setStyle('left', ((window_width - div_width) / 2));
+    
+    // make the invisible layer appear for IE
+    if (Browser.Engine.Trident) {
+        $(_id).setStyle('display', 'block');
+    }
 }
 
 function close_window(_id) {
