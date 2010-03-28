@@ -38,15 +38,6 @@ table.drop_contact {
     margin: auto;
 }
 
-input.login, input.drop {
-    font-size: 12pt;
-    /*height: 23px;*/
-}
-
-td.id, td.password {
-    text-align: right;
-    width: 15%;
-}
 
 td.title {
     text-align: center;
@@ -82,8 +73,8 @@ td.label {
 }
 
 td.buttons {
-    text-align: center;
-    background-color: #CCCCCC;
+    text-align: right;
+    border-top: 1px solid #CCCCCC;
     padding-top: 3px;
     padding-bottom: 3px;
 }

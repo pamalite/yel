@@ -113,7 +113,10 @@ function show_resumes_of(_job_id, _job_title) {
             }
             
             if (txt == '0') {
-                $('div_resumes').set('html', '<div class="empty_results">No resumess found for the selected job posts at this moment.</div>');
+                alert('No resumess found for the selected job posts at this moment.');
+                $('filter').selectedIndex = 0;
+                return;
+                //$('div_resumes').set('html', '<div class="empty_results">No resumess found for the selected job posts at this moment.</div>');
             } else {
                 var referral_ids = xml.getElementsByTagName('id');
                 var resume_ids = xml.getElementsByTagName('resume');

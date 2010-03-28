@@ -20,7 +20,7 @@ if (!isset($_SESSION['yel']['member']) ||
 
 $home = new MemberProfilePage($_SESSION['yel']['member']);
 $home->header(array('root_dir' => '../', 
-                    'title' => 'Member Profile'));
+                    'title' => 'Profile'));
 $home->insert_member_profile_css();
 $home->insert_member_profile_scripts();
 $home->insert_inline_scripts();

@@ -88,6 +88,7 @@ class EmployerInvoicesPage extends Page {
                 $invoices_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('invoices', 'payable_by');\">Payable By</a>", '', 'header');
                 $invoices_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('invoices', 'type');\">Type</a>", '', 'header');
                 $invoices_table->set(0, 4, "<a class=\"sortable\" onClick=\"sort_by('invoices', 'id');\">Invoice</a>", '', 'header');
+                $invoices_table->set(0, 5, "&nbsp;", '', 'header pdf_download');
                 
                 foreach ($invoices as $i=>$invoice) {
                     if ($invoice['expired'] <= 0) {
@@ -113,6 +114,7 @@ class EmployerInvoicesPage extends Page {
                     }
                     $invoices_table->set($i+1, 3, $type, '', 'cell');
                     $invoices_table->set($i+1, 4, '<a class="no_link" onClick="show_invoice_page('. $invoice['id']. ');">'. pad($invoice['id'], 11, '0'). '</a>', '', 'cell');
+                    $invoices_table->set($i+1, 5, '<a href="invoice_pdf.php?id='. $invoice['id']. '"><img src="../common/images/icons/pdf.gif"/></a>', '', 'cell pdf_download');
                 }
                 
                 echo $invoices_table->get_html();
@@ -121,42 +123,6 @@ class EmployerInvoicesPage extends Page {
         </div>
         
         <div id="div_receipts">
-        <?php
-            if (empty($receipts)) {
-        ?>
-            <div class="empty_results">No receipts issued at this moment.</div>
-        <?php
-            } else {
-                $receipts_table = new HTMLTable('receipts_table', 'payments');
-
-                $receipts_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('receipts', 'issued_on');\">Issued On</a>", '', 'header');
-                $receipts_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('receipts', 'paid_on');\">Paid On</a>", '', 'header');
-                $receipts_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('receipts', 'type');\">Type</a>", '', 'header');
-                $receipts_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('receipts', 'id');\">Receipts</a>", '', 'header');
-
-                foreach ($receipts as $i=>$receipt) {
-                    $receipts_table->set($i+1, 0, $receipt['formatted_issued_on'], '', 'cell');
-                    $receipts_table->set($i+1, 1, $receipt['formatted_paid_on'], '', 'cell');
-
-                    $type = 'Others';
-                    switch ($receipt['type']) {
-                        case 'R':
-                            $type = 'Service Fee';
-                            break;
-                        case 'J':
-                            $type = 'Subscription';
-                            break;
-                        case 'P':
-                            $type = 'Job Posting';
-                            break;
-                    }
-                    $receipts_table->set($i+1, 2, $type, '', 'cell');
-                    $receipts_table->set($i+1, 3, '<a class="no_link" onClick="show_invoice_page('. $invoice['id']. ');">'. pad($receipt['id'], 11, '0'). '</a>', '', 'cell');
-                }
-
-                echo $receipts_table->get_html();
-            }
-        ?>
         </div>
         
         <?php

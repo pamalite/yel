@@ -19,7 +19,7 @@
     border-bottom: 1px solid #AAAAAA;
 }
 
-.cell_indicator {
+.cell_indicator, .pdf_download {
     width: 20px;
     text-align: center;
     vertical-align: middle;

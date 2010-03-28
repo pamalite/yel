@@ -53,6 +53,7 @@ if ($_POST['action'] == 'get_job_desc') {
     $criteria = array(
         'columns' => "jobs.title, jobs.state, jobs.salary, jobs.salary_end, jobs.salary_negotiable, 
                       industries.industry, jobs.description, jobs.contact_carbon_copy, 
+                      jobs.alternate_employer, 
                       DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on, 
                       DATE_FORMAT(created_on, '%e %b, %Y') AS formatted_created_on", 
         'joins' => "industries ON industries.id = jobs.industry", 

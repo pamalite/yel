@@ -1,20 +1,69 @@
-div.banner {
+.profile, .bank, .highlights {
+    border-top: 1px solid #AAAAAA;
+    margin-top: -8px;
+}
+
+.bank, .highlights {
+    display: none;
+}
+
+.profile_form {
+    padding-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: auto;
+}
+
+.profile_photo_area {
+    margin-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    float: left;
+}
+
+.photo {
+    border: 1px solid #CCCCCC;
+    width: 205px;
+    height: 225px;
+    margin: auto;
+    text-align: center;
+    font-size: 9pt;
+    overflow: auto;
+    color: #666666;
+}
+
+.upload_button {
+    padding-top: 5px;
     text-align: center;
 }
 
-#div_banner {
-    overflow: hidden;
-    /*height: 175px;*/
+#div_tabs {
+    text-align: center;
 }
 
-div.profile {
-    padding-top: 20px;
+#div_tabs ul {
+    padding: none;
+    margin: none;
+    list-style-type: none;
+    white-space: nowrap;
 }
 
-table.profile_form {
-    width: 80%;
-    margin: auto;
+#div_tabs li {
+    padding: 5px 5px 5px 5px;
+    display: inline;
+    cursor: pointer;
 }
+
+#li_profile {
+    border: 1px solid #AAAAAA;
+    border-bottom: 1px solid #FFFFFF;
+}
+
+#li_bank, #li_highlights {
+    border: 1px solid #0000FF;
+    border-bottom: none;
+}
+/* --- */
 
 table.profile_form td.label {
     width: 35%;

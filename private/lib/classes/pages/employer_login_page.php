@@ -75,9 +75,8 @@ class EmployerLoginPage extends Page {
                     </tr>
                     <tr>
                         <td class="buttons" colspan="2">
-                            <input type="button" class="drop" onClick="close_contact_drop_form();" value="Cancel" />
-                            &nbsp;
                             <input type="button" class="drop" id="drop" value="Drop My Contact Now" />
+                            <input type="button" class="drop" onClick="close_contact_drop_form();" value="Cancel" />
                         </td>
                     </tr>
                 </table>

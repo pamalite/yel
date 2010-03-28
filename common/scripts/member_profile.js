@@ -251,12 +251,6 @@ function show_confirm_profile() {
 
 function onDomReady() {
     set_root();
-    get_employers_for_mini();
-    get_industries_for_mini();
-    set_mini_keywords();
-    get_referrals_count();
-    get_requests_count();
-    get_jobs_employed_count();
     
     $('save').addEvent('click', save);
     $('save_1').addEvent('click', save);
@@ -270,15 +264,13 @@ function onDomReady() {
         }
     });
     
-    show_confirm_profile();
-    
-    var suggest_url = root + '/common/php/search_suggest.php';
+    /*var suggest_url = root + '/common/php/search_suggest.php';
     new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
         'postVar': 'keywords',
         'minLength' : 1,
         'overflow' : true,
         'delay' : 50
-    });
+    });*/
 }
 
 window.addEvent('domready', onDomReady);

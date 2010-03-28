@@ -24,7 +24,7 @@ if (isset($_GET['job'])) {
 
 $home = new MemberHomePage($_SESSION['yel']['member']);
 $home->header(array('root_dir' => '../', 
-                     'title' => 'Member Home'));
+                     'title' => 'Home'));
 $home->insert_member_home_css();
 $home->insert_member_home_scripts();
 $home->insert_inline_scripts();

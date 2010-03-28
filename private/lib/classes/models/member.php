@@ -282,6 +282,22 @@ class Member implements Model {
         return $this->id;
     }
     
+    public function getPasswordHint() {
+        $question = '';
+        
+        $query = "SELECT password_reset_questions.question 
+                  FROM password_reset_questions 
+                  LEFT JOIN members ON password_reset_questions.id = members.forget_password_question 
+                  WHERE members.email_addr = '". $this->id. "' LIMIT 1";
+        $result = $this->mysqli->query($query);
+        
+        if (is_null($result) || empty($result) || $result === false) {
+            return false;
+        }
+        
+        return $result[0]['question'];
+    }
+    
     public function isRegistered($_sha1) {
         if ($this->seed_id == 0) {
             return false;
@@ -581,6 +597,14 @@ class Member implements Model {
         }
         
         return false;
+    }
+    
+    public function getIndustries() {
+        $query = "SELECT industries.id, industries.industry 
+                  FROM member_industries 
+                  LEFT JOIN industries ON industries.id = member_industries.industry 
+                  WHERE member_industries.member = '". $this->id. "'";
+        return $this->mysqli->query($query);
     }
 }
 ?>

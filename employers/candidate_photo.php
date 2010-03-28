@@ -18,7 +18,6 @@ if (!isset($_SESSION['yel']['employer']) ||
     exit();
 }
 
-
 $member = new Member($_GET['id']);
 if ($member->hasPhoto()) {
     $photo = $member->getPhotoFileInfo();

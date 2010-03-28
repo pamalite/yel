@@ -46,121 +46,71 @@ class MemberLoginPage extends Page {
         echo '</script>';
     }
     
-    private function generate_password_reset_questions() {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM password_reset_questions";
-        $questions = $mysqli->query($query);
-        
-        echo '<select class="field" id="forget_password_question" name="forget_password_question">'. "\n";
-        echo '<option value="0" selected>Please select a password hint.</option>'. "\n";    
-        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
-        foreach ($questions as $question) {
-            if ($question['id'] != $selected) {
-                echo '<option value="'. $question['id']. '">'. $question['question']. '</option>'. "\n";
-            } else {
-                echo '<option value="'. $question['id']. '" selected>'. $question['question']. '</option>'. "\n";
-            }
-        }
-        
-        echo '</select>'. "\n";
-    }
-    
     public function show($_error = "") {
         $this->begin();
-        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Members</span>");
+        $this->top("Member Sign In");
+        
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
-        <table class="content">
-            <tr>
-                <td class="content">
-                    <div class="content">
-                        <table class="description">
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/member_login/01.jpg" /></td>
-                                <td>Create and manage multiple resumes</td>
-                            </tr>
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/member_login/02.jpg" /></td>
-                                <td>Manage your contacts</td>
-                            </tr>
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/member_login/03.jpg" /></td>
-                                <td>Refer jobs to your contacts easily and get referred to better jobs</td>
-                            </tr>
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/member_login/04.jpg" /></td>
-                                <td>Manage and keep track of the referrals you make</td>
-                            </tr>
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/member_login/05.jpg" /></td>
-                                <td>Earn and manage the rewards for every successful job referral that you make</td>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
-                <td class="login_form">
-                    <form method="post" id="login_form" onSubmit="return false">
-                        <div class="login">
-                            <table class="login">
-                                <tr>
-                                    <td class="title">Member Sign In</td>
-                                </tr>
-                                <tr>
-                                    <td><label for="id">E-mail:</label><br/>
-                                    <input type="text" id="id" name="id" value=""></td>
-                                </tr>
-                                <tr>
-                                    <td><label for="password">Password:</label><br/>
-                                    <input type="password" id="password" name="password"></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <input type="submit" class="login" id="login" value="Sign In">
-                                        &nbsp;
-                                        <span class="forgot_password"><a class="no_link" onClick="show_get_password_hint();">Reset Password</a></span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </form>
-                    
-                </td>
-            </tr>
-        </table>
         
-        <div style="text-align: center;">
-            <a href="sign_up.php"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/50_bonus_banner.jpg" /></a>
-        </div>
-        
-        <div id="div_blanket"></div>
-        <div id="div_get_password_hint_form">
-            <form onSubmit="return false;">
-                <table class="get_password_hint_form">
-                    <tr>
-                        <td class="label"><label for="email_addr">Email:</label></td>
-                        <td class="field"><input class="field" type="text" id="email_addr" name="email_addr" /></td>
-                    </tr>
-                </table>
-                <p class="button"><input type="button" value="Cancel" onClick="close_get_password_hint();" />&nbsp;<input type="button" value="Get My Password Hint" onClick="get_password_hint();" /></p>
+        <div class="login_form">
+            <form method="post" onSubmit="return false;">
+                <label for="id">E-mail:</label><br/>
+                <input type="text" id="id" name="id" value="" />
+                <br/><br/>
+                <label for="password">Password:</label><br/>
+                <input type="password" id="password" name="password" />
+                <div class="button_bar left">
+                    <a class="no_link" onClick="show_password_reset_window();">Reset Password</a>
+                </div>
+                <div class="button_bar right">
+                    <a href="sign_up.php">Sign Up</a>&nbsp;
+                    <input type="submit" class="login" id="login" value="Sign In" />
+                </div>
             </form>
         </div>
         
-        <div id="div_reset_password_form">
-            <form onSubmit="return false;">
-                <input type="hidden" id="hint_id" name="hint_id" />
-                <table class="reset_password_form">
-                    <tr>
-                        <td class="question"><label for="hint_answer"><span id="password_hint"></span></label></td>
-                    </tr>
-                    <tr>
-                        <td><textarea class="field" id="hint_answer" name="hint_answer"></textarea></td>
-                    </tr>
-                </table>
-                <p class="button"><input type="button" value="Cancel" onClick="close_reset_password();" />&nbsp;<input type="button" value="Reset My Password" onClick="reset_password();" /></p>
+        <!-- popup goes here -->
+        <div id="div_password_reset_window" class="popup_window">
+            <div class="window_title" id="window_title">Get My Password Hint</div>
+            
+            <form method="post" onSubmit="return false;">
+                <div id="div_password_hint_form">
+                    <table class="password_hint_form">
+                        <tr>
+                            <td class="label"><label for="email_addr">Email:</label></td>
+                            <td class="field"><input class="field" type="text" id="email_addr" name="email_addr" /></td>
+                        </tr>
+                        <tr>
+                            <td class="buttons" colspan="2">
+                                <input type="button" value="Get My Password Hint" onClick="continue_password_reset();" />
+                                <input type="button" onClick="close_password_reset_window(false);" value="Cancel" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div id="div_password_reset_form">
+                    <table class="password_reset_form">
+                        <tr>
+                            <td class="question"><label for="hint_answer"><span id="password_hint"></span></label></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" class="field" id="hint_answer" name="hint_answer" /></td>
+                        </tr>
+                        <tr>
+                            <td class="buttons" colspan="2">
+                                <input type="button" value="Reset My Password" onClick="close_password_reset_window(true);" />
+                                <input type="button" onClick="close_password_reset_window(false);" value="Cancel" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </form>
         </div>
+        
         <?php
     }
 }

@@ -266,33 +266,6 @@ div.mini_search {
     /*border: 1px solid #FFCC00;*/
 }
 
-#mini_industry_drop_down {
-    font-size: 10pt;
-}
-
-#mini_employer_drop_down {
-    font-size: 10pt;
-}
-
-#mini_industry {
-    font-size: 10pt;
-}
-
-#mini_employer {
-    font-size: 10pt;
-}
-
-#mini_keywords {
-    width: 35%;
-    font-size: 10pt;
-    vertical-align: middle;
-}
-
-#mini_search_button {
-    font-size: 10pt;
-    vertical-align: middle;
-}
-
 table.search td.title {
     text-align: center;
     vertical-align: middle;
@@ -324,17 +297,12 @@ option.main_industry {
     vertical-align: middle;
 }
 
-#mini_industry {
-    /*width: 15%;
-    font-size: 12pt;
-    width: 28%;*/
-    font-size: 10pt;
+#mini_industry, #mini_employer {
     vertical-align: middle;
 }
 
 #mini_keywords {
-    width: 25%;
-    font-size: 10pt;
+    width: 465px;
 }
 
 #industry {
@@ -370,11 +338,17 @@ p.small_notes {
     color: #666666;
 }
 
-div.reminder {
+.reminder {
     font-size: 9pt;
     color: #666666;
     font-style: italic;
-    width: 70%;
+    width: 65%;
+    padding-top: 5px;
+}
+
+.reminder .reminder_warn {
+    float: left;
+    padding-right: 5px;
 }
 
 .popup_window {
@@ -385,4 +359,15 @@ div.reminder {
     position: absolute;
     background-color: #FFFFFF;
     overflow: auto;
+}
+
+.top_logo {
+    float: left;
+    text-align: center;
+    width: 150px;
+    padding-top: 5px;
+}
+
+.top_search {
+    height: 85px;
 }

@@ -26,18 +26,21 @@ class MemberProfilePage extends Page {
     
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
-        echo 'var email_addr = "'. $this->member->id(). '";'. "\n";
+        echo 'var email_addr = "'. $this->member->getId(). '";'. "\n";
         echo '</script>'. "\n";
     }
     
-    private function generateCountries($selected) {
-        //$countries = Country::getAllWithDisplay();
-        $countries = Country::getAll();
+    private function generate_countries($_selected) {
+        $criteria = array(
+            'columns' => "country_code, country", 
+            'order' => "country"
+        );
+        $countries = Country::find($criteria);
         
         echo '<select class="field" id="country" name="country">'. "\n";
         
         foreach ($countries as $country) {
-            if ($country['country_code'] != $selected) {
+            if ($country['country_code'] != $_selected) {
                 echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
             } else {
                 echo '<option value="'. $country['country_code']. '" selected>'. $country['country']. '</option>'. "\n";
@@ -65,14 +68,14 @@ class MemberProfilePage extends Page {
         echo '</select>'. "\n";
     }
     
-    private function generate_industries($_id, $selected) {
+    private function generate_industries($_id, $_selected) {
         $mysqli = Database::connect();
         $query = "SELECT * FROM industries";
         $industries = $mysqli->query($query);
         
         echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
         
-        if (empty($selected) || is_null($selected) || $selected == '0') {
+        if (empty($_selected) || is_null($_selected) || $_selected == '0') {
             echo '<option value="0" selected>Please select an industry.</option>'. "\n";    
         }
         
@@ -98,20 +101,49 @@ class MemberProfilePage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_search($this->member->get_name(). "&nbsp;&nbsp;<span style=\"color: #FC8503;\">Profile</span>");
+        $this->top_search("Profile");
         $this->menu('member', 'profile');
         
         $profile = desanitize($this->member->get());
+        
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
+        
+        <div id="div_tabs">
+            <ul>
+                <li id="li_profile">Profile</li>
+                <li id="li_bank">Bank</li>
+                <li id="li_highlights">Highlights</li>
+            </ul>
+        </div>
+        
         <div class="profile">
             <form id="profile" method="post" onSubmit="return false;">
+                <div class="profile_photo_area">
+                    <div class="photo">
+                    <?php
+                    if ($this->member->hasPhoto()) {
+                    ?>
+                        <img class="the_photo" src="candidate_photo.php?id=<?php echo $this->member->getId(); ?>" widt="200" height="220" />
+                    <?php
+                    } else {
+                    ?>
+                        Upload your photo here by clicking the "Upload Button" below.<br/><br/>
+                        The dimension of your photo should be at most 200px wide &amp; 220px high, and filled most parts of this box.<br/><br/>
+                        The size of your photo is normal than 500KB, and can be a JPEG, PNG, BMP or GIF format.<br/><br/>
+                        Tip: If you see scroll bars after you have uploaded your photo, that means your photo is too big.
+                    <?php
+                    }
+                    ?>
+                    </div>
+                    <div class="upload_button">
+                        <input type="button" value="Upload Photo" onClick="show_upload_photo_window();" />
+                    </div>
+                </div>
+                
                 <table class="profile_form">
-                    <tr>
-                        <td  class="buttons_bar" colspan="2"><input type="button" id="save" value="Save &amp; Update Profile" /></td>
-                    </tr>
                     <tr>
                         <td class="label">First Name / Given Names:</td>
                         <td class="field"><?php echo $profile[0]['firstname']; ?></td>
@@ -204,7 +236,7 @@ class MemberProfilePage extends Page {
                     <tr>
                         <td class="label"><label for="country">Country:</label></td>
                         <td class="field">
-                            <?php $this->generateCountries($profile[0]['country']) ?>
+                            <?php $this->generate_countries($profile[0]['country']) ?>
                         </td>
                     </tr>
                     <tr>
@@ -238,27 +270,11 @@ class MemberProfilePage extends Page {
                         </td>
                     </tr>
                     <tr>
-                        <td class="title" colspan="2">Reward Payment Details</td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="phone_num">Bank Accounts:</label></td>
-                        <td class="field">
-                            <a href="banks.php">Click here to create/update your bank accounts.</a><br/>
-                            <span style="font-style: italic; font-size: 9pt;">
-                                With your bank account details, you can directly receive your rewards from us for every successful job referral you make.
-                            </span>
-                        </td>
-                    </tr>
-                    <tr>
                         <td colspan="2">
                             <table class="buttons">
                                 <tr>
-                                    <td class="left"><a class="no_link" onClick="show_unsubscribe_form();">Unsubscribe</a></td>
+                                    <td class="left"><a class="no_link" onClick="show_unsubscribe_form();">Remove My Account</a></td>
                                     <td class="right">
-                                        <span id="confirm_profile_form">
-                                            <input type="checkbox" id="confirm_profile" onClick="checked_profile();" /><label for="confirm_profile">I verified that my profile is correct.</label>
-                                            &nbsp;&nbsp;&nbsp;
-                                        </span>
                                         <input type="button" id="save_1" value="Save &amp; Update Profile" />
                                     </td>
                                 </tr>

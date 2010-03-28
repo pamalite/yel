@@ -827,7 +827,7 @@ function set_mouse_events() {
 
 function onDomReady() {
     set_root();
-    get_employers_for_mini();
+    /*get_employers_for_mini();
     get_industries_for_mini();
     set_mini_keywords();
     get_potential_rewards();
@@ -928,42 +928,6 @@ function onDomReady() {
         show_rewards();
     });
     
-    /*$('sort_acknowledgements_employer').addEvent('click', function() {
-        acknowledgements_order_by = 'employers.employer';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_title').addEvent('click', function() {
-        acknowledgements_order_by = 'jobs.title';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_candidate').addEvent('click', function() {
-        acknowledgements_order_by = 'candidate';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_referred_on').addEvent('click', function() {
-        acknowledgements_order_by = 'referrals.referred_on';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_acknowledged_on').addEvent('click', function() {
-        acknowledgements_order_by = 'referrals.referee_acknowledged_on';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_reward').addEvent('click', function() {
-        acknowledgements_order_by = 'jobs.potential_reward';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });*/
-    
     count_items_and_show_tab();
     get_completeness_status();
     
@@ -973,7 +937,7 @@ function onDomReady() {
         'minLength' : 1,
         'overflow' : true,
         'delay' : 50
-    });
+    });*/
 }
 
 window.addEvent('domready', onDomReady);

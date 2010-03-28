@@ -63,6 +63,10 @@
     margin: auto;
 }
 
+.subscriptions_info td.label {
+    width: 60%;
+}
+
 .buy {
     padding-top: 5px;
     padding-bottom: 5px;
@@ -96,7 +100,8 @@
 .job td.title {
     text-align: center;
     font-weight: bold;
-    background-color: #CCCCCC;
+    background-color: #EEEEEE;
+    border: 1px solid #CCCCCC;
 }
 
 .job td.label {

@@ -47,11 +47,25 @@ function show_job_description(_job_id) {
             var created_on = xml.getElementsByTagName('formatted_created_on');
             var expire_on = xml.getElementsByTagName('formatted_expire_on');
             var contact_ccs = xml.getElementsByTagName('contact_carbon_copy');
+            var alternate_employer = xml.getElementsByTagName('alternate_employer');
             
             $('job.title').set('html', title[0].childNodes[0].nodeValue);
+            
+            var carbon_copy = '<span style="color: #666666; text-style: italic;">None Provided</span>';
+            if (contact_ccs[0].childNodes.length > 0) {
+                carbon_copy = contact_ccs[0].childNodes[0].nodeValue;
+            }
+            $('job.contact_carbon_copy').set('html', carbon_copy);
+            
+            var alt_employer = '<span style="color: #666666; text-style: italic;">Actual Employer Viewable to All</span>';
+            if (alternate_employer[0].childNodes.length > 0) {
+                alt_employer = alternate_employer[0].childNodes[0].nodeValue;
+            }
+            $('job.alternate_employer').set('html', alt_employer);
+            
             $('job.specialization').set('html', industry[0].childNodes[0].nodeValue);
             
-            var state_name = '';
+            var state_name = '<span style="color: #666666; text-style: italic;">None Provided</span>';
             if (state[0].childNodes.length > 0) {
                 state_name = state[0].childNodes[0].nodeValue;
             }
@@ -74,7 +88,7 @@ function show_job_description(_job_id) {
             $('job.expired_on').set('html', expire_on[0].childNodes[0].nodeValue);
             
             set_status('');
-            window.scrollTo(0, 0);
+            window.scrollTo(0, 250);
         },
         onRequest: function(instance) {
             set_status('Loading job...');

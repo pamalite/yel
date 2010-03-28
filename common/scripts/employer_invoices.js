@@ -87,6 +87,7 @@ function show_invoices() {
                 header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('invoices', 'payable_by');\">Payable By</a>", '', 'header'));
                 header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('invoices', 'type');\">Type</a>", '', 'header'));
                 header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('invoices', 'id');\">Invoice</a>", '', 'header'));
+                header.set(5, new Cell("&nbsp;", '', 'header pdf_download'));
                 invoices_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
@@ -102,6 +103,7 @@ function show_invoices() {
                     row.set(2, new Cell(payable_bys[i].childNodes[0].nodeValue, '', 'cell'));
                     row.set(3, new Cell(types[i].childNodes[0].nodeValue, '', 'cell'));
                     row.set(4, new Cell('<a class="no_link" onClick="show_invoice_page(' + ids[i].childNodes[0].nodeValue + ');">' + padded_ids[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
+                    row.set(5, new Cell('<a href="invoice_pdf.php?id=' + ids[i].childNodes[0].nodeValue + '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell'));
                     invoices_table.set((parseInt(i)+1), row);
                 }
                 
@@ -157,7 +159,8 @@ function show_receipts() {
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('receipts', 'issued_on');\">Issued On</a>", '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('receipts', 'paid_on');\">Payable By</a>", '', 'header'));
                 header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('receipts', 'type');\">Type</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('receipts', 'id');\">Invoice</a>", '', 'header'));
+                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('receipts', 'id');\">Receipt</a>", '', 'header'));
+                header.set(4, new Cell("&nbsp;", '', 'header pdf_download'));
                 receipts_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
@@ -167,6 +170,7 @@ function show_receipts() {
                     row.set(1, new Cell(paid_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     row.set(2, new Cell(types[i].childNodes[0].nodeValue, '', 'cell'));
                     row.set(3, new Cell('<a class="no_link" onClick="show_invoice_page(' + ids[i].childNodes[0].nodeValue + ');">' + padded_ids[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
+                    row.set(4, new Cell('<a href="invoice_pdf.php?id=' + ids[i].childNodes[0].nodeValue + '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell'));
                     receipts_table.set((parseInt(i)+1), row);
                 }
                 

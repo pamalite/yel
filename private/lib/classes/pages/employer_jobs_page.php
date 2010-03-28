@@ -100,7 +100,7 @@ class EmployerJobsPage extends Page {
                         <div class="subscriptions_details">
                             <table class="subscriptions_info">
                                 <tr>
-                                    <td>Subscription Expires On: </td>
+                                    <td class="label">Subscription Expires On: </td>
 
                                     <td>
                                         <?php $expired_html = ($subscription_is_expired) ? 'color: #FF0000;' : 'color: #000000;'; ?>
@@ -110,7 +110,7 @@ class EmployerJobsPage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Job Posts Left: </td>
+                                    <td class="label">Job Posts Left: </td>
                                     <td>
                                         <span id="subscriptions_job_postings" style="font-weight: bold;">
                                             <?php echo $job_postings_left; ?>
@@ -118,7 +118,7 @@ class EmployerJobsPage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Free Posts Left: </td>
+                                    <td class="label">Free Posts Left: </td>
                                     <td>
                                         <span id="subscriptions_free_postings" style="font-weight: bold;">
                                             <?php echo $free_postings_left; ?>
@@ -185,6 +185,14 @@ class EmployerJobsPage extends Page {
                         <td colspan="2" class="title">
                             <span id="job.title"></span>
                         </td>
+                    </tr>
+                    <tr>
+                        <td class="label">Alternate Employer:</td>
+                        <td><span id="job.alternate_employer"></span></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Carbon Copy Email:</td>
+                        <td><span id="job.contact_carbon_copy"></span></td>
                     </tr>
                     <tr>
                         <td class="label">Specialization:</td>
