@@ -147,43 +147,4 @@ if ($_POST['action'] == 'upload') {
     ?><script type="text/javascript">top.stop_upload(<?php echo "1"; ?>);</script><?php
     exit();
 }
-
-
-// --- 
-if (!isset($_POST['action'])) {
-    if (!isset($_POST['email_addr']) || !isset($_POST['phone_num']) ||
-        !isset($_POST['zip']) || !isset($_POST['country']) || 
-        !isset($_POST['forget_password_question']) || !isset($_POST['forget_password_answer'])) {
-        echo "ko";
-        exit();
-        //redirect_to('login.php');
-    }
-
-    
-}
-
-if ($_POST['action'] == 'checked_profile') {
-    $member = new Member($_POST['email_addr']);
-
-    $data = array();
-    $data['checked_profile'] = 'Y';
-    
-    if (!$member->update($data)) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'is_checked_profile') {
-    $mysqli = Database::connect();
-    $query = "SELECT COUNT(*) AS is_checked FROM members 
-              WHERE email_addr = '". $_POST['email_addr']. "' AND 
-              checked_profile = 'N'";
-    $result = $mysqli->query($query);
-    echo ($result[0]['is_checked'] == '0') ? 'Y' : 'N';
-    exit();
-}
 ?>

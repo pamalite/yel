@@ -1,17 +1,55 @@
-div.banner {
-    text-align: center;
-}
-
-#div_banner {
-    overflow: hidden;
-    /*height: 175px;*/
-}
-
-table.upload_form, table.cover_note_form, table.experiences_form, 
-table.educations_form, table.skills_form, table.technical_skills_form {
-    width: 65%;
+#resumes_table {
     margin: auto;
+    width: 100%;
     border-collapse: collapse;
+}
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.actions {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+#resumes_table tr:hover {
+    background-color: #FFFF00;
+}
+
+#upload_resume_window {
+    width: 450px;
+    display: none;
+}
+
+#upload_progress {
+    display: none;
+}
+
+.upload_resume_form {
+    width: 99%;
+    height: 165px;
+    margin: auto;
+    overflow: auto;
+}
+
+.upload_field {
+    margin-top: 3px;
+    text-align: center;
+    margin: auto;
+    width: 100%;
 }
 
 table.buttons {
@@ -20,147 +58,6 @@ table.buttons {
     background-color: #CCCCCC;
 }
 
-table.buttons td.left {
-    text-align: left;
-}
-
 table.buttons td.right {
     text-align: right;
-}
-
-input.button {
-    font-size: 10pt;
-}
-
-#div_tabs {
-    text-align: center;
-}
-
-#div_tabs ul {
-    padding: none;
-    margin: none;
-    list-style-type: none;
-    white-space: nowrap;
-}
-
-#div_tabs li {
-    padding: 5px 5px 5px 5px;
-    display: inline;
-    cursor: pointer;
-}
-
-#li_cover_note {
-    border: 1px solid #CCCCCC;
-}
-
-#li_experiences, #li_educations, #li_skills, #li_technical_skills, #li_resumes {
-    border: 1px solid #0000FF;
-}
-
-td.checkbox {
-    width: 10px;
-}
-
-td.id {
-    width: 35px;
-}
-
-td.private {
-   width: 60px;
-   text-align: center;
-}
-
-td.date {
-    width: 150px;
-}
-
-span.sort {
-    color: #0000FF;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-span.sort:hover {
-    color: #FF0000;
-}
-
-option.main_industry {
-    font-weight: bold;
-}
-
-textarea {
-    font-size: 10pt;
-    width: 99%;
-    height: 150px;
-}
-
-input.year {
-    width: 40px;
-    font-size: 10pt;
-}
-
-#div_upload_resume_form, #div_resume_form {
-    display: none;
-}
-
-span.reupload {
-    border: none;
-    font-size: 8pt;
-    background-color: #FFFF99;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-table.upload_form td.label, table.cover_note_form td.label, table.experiences_form td.label,
-table.educations_form td.label, table.skills_form td.label, table.technical_skills_form td.label {
-    width: 25%;
-    text-align: right;
-    padding-right: 20px;
-    vertical-align: top;
-}
-
-table.educations_form td.label {
-    width: 35%;
-}
-
-table.upload_form td.title, table.cover_note_form td.title, table.experiences_form td.title,
-table.educations_form td.title, table.skills_form td.title, table.technical_skills_form td.title {
-    text-align: center;
-    border: 1px solid #CCCCCC;
-    font-weight: bold;
-}
-
-
-table.upload_form input.field, #div_resume_form input.field, #div_resume_form select.field,
-table.educations_form td.field, table.skills_form td.field, table.technical_skills_form td.field {
-    width: 98%;
-    font-size: 10pt;
-}
-
-#upload_progress {
-    display: none;
-}
-
-td.buttons_left, td.buttons_right {
-    background-color: #CCCCCC;
-}
-
-td.buttons_right {
-    text-align: right;
-}
-
-span.upload_note {
-    font-style: italic;
-    font-size: 9pt;
-}
-
-#experience_forms, #education_forms, #technical_skill_forms {
-    padding-bottom: 5px;
-}
-
-#div_resume_title {
-    text-align: center;
-    font-weight: bolder;
-    text-decoration: underline;
-    padding-top: 5px;
 }

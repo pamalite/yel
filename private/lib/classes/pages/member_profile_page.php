@@ -330,11 +330,11 @@ class MemberProfilePage extends Page {
                         </div>
                     </div>
                 </div>
-                <div class="popup_window_buttons_bar">
-                    <input type="button" value="Upload Photo" onClick="close_upload_photo_popup(true);" />
-                    <input type="button" value="Close" onClick="close_upload_photo_popup(false);" />
-                </div>
             </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Upload Photo" onClick="close_upload_photo_popup(true);" />
+                <input type="button" value="Close" onClick="close_upload_photo_popup(false);" />
+            </div>
         </div>
         
         <div id="unsubscribe_window" class="popup_window">

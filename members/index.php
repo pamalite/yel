@@ -31,7 +31,7 @@ if (empty($_SESSION['yel']['member']['id']) ||
 // Check whether the member is logged in
 $member = new Member($_SESSION['yel']['member']['id'], $_SESSION['yel']['member']['sid']);
 
-if (!$member->is_logged_in($_SESSION['yel']['member']['hash'])) {
+if (!$member->isLoggedIn($_SESSION['yel']['member']['hash'])) {
     redirect_to('login.php'. $job);
 }
 

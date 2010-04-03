@@ -169,7 +169,7 @@ class Resume implements Model{
         $query = "SELECT file_name FROM resumes WHERE id = ". $this->id. " LIMIT 1";
         if ($result = $this->mysqli->query($query)) {
             if (!empty($result[0]['file_name']) && !is_null($result[0]['file_name'])) {
-                if (!$this->delete_file()) {
+                if (!$this->deleteFile()) {
                     return false;
                 }
             }

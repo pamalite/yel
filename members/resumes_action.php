@@ -9,23 +9,30 @@ if (!isset($_POST['id'])) {
     //redirect_to('login.php');
 }
 
+$xml_dom = new XMLDOM();
+
 if (!isset($_POST['action'])) {
-    $xml_dom = new XMLDOM();
+    redirect_to('resumes.php');
+}
+
+if ($_POST['action'] == 'get_resumes') {
     $order_by = 'modified_on desc';
 
     if (isset($_POST['order_by'])) {
         $order_by = $_POST['order_by'];
     }
-
+    
+    $resume = new Resume();
+    
     $criteria = array(
-        'columns' => 'id, name, DATE_FORMAT(modified_on, \'%e %b, %Y\') AS modified_date, file_hash',
+        'columns' => 'id, file_name, DATE_FORMAT(modified_on, \'%e %b, %Y\') AS formatted_modified_on',
         'order' => $order_by,
         'match' => 'member = \''. $_POST['id']. '\' AND deleted = \'N\''
     );
-
-    $resumes = Resume::find($criteria);
+    
+    $result = $resume->find($criteria);
     $response = array(
-        'resumes' => array('resume' => $resumes)
+        'resumes' => array('resume' => $result)
     );
 
     header('Content-type: text/xml');
@@ -34,37 +41,51 @@ if (!isset($_POST['action'])) {
     exit();
 }
 
-if ($_POST['action'] == 'get_hide_banner') {
-    $query = "SELECT pref_value FROM member_banners 
-              WHERE member = '". $_POST['id']. "' AND pref_key = 'hide_resumes_banner' LIMIT 1";
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    if (is_null($result)) {
-        echo '0';
+if ($_POST['action'] == 'upload') {
+    $resume = NULL;
+    $is_update = false;
+    $data = array();
+    $data['modified_on'] = now();
+    $data['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_file']['name']));
+    $data['private'] = 'N';
+    
+    if ($_POST['id'] == '0') {
+        $resume = new Resume($_POST['member']);
+        if (!$resume->create($data)) {
+            ?>
+                <script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script>
+            <?php
+            exit();
+        }
     } else {
-        echo $result[0]['pref_value']; 
+        $resume = new Resume($_POST['member'], $_POST['id']);
+        $is_update = true;
+        if (!$resume->update($data)) {
+            ?>
+                <script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script>
+            <?php
+            exit();
+        }
     }
     
+    $data = array();
+    $data['FILE'] = array();
+    $data['FILE']['type'] = $_FILES['my_file']['type'];
+    $data['FILE']['size'] = $_FILES['my_file']['size'];
+    $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_file']['name']));
+    $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
+    
+    if (!$resume->upload_file($data, $is_update)) {
+        $query = "DELETE FROM resume_index WHERE resume = ". $resume->id(). ";
+                  DELETE FROM resumes WHERE id = ". $resume->id();
+        $mysqli = Database::connect();
+        $mysqli->transact($query);
+        ?><script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script><?php
+        exit();
+    }
+    
+    ?><script type="text/javascript">top.stop_upload(<?php echo "1"; ?>);</script><?php
     exit();
 }
 
-if ($_POST['action'] == 'set_hide_banner') {
-    $query = "SELECT id FROM member_banners 
-              WHERE member = '". $_POST['id']. "' AND pref_key = 'hide_resumes_banner' LIMIT 1";
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    if ($result[0]['id'] > 0) {
-        $query = "UPDATE member_banners SET pref_value = '". $_POST['hide']. "' WHERE id = ". $result[0]['id'];
-    } else {
-        $query = "INSERT INTO member_banners SET 
-                  id = 0,
-                  pref_key = 'hide_resumes_banner', 
-                  pref_value = '". $_POST['hide']. "',
-                  member = '". $_POST['id']. "'";
-    }
-    
-    $mysqli->execute($query);
-    
-    exit();
-}
 ?>
