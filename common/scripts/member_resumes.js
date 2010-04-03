@@ -38,7 +38,7 @@ function show_resumes() {
                 var file_names = xml.getElementsByTagName('file_name');
                 var modified_ons = xml.getElementsByTagName('formatted_modified_on');
                 
-                var resumes_table = new FlexTable('resumes_table', 'payments');
+                var resumes_table = new FlexTable('resumes_table', 'resumes');
                 
                 var header = new Row('');
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('resumes', 'modified_on');\">Modified On</a>", '', 'header'));
@@ -51,8 +51,7 @@ function show_resumes() {
                     
                     row.set(0, new Cell(modified_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     row.set(1, new Cell('<a href="resume.php?id=' + ids[i].childNodes[0].nodeValue + '">' + file_names[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
-                    ow.set(2, new Cell('<a class="no_link" onClick="update_resume('+ ids[i].childNodes[0].nodeValue + ');">Update</a>', '', 'cell actions'));
-                    //row.set(2, new Cell('<a class="no_link" onClick="delete_resume(' + ids[i].childNodes[0].nodeValue + ');">Delete</a>&nbsp;|&nbsp;<a class="no_link" onClick="update_resume('+ ids[i].childNodes[0].nodeValue + ');">Update</a>', '', 'cell actions'));
+                    row.set(2, new Cell('<a class="no_link" onClick="update_resume('+ ids[i].childNodes[0].nodeValue + ');">Update</a>', '', 'cell actions'));
                     resumes_table.set((parseInt(i)+1), row);
                 }
                 
@@ -86,7 +85,13 @@ function close_upload_resume_popup(_is_upload) {
 }
 
 function show_upload_resume_popup(_resume_id) {
+    if (Browser.Engine.webkit) {
+        var msg = 'NOTE: To Safari/Chrome (WebKit) on Mac OS X users, the mentioned browsers have a problem uploading any file through this page.\n\nPlease try Firefox to upload your resume.';
+        alert(msg);
+    }
+    
     $('resume_id').value = _resume_id;
+    $('upload_field').setStyle('display', 'block');
     show_window('upload_resume_window');
     window.scrollTo(0, 0);
 }
@@ -103,8 +108,8 @@ function stop_upload(_success) {
     if (_success == 1) {
         close_window('upload_resume_window');
         show_resumes();
-        return true;
     } else {
+        $('upload_field').setStyle('display', 'block');
         alert('An error occured while uploading your resume. Make sure your resume file meets the conditions stated.');
         return false;
     }

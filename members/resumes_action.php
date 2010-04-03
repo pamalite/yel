@@ -43,6 +43,7 @@ if ($_POST['action'] == 'get_resumes') {
 
 if ($_POST['action'] == 'upload') {
     $resume = NULL;
+    $member = new Member($_POST['member']);
     $is_update = false;
     $data = array();
     $data['modified_on'] = now();
@@ -50,7 +51,7 @@ if ($_POST['action'] == 'upload') {
     $data['private'] = 'N';
     
     if ($_POST['id'] == '0') {
-        $resume = new Resume($_POST['member']);
+        $resume = new Resume($member->getId());
         if (!$resume->create($data)) {
             ?>
                 <script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script>
@@ -58,7 +59,7 @@ if ($_POST['action'] == 'upload') {
             exit();
         }
     } else {
-        $resume = new Resume($_POST['member'], $_POST['id']);
+        $resume = new Resume($member->getId(), $_POST['id']);
         $is_update = true;
         if (!$resume->update($data)) {
             ?>
@@ -75,9 +76,9 @@ if ($_POST['action'] == 'upload') {
     $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_file']['name']));
     $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
     
-    if (!$resume->upload_file($data, $is_update)) {
-        $query = "DELETE FROM resume_index WHERE resume = ". $resume->id(). ";
-                  DELETE FROM resumes WHERE id = ". $resume->id();
+    if ($resume->uploadFile($data, $is_update) === false) {
+        $query = "DELETE FROM resume_index WHERE resume = ". $resume->getId(). ";
+                  DELETE FROM resumes WHERE id = ". $resume->getId();
         $mysqli = Database::connect();
         $mysqli->transact($query);
         ?><script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script><?php

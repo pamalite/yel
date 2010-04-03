@@ -317,7 +317,8 @@ class MemberProfilePage extends Page {
                     <input type="hidden" name="action" value="upload" />
                     <div id="upload_progress" style="text-align: center; width: 99%; margin: auto;">
                         Please wait while your photo is being uploaded... <br/><br/>
-                        <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
+                        <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" /><br/><br/>
+                        NOTE: To Safari/Chrome (WebKit) on Mac OS X users, the mentioned browsers have a problem uploading any file through this page. Please try Firefox to upload your resume.
                     </div>
                     <div id="upload_field" class="upload_field">
                         <input id="my_file" name="my_file" type="file" />

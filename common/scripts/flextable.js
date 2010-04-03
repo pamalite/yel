@@ -81,7 +81,16 @@ function FlexTable(_id, _css_class) {
                         column_css = 'class="' + this.rows[i].cells[j].css_class + '"';
                     }
                     
-                    html = html + '<td ' + column_id + ' ' + column_css + ' colspan="' + this.rows[i].cells[j].colspan + '" rowspan="' + this.rows[i].cells[j].rowspan + '">';
+                    var rowspan = '';
+                    if (this.rows[i].cells[j].rowspan > 0) {
+                        rowspan = 'rowspan="' + this.rows[i].cells[j].rowspan;
+                    }
+                    
+                    var colspan = '';
+                    if (this.rows[i].cells[j].colspan > 0) {
+                        colspan = 'colspan="' + this.rows[i].cells[j].colspan;
+                    }
+                    html = html + '<td ' + column_id + ' ' + column_css + ' ' + colspan + ' ' + rowspan + '>';
                     html = html + this.rows[i].cells[j].content;
                     html = html + '</td>' + "\n";
                 }

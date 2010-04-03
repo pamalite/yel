@@ -126,7 +126,7 @@ class MemberResumesPage extends Page {
         </div>
         
         <!-- upload target -->
-        <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:0px;height:0px;border:none;"></iframe>
+        <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:1000px;height:1000px;border:none;"></iframe>
         
         <?php
     }

@@ -60,7 +60,7 @@ class Resume implements Model{
     
     private function getTextFromMsword($_userDoc) {
         $fileHandle = fopen($_userDoc, "r");
-        $line = @fread($fileHandle, filesize($userDoc));   
+        $line = @fread($fileHandle, filesize($userDoc));
         $lines = explode(chr(0x0D),$line);
         $outtext = "";
         foreach($lines as $thisline)
@@ -310,7 +310,7 @@ class Resume implements Model{
             $query = "SELECT file_hash FROM resumes WHERE id = ". $this->id. " LIMIT 1";
             $result = $this->mysqli->query($query);
             $file = $GLOBALS['resume_dir']. '/'. $this->id. '.'. $result[0]['file_hash'];
-            unlink($file);
+            @unlink($file);
         }
         
         $type = $_file_data['FILE']['type'];
@@ -357,10 +357,16 @@ class Resume implements Model{
                                     break;
                                 case 'application/msword':
                                     $tmp = $this->getTextFromMsword($GLOBALS['resume_dir']. "/". $new_name);
+                                    if (empty($tmp)) {
+                                        $tmp = $this->getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
+                                    }
                                     $resume_text = sanitize($tmp);
                                     break;
                                 case 'application/rtf':
                                     $tmp = $this->getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
+                                    if (empty($tmp)) {
+                                        $tmp = $this->getTextFromMsword($GLOBALS['resume_dir']. "/". $new_name);
+                                    }
                                     $resume_text = sanitize($tmp);
                                     break;
                             }

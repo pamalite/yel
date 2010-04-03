@@ -20,7 +20,7 @@ if (!isset($_SESSION['yel']['employer']) ||
     exit();
 }
 
-$resume = new Resume(0, $_GET['id']);
+$resume = new Resume('', $_GET['id']);
 $resume_file = $resume->getFileInfo();
 $member = new Member($resume_file['member']);
 $has_photo = $member->hasPhoto();
