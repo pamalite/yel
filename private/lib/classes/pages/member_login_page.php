@@ -74,7 +74,7 @@ class MemberLoginPage extends Page {
         
         <!-- popup goes here -->
         <div id="div_password_reset_window" class="popup_window">
-            <div class="window_title" id="window_title">Get My Password Hint</div>
+            <div class="window_title" id="window_title" class="popup_window_title">Get My Password Hint</div>
             
             <form method="post" onSubmit="return false;">
                 <div id="div_password_hint_form">

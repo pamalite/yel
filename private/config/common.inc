@@ -29,8 +29,8 @@ $allowable_resume_types = array("text/plain",
 
 // Photo upload settings
 $photo_dir = $data_path. "/photos";
-$max_photo_resolution = array('width' => 640, 'height' => 640);
-$photo_size_limit = "512000"; // ~5KB
+$max_photo_resolution = array('width' => 200, 'height' => 220);
+$photo_size_limit = "153600"; // ~150KB
 $allowable_photo_types = array("image/gif",
                                "image/jpeg",
                                "image/png",

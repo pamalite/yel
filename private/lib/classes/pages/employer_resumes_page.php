@@ -178,15 +178,15 @@ class EmployerResumesPage extends Page {
         
         <!-- popups goes here -->
         <div id="job_description_window" class="popup_window">
-            <div id="window_job_title"></div>
+            <div id="window_job_title" class="popup_window_title"></div>
             <div id="window_description"></div>
-            <div class="buttons_bar"><input type="button" value="Close" onClick="close_job_description_popup();" /></div>
+            <div class="popup_window_buttons_bar"><input type="button" value="Close" onClick="close_job_description_popup();" /></div>
         </div>
         
         <div id="testimony_window" class="popup_window">
-            <div id="window_testimony_candidate"></div>
+            <div id="window_testimony_candidate" class="popup_window_title"></div>
             <div id="window_testimony"></div>
-            <div class="buttons_bar">
+            <div class="popup_window_buttons_bar">
                 <div class="instructions_label">
                     (Tip: Drag and select all to copy by pressing Ctrl + C or Command + C.)
                 </div>
@@ -195,9 +195,9 @@ class EmployerResumesPage extends Page {
         </div>
         
         <div id="remarks_window" class="popup_window">
-            <div id="window_remarks_candidate"></div>
+            <div id="window_remarks_candidate" class="popup_window_title"></div>
             <textarea id="txt_remarks" class="txt_remarks"></textarea>
-            <div class="buttons_bar">
+            <div class="popup_window_buttons_bar">
                 <input type="hidden" id="remarks_referral_id" value="0" />
                 <input type="hidden" id="remarks_candidate_idx" value="-1" />
                 <input type="button" value="Save &amp; Close" onClick="close_remarks_popup(true);" />
@@ -206,7 +206,7 @@ class EmployerResumesPage extends Page {
         </div>
         
         <div id="notify_window" class="popup_window">
-            <div id="window_notify_candidate"></div>
+            <div id="window_notify_candidate" class="popup_window_title"></div>
             <div class="message_options">
                 Choose a message to send, and enter any further communications below.<br/><br/>
                 <input type="radio" name="message" id="good" checked /><label for="good">&quot;You have been shortlisted.&quot;&nbsp;
@@ -223,7 +223,7 @@ class EmployerResumesPage extends Page {
                     </td>
                 </tr>
             </table>
-            <div class="buttons_bar">
+            <div class="popup_window_buttons_bar">
                 <input type="hidden" id="notify_referral_id" value="0" />
                 <input type="hidden" id="notify_candidate_idx" value="-1" />
                 <input type="button" value="Send E-mail &amp; Close" onClick="close_notify_popup(true);" />
@@ -232,7 +232,7 @@ class EmployerResumesPage extends Page {
         </div>
         
         <div id="employment_window" class="popup_window">
-            <div id="window_employment_title"></div>
+            <div id="window_employment_title" class="popup_window_title"></div>
             <div class="employment_form">
                 <table class="employment_form_table">
                     <tr>
@@ -257,7 +257,7 @@ class EmployerResumesPage extends Page {
                     </tr>
                 </table>
             </div>
-            <div class="buttons_bar">
+            <div class="popup_window_buttons_bar">
                 <input type="hidden" id="employment_referral_id" value="0" />
                 <input type="hidden" id="employment_candidate_idx" value="-1" />
                 <input type="button" value="Confirm &amp; Close" onClick="close_employment_popup(true);" />

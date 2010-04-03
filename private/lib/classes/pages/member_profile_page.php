@@ -26,7 +26,7 @@ class MemberProfilePage extends Page {
     
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
-        echo 'var email_addr = "'. $this->member->getId(). '";'. "\n";
+        echo 'var id = "'. $this->member->getId(). '";'. "\n";
         echo '</script>'. "\n";
     }
     
@@ -68,18 +68,14 @@ class MemberProfilePage extends Page {
         echo '</select>'. "\n";
     }
     
-    private function generate_industries($_id, $_selected) {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM industries";
-        $industries = $mysqli->query($query);
+    private function generate_industries($_id) {
+        $expertises = $this->member->getIndustries();
         
-        echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+        $criteria = array('columns' => "id, industry, parent_id");
+        $industries = Industry::find($criteria);
         
-        if (empty($_selected) || is_null($_selected) || $_selected == '0') {
-            echo '<option value="0" selected>Please select an industry.</option>'. "\n";    
-        }
+        echo '<select class="multiselect" id="'. $_id. '" name="'. $_id. '" multiple>'. "\n";
         
-        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
         foreach ($industries as $industry) {
             $css_class = '';
             $spacing = '';
@@ -89,10 +85,18 @@ class MemberProfilePage extends Page {
                 $spacing = '&nbsp;&nbsp;&nbsp;';
             }
             
-            if ($industry['id'] != $selected) {
-                echo '<option value="'. $industry['id']. '" '. $css_class. '>'. $spacing. $industry['industry']. '</option>'. "\n";
-            } else {
+            $selected = false;
+            foreach ($expertises as $expertise) {
+                if ($expertise['id'] == $industry['id']) {
+                    $selected = true;
+                    break;
+                }
+            }
+            
+            if ($selected) {
                 echo '<option value="'. $industry['id']. '" '. $css_class. ' selected>'. $spacing. $industry['industry']. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $industry['id']. '" '. $css_class. '>'. $spacing. $industry['industry']. '</option>'. "\n";
             }
         }
         
@@ -105,6 +109,12 @@ class MemberProfilePage extends Page {
         $this->menu('member', 'profile');
         
         $profile = desanitize($this->member->get());
+        $bank = $this->member->getBankAccount();
+        if (empty($bank) || $bank === false) {
+            $bank[0]['id'] = 0;
+            $bank[0]['bank'] = '';
+            $bank[0]['account'] = '';
+        }
         
         ?>
         <div id="div_status" class="status">
@@ -119,27 +129,26 @@ class MemberProfilePage extends Page {
             </ul>
         </div>
         
-        <div class="profile">
-            <form id="profile" method="post" onSubmit="return false;">
+        <div id="profile" class="profile">
+            <form id="profile_form" method="post" onSubmit="return false;">
                 <div class="profile_photo_area">
                     <div class="photo">
                     <?php
                     if ($this->member->hasPhoto()) {
                     ?>
-                        <img class="the_photo" src="candidate_photo.php?id=<?php echo $this->member->getId(); ?>" widt="200" height="220" />
+                        <img id="photo_image" class="photo_image" src="candidate_photo.php?id=<?php echo $this->member->getId(); ?>" />
                     <?php
                     } else {
                     ?>
-                        Upload your photo here by clicking the "Upload Button" below.<br/><br/>
-                        The dimension of your photo should be at most 200px wide &amp; 220px high, and filled most parts of this box.<br/><br/>
-                        The size of your photo is normal than 500KB, and can be a JPEG, PNG, BMP or GIF format.<br/><br/>
-                        Tip: If you see scroll bars after you have uploaded your photo, that means your photo is too big.
+                        <div style="text-align: center; margin: auto;">
+                            Upload your photo here by clicking the "Upload Photo" button.
+                        </div>
                     <?php
                     }
                     ?>
                     </div>
                     <div class="upload_button">
-                        <input type="button" value="Upload Photo" onClick="show_upload_photo_window();" />
+                        <input type="button" value="Upload Photo" onClick="show_upload_photo_popup();" />
                     </div>
                 </div>
                 
@@ -152,147 +161,199 @@ class MemberProfilePage extends Page {
                         <td class="label">Last Name / Surname:</td>
                         <td class="field"><?php echo $profile[0]['lastname']; ?></td>
                     </tr>
+                        <tr>
+                            <td class="title" colspan="2">Sign In Details</td>
+                        </tr>
+                        <tr>
+                            <td class="label">E-mail Address:</td>
+                            <td class="field">
+                                <input id="email_addr" type="hidden" value="<?php echo $profile[0]['email_addr']; ?>" />
+                                <?php echo $profile[0]['email_addr']; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="password">New Password:</label></td>
+                            <td class="field"><input class="field" type="password" id="password" name="password" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="password_confirm">Confirm New Password:</label></td>
+                            <td class="field"><input class="field" type="password" id="password_confirm" name="password_confirm" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="forget_password_question">Forgot password question:</label></td>
+                            <td class="field">
+                                <?php $this->generate_password_reset_questions($profile[0]['forget_password_question']); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="forget_password_answer">Forgot passsword answer:</label></td>
+                            <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" value="<?php echo $profile[0]['forget_password_answer'] ?>" /></td>
+                        </tr>
+                        <tr>
+                            <td class="title" colspan="2">Contact Details</td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="phone_num">Telephone Number:</label></td>
+                            <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile[0]['phone_num']; ?>" maxlength="20" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="address">Mailing Address:</label></td>
+                            <td class="field"><textarea id="address" name="address"><?php echo $profile[0]['address']; ?></textarea></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="state">State/Province:</label></td>
+                            <td class="field"><input class="field" type="text" id="state" name="state" value="<?php echo $profile[0]['state']; ?>" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="zip">Zip/Postal Code:</label></td>
+                            <td class="field"><input class="field" type="text" id="zip" name="zip" value="<?php echo $profile[0]['zip']; ?>" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="country">Country:</label></td>
+                            <td class="field">
+                                <?php $this->generate_countries($profile[0]['country']) ?>
+                            </td>
+                        </tr>
+                    
+                    <!-- expertise -->
                     <tr>
-                        <td class="title" colspan="2">Expertise</td>
+                        <td class="title" colspan="2">Top 3 Specializations</td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="primary_industry">Primary/Majoring Specialization:</label></td>
-                        <td class="field">
-                            <?php $this->generate_industries('primary_industry', $profile[0]['primary_industry']); ?>
+                        <td class="specializations" colspan="2">
+                            <div class="note">Please choose your top 3 industrial sector. We collect these information is to better understand the needs of our members.</div>
+                            <?php $this->generate_industries('industry'); ?>
                         </td>
                     </tr>
-                    <tr>
-                        <td class="label"><label for="secondary_industry">Secondary/Minoring Specialization:</label></td>
-                        <td class="field">
-                            <?php $this->generate_industries('secondary_industry', $profile[0]['secondary_industry']); ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="tertiary_industry">Tertiary/Minoring Specialization:</label></td>
-                        <td class="field">
-                            <?php 
-                                $this->generate_industries('tertiary_industry', $profile[0]['tertiary_industry']); 
-                                
-                                if (empty($profile[0]['primary_industry']) ||
-                                    is_null($profile[0]['primary_industry']) ||
-                                    empty($profile[0]['secondary_industry']) ||
-                                    is_null($profile[0]['secondary_industry']) || 
-                                    empty($profile[0]['tertiary_industry']) ||
-                                    is_null($profile[0]['tertiary_industry'])) {
-                                    ?>
-                            <p id="note" style="font-style: italic; color: #666666; font-size: 9pt;">Please choose your primary and secondary industrial sector. If you are a fresh graduate, just choose the industry that is closest to your majoring. If you consider yourself to be an expert in only one industry, select the same industry for both. We collect these information is to better understand the needs of our members.</p>
-                                    <?php
-                                } 
-                            ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="title" colspan="2">Sign In Details</td>
-                    </tr>
-                    <tr>
-                        <td class="label">E-mail Address:</td>
-                        <td class="field">
-                            <input id="email_addr" type="hidden" value="<?php echo $profile[0]['email_addr']; ?>" />
-                            <?php echo $profile[0]['email_addr']; ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="password">New Password:</label></td>
-                        <td class="field"><input class="field" type="password" id="password" name="password" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="password_confirm">Confirm New Password:</label></td>
-                        <td class="field"><input class="field" type="password" id="password_confirm" name="password_confirm" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="forget_password_question">Forgot password question:</label></td>
-                        <td class="field">
-                            <?php $this->generate_password_reset_questions($profile[0]['forget_password_question']); ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="forget_password_answer">Forgot passsword answer:</label></td>
-                        <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" value="<?php echo $profile[0]['forget_password_answer'] ?>" /></td>
-                    </tr>
-                    <tr>
-                        <td class="title" colspan="2">Contact Details</td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="phone_num">Telephone Number:</label></td>
-                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile[0]['phone_num']; ?>" maxlength="20" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="address">Mailing Address:</label></td>
-                        <td class="field"><textarea id="address" name="address"><?php echo $profile[0]['address']; ?></textarea></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="state">State/Province:</label></td>
-                        <td class="field"><input class="field" type="text" id="state" name="state" value="<?php echo $profile[0]['state']; ?>" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="zip">Zip/Postal Code:</label></td>
-                        <td class="field"><input class="field" type="text" id="zip" name="zip" value="<?php echo $profile[0]['zip']; ?>" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="country">Country:</label></td>
-                        <td class="field">
-                            <?php $this->generate_countries($profile[0]['country']) ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="title" colspan="2">Weekly Highlights Preferences</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="padding-left: 25%; padding-top: 15px; padding-bottom: 15px;">
-                            <?php
-                                if ($profile[0]['like_newsletter'] == 'Y') {
-                                    ?><input type="checkbox" id="like_newsletter" name="like_newsletter" checked><?php
-                                } else {
-                                    ?><input type="checkbox" id="like_newsletter" name="like_newsletter"><?php
-                                }
-                            ?>
-                            &nbsp;
-                            <label for="like_newsletter">Get Weekly Highlights of Latest Jobs To Refer To Your Contacts:</label>
-                            <br/>
-                            <?php
-                                if ($profile[0]['like_newsletter'] == 'Y') {
-                                    if ($profile[0]['filter_jobs'] == 'Y') {
-                                        ?><input type="checkbox" id="filter_jobs" name="filter_jobs" checked><?php
-                                    } else {
-                                        ?><input type="checkbox" id="filter_jobs" name="filter_jobs"><?php
-                                    }
-                                } else {
-                                    ?><input type="checkbox" id="filter_jobs" name="filter_jobs" disabled><?php
-                                }
-                            ?>
-                            &nbsp;
-                            <label for="filter_jobs">Filter Weekly Highlights to Only my Primary and Secondary Specilizations:</label>
-                        </td>
-                    </tr>
+                    <!-- expertise -->
+                    
                     <tr>
                         <td colspan="2">
-                            <table class="buttons">
-                                <tr>
-                                    <td class="left"><a class="no_link" onClick="show_unsubscribe_form();">Remove My Account</a></td>
-                                    <td class="right">
-                                        <input type="button" id="save_1" value="Save &amp; Update Profile" />
-                                    </td>
-                                </tr>
-                            </table>
+                            <div class="buttons buttons_left">
+                                <a class="no_link" onClick="show_unsubscribe_popup();">Remove My Account</a>
+                            </div>
+                            <div class="buttons buttons_right">
+                                <input type="button" id="save" value="Save &amp; Update Profile" onClick="save_profile();" />
+                            </div>
                         </td>
                     </tr>
                 </table>
             </form>
         </div>
         
-        <div id="div_blanket"></div>
-        <div id="div_unsubscribe_form">
-            <form onSubmit="return false;">
-                <p><label for="reason">Please tell us briefly why do you decide to unsubscribe from Yellow Elevator?</label></p>
-                <p><textarea id="reason" name="reason"></textarea></p>
-                <p class="button"><input type="button" value="Cancel" onClick="close_unsubscribe_form();" />&nbsp;<input type="button" value="Unsubscribe" onClick="unsubscribe();" /></p>
+        <div id="bank" class="bank">
+            <input type="hidden" id="bank_id"value="<?php echo $bank[0]['id']; ?>" />
+            <table class="profile_form">
+                <tr>
+                    <td class="title" colspan="2">Bank Account Information</td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="bank">Bank:</label></td>
+                    <td class="field"><input class="field" type="text" id="bank_name" name="bank_name" value="<?php echo $bank[0]['bank']; ?>" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="account">Account Number:</label></td>
+                    <td class="field"><input class="field" type="text" id="account" name="account" value="<?php echo $bank[0]['account']; ?>" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="buttons buttons_right">
+                            <input type="button" id="save" value="Save &amp; Update Profile" onClick="save_bank();" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div id="highlights" class="highlights">
+            <table class="profile_form">
+                <tr>
+                    <td class="title" colspan="2">Weekly Highlights Preferences</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="padding-left: 15px; padding-top: 15px; padding-bottom: 15px;">
+                        <?php
+                            if ($profile[0]['like_newsletter'] == 'Y') {
+                                ?><input type="checkbox" id="like_newsletter" name="like_newsletter" checked><?php
+                            } else {
+                                ?><input type="checkbox" id="like_newsletter" name="like_newsletter"><?php
+                            }
+                        ?>
+                        &nbsp;
+                        <label for="like_newsletter">Get Weekly Highlights of Latest Jobs To Refer To Your Contacts</label>
+                        <br/>
+                        <?php
+                            if ($profile[0]['like_newsletter'] == 'Y') {
+                                if ($profile[0]['filter_jobs'] == 'Y') {
+                                    ?><input type="checkbox" id="filter_jobs" name="filter_jobs" checked><?php
+                                } else {
+                                    ?><input type="checkbox" id="filter_jobs" name="filter_jobs"><?php
+                                }
+                            } else {
+                                ?><input type="checkbox" id="filter_jobs" name="filter_jobs" disabled><?php
+                            }
+                        ?>
+                        &nbsp;
+                        <label for="filter_jobs">Filter Weekly Highlights to Only my Primary and Secondary Specilizations</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="buttons buttons_right">
+                            <input type="button" id="save" value="Save &amp; Update Profile" onClick="save_highlights();" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- popup windows go here -->
+        <div id="upload_photo_window" class="popup_window">
+            <div class="popup_window_title">Upload Photo</div>
+            <form id="upload_photo_form" action="profile_action.php" method="post" enctype="multipart/form-data" target="upload_target">
+                <div class="upload_photo_form">
+                    <br/>
+                    <input type="hidden" name="id" value="<?php echo $this->member->getId(); ?>" />
+                    <input type="hidden" name="action" value="upload" />
+                    <div id="upload_progress" style="text-align: center; width: 99%; margin: auto;">
+                        Please wait while your photo is being uploaded... <br/><br/>
+                        <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
+                    </div>
+                    <div id="upload_field" class="upload_field">
+                        <input id="my_file" name="my_file" type="file" />
+                        <div style="font-size: 9pt; margin-top: 15px;">
+                            <ol>
+                                <li>Only GIF (*.gif), JPEG (*.jpg, *.jpeg), Portable Network Graphics (*.png), TIFF (*.tiff) or Bitmap (*.bmp) with the file size of less than 150KB are allowed.</li>
+                                <li>Maximum photo resolution is 200 (width) x 220 (height) pixels.</li>
+                                <li>You can update your photo by uploading a new one.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup_window_buttons_bar">
+                    <input type="button" value="Upload Photo" onClick="close_upload_photo_popup(true);" />
+                    <input type="button" value="Close" onClick="close_upload_photo_popup(false);" />
+                </div>
             </form>
         </div>
+        
+        <div id="unsubscribe_window" class="popup_window">
+            <div class="popup_window_title">Remove My Account</div>
+            <div class="unsubscribe_form">
+                <form onSubmit="return false;">
+                    <label for="reason">Please tell us briefly why do you decide to unsubscribe from Yellow Elevator?</label>
+                    <textarea id="reason" name="reason"></textarea>
+                </form>
+            </div>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Unsubscribe" onClick="close_unsubscribe_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_unsubscribe_popup(false);" />
+            </div>
+        </div>
+        
+        <!-- upload target -->
+        <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:0px;height:0px;border:none;"></iframe>
+        
         <?php
     }
 }

@@ -454,10 +454,10 @@ class Member implements Model {
                         $file_name = $result[0]['id']. ".". $result[0]['photo_hash'];
                         if (move_uploaded_file($temp, $GLOBALS['photo_dir']. "/". $file_name)) {
                             $query = "UPDATE member_photos SET 
-                                      photo_hash = '". $hash. "',
+                                      photo_hash = '". $result[0]['photo_hash']. "',
                                       photo_type = '". $type. "', 
                                       approved = 'N' 
-                                      WHERE id = ". $id;
+                                      WHERE id = ". $result[0]['id'];
                             return $this->mysqli->execute($query);
                         }
                     } else {
@@ -605,6 +605,28 @@ class Member implements Model {
                   LEFT JOIN industries ON industries.id = member_industries.industry 
                   WHERE member_industries.member = '". $this->id. "'";
         return $this->mysqli->query($query);
+    }
+    
+    public function saveIndustries($_industries) {
+        if (!$this->hasData($_industries)) {
+            return false;
+        }
+        
+        $query = "DELETE FROM member_industries WHERE member = '". $this->id. "'";
+        if ($this->mysqli->execute($query) === false) {
+            return false;
+        }
+        
+        $query = '';
+        foreach($_industries as $i=>$industry) {
+            $query .= "INSERT INTO member_industries SET 
+                       member = '". $this->id. "', 
+                       industry = ". $industry;
+            if ($i < count($_industries)-1) {
+                $query .= ";";
+            }
+        }
+        return $this->mysqli->transact($query);
     }
 }
 ?>

@@ -3,21 +3,29 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 
 session_start();
 
+if (!isset($_POST['id'])) {
+    echo "ko";
+    exit();
+    //redirect_to('login.php');
+}
+
+$xml_dom = new XMLDOM();
+
 if (!isset($_POST['action'])) {
-    if (!isset($_POST['email_addr']) || !isset($_POST['phone_num']) ||
+    redirect_to('profile.php');
+}
+
+if ($_POST['action'] == 'save_profile') {
+    if (!isset($_POST['id']) || !isset($_POST['phone_num']) ||
         !isset($_POST['zip']) || !isset($_POST['country']) || 
         !isset($_POST['forget_password_question']) || !isset($_POST['forget_password_answer'])) {
-        echo "ko";
+        echo 'ko';
         exit();
-        //redirect_to('login.php');
     }
-
-    $member = new Member($_POST['email_addr'], $_SESSION['yel']['member']['sid']);
+    
+    $member = new Member($_POST['id'], $_SESSION['yel']['member']['sid']);
 
     $data = array();
-    $data['primary_industry'] = $_POST['primary_industry'];
-    $data['secondary_industry'] = $_POST['secondary_industry'];
-    $data['tertiary_industry'] = $_POST['tertiary_industry'];
     $data['forget_password_question'] = $_POST['forget_password_question'];
     $data['forget_password_answer'] = $_POST['forget_password_answer'];
     $data['phone_num'] = $_POST['phone_num'];
@@ -31,14 +39,20 @@ if (!isset($_POST['action'])) {
 
     $data['address'] = $_POST['address'];
     $data['state'] = $_POST['state'];
-    $data['like_newsletter'] = $_POST['like_newsletter'];
-    $data['filter_jobs'] = $_POST['filter_jobs'];
 
     if (!$member->update($data)) {
-        echo "ko";
+        echo 'ko';
         exit();
     }
-
+    
+    if (isset($_POST['industries'])) {
+        $industries = explode(',', $_POST['industries']);
+        if (!$member->saveIndustries($industries)) {
+            echo 'ko';
+            exit();
+        }
+    }
+    
     if (array_key_exists('password', $data)) {
         $lines = file(dirname(__FILE__). '/../private/mail/member_password_reset.txt');
         $message = '';
@@ -53,11 +67,48 @@ if (!isset($_POST['action'])) {
         mail($_POST['email_addr'], $subject, $message, $headers);
     }
 
-    echo "ok";
+    echo 'ok';
+}
+
+if ($_POST['action'] == 'save_bank') {
+    $member = new Member($_POST['id']);
+    
+    if ($member->saveBankAccount($_POST['bank'], $_POST['account'], $_POST['bank_id']) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'save_highlights') {
+    $member = new Member($_POST['id']);
+    
+    $data = array();
+    $data['like_newsletter'] = 'N';
+    $data['filter_jobs'] = 'N';
+    if ($_POST['like_newsletter'] == 'Y') {
+        $data['like_newsletter'] = 'Y';
+        
+        if (isset($_POST['filter_jobs'])) {
+            $data['filter_jobs'] = $_POST['filter_jobs'];
+        } else {
+            $data['filter_jobs'] = 'N';
+        }
+    } 
+    
+    if (!$member->update($data)) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
 }
 
 if ($_POST['action'] == 'unsubscribe') {
-    $member = new Member($_POST['email_addr']);
+    $member = new Member($_POST['id']);
 
     $data = array();
     $data['active'] = 'N';
@@ -68,7 +119,7 @@ if ($_POST['action'] == 'unsubscribe') {
     }
     
     $query = "INSERT INTO member_unsubscribes SET 
-              member = '". $_POST['email_addr']. "', 
+              member = '". $_POST['id']. "', 
               unsubscribed_on = '". now(). "', 
               reason = '". $_POST['reason']. "'";
     $mysqli = Database::connect();
@@ -76,6 +127,39 @@ if ($_POST['action'] == 'unsubscribe') {
     
     echo 'ok';
     exit();
+}
+
+if ($_POST['action'] == 'upload') {
+    $member = new Member($_POST['id']);
+    
+    $data = array();
+    $data['FILE'] = array();
+    $data['FILE']['type'] = $_FILES['my_file']['type'];
+    $data['FILE']['size'] = $_FILES['my_file']['size'];
+    $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_file']['name']));
+    $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
+    
+    if ($member->savePhoto($data) === false) {
+        ?><script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script><?php
+        exit();
+    }
+    
+    ?><script type="text/javascript">top.stop_upload(<?php echo "1"; ?>);</script><?php
+    exit();
+}
+
+
+// --- 
+if (!isset($_POST['action'])) {
+    if (!isset($_POST['email_addr']) || !isset($_POST['phone_num']) ||
+        !isset($_POST['zip']) || !isset($_POST['country']) || 
+        !isset($_POST['forget_password_question']) || !isset($_POST['forget_password_answer'])) {
+        echo "ko";
+        exit();
+        //redirect_to('login.php');
+    }
+
+    
 }
 
 if ($_POST['action'] == 'checked_profile') {
