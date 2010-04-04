@@ -19,12 +19,14 @@ if (!isset($_SESSION['yel']['employer']) ||
     exit();
 }
 
-$mysqli = Database::connect();
-$query = "SELECT referrals.member, referrals.testimony, jobs.title 
-          FROM referrals 
-          LEFT JOIN jobs ON jobs.id = referrals.job 
-          WHERE referrals.id = ". $_GET['id']. " LIMIT 1";
-$result = $mysqli->query($query);
+$referral = new Referral();
+$criteria = array(
+    'columns' => "referrals.member, referrals.testimony, jobs.title", 
+    'joins' => "jobs ON jobs.id = referrals.job", 
+    'match' => "referrals.id = ". $_GET['id'],
+    'limit' => 1
+);
+$result = $referral->find($criteria);
 
 if (is_null($result[0]['testimony']) || empty($result[0]['testimony'])) {
     ?><div style="text-align: center;">No testimony found.</div><?php
@@ -90,14 +92,14 @@ class TestimonyPdf extends FPDF {
 $pdf = new TestimonyPdf();
 $pdf->AliasNbPages();
 $pdf->SetAuthor('YellowElevator.com Testimony Generator. Terms of Use subjected.');
-$pdf->SetTitle(htmlspecialchars_decode($member->get_name()). '\'s Testimony');
+$pdf->SetTitle(htmlspecialchars_decode($member->getFullName()). '\'s Testimony');
 $pdf->SetFontSize(10);
 $pdf->AddPage('P'); 
 $pdf->SetDisplayMode('real','default');
 
-$pdf->make_title(htmlspecialchars_decode($member->get_name()). '\'s Testimony for '. $job. ' position');
+$pdf->make_title(htmlspecialchars_decode($member->getFullName()). '\'s Testimony for '. $job. ' position');
 $pdf->show_testimony($testimonies);
 
 $pdf->Close();
-$pdf->Output($member->id(). '_'. $job. '_testimony.pdf', 'D');
+$pdf->Output($member->getId(). '_'. $job. '_testimony.pdf', 'D');
 ?>

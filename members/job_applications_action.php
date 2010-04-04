@@ -28,11 +28,11 @@ if ($_POST['action'] == 'get_applications') {
     $criteria = array(
         'columns' => "referrals.id, referrals.job AS job_id, jobs.alternate_employer, 
                       employers.name AS employer, jobs.title AS job, 
-                      referrals.referee_confirmed_hired_on, 
                       resumes.file_name AS `resume`, referrals.`resume` AS resume_id, 
                       referrals.employer_agreed_terms_on, referrals.employed_on, 
                       DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
-                      DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on", 
+                      DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
+                      DATE_FORMAT(referrals.referee_confirmed_hired_on, '%e %b, %Y') AS formatted_confirmed_on", 
         'joins' => "resumes ON resumes.id = referrals.`resume`, 
                     jobs ON jobs.id = referrals.job, 
                     employers ON employers.id = jobs.employer", 

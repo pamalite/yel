@@ -38,11 +38,11 @@ class MemberJobApplicationsPage extends Page {
         $criteria = array(
             'columns' => "referrals.id, referrals.job AS job_id, jobs.alternate_employer, 
                           employers.name AS employer, jobs.title AS job, 
-                          referrals.referee_confirmed_hired_on, 
                           resumes.file_name AS `resume`, referrals.`resume` AS resume_id, 
                           referrals.employer_agreed_terms_on, referrals.employed_on, 
                           DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
-                          DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on", 
+                          DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on,
+                          DATE_FORMAT(referrals.referee_confirmed_hired_on, '%e %b, %Y') AS formatted_confirmed_on", 
             'joins' => "resumes ON resumes.id = referrals.`resume`, 
                         jobs ON jobs.id = referrals.job, 
                         employers ON employers.id = jobs.employer", 
@@ -108,9 +108,9 @@ class MemberJobApplicationsPage extends Page {
                     $applications_table->set($i+1, 4, $status, '', 'cell');
                     
                     $button = '<input type="button" value="Confirm" onClick="confirm_employment('. $application['id']. ', \''. addslashes($application['employer']). '\', \''. addslashes($application['job']). '\')" />';
-                    if (!is_null($application['referee_confirmed_hired_on']) && 
-                        $application['referee_confirmed_hired_on'] != '0000-00-00 00:00:00') {
-                        $button = '<span style="color: #666666;">Employed on '. $application['formatted_employed_on'].'</span>';
+                    if (!is_null($application['formatted_confirmed_on']) && 
+                        !empty($application['formatted_confirmed_on'])) {
+                        $button = '<span style="color: #666666; font-size: 9pt;">Employed on '. $application['formatted_employed_on']. '<br/>Confirmed on '. $application['formatted_confirmed_on']. ' </span>';
                     }
                     $applications_table->set($i+1, 5, $button, '', 'cell actions');
                 }

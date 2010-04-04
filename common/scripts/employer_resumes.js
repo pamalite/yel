@@ -186,7 +186,7 @@ function show_resumes_of(_job_id, _job_title) {
                     var resume_link = '<a class="no_link" onClick="download_resume(' + referral_ids[i].childNodes[0].nodeValue + ', ' + resume_ids[i].childNodes[0].nodeValue + ', ' + i + ', ' + agreed_terms + ');">Download</a>';
                     
                     if (has_testimony) {
-                        resume_link = resume_link + '<br/><a class="no_link testimony_link" onClick="show_testimony_popup(' + i + ');">(View Testimony)</a>';
+                        resume_link = resume_link + '<br/><a class="no_link testimony_link" onClick="show_testimony_popup(' + i + ', ' + referral_ids[i].childNodes[0].nodeValue + ');">(View Testimony)</a>';
                     }
                     row.set(2, new Cell(resume_link, '', 'cell actions_column'));
                     
@@ -375,11 +375,16 @@ function close_testimony_popup() {
     close_window('testimony_window');
 }
 
-function show_testimony_popup(_candidate_idx) {
-    $('window_testimony_candidate').set('html', 'Testimony for' + candidates[_candidate_idx].name);
+function show_testimony_popup(_candidate_idx, _referral_id) {
+    $('window_testimony_candidate').set('html', 'Testimony for ' + candidates[_candidate_idx].name);
+    $('referral_id').value = _referral_id;
     $('window_testimony').set('html', candidates[_candidate_idx].testimony);
     
     show_window('testimony_window');
+}
+
+function download_testimony_pdf() {
+    location.replace('testimony_pdf.php?id=' + $('referral_id').value);
 }
 
 function close_remarks_popup(_needs_saving) {

@@ -1,223 +1,120 @@
-a.guides {
-    color: #1D3E6E;
-    font-size: 11pt;
-}
-
-div.banner, div.rewards, div.job_count {
-    text-align: center;
-}
-
-#div_banner {
-    overflow: hidden;
-    /*height: 175px;*/
-}
-
-#div_approvals, #div_rewards, #div_jobs, 
-#div_acknowledgements {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-#div_approvals, #div_rewards, 
-#div_acknowledgements {
-    display: none;
-}
-
-#div_tabs {
-    text-align: center;
-}
-
-#div_tabs ul {
-    padding: none;
-    margin: none;
-    list-style-type: none;
-    white-space: nowrap;
-}
-
-#div_tabs li {
-    padding: 5px 5px 5px 5px;
-    display: inline;
-    cursor: pointer;
-}
-
-#li_jobs {
-    border: 1px solid #CCCCCC;
-}
-
-#li_rewards, #li_approvals, 
-#li_acknowledgements {
-    border: 1px solid #0000FF;
-}
-
-#div_completeness {
-    width: 440px;
+.content {
     margin: auto;
-    text-align: center;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.content td {
+    vertical-align: top;
+}
+
+.left_content {
+    width: 75%;
+    border-right: 1px solid #CCCCCC;
+}
+
+.right_content {
+    padding-left: 5px;
+}
+
+.quick_search {
+    border: 1px solid #8BB1EB;
+}
+
+.quick_search_title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-color: #8BB1EB;
+    padding-left: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+.quick_search_list {
+    list-style-type: square;
+}
+
+.quick_search_list_inner {
+    list-style-type: disc;
+}
+
+#div_hrm_census {
+    width: 99%;
+    /*display: none;*/
+    border: 1px solid #F89D00;
+}
+
+.census_title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #fff;
+    padding: 3px 3px 3px 3px;
+    background-color: #F89D00;
+}
+
+.buttons {
+    width: 98%;
+    margin: auto;
     padding-top: 5px;
     padding-bottom: 5px;
-    background-color: #F8E9CF;
+    text-align: right;
+    border-top: 1px solid #CCCCCC;
+}
+.census_form {
+    width: 98%;
+    margin: auto;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.year {
+    width: 30px;
+}
+
+.profile_completeness {
+    width: 99%;
+    text-align: center;
+    margin-top: 15px;
+    border: 1px solid #CCCCCC;
+    padding-bottom: 4px;
+}
+
+.completeness_title {
+    float: left;
+    font-size: 12pt;
+    font-weight: bold;
+    color: #464545;
+    padding: 5px 3px 5px 3px;
+    background-color: #CCCCCC;
+}
+
+.progress {
+    border: 1px solid #0000FF;
+    background-color: #FFFFFF;
+    padding: 1px 1px 1px 1px;
+    width: 260px;
+    height: 16px;
+    margin-top: 5px;
+    margin-left: 210px;
 }
 
 #progress_bar {
     border: 1px solid #0000FF;
     background-color: #0000FF;
-    height: 5px;
+    height: 14px;
 }
 
-#progress {
-    border: 1px solid #0000FF;
-    background-color: #FFFFFF;
-    padding: 1px 1px 1px 1px;
-    width: 260px;
-    height: 7px;
-    margin: auto;
+#percent {
+    float: left;
+    margin-left: 280px;
+    margin-top: -19px;
+    font-weight: bold;
 }
 
-div.progress_details {
-    padding-top: 3px;
-    width: 100%;
-    margin: auto;
+.progress_details {
     text-align: center;
     font-size: 9pt;
+    float: left;
+    margin-left: 350px;
+    margin-top: -19px;
 }
-
-td.id {
-    width: 35px;
-}
-
-td.industry, td.employer {
-    width: 150px;
-}
-
-td.title, td.referrer {
-    width: 200px;
-}
-
-td.date {
-    width: 150px;
-}
-
-td.buttons {
-    text-align: center;
-    background-color: #CCCCCC;
-}
-
-td.acknowledge, td.approve {
-    width: 150px;
-    text-align: center;
-}
-
-td.reward_title, td.potential_title {
-    width: 100px;
-}
-
-td.reward {
-    width: 100px;
-    text-align: right;
-}
-
-input.button {
-    font-size: 10pt;
-}
-
-span.sort {
-    color: #0000FF;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-span.sort:hover {
-    color: #FF0000;
-}
-
-table.guides {
-    width: 65%;
-    margin: auto;
-}
-
-table.guides td.spacer {
-    width: 1px;
-    border-left: 1px solid #CCCCCC;
-}
-
-table.job_info {
-    width: 100%;
-    margin: auto;
-}
-
-table.job_info td.label {
-    width: 25%;
-    text-align: right;
-    padding-right: 20px;
-    vertical-align: top;
-    font-weight: bold;
-}
-
-table.job_info td.title {
-    text-align: center;
-    border: 1px solid #CCCCCC;
-    font-weight: bold;
-}
-
-table.job_info td.title_reward {
-    text-align: center;
-    font-weight: bold;
-    font-style: italic;
-}
-
-table.job_info div.job_description {
-    width: 100%;
-    height: 340px;
-    overflow: auto;
-}
-
-#div_blanket {
-    display: none;
-    background-color: #000000;
-    opacity: 0.5;
-    filter : alpha(opacity=50); /* for IE */
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#div_job_info {
-    background-color: #FFFFFF;
-    display: none;
-    position: fixed;
-    border: 3px solid #0000FF;
-    text-align: center;
-    width: 800px;
-    height: 600px;
-}
-
-#div_acknowledge_form {
-    margin: 10px 10px 10px 10px;
-    display: none;
-    background-color: #FFFFFF;
-    border: 3px solid #0000FF;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 640px;
-    height: 120px;
-    overflow: auto;
-}
-
-#div_acknowledge_form p {
-    text-align: center;
-}
-
-#div_acknowledge_form p.button {
-    background-color: #CCCCCC;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-
-#div_acknowledge_form select.field {
-    font-size: 12pt;
-}
-
-    

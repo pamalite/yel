@@ -184,12 +184,14 @@ class EmployerResumesPage extends Page {
         </div>
         
         <div id="testimony_window" class="popup_window">
+            <input type="hidden" id="referral_id" value="0" />
             <div id="window_testimony_candidate" class="popup_window_title"></div>
             <div id="window_testimony"></div>
             <div class="popup_window_buttons_bar">
                 <div class="instructions_label">
                     (Tip: Drag and select all to copy by pressing Ctrl + C or Command + C.)
                 </div>
+                <input type="button" value="Download PDF" onClick="download_testimony_pdf();" />
                 <input type="button" value="Close" onClick="close_testimony_popup();" />
             </div>
         </div>

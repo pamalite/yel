@@ -73,7 +73,7 @@ function show_applications() {
                 var referred_ons = xml.getElementsByTagName('formatted_referred_on');
                 var employed_ons = xml.getElementsByTagName('formatted_employed_on');
                 var statuses = xml.getElementsByTagName('status');
-                var confirmed_hired_ons = xml.getElementsByTagName('referee_confirmed_hired_on');
+                var confirmed_hired_ons = xml.getElementsByTagName('formatted_confirmed_on');
                 
                 var applications_table = new FlexTable('applications_table', 'applications');
                 
@@ -98,7 +98,7 @@ function show_applications() {
                     
                     var button = '<input type="button" value="Confirm" onClick="confirm_employment(' + ids[i].childNodes[0].nodeValue + ', \'' + add_slashes(employers[i].childNodes[0].nodeValue) + '\', \'' + add_slashes(jobs[i].childNodes[0].nodeValue) + '\')" />';
                     if (confirmed_hired_ons[i].childNodes.length > 0) {
-                        button = '<span style="color: #666666;">Employed on ' + employed_ons[i].childNodes[0].nodeValue + '</span>';
+                        button = '<span style="color: #666666; font-size: 9pt;">Employed on ' + employed_ons[i].childNodes[0].nodeValue + '<br/>Confirmed on ' + confirmed_hired_ons[i].childNodes[0].nodeValue + '</span>';
                     }
                     row.set(5, new Cell(button, '', 'cell actions'));
                     

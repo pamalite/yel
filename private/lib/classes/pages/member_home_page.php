@@ -30,28 +30,141 @@ class MemberHomePage extends Page {
         echo '</script>'. "\n";
     }
     
+    private function get_completeness() {
+        $mysqli = Database::connect();
+        $query = "SELECT members.checked_profile, bank.has_bank, cv.has_resume, photo.has_photo 
+                  FROM members, 
+                  (SELECT COUNT(*) AS has_bank FROM member_banks WHERE member = '". $_POST['id']. "') bank, 
+                  (SELECT COUNT(*) AS has_resume FROM resumes WHERE member = '". $_POST['id']. "' AND deleted = 'N') cv, 
+                  (SELECT COUNT(*) AS has_photo FROM member_photos WHERE member = '". $_POST['id']. "') photo 
+                  WHERE members.email_addr = '". $this->member->getId(). "'";
+        $result = $mysqli->query($query);
+        
+        $response = array();
+        $response['checked_profile'] = ($result[0]['checked_profile'] == 'Y') ? '1' : '0';
+        $response['has_bank'] = ($result[0]['has_bank'] > 0) ? '1' : '0';
+        $response['has_resume'] = ($result[0]['has_resume'] > 0) ? '1' : '0';
+        $response['has_photo'] = ($result[0]['has_photo'] > 0) ? '1' : '0';
+        
+        return $response;
+    }
+    
     public function show() {
         $this->begin();
         $this->top_search('Home');
         $this->menu('member', 'home');
+        
+        $currency = Currency::getSymbolFromCountryCode($this->member->getCountry());
+        $completeness_raw = $this->get_completeness();
+        $completeness_percent = 0;
+        $next_step = '';
+        $total = 0;
+        foreach ($completeness_raw as $key=>$value) {
+            $total += $value;
+            $completeness_percent = ($total / count($completeness_raw)) * 100;
+            
+            if ($value == 0 && empty($next_step)) {
+                switch ($key) {
+                    case 'checked_profile':
+                        $next_step = '<a href="profile.php">Check Your Profile</a>';
+                        break;
+                    case 'has_bank':
+                        $next_step = '<a href="profile.php">Enter a bank account in Profile</a>';
+                        break;
+                    case 'has_resume':
+                        $next_step = '<a href="resumes.php">Upload a Resume</a>';
+                        break;
+                    case 'has_photo':
+                        $next_step = '<a href="profile.php">Upload a photo in Profile</a>';
+                        break;
+                }
+            }
+        }
         
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
         
-        <div id="div_completeness">
-            <div style="padding-bottom: 3px; font-size: 9pt; text-align: center; width: 100%;">
-                Your account details are <span id="progress_percent" style="font-weight: bold;"></span> complete.
-            </div>
-            <div id="progress">
-                <div id="progress_bar"></div>
-            </div>
-            <div class="progress_details">
-                <span id="details"></span>
-            </div>
-        </div><br/>
-        
+        <table class="content">
+            <tr>
+                <td class="left_content">        
+                    <div id="div_hrm_census" class="hrm_census_form">
+                        <div class="census_title">One-time Survey</div>
+                        <div class="census_form">
+                            Please help us answer the following <span style="text-decoration: underline; font-weight: bold;">one-time</span> questions as part of our on-going effort to serve you better.<br/>
+                            <ol>
+                                <li>
+                                    Gender: 
+                                    <select id="gender">
+                                        <option value="">Please select one</option>
+                                        <option value="" disabled>&nbsp;</option>
+                                        <option value="m">Male</option>
+                                        <option value="f">Female</option>
+                                    </select>
+                                </li>
+                                <li>
+                                    Ethnicity:
+                                    <select id="ethnicity">
+                                        <option value="">Please select one</option>
+                                        <option value="" disabled>&nbsp;</option>
+                                        <option value="malay">Malay</option>
+                                        <option value="chinese">Chinese</option>
+                                        <option value="indian">Indian</option>
+                                        <option value="caucasian">Caucasian</option>
+                                        <option value="others">Others (please specify)</option>
+                                    </select>
+                                    <input type="text" id="ethnicity_txt" value="" />
+                                </li>
+                                <li>
+                                    Birth Date:
+                                    <?php echo generate_dropdown('birthdate_day', '', 1, 31, '', 2, 'Day'); ?>
+                                    <?php echo generate_month_dropdown('birthdate_month', '', 'Month'); ?>
+                                    <input type="text" class="year" id="birthdate_year" value="year" maxlength="4" />
+                                </li>
+                            </ol>
+                        </div>
+                        <div class="buttons">
+                            <input type="button" value="Save &amp; Close Forever" onClick="save_census_answers();" />
+                        </div>
+                    </div>
+
+                    <div class="profile_completeness">
+                        <div class="completeness_title">Profile Completeness:</div>
+                        <div class="progress">
+                            <div id="progress_bar" style="width: <?php echo $completeness_percent; ?>%;"></div>
+                        </div>
+                        <div id="percent"><?php echo $completeness_percent; ?>%</div>
+                        <div class="progress_details">
+                            Tip: <span id="details"><?php echo $next_step; ?></span>
+                        </div>
+                    </div>
+                </td>
+                <td class="right_content">
+                    <div class="quick_search">
+                        <div class="quick_search_title">Quick Search</div>
+                        <ul class="quick_search_list">
+                            <li><a class="no_link" onClick="quick_search_jobs('latest');">Latest jobs</a></li>
+                            <li><a class="no_link" onClick="quick_search_jobs('top');">Top jobs</a></li>
+                            <li>
+                                <a class="no_link" onClick="quick_search_jobs('country', '<?php echo $this->member->getCountry(); ?>');">Jobs in <?php echo Country::getCountryFrom($this->member->getCountry()); ?></a>
+                            </li>
+                            <li>
+                                Jobs in salary range:
+                                <ul class="quick_search_list_inner">
+                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 8001, 0);">above <?php echo $currency; ?>$ 8,000</a></li>
+                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 7001, 8000);"><?php echo $currency; ?>$ 7,000 - 8,000</a></li>
+                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 6001, 7000);"><?php echo $currency; ?>$ 6,000 - 7,000</a></li>
+                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 5001, 6000);"><?php echo $currency; ?>$ 5,000 - 6,000</a></li>
+                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 4001, 5000);"><?php echo $currency; ?>$ 4,000 - 5,000</a></li>
+                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 3000, 4000);"><?php echo $currency; ?>$ 3,000 - 4,000</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        </table>
         
         <?php
     }
