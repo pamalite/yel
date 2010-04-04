@@ -42,6 +42,7 @@
     width: 99%;
     /*display: none;*/
     border: 1px solid #F89D00;
+    margin-bottom: 15px;
 }
 
 .census_title {
@@ -60,6 +61,7 @@
     text-align: right;
     border-top: 1px solid #CCCCCC;
 }
+
 .census_form {
     width: 98%;
     margin: auto;
@@ -74,9 +76,9 @@
 .profile_completeness {
     width: 99%;
     text-align: center;
-    margin-top: 15px;
     border: 1px solid #CCCCCC;
     padding-bottom: 4px;
+    margin-bottom: 15px;
 }
 
 .completeness_title {
