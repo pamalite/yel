@@ -1,0 +1,31 @@
+#applications_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.actions {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+#applications_table tr:hover {
+    background-color: #FFFF00;
+}

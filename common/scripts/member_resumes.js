@@ -85,10 +85,10 @@ function close_upload_resume_popup(_is_upload) {
 }
 
 function show_upload_resume_popup(_resume_id) {
-    if (Browser.Engine.webkit) {
+    /*if (Browser.Engine.webkit) {
         var msg = 'NOTE: To Safari/Chrome (WebKit) on Mac OS X users, the mentioned browsers have a problem uploading any file through this page.\n\nPlease try Firefox to upload your resume.';
         alert(msg);
-    }
+    }*/
     
     $('resume_id').value = _resume_id;
     $('upload_field').setStyle('display', 'block');
