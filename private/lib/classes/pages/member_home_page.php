@@ -3,9 +3,11 @@ require_once dirname(__FILE__). "/../../utilities.php";
 
 class MemberHomePage extends Page {
     private $member = NULL;
+    private $mysqli = NULL;
     
     function __construct($_session) {
         $this->member = new Member($_session['id'], $_session['sid']);
+        $this->mysqli = Database::connect();
     }
     
     public function insert_inline_css() {
@@ -31,14 +33,13 @@ class MemberHomePage extends Page {
     }
     
     private function get_completeness() {
-        $mysqli = Database::connect();
         $query = "SELECT members.checked_profile, bank.has_bank, cv.has_resume, photo.has_photo 
                   FROM members, 
                   (SELECT COUNT(*) AS has_bank FROM member_banks WHERE member = '". $_POST['id']. "') bank, 
                   (SELECT COUNT(*) AS has_resume FROM resumes WHERE member = '". $_POST['id']. "' AND deleted = 'N') cv, 
                   (SELECT COUNT(*) AS has_photo FROM member_photos WHERE member = '". $_POST['id']. "') photo 
                   WHERE members.email_addr = '". $this->member->getId(). "'";
-        $result = $mysqli->query($query);
+        $result = $this->mysqli->query($query);
         
         $response = array();
         $response['checked_profile'] = ($result[0]['checked_profile'] == 'Y') ? '1' : '0';
@@ -47,6 +48,23 @@ class MemberHomePage extends Page {
         $response['has_photo'] = ($result[0]['has_photo'] > 0) ? '1' : '0';
         
         return $response;
+    }
+    
+    private function is_hrm_questions_filled() {
+        $criteria = array(
+            'columns' => "hrm_gender, hrm_ethnicity, hrm_birthdate", 
+            'match' => "email_addr = '". $this->member->getId(). "'", 
+            'limit' => "1"
+        );
+        
+        $result = $this->member->find($criteria);
+        if ((is_null($result[0]['hrm_gender']) || empty($result[0]['hrm_gender'])) ||
+            (is_null($result[0]['hrm_ethnicity']) || empty($result[0]['hrm_ethnicity'])) || 
+            (is_null($result[0]['hrm_birthdate']) || empty($result[0]['hrm_birthdate']))) {
+            return false;
+        }
+        
+        return true;
     }
     
     public function show() {
@@ -81,6 +99,11 @@ class MemberHomePage extends Page {
             }
         }
         
+        $display_hrm_questions = 'display: none;';
+        if (!$this->is_hrm_questions_filled()) {
+            $display_hrm_questions = 'display: block;';
+        }
+        
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
@@ -89,7 +112,7 @@ class MemberHomePage extends Page {
         <table class="content">
             <tr>
                 <td class="left_content">        
-                    <div id="div_hrm_census" class="hrm_census_form">
+                    <div id="div_hrm_census" style="<?php echo $display_hrm_questions; ?>">
                         <div class="census_title">One-time Survey</div>
                         <div class="census_form">
                             Please help us answer the following <span style="text-decoration: underline; font-weight: bold;">one-time</span> questions as part of our on-going effort to serve you better.<br/>
