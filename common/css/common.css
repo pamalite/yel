@@ -390,3 +390,8 @@ p.small_notes {
 .top_search {
     height: 85px;
 }
+
+label.overTxtLabel {
+    font-size: 9pt;
+    color: #AAAAAA;
+}

@@ -6,6 +6,12 @@ var root = "";
 
 function set_root() {
     root = location.protocol + "//" + location.hostname + "/yel";
+    
+    if ($('mini_keywords') != undefined) {
+        new OverText($('mini_keywords'), {
+            positionOptions: {x: 165, y: 39}
+        });
+    }
 }
 
 function set_status(msg) {

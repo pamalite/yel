@@ -72,6 +72,10 @@
     width: 30px;
 }
 
+#ethnicity_txt {
+    width: 225px;
+}
+
 .profile_completeness {
     width: 99%;
     text-align: center;

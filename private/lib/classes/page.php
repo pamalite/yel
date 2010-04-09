@@ -257,7 +257,7 @@ class Page {
                     <input type="radio" id="international" name="is_local" value="0" />
                     <label for="international">international jobs</label>
                     <br/>
-                    <input type="text" name="keywords" id="mini_keywords" value="Job title or keywords">
+                    <input type="text" name="keywords" id="mini_keywords" alt="Job title or keywords" value="" />
                     &nbsp;
                     <input id="mini_search_button" type="submit" value="Search Jobs">
                 </form>

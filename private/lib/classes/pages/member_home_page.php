@@ -122,8 +122,8 @@ class MemberHomePage extends Page {
                                     <select id="gender">
                                         <option value="">Please select one</option>
                                         <option value="" disabled>&nbsp;</option>
-                                        <option value="m">Male</option>
-                                        <option value="f">Female</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
                                     </select>
                                 </li>
                                 <li>
@@ -135,15 +135,15 @@ class MemberHomePage extends Page {
                                         <option value="chinese">Chinese</option>
                                         <option value="indian">Indian</option>
                                         <option value="caucasian">Caucasian</option>
-                                        <option value="others">Others (please specify)</option>
+                                        <option value="other">Other (please specify)</option>
                                     </select>
-                                    <input type="text" id="ethnicity_txt" value="" />
+                                    <input type="text" id="ethnicity_txt" alt="specify only when Other is selected" value="" />
                                 </li>
                                 <li>
                                     Birth Date:
                                     <?php echo generate_dropdown('birthdate_day', '', 1, 31, '', 2, 'Day'); ?>
                                     <?php echo generate_month_dropdown('birthdate_month', '', 'Month'); ?>
-                                    <input type="text" class="year" id="birthdate_year" value="year" maxlength="4" />
+                                    <input type="text" class="year" id="birthdate_year" alt="year" maxlength="4" value="" />
                                 </li>
                             </ol>
                         </div>
