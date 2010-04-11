@@ -97,17 +97,23 @@ class SearchPage extends Page {
                             </div>
                             <div class="description">
                                 <?php
+                                $new_lines = array("\r", "\n", "\r\n");
                                 $description = desanitize($row['description']);
+                                $description = str_replace('&amp;', '&', $description);
                                 $description = str_replace('&lt;', '<', $description);
                                 $description = str_replace('&gt;', '>', $description);
                                 $description = str_replace('<br>', ' ', $description);
                                 $description = str_replace('<br/>', ' ', $description);
                                 $description = str_replace('<br />', ' ', $description);
+                                $description = str_replace('&nbsp;', ' ', $description);
+                                $description = str_replace($new_lines, ' ', $description);
+                                $description = preg_replace('/<(.|\n)*?>/', ' ', $description);
+                                
                                 $words = explode(' ', $description);
                                 $short_description = '';
                                 foreach ($words as $w=>$word) {
                                     if ($w < 50) {
-                                        $short_description .= $word. ' ';
+                                        $short_description .= trim($word). ' ';
                                     }
                                 }
                                 echo $short_description. '...';

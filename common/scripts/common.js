@@ -8,7 +8,7 @@ function initialize_page() {
     set_root();
     
     if ($('mini_keywords') != undefined) {
-        new OverText($('mini_keywords'), {
+        var mini_keywords_overtext = new OverText($('mini_keywords'), {
             'positionOptions': {
                 'offset': {
                     'x': 155,
