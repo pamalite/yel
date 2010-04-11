@@ -123,3 +123,50 @@
     margin-left: 350px;
     margin-top: -19px;
 }
+
+.profile {
+    width: 99%;
+    border: 1px solid #CCCCCC;
+    margin-bottom: 15px;
+}
+
+.profile_title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #464545;
+    background-color: #CCCCCC;
+    padding: 3px 3px 3px 3px;
+}
+
+.profile_form {
+    width: 98%;
+    margin: auto;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.profile_form_table {
+    width: 98%;
+    margin: auto;
+}
+
+.profile_form_table td {
+    padding: 5px 5px 5px 5px;
+}
+
+.profile_form_table td.field {
+    width: 35%;
+}
+
+.profile_form_table td.odd {
+    background-color: #EEEEEE;
+}
+
+textarea {
+    width: 75%;
+    height: 100px;
+}
+
+.notice_period {
+    width: 45px;
+}

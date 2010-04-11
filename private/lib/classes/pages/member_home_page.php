@@ -67,6 +67,20 @@ class MemberHomePage extends Page {
         return true;
     }
     
+    private function get_answers() {
+        $criteria = array(
+            'columns' => "is_active_seeking_job, seeking, expected_salary, 
+                          expected_salary_end, can_travel_relocate, reason_for_leaving, 
+                          current_position, current_salary, current_salary_end, 
+                          notice_period", 
+            'match' => "email_addr = '". $this->member->getId(). "'", 
+            'limit' => "1"
+        );
+        
+        $result = $this->member->find($criteria);
+        return $result[0];
+    }
+    
     public function show() {
         $this->begin();
         $this->top_search('Home');
@@ -103,6 +117,9 @@ class MemberHomePage extends Page {
         if (!$this->is_hrm_questions_filled()) {
             $display_hrm_questions = 'display: block;';
         }
+        
+        $answers = $this->get_answers();
+        $is_active = ($answers['is_active_seeking_job'] == '1') ? true : false;
         
         ?>
         <div id="div_status" class="status">
@@ -160,6 +177,178 @@ class MemberHomePage extends Page {
                         <div id="percent"><?php echo $completeness_percent; ?>%</div>
                         <div class="progress_details">
                             Tip: <span id="details"><?php echo $next_step; ?></span>
+                        </div>
+                    </div>
+                    
+                    <div class="profile">
+                        <div class="profile_title">Quick Profile</div>
+                        <div class="profile_form">
+                            Please help us answer the following questions as part of our on-going effort to understand you better. You may also update youe answers if necessary.<br/>
+                            <table class="profile_form_table">
+                                <tr>
+                                    <td class="field"><label for="is_seeking_job">Are you actively seeking for a new job or experience?</label></td>
+                                    <td>
+                                        <select id="is_seeking_job" onChange="toggle_the_rest_of_form();">
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <option value="1" selected>Yes</option>
+                                            <option value="0">No</option>
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <option value="1">Yes</option>
+                                            <option value="0" selected>No</option>
+                                        <?php
+                                        }
+                                        ?>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field odd"><label for="seeking">Briefly, what sort of job or experience are you seeking?</label></td>
+                                    <td class="odd">
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <textarea id="seeking"><?php echo $answers['seeking']; ?></textarea>
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <textarea id="seeking" disabled></textarea>
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field"><label for="expected_salary">What will be your expected salary range?</label></td>
+                                    <td>
+                                        <?php echo $currency. '$&nbsp;'; ?>
+                                        <?php 
+                                        if ($is_active) {
+                                        ?>
+                                            <input type="input" id="expected_salary" value="<?php echo $answers['expected_salary']; ?>" /> 
+                                            to
+                                            <input type="input" id="expected_salary_end" value="<?php echo $answers['expected_salary_end']; ?>"/>
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <input type="input" id="expected_salary" value="" disabled /> 
+                                            to
+                                            <input type="input" id="expected_salary_end" value="" disabled />
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field odd"><label for="can_travel_relocate">Perhaps you can travel, or relocate, if the new job requires it?</label></td>
+                                    <td class="odd">
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <select id="can_travel_relocate">
+                                            <?php
+                                            if ($answers['can_travel_relocate'] == 'Y') {
+                                            ?>
+                                                <option value="1" selected>Yes</option>
+                                                <option value="0">No</option>
+                                            <?php
+                                            } else {
+                                            ?>
+                                                <option value="1">Yes</option>
+                                                <option value="0" selected>No</option>
+                                            <?php
+                                            }
+                                            ?>
+                                            </select>
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <select id="can_travel_relocate" disabled>
+                                                <option value="1" selected>Yes</option>
+                                                <option value="0">No</option>
+                                            </select>
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field"><label for="reason_for_leaving">Briefly, why do you want to leave your current job?</label></td>
+                                    <td>
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <textarea id="reason_for_leaving"><?php echo $answers['reason_for_leaving']; ?></textarea>
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <textarea id="reason_for_leaving" disabled></textarea>
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field odd"><label for="current_position">Briefly, what is your current position, and what do you do?</label></td>
+                                    <td class="odd">
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <textarea id="current_position"><?php echo $answers['current_position']; ?></textarea>
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <textarea id="current_position" disabled></textarea>
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field"><label for="current_salary">What is your current salary range?</label></td>
+                                    <td>
+                                        <?php echo $currency. '$&nbsp;'; ?>
+                                        <?php 
+                                        if ($is_active) {
+                                        ?>
+                                            <input type="input" id="current_salary" value="<?php echo $answers['current_salary']; ?>" /> 
+                                            to
+                                            <input type="input" id="current_salary_end" value="<?php echo $answers['current_salary_end']; ?>"/>
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <input type="input" id="current_salary" value="" disabled /> 
+                                            to
+                                            <input type="input" id="current_salary_end" value="" disabled />
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field odd"><label for="notice_period">What is your notice period?</label></td>
+                                    <td class="odd">
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <input type="text" class="notice_period" id="notice_period" value="<?php echo $answers['notice_period']; ?>" />
+                                        <?php
+                                        } else {
+                                        ?>
+                                            <input type="text" class="notice_period" id="notice_period" value="" disabled />
+                                        <?php
+                                        }
+                                        ?>
+                                        months
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="buttons">
+                            <input type="button" value="Save" onClick="save_answers();" />
                         </div>
                     </div>
                 </td>

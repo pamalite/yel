@@ -9,9 +9,16 @@ function set_root() {
     
     if ($('mini_keywords') != undefined) {
         new OverText($('mini_keywords'), {
-            positionOptions: {x: 165, y: 39}
+            'positionOptions': {
+                'offset': {
+                    'x': 155,
+                    'y': 2
+                }
+            }
         });
     }
+    
+    OverText.update();
 }
 
 function set_status(msg) {

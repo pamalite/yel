@@ -128,6 +128,122 @@ function save_census_answers() {
     request.send(params);
 }
 
+function save_answers() {
+    var is_active_seeking_job = $('is_seeking_job').options[$('is_seeking_job').selectedIndex].value;
+    
+    if (is_active_seeking_job == '1') {
+        if (!isEmpty($('expected_salary').value)) {
+            if (isNaN($('expected_salary').value)) {
+                alert('Expected salary range must be a number.');
+                return false;
+            }
+        }
+
+        if (!isEmpty($('expected_salary_end').value)) {
+            if (isNaN($('expected_salary_end').value)) {
+                alert('Expected salary range must be a number.');
+                return false;
+            }
+        }
+
+        if (!isEmpty($('current_salary_end').value)) {
+            if (isNaN($('current_salary_end').value)) {
+                alert('Current salary range must be a number.');
+                return false;
+            }
+        }
+
+        if (!isEmpty($('current_salary_end').value)) {
+            if (isNaN($('current_salary_end').value)) {
+                alert('Current salary range must be a number.');
+                return false;
+            }
+        }
+        
+        if (!isEmpty($('notice_period').value)) {
+            if (isNaN($('notice_period').value)) {
+                alert('Notice period must be a number.');
+                return false;
+            }
+        }
+    }
+    
+    var params = 'id=' + id + '&action=save_answers';
+    params = params + '&is_active_seeking_job=' + is_active_seeking_job;
+    
+    if (is_active_seeking_job == '1') {
+        params = params + '&seeking=' + $('seeking').value;
+        params = params + '&expected_salary=' + $('expected_salary').value;
+        
+        if (isEmpty($('expected_salary_end').value)) {
+            params = params + '&expected_salary_end=0';
+        } else {
+            params = params + '&expected_salary_end=' + $('expected_salary_end').value;
+        }
+        
+        params = params + '&can_travel_relocate=' + $('can_travel_relocate').options[$('can_travel_relocate').selectedIndex].value;
+        params = params + '&reason_for_leaving=' + $('reason_for_leaving').value;
+        params = params + '&current_position=' + $('current_position').value;
+        
+        params = params + '&current_salary=' + $('current_salary').value;
+        
+        if (isEmpty($('current_salary_end').value)) {
+            params = params + '&current_salary_end=0';
+        } else {
+            params = params + '&current_salary_end=' + $('current_salary_end').value;
+        }
+        
+        if (isEmpty($('notice_period').value)) {
+            params = params + '&notice_period=0';
+        } else {
+            params = params + '&notice_period=' + $('notice_period').value;
+        }
+    }
+    alert(params);
+    var uri = root + "/members/home_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                set_status('An error occured when saving answers. Please try again later.');
+                return false;
+            }
+            
+            set_status('');
+        },
+        onRequest: function() {
+            set_status('Saving One-Time Survey...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function toggle_the_rest_of_form() {
+    if ($('is_seeking_job').options[$('is_seeking_job').selectedIndex].value == '0') {
+        $('seeking').disabled = true;
+        $('expected_salary').disabled = true;
+        $('expected_salary_end').disabled = true;
+        $('can_travel_relocate').disabled = true;
+        $('reason_for_leaving').disabled = true;
+        $('current_position').disabled = true;
+        $('current_salary').disabled = true;
+        $('current_salary_end').disabled = true;
+        $('notice_period').disabled = true;
+    } else {
+        $('seeking').disabled = false;
+        $('expected_salary').disabled = false;
+        $('expected_salary_end').disabled = false;
+        $('can_travel_relocate').disabled = false;
+        $('reason_for_leaving').disabled = false;
+        $('current_position').disabled = false;
+        $('current_salary').disabled = false;
+        $('current_salary_end').disabled = false;
+        $('notice_period').disabled = false;
+    }
+}
+
 function onDomReady() {
     set_root();
     

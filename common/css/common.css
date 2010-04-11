@@ -391,7 +391,7 @@ p.small_notes {
     height: 85px;
 }
 
-label.overTxtLabel {
+.overTxtLabel {
     font-size: 9pt;
     color: #AAAAAA;
 }
