@@ -1,5 +1,5 @@
 function onDomReady() {
-    set_root();
+    initialize_page();
     list_available_industries('0');
 }
 

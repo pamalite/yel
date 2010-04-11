@@ -166,7 +166,7 @@ function validate() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     
     if (!isEmpty(error_message)) {
         set_status(error_message);

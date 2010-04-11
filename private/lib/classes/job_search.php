@@ -6,7 +6,7 @@ class JobSearch {
     private $industry = 0;
     private $keywords = '';
     private $country_code = '';
-    private $order_by = 'relevance desc';
+    private $order_by = 'jobs.created_on DESC';
     private $limit = '';
     private $offset = 0;
     private $punctuations = array(",", ".",";","\"","\'","(",")","[","]","{","}","<",">");
@@ -19,8 +19,8 @@ class JobSearch {
         $this->limit = $GLOBALS['default_results_per_page'];
     }
     
-    private function remove_punctuations_from($keywords) {
-        return str_replace($this->punctuations, ' ', $keywords);
+    private function remove_punctuations_from($_keywords) {
+        return str_replace($this->punctuations, ' ', $_keywords);
     }
     
     private function insert_wildcard_to_keywords() {
@@ -58,18 +58,13 @@ class JobSearch {
         $this->log_search_criteria();
         $boolean_mode = '';
         
-        // check should we use BOOLEAN MODE
-        if (str_word_count($this->keywords) <= 3) {
-            $boolean_mode = ' IN BOOLEAN MODE';
-        }
-        
         $match_against = "MATCH (job_index.title, 
                                  job_index.description, 
                                  job_index.state) 
-                          AGAINST ('". $this->keywords. "'". $boolean_mode. ")";
+                          AGAINST ('". $this->keywords. "' IN BOOLEAN MODE)";
         
-        //$filter_job_status = "jobs.closed = 'N' AND jobs.expire_on >= NOW()";
-        $filter_job_status = "jobs.closed = 'N'";
+        $filter_job_status = "jobs.closed = 'N' OR jobs.closed = 'Y'";
+        //$filter_job_status = "jobs.closed = 'N'";
         
         $filter_employer = "jobs.employer IS NOT NULL";
         if (!empty($this->employer)) {
@@ -78,7 +73,7 @@ class JobSearch {
         
         $filter_industry = "jobs.industry <> 0";
         if ($this->industry > 0) {
-            $children = Industry::get_sub_industries_of($this->industry);
+            $children = Industry::getSubIndustriesOf($this->industry);
             $industries = '('. $this->industry;
             if (count($children) > 0) {
                 $industries .= ', ';
@@ -101,42 +96,49 @@ class JobSearch {
             $filter_country = "jobs.country = '". $this->country_code. "'";
         }
         
-        $query = "SELECT jobs.id, jobs.title, jobs.state, jobs.salary, jobs.salary_end, 
-                         jobs.potential_reward, currencies.symbol AS currency, 
-                         employers.name, industries.industry, countries.country, 
-                         DATE_FORMAT(jobs.created_on, '%e %b %Y') AS formatted_created_on ";
+        $columns = "jobs.id, jobs.title, jobs.state, jobs.salary, jobs.salary_end, jobs.description, 
+                    jobs.potential_reward, branches.currency, jobs.alternate_employer, 
+                    employers.name AS employer, industries.industry, countries.country, 
+                    DATE_FORMAT(jobs.created_on, '%e %b %Y') AS formatted_created_on";
         
+        $joins = "job_index ON job_index.job = jobs.id, 
+                  employers ON employers.id = jobs.employer, 
+                  employees ON employees.id = employers.registered_by, 
+                  branches ON branches.id = employees.branch, 
+                  industries ON industries.id = jobs.industry, 
+                  countries ON countries.country_code = jobs.country";
+        
+        $match = "";
         if (!is_null($this->keywords) && !empty($this->keywords)) {
-            $query .= ", ". $match_against. " AS relevance, relevances.max_relevance ";
-        } else {
-            $query .= ", '1' AS relevance, '1' AS max_relevance ";
-        }
-        
-        $query .= "FROM jobs 
-                   LEFT JOIN job_index ON job_index.job = jobs.id 
-                   LEFT JOIN employers ON employers.id = jobs.employer 
-                   LEFT JOIN industries ON industries.id = jobs.industry 
-                   LEFT JOIN countries ON countries.country_code = jobs.country 
-                   LEFT JOIN currencies ON currencies.country_code = employers.country ";
-        
-       if (!is_null($this->keywords) && !empty($this->keywords)) {
-           $query .= ", (SELECT MAX(". $match_against. ") AS max_relevance FROM job_index LIMIT 1) relevances ";
-           $query .= "WHERE ". $match_against. " AND ";
-       } else {
-           $query .= "WHERE ";
-       }
+            $match .= $match_against. " AND ";
+        } 
        
-       $query .= $filter_job_status. " 
+        $match .= $filter_job_status. " 
                   AND ". $filter_industry. " 
                   AND ". $filter_country. " 
-                  AND ". $filter_employer. " ";
+                  AND ". $filter_employer. " "; 
         
+        $order = $this->order_by;
+        
+        $limit = "";
         if ($with_limit) {
-            $query .= "ORDER BY ". $this->order_by. " 
-                       LIMIT ". $this->offset. ", ". $this->limit; 
-        } 
+            $limit = $this->offset. ", ". $this->limit; 
+            
+            return array(
+                'columns' => $columns, 
+                'joins' => $joins, 
+                'match' => $match, 
+                'order' => $order, 
+                'limit' => $limit
+            );
+        }
         
-        return $query;
+        return array(
+            'columns' => $columns, 
+            'joins' => $joins, 
+            'match' => $match, 
+            'order' => $order
+        );
     }
     
     public function total_results() {
@@ -169,6 +171,10 @@ class JobSearch {
             $this->country_code = $_criterias['country_code'];
         }
         
+        if ($_criterias['is_local'] <= 0) {
+            $this->country_code = NULL;
+        }
+        
         if (array_key_exists('order_by', $_criterias)) {
             $this->order_by = $_criterias['order_by'];
         }
@@ -181,22 +187,11 @@ class JobSearch {
             $this->offset = $_criterias['offset'];
         }
         
-        $query = $this->make_query();
-        $mysqli = Database::connect();
-        $result = $mysqli->query($query);
+        $criteria = $this->make_query();
+        $job = new Job();
+        $result = $job->find($criteria);
         if (!is_null($result) && !empty($result)) {
             $this->total = count($result);
-        }
-        
-        // generalized for any country
-        if ($this->total <= 0) {
-            $this->country_code = '';
-            $this->changed_country_code = true;
-            $query = $this->make_query();
-            $result = $mysqli->query($query);
-            if (!is_null($result) && !empty($result)) {
-                $this->total = count($result);
-            }
         }
         
         $total_pages = ceil($this->total / $this->limit);
@@ -204,13 +199,9 @@ class JobSearch {
             return 0;
         }
         
-        $result = $mysqli->query($this->make_query(true));
+        $result = $job->find($this->make_query(true));
         if ($result === false) {
             return false;
-        }
-        
-        foreach($result as $i=>$row) {
-            $result[$i]['match_percentage'] = number_format((($row['relevance'] / $row['max_relevance']) * 100.00), 0, '.', ', ');
         }
         
         return $result;

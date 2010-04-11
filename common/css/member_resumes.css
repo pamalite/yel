@@ -62,3 +62,10 @@ table.buttons {
 table.buttons td.right {
     text-align: right;
 }
+
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}

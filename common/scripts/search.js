@@ -4,7 +4,6 @@ var order = 'desc';
 var current_page = 1;
 var total_pages = 1;
 var filter_by = '0';
-var candidates_list = new ListBox('candidates', 'candidates_list');
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -583,97 +582,7 @@ function refer() {
 }
 
 function onDomReady() {
-    set_root();
-    get_employers_for_mini(employer);
-    get_industries_for_mini(industry);
-    set_mini_keywords();
-    get_referrals_count();
-    
-    $('candidates').addEvent('click', function() {
-        check_referred_already();
-    });
-    
-    if (isEmpty(keywords)) {
-        $('mini_keywords').value = 'Job title or keywords';
-    } else {
-        $('mini_keywords').value = keywords;
-    }
-    
-    $('testimony_answer_1').addEvent('keypress', function() {
-       update_word_count_of('word_count_q1', 'testimony_answer_1') 
-    });
-
-    $('testimony_answer_2').addEvent('keypress', function() {
-       update_word_count_of('word_count_q2', 'testimony_answer_2') 
-    });
-    
-    $('testimony_answer_3').addEvent('keypress', function() {
-       update_word_count_of('word_count_q3', 'testimony_answer_3') 
-    });
-    
-    $('sort_match_percentage').addEvent('click', function() {
-        order_by = 'relevance';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_industry').addEvent('click', function() {
-        order_by = 'industries.industry';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_title').addEvent('click', function() {
-        order_by = 'jobs.title';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_employer').addEvent('click', function() {
-        order_by = 'employers.name';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_salary').addEvent('click', function() {
-        order_by = 'jobs.salary';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    /*$('sort_created_on').addEvent('click', function() {
-        order_by = 'jobs.created_on';
-        ascending_or_descending();
-        show_jobs();
-    });*/
-    
-    $('sort_country').addEvent('click', function() {
-        order_by = 'countries.country';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_state').addEvent('click', function() {
-        order_by = 'jobs.state';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_potential_reward').addEvent('click', function() {
-        order_by = 'jobs.potential_reward';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    show_jobs();
-    
-    var suggest_url = root + '/common/php/search_suggest.php';
-    new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
-        'postVar': 'keywords',
-        'minLength' : 1,
-        'overflow' : true,
-        'delay' : 50
-    });
+    initialize_page();
 }
 
 window.addEvent('domready', onDomReady);

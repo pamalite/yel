@@ -341,7 +341,7 @@ function set_mouse_events() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     list_available_industries('0');
     set_mouse_events();
     

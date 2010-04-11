@@ -247,7 +247,6 @@ class Job implements Model {
         
         $query = "SELECT ". $columns. " FROM jobs ". $joins. 
                   " ". $match. " ". $group. " ". $order. " ". $limit;
-        
         return $this->mysqli->query($query);
     }
     

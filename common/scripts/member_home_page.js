@@ -245,20 +245,12 @@ function toggle_the_rest_of_form() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     
     if ($('div_hrm_census').getStyle('display') != 'none') {
         new OverText($('birthdate_year'));
         new OverText($('ethnicity_txt'));
     }
-    
-    /*var suggest_url = root + '/common/php/search_suggest.php';
-    new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
-        'postVar': 'keywords',
-        'minLength' : 1,
-        'overflow' : true,
-        'delay' : 50
-    });*/
 }
 
 window.addEvent('domready', onDomReady);

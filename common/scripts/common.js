@@ -4,8 +4,8 @@ var root = "";
 // var paypal_ipn_url = 'http://60.50.27.9/yel/employers/slots_ipn_action.php';
 // var paypal_id = 'J77S5ZAUFN8SS';
 
-function set_root() {
-    root = location.protocol + "//" + location.hostname + "/yel";
+function initialize_page() {
+    set_root();
     
     if ($('mini_keywords') != undefined) {
         new OverText($('mini_keywords'), {
@@ -16,9 +16,21 @@ function set_root() {
                 }
             }
         });
+        
+        var suggest_url = root + '/common/php/search_suggest.php';
+        new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
+            'postVar': 'keywords',
+            'minLength' : 1,
+            'overflow' : true,
+            'delay' : 30
+        });
     }
     
     OverText.update();
+}
+
+function set_root() {
+    root = location.protocol + "//" + location.hostname + "/yel";
 }
 
 function set_status(msg) {

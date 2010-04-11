@@ -75,7 +75,7 @@ function get_seed() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_seed();
     $('login').addEvent('click', login);
 }

@@ -134,7 +134,7 @@ function show_contact_drop_form() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_seed();
     $('login').addEvent('click', login);
     $('drop').addEvent('click', drop_contact_now);

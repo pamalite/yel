@@ -169,7 +169,7 @@ function show_tour() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_employers();
     get_industries();
     get_potential_rewards();
@@ -191,14 +191,6 @@ function onDomReady() {
     
     //this.addEvent('resize', show_dimensions);
     //show_dimensions();
-    
-    var suggest_url = root + '/common/php/search_suggest.php';
-    new Autocompleter.Ajax.Json('keywords', suggest_url, {
-        'postVar' : 'keywords',
-        'minLength' : 1,
-        'overflow' : true,
-        'delay' : 50
-    });
 }
 
 window.addEvent('domready', onDomReady);

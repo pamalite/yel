@@ -216,7 +216,7 @@ function set_mouse_events() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     set_mouse_events();
     
     $('li_invoices').addEvent('click', show_invoices);

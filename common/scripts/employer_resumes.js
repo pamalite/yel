@@ -572,7 +572,7 @@ function update_year() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     
     $('month').addEvent('change', update_year);
     $('day').addEvent('change', update_year);

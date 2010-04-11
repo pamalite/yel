@@ -253,7 +253,7 @@ function hide_show_banner() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_employers_for_mini();
     get_industries_for_mini();
     set_mini_keywords();
@@ -282,14 +282,6 @@ function onDomReady() {
     });
     
     show_banks();
-    
-    var suggest_url = root + '/common/php/search_suggest.php';
-    new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
-        'postVar': 'keywords',
-        'minLength' : 1,
-        'overflow' : true,
-        'delay' : 50
-    });
 }
 
 window.addEvent('domready', onDomReady);

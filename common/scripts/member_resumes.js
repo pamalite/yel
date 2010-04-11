@@ -116,15 +116,7 @@ function stop_upload(_success) {
 }
 
 function onDomReady() {
-    set_root();
-    
-    /*var suggest_url = root + '/common/php/search_suggest.php';
-    new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
-        'postVar': 'keywords',
-        'minLength' : 1,
-        'overflow' : true,
-        'delay' : 50
-    });*/
+    initialize_page();
 }
 
 window.addEvent('domready', onDomReady);

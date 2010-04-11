@@ -529,7 +529,7 @@ function show_resume_preview(_resume_id, _is_file) {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     list_available_industries(industry);
     set_mini_keywords(true);
     

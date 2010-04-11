@@ -969,7 +969,7 @@ function stop_quick_upload(_error) {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_employers_for_mini();
     get_industries_for_mini();
     set_mini_keywords();
@@ -1004,14 +1004,6 @@ function onDomReady() {
     
     $('testimony_answer_4').addEvent('keypress', function() {
        update_word_count_of('word_count_q4', 'testimony_answer_4') 
-    });
-    
-    var suggest_url = root + '/common/php/search_suggest.php';
-    new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
-        'postVar': 'keywords',
-        'minLength' : 1,
-        'overflow' : true,
-        'delay' : 50
     });
 }
 

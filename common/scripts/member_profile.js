@@ -307,7 +307,7 @@ function set_mouse_events() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     set_mouse_events();
     
     $('industry').addEvent('change', function() {
@@ -377,14 +377,6 @@ function onDomReady() {
             $('filter_jobs').disabled = true;
         }
     });
-    
-    /*var suggest_url = root + '/common/php/search_suggest.php';
-    new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
-        'postVar': 'keywords',
-        'minLength' : 1,
-        'overflow' : true,
-        'delay' : 50
-    });*/
 }
 
 window.addEvent('domready', onDomReady);

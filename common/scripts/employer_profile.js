@@ -1,5 +1,5 @@
 function onDomReady() {
-    set_root();
+    initialize_page();
 }
 
 window.addEvent('domready', onDomReady);

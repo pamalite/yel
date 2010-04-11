@@ -31,7 +31,7 @@ if (isset($_SESSION['yel']['member']) &&
 } else {
     $search = new SearchPage(NULL, $criteria);
 }
-$search->header(array('title' => 'Search Results'));
+$search->header(array('title' => 'Searched Jobs'));
 $search->insert_search_css();
 $search->insert_search_scripts();
 $search->insert_inline_scripts();

@@ -1,4 +1,4 @@
-set_root();
+initialize_page();
 var pagearSmallImg = root + "/common/images/misc/peeloff/peeloff_s.jpg";
 var pagearSmallSwf = root + "/common/images/flash/peeloff/peeloff_s.swf";
 var pagearBigImg = root + "/common/images/misc/peeloff/peeloff_b.jpg";
