@@ -6,6 +6,7 @@ class JobSearch {
     private $industry = 0;
     private $keywords = '';
     private $country_code = '';
+    private $salary = 0;
     private $order_by = 'jobs.created_on DESC';
     private $limit = '';
     private $offset = 0;
@@ -13,6 +14,12 @@ class JobSearch {
     private $total = 0;
     private $pages = 1;
     private $changed_country_code = false;
+    private $time_elapsed = 0;
+    
+    public $result_countries = array();
+    public $result_employers = array();
+    public $result_industries = array();
+    public $result_salaries = array();
     
     function __construct() {
         $this->country_code = $GLOBALS['default_country_code'];
@@ -63,7 +70,7 @@ class JobSearch {
                                  job_index.state) 
                           AGAINST ('". $this->keywords. "' IN BOOLEAN MODE)";
         
-        $filter_job_status = "jobs.closed = 'N' OR jobs.closed = 'Y'";
+        $filter_job_status = "(jobs.closed = 'N' OR jobs.closed = 'Y')";
         //$filter_job_status = "jobs.closed = 'N'";
         
         $filter_employer = "jobs.employer IS NOT NULL";
@@ -96,10 +103,17 @@ class JobSearch {
             $filter_country = "jobs.country = '". $this->country_code. "'";
         }
         
+        $filter_salary = "";
+        if ($this->salary > 0) {
+            $filter_salary = "jobs.salary >= ". $this->salary;
+        }
+        
         $columns = "jobs.id, jobs.title, jobs.state, jobs.salary, jobs.salary_end, jobs.description, 
                     jobs.potential_reward, branches.currency, jobs.alternate_employer, 
-                    employers.name AS employer, industries.industry, countries.country, 
-                    DATE_FORMAT(jobs.created_on, '%e %b %Y') AS formatted_created_on";
+                    jobs.employer AS employer_id, employers.name AS employer, 
+                    industries.industry, industries.id AS industry_id, 
+                    countries.country, countries.country_code, 
+                    DATE_FORMAT(jobs.expire_on, '%e %b %Y') AS formatted_expire_on";
         
         $joins = "job_index ON job_index.job = jobs.id, 
                   employers ON employers.id = jobs.employer, 
@@ -117,6 +131,10 @@ class JobSearch {
                   AND ". $filter_industry. " 
                   AND ". $filter_country. " 
                   AND ". $filter_employer. " "; 
+        
+        if (!empty($filter_salary)) {
+            $match .= "AND ". $filter_salary. " ";
+        }
         
         $order = $this->order_by;
         
@@ -169,10 +187,14 @@ class JobSearch {
         
         if (array_key_exists('country_code', $_criterias)) {
             $this->country_code = $_criterias['country_code'];
+        } else {
+            if ($_criterias['is_local'] <= 0) {
+                $this->country_code = NULL;
+            }
         }
         
-        if ($_criterias['is_local'] <= 0) {
-            $this->country_code = NULL;
+        if ($_criterias['salary'] > 0) {
+            $this->salary = $_criterias['salary'];
         }
         
         if (array_key_exists('order_by', $_criterias)) {
@@ -199,16 +221,103 @@ class JobSearch {
             return 0;
         }
         
+        $start = microtime();
         $result = $job->find($this->make_query(true));
+        $end = microtime();
+        
+        list($ustart, $istart) = explode(" ", $start);
+        list($uend, $iend) = explode(" ", $end);
+        
+        $this->time_elapsed = ((float)$uend + (float)$iend) - ((float)$ustart + (float)$istart);
+        
         if ($result === false) {
             return false;
         }
+        
+        // find the unique employers
+        $i = 0;
+        foreach ($result as $row) {
+            $is_in_array = false;
+            if (count($this->result_employers) > 0) {
+                foreach ($this->result_employers as $employer) {
+                    if ($row['employer_id'] == $employer['id']) {
+                        $is_in_array = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!$is_in_array) {
+                $name = $row['employer'];
+                if (!is_null($row['alternate_employer']) && !empty($row['alternate_employer'])) {
+                    $name = $row['employer'];
+                }
+                
+                $this->result_employers[$i]['id'] = $row['employer_id'];
+                $this->result_employers[$i]['name'] = $name;
+                $i++;
+            }
+        }
+        
+        // find the unique industries
+        $i = 0;
+        foreach ($result as $row) {
+            $is_in_array = false;
+            if (count($this->result_industries) > 0) {
+                foreach ($this->result_industries as $industry) {
+                    if ($row['industry_id'] == $industry['id']) {
+                        $is_in_array = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!$is_in_array) {
+                $this->result_industries[$i]['id'] = $row['industry_id'];
+                $this->result_industries[$i]['name'] = $row['industry'];
+                $i++;
+            }
+        }
+        
+        // find the unique countries
+        $i = 0;
+        foreach ($result as $row) {
+            $is_in_array = false;
+            if (count($this->result_countries) > 0) {
+                foreach ($this->result_countries as $country) {
+                    if ($row['country_code'] == $country['id']) {
+                        $is_in_array = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!$is_in_array) {
+                $this->result_countries[$i]['id'] = $row['country_code'];
+                $this->result_countries[$i]['name'] = $row['country'];
+                $i++;
+            }
+        }
+        
+        // find the unique salary beginning
+        foreach ($result as $row) {
+            $is_in_array = in_array($row['salary'], $this->result_salaries);
+            
+            if (!$is_in_array) {
+                $this->result_salaries[] = $row['salary'];
+            }
+        }
+        sort($this->result_salaries);
         
         return $result;
     }
     
     public function country_code_changed() {
         return $this->changed_country_code;
+    }
+    
+    public function time_elapsed() {
+        return $this->time_elapsed;
     }
 }
 ?>

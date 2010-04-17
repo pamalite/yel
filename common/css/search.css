@@ -5,6 +5,11 @@
     font-style: italic;
 }
 
+.statistics {
+    padding-bottom: 10px;
+    text-align: right;
+}
+
 .results_table {
     margin: auto;
     width: 100%;
@@ -43,8 +48,26 @@
     padding-bottom: 3px;
 }
 
+.filter_options {
+    padding-left: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.filter_button {
+    width: 95%;
+    margin: auto;
+    text-align: right;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-top: 1px solid #CCCCCC;
+    
+}
+
 .job_short_details {
     padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #EEEEEE;
 }
 
 .job_short_details .job_title {
@@ -101,6 +124,14 @@
 .page {
     font-size: 12pt;
 }
+
+.expire_on {
+    padding-top: 5px;
+    font-style: italic;
+    font-size: 7pt;
+    color: #666666;
+}
+
 /* old CSS */
 
 div.filters, div.page_navigation {

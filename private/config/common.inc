@@ -15,7 +15,7 @@ $default_currency_symbol = "MYR";
 $maxmind_geoip_data_file = $data_path. "/maxmind/geoip.dat";
 
 // Search settings
-$default_results_per_page = 20;
+$default_results_per_page = 10;
 
 // Resume upload settings
 $resume_dir = $data_path. "/resumes";

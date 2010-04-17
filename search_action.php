@@ -7,25 +7,20 @@ $xml_dom = new XMLDOM();
 
 if (!isset($_POST['action'])) {
     $job_search = new JobSearch();
-
+    
     $criteria = array();
-    $criteria['order_by'] = 'relevance desc';
+    $criteria['order_by'] = 'jobs.created_on desc';
     $criteria['industry'] = 0;
     $criteria['employer'] = '';
     $criteria['country_code'] = $GLOBALS['default_country_code'];
     $criteria['limit'] = $GLOBALS['default_results_per_page'];
     $criteria['offset'] = 0;
     $criteria['keywords'] = $_POST['keywords'];
+    $criteria['is_local'] = 1;
+    $criteria['salary'] = 0;
     
-    $_SESSION['yel']['job_search']['criteria'] = array();
-    $_SESSION['yel']['job_search']['criteria']['order_by'] = 'relevance desc';
-    $_SESSION['yel']['job_search']['criteria']['industry'] = 0;
-    $_SESSION['yel']['job_search']['criteria']['employer'] = '';
-    $_SESSION['yel']['job_search']['criteria']['country_code'] = $GLOBALS['default_country_code'];
-    $_SESSION['yel']['job_search']['criteria']['limit'] = $GLOBALS['default_results_per_page'];
-    $_SESSION['yel']['job_search']['criteria']['offset'] = 0;
-    $_SESSION['yel']['job_search']['criteria']['keywords'] = $_POST['keywords'];
-
+    $_SESSION['yel']['job_search']['criteria'] = $criteria;
+    
     if (isset($_POST['order_by'])) {
         $criteria['order_by'] = $_POST['order_by'];
         $_SESSION['yel']['job_search']['criteria']['order_by'] = $_POST['order_by'];
@@ -45,7 +40,17 @@ if (!isset($_POST['action'])) {
         $criteria['country_code'] = $_POST['country_code'];
         $_SESSION['yel']['job_search']['criteria']['country_code'] = $_POST['country_code'];
     }
-
+    
+    if (isset($_POST['is_local'])) {
+        $criteria['is_local'] = $_POST['is_local'];
+        $_SESSION['yel']['job_search']['criteria']['is_local'] = $_POST['is_local'];
+    }
+    
+    if (isset($_POST['salary'])) {
+        $criteria['salary'] = $_POST['salary'];
+        $_SESSION['yel']['job_search']['criteria']['salary'] = $_POST['salary'];
+    }
+    
     if (isset($_POST['limit'])) {
         $criteria['limit'] = $_POST['limit'];
         $_SESSION['yel']['job_search']['criteria']['limit'] = $_POST['limit'];
@@ -67,28 +72,41 @@ if (!isset($_POST['action'])) {
         exit();
     }
     
-    $total_results = $job_search->total_results();
-    $current_page = '1';
-    if ($criteria['offset'] > 0) {
-        $current_page = ceil($criteria['offset'] / $criteria['limit']) + 1;
-    }
-    
-    $result[0]['changed_country_code'] = 0;
-    if ($job_search->country_code_changed()) {
-        $result[0]['changed_country_code'] = 1;
-    } 
-    
     foreach($result as $i=>$row) {
-        $result[$i]['description'] = htmlspecialchars_decode($row['description']);
+        $result[$i]['employer'] = (!is_null($row['alternate_employer']) && !empty($row['alternate_employer'])) ? $row['alternate_employer'] : $row['employer'];
+        
         $result[$i]['title'] = htmlspecialchars_decode($row['title']);
         $result[$i]['salary'] = number_format($row['salary'], 2, '.', ', ');
         $result[$i]['salary_end'] = number_format($row['salary_end'], 2, '.', ', ');
         $result[$i]['potential_reward'] = number_format($row['potential_reward'], 2, '.', ', ');
-        $result[$i]['total_results'] = $total_results;
-        $result[$i]['current_page'] = $current_page;
+        
+        $new_lines = array("\r", "\n", "\r\n");
+        $description = desanitize($row['description']);
+        $description = str_replace('&amp;', '&', $description);
+        $description = str_replace('&lt;', '<', $description);
+        $description = str_replace('&gt;', '>', $description);
+        $description = str_replace('<br>', ' ', $description);
+        $description = str_replace('<br/>', ' ', $description);
+        $description = str_replace('<br />', ' ', $description);
+        $description = str_replace('&nbsp;', ' ', $description);
+        $description = str_replace($new_lines, ' ', $description);
+        $description = preg_replace('/<(.|\n)*?>/', ' ', $description);
+        
+        $words = explode(' ', $description);
+        $short_description = '';
+        foreach ($words as $w=>$word) {
+            if ($w < 50) {
+                $short_description .= trim($word). ' ';
+            }
+        }
+        $result[$i]['description'] = $short_description;
     }
 
-    $response = array('results' => array('result' => $result));
+    $response = array('results' => array(
+        'total' => $job_search->total_results(), 
+        'elapsed' => number_format($job_search->time_elapsed(), 6), 
+        'result' => $result
+    ));
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
     exit();

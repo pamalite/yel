@@ -5,6 +5,7 @@ class SearchPage extends Page {
     private $member = NULL;
     private $criterias = '';
     private $job_search = '';
+    private $country_code = '';
     
     function __construct($_session = NULL, $_criterias = '') {
         if (!is_null($_session)) {
@@ -14,6 +15,10 @@ class SearchPage extends Page {
         }
         
         $this->criterias = $_criterias;
+        if (!isset($this->criterias['salary'])) {
+            $this->criterias['salary'] = 0;
+        }
+        
         $this->job_search = new JobSearch();
     }
     
@@ -38,17 +43,19 @@ class SearchPage extends Page {
         if (!is_null($this->member)) {
             echo 'var id = "'. $this->member->getId(). '";'. "\n";
             
-            $country_code = (isset($this->criterias['country_code'])) ? $this->criterias['country_code'] : $this->member->getCountry();
-            echo 'var country_code = "'. $country_code. '";'. "\n";
+            $this->country_code = (isset($this->criterias['country_code'])) ? $this->criterias['country_code'] : $this->member->getCountry();
+            echo 'var country_code = "'. $this->country_code. '";'. "\n";
         } else {
             echo 'var id = 0;'. "\n";
             
-            $country_code = (isset($this->criterias['country_code'])) ? $this->criterias['country_code'] : $_SESSION['yel']['country_code'];
-            echo 'var country_code = "'. $country_code. '";'. "\n";
+            $this->country_code = (isset($this->criterias['country_code'])) ? $this->criterias['country_code'] : $_SESSION['yel']['country_code'];
+            echo 'var country_code = "'. $this->country_code. '";'. "\n";
         }
         echo 'var industry = "'. $this->criterias['industry']. '";'. "\n";
         echo 'var employer = "'. $this->criterias['employer']. '";'. "\n";
         echo 'var keywords = "'. $this->criterias['keywords']. '";'. "\n";
+        echo 'var is_local = '. $this->criterias['is_local']. ';'. "\n";
+        echo 'var filter_salary = '. $this->criterias['salary']. ';'. "\n";
         
         $limit = (isset($this->criterias['limit'])) ? $this->criterias['limit'] : $GLOBALS['default_results_per_page'];
         echo 'var limit = "'. $limit. '";'. "\n";
@@ -71,9 +78,12 @@ class SearchPage extends Page {
         </div>
         
         <div class="content">
+            <div class="statistics" id="statistics">
+                Found <?php echo $this->job_search->total_results(); ?> jobs in <?php echo number_format($this->job_search->time_elapsed(), 6) ?> seconds.
+            </div>
             <table class="results_table">
                 <tr>
-                    <td class="results">
+                    <td class="results" id="results">
                     <?php
                     if (is_null($results) || empty($results) || $results === false) {
                     ?>
@@ -85,15 +95,13 @@ class SearchPage extends Page {
                         <div class="job_short_details">
                             <div class="job_title">
                                 <span class="industry"><?php echo $row['industry'] ?></span>
-                                &nbsp;
                                 <a href="./job/<?php echo $row['id']; ?>"><?php echo $row['title'] ?></a>
                             </div>
                             <div class="employer">
                                 <?php 
                                     echo (!is_null($row['alternate_employer']) && !empty($row['alternate_employer'])) ? $row['alternate_employer'] : $row['employer'];
                                 ?>
-                                &nbsp;
-                                <span class="country"><?php echo $row['country'] ?></span>
+                                <span class="country"><?php echo $row['country'] ?></span>                    
                             </div>
                             <div class="description">
                                 <?php
@@ -136,10 +144,13 @@ class SearchPage extends Page {
                                 </span>
                                 &nbsp;
                                 <span class="controls">
-                                    <a class="no_link" onClick="show_refer_window();">Refer Now</a>
+                                    <a class="no_link" onClick="show_refer_window(<?php echo $row['id'] ?>);">Refer Now</a>
                                     |
                                     <a href="./job/<?php echo $row['id']; ?>">View Details</a>
                                 </span>
+                            </div>
+                            <div class="expire_on">
+                                Expires on <?php echo $row['formatted_expire_on'] ?>
                             </div>
                         </div>
                     <?php
@@ -149,34 +160,145 @@ class SearchPage extends Page {
                     </td>
                     <td class="sort_and_filter">
                         <div class="sorter">
-                            <div class="sorter_title">Sort</div>
-                            <ul>
-                                <li>Job Title</li>
-                                <li>Employer</li>
-                                <li>Monthly Salary Range</li>
-                                <li>Oldest first</li>
-                                <li>Newest first</li>
-                                <li>Specialization</li>
-                            </ul>
+                            <div class="sorter_title">Sort By</div>
+                            <div>
+                                <input type="radio" name="sort_by" id="sort_by_job_title" onClick="sort_by('jobs.title');" /><label for="sort_by_job_title">Job Title</label><br/>
+                                <input type="radio" name="sort_by" id="sort_by_employer" onClick="sort_by('employers.name');" /><label for="sort_by_employer">Employer</label><br/>
+                                <input type="radio" name="sort_by" id="sort_by_salary" onClick="sort_by('jobs.salary');" /><label for="sort_by_salary">Monthly Salary Range</label><br/>
+                                <input type="radio" name="sort_by" id="sort_by_expiry" onClick="sort_by('jobs.expire_on');" checked /><label for="sort_by_expiry">Expiry Date</label><br/>
+                                <input type="radio" name="sort_by" id="sort_by_specialization" onClick="sort_by('industries.industry');" /><label for="sort_by_specialization">Specialization</label>
+                            </div>
                         </div>
                         
                         <div class="filter">
-                            <div class="filter_title">Filter</div>
-                            <ul>
-                                <li>Job Title</li>
-                                <li>Employer</li>
-                                <li>Monthly Salary Range</li>
-                                <li>Oldest first</li>
-                                <li>Newest first</li>
-                                <li>Specialization</li>
-                            </ul>
+                            <div class="filter_title">Filter Jobs</div>
+                            <div class="filter_options">
+                                <label for="filter_employer">Employer:</label>
+                                <select id="filter_employer">
+                                <?php
+                                if (empty($this->criterias['employer'])) {
+                                ?>
+                                    <option value="" selected>Any</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="">Any</option>
+                                <?php
+                                }
+                                ?>
+                                    <option value="" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($this->job_search->result_employers as $employer) {
+                                    if ($this->criterias['employer'] == $employer['id']) {
+                                ?>
+                                    <option value="<?php echo $employer['id'] ?>" selected><?php echo $employer['name'] ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $employer['id'] ?>"><?php echo $employer['name'] ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                                <br/>
+                                <label for="filter_industry">Specialization:</label>
+                                <select id="filter_industry">
+                                <?php
+                                if (empty($this->criterias['industry'])) {
+                                ?>
+                                    <option value="" selected>Any</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="">Any</option>
+                                <?php
+                                }
+                                ?>
+                                    <option value="" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($this->job_search->result_industries as $industry) {
+                                    if ($this->criterias['industry'] == $industry['id']) {
+                                ?>
+                                    <option value="<?php echo $industry['id'] ?>" selected><?php echo $industry['name'] ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $industry['id'] ?>"><?php echo $industry['name'] ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                                <br/>
+                                <label for="filter_country">Country:</label>
+                                <select id="filter_country" onChange="changed_country();">
+                                <?php
+                                if (empty($this->country_code)) {
+                                ?>
+                                    <option value="" selected>Any</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="">Any</option>
+                                <?php
+                                }
+                                ?>
+                                    <option value="" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($this->job_search->result_countries as $country) {
+                                    if ($this->country_code == $country['id']) {
+                                ?>
+                                    <option value="<?php echo $country['id'] ?>" selected><?php echo $country['name'] ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $country['id'] ?>"><?php echo $country['name'] ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                                <br/>
+                                <label for="filter_salary">Salary from:</label>
+                                <select id="filter_salary">
+                                <?php
+                                if ($this->criterias['salary'] <= 0) {
+                                ?>
+                                    <option value="" selected>Any</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="">Any</option>
+                                <?php
+                                }
+                                ?>
+                                    <option value="" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($this->job_search->result_salaries as $salary) {
+                                    if ($this->criterias['salary'] == $salary) {
+                                ?>
+                                    <option value="<?php echo $salary ?>" selected><?php echo $salary ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $salary ?>"><?php echo $salary ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                            </div>
+                            <div class="filter_button">
+                                <input type="button" value="Filter Now" onClick="filter_jobs();" />
+                            </div>
                         </div>
                     </td>
                 </tr>
             </table>
         </div>
         
-        <div class="pagination">
+        <div class="pagination" id="pagination">
         <?php
         if ($this->job_search->total_results() <= $GLOBALS['default_results_per_page']) {
         ?>
@@ -193,7 +315,7 @@ class SearchPage extends Page {
                 $current_page = ceil($this->criterias['offset'] / $GLOBALS['default_results_per_page']) + 1;
             }
             
-            for ($page=0; $page <= $total_pages; $page++) {
+            for ($page=0; $page < $total_pages; $page++) {
                 if (($page+1) == $current_page) {
             ?>
                 <option value="<?php echo $page; ?>" selected><?php echo ($page+1) ?></option>
@@ -206,39 +328,11 @@ class SearchPage extends Page {
             }
         ?>
             </select>
-            of <?php echo $this->job_search->total_results() ?>
+            of <?php echo $total_pages ?>
         <?php
         }
         ?>
         </div>
-        
-        <!-- div id="div_search_results">
-            <div class="filters">
-                Show all available jobs in <span id="filter_industry_dropdown"></span> from <span id="filter_country_dropdown"></span> with <span id="filter_limit_dropdown"></span> jobs in each page.
-            </div>
-            <div class="page_navigation">
-                <span id="previous_page"></span>&nbsp;&nbsp;&nbsp;Page <span id="current_page"></span> of <span id="total_page"></span>&nbsp;&nbsp;&nbsp;<span id="next_page"></span>
-            </div>
-            <table class="header">
-                <tr>
-                    <td class="match_percentage"><span class="sort" id="sort_match_percentage">Match</span></td>
-                    <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
-                    <td class="industry"><span class="sort" id="sort_industry">Specialization</span></td>
-                    <td class="title"><span class="sort" id="sort_title">Job</span></td>
-                    <td class="date"><span class="sort" id="sort_created_on">Created On</span></td>
-                    <td class="country"><span class="sort" id="sort_country">Country</span></td>
-                    <td class="state"><span class="sort" id="sort_state">State/Area</span></td>
-                    <td class="salary"><span class="sort" id="sort_salary">Monthly Salary</span></td>
-                    <td class="potential_reward"><span class="sort" id="sort_potential_reward">Potential Rewards</span></td>
-                </tr>
-            </table>
-            <div id="div_list">
-            </div>
-            <div class="page_navigation">
-                <span id="previous_page_1"></span>&nbsp;&nbsp;&nbsp;Page <span id="current_page_1"></span> of <span id="total_page_1"></span>&nbsp;&nbsp;&nbsp;<span id="next_page_1"></span>
-            </div>
-        </div -->
-        
         
         <!-- popup windows goes here -->
         
