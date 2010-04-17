@@ -56,6 +56,7 @@ class SearchPage extends Page {
         echo 'var keywords = "'. $this->criterias['keywords']. '";'. "\n";
         echo 'var is_local = '. $this->criterias['is_local']. ';'. "\n";
         echo 'var filter_salary = '. $this->criterias['salary']. ';'. "\n";
+        echo 'var filter_salary_end = '. ((isset($this->criterias['salary_end'])) ? $this->criterias['salary_end'] : 0). ';'. "\n";
         
         $limit = (isset($this->criterias['limit'])) ? $this->criterias['limit'] : $GLOBALS['default_results_per_page'];
         echo 'var limit = "'. $limit. '";'. "\n";
@@ -234,7 +235,7 @@ class SearchPage extends Page {
                                 <label for="filter_country">Country:</label>
                                 <select id="filter_country" onChange="changed_country();">
                                 <?php
-                                if (empty($this->country_code)) {
+                                if (empty($this->country_code) || $this->country_code <= 0) {
                                 ?>
                                     <option value="" selected>Any</option>
                                 <?php

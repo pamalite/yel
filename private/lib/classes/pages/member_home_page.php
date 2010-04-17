@@ -86,7 +86,8 @@ class MemberHomePage extends Page {
         $this->top_search('Home');
         $this->menu('member', 'home');
         
-        $currency = Currency::getSymbolFromCountryCode($this->member->getCountry());
+        $country = $this->member->getCountry();
+        $currency = Currency::getSymbolFromCountryCode($country);
         $completeness_raw = $this->get_completeness();
         $completeness_percent = 0;
         $next_step = '';
@@ -356,20 +357,20 @@ class MemberHomePage extends Page {
                     <div class="quick_search">
                         <div class="quick_search_title">Quick Search</div>
                         <ul class="quick_search_list">
-                            <li><a class="no_link" onClick="quick_search_jobs('latest');">Latest jobs</a></li>
-                            <li><a class="no_link" onClick="quick_search_jobs('top');">Top jobs</a></li>
+                            <li><a href="../search.php?special=latest&country=<?php echo $country; ?>">Latest jobs</a></li>
+                            <li><a href="../search.php?special=top&country=<?php echo $country; ?>">Top jobs</a></li>
                             <li>
-                                <a class="no_link" onClick="quick_search_jobs('country', '<?php echo $this->member->getCountry(); ?>');">Jobs in <?php echo Country::getCountryFrom($this->member->getCountry()); ?></a>
+                                <a href="../search.php?special=country&country=<?php echo $country; ?>">Jobs in <?php echo Country::getCountryFrom($country); ?></a>
                             </li>
                             <li>
                                 Jobs in salary range:
                                 <ul class="quick_search_list_inner">
-                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 8001, 0);">above <?php echo $currency; ?>$ 8,000</a></li>
-                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 7001, 8000);"><?php echo $currency; ?>$ 7,000 - 8,000</a></li>
-                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 6001, 7000);"><?php echo $currency; ?>$ 6,000 - 7,000</a></li>
-                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 5001, 6000);"><?php echo $currency; ?>$ 5,000 - 6,000</a></li>
-                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 4001, 5000);"><?php echo $currency; ?>$ 4,000 - 5,000</a></li>
-                                    <li><a class="no_link" onClick="quick_search_jobs('salary', 3000, 4000);"><?php echo $currency; ?>$ 3,000 - 4,000</a></li>
+                                    <li><a href="../search.php?special=salary&range=0&country=<?php echo $country; ?>">above <?php echo $currency; ?>$ 8,000</a></li>
+                                    <li><a href="../search.php?special=salary&range=1&country=<?php echo $country; ?>">$ 7,000 - 8,000</a></li>
+                                    <li><a href="../search.php?special=salary&range=2&country=<?php echo $country; ?>">$ 6,000 - 7,000</a></li>
+                                    <li><a href="../search.php?special=salary&range=3&country=<?php echo $country; ?>">$ 5,000 - 6,000</a></li>
+                                    <li><a href="../search.php?special=salary&range=4&country=<?php echo $country; ?>">$ 4,000 - 5,000</a></li>
+                                    <li><a href="../search.php?special=salary&range=5&country=<?php echo $country; ?>">$ 3,000 - 4,000</a></li>
                                 </ul>
                             </li>
                         </ul>

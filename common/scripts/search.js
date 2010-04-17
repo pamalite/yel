@@ -40,6 +40,11 @@ function show_jobs() {
     params = params + '&country_code=' + country_code;
     params = params + '&is_local=' + is_local;
     params = params + '&salary=' + filter_salary;
+    
+    if (parseInt(filter_salary_end) > 0) {
+        params = params + '&salary_end=' + filter_salary_end;
+    }
+    
     params = params + '&keywords=' + keywords;
     params = params + '&offset=' + offset;
     params = params + '&limit=' + limit;

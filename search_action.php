@@ -18,6 +18,7 @@ if (!isset($_POST['action'])) {
     $criteria['keywords'] = $_POST['keywords'];
     $criteria['is_local'] = 1;
     $criteria['salary'] = 0;
+    $criteria['salary_end'] = 0;
     
     $_SESSION['yel']['job_search']['criteria'] = $criteria;
     
@@ -49,6 +50,11 @@ if (!isset($_POST['action'])) {
     if (isset($_POST['salary'])) {
         $criteria['salary'] = $_POST['salary'];
         $_SESSION['yel']['job_search']['criteria']['salary'] = $_POST['salary'];
+    }
+    
+    if (isset($_POST['salary_end'])) {
+        $criteria['salary_end'] = $_POST['salary_end'];
+        $_SESSION['yel']['job_search']['criteria']['salary_end'] = $_POST['salary_end'];
     }
     
     if (isset($_POST['limit'])) {

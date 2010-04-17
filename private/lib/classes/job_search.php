@@ -7,6 +7,7 @@ class JobSearch {
     private $keywords = '';
     private $country_code = '';
     private $salary = 0;
+    private $salary_end = 0;
     private $order_by = 'jobs.created_on DESC';
     private $limit = '';
     private $offset = 0;
@@ -15,6 +16,7 @@ class JobSearch {
     private $pages = 1;
     private $changed_country_code = false;
     private $time_elapsed = 0;
+    private $special = '';
     
     public $result_countries = array();
     public $result_employers = array();
@@ -106,6 +108,22 @@ class JobSearch {
         $filter_salary = "";
         if ($this->salary > 0) {
             $filter_salary = "jobs.salary >= ". $this->salary;
+            if ($this->salary_end > 0) {
+                $filter_salary = "(jobs.salary BETWEEN ". $this->salary. " AND ". $this->salary_end. ")";
+            }
+        }
+        
+        $filter_latest = "";
+        if ($this->special == 'latest') {
+            $filter_latest = "jobs.created_on BETWEEN date_add(CURDATE(), INTERVAL -5 DAY) AND CURDATE() ";
+            $this->offset = 0;
+            $this->limit = 10;
+            $with_limit = true;
+        } else if ($this->special == 'top') {
+            $this->order_by = "jobs.potential_reward DESC";
+            $this->offset = 0;
+            $this->limit = 10;
+            $with_limit = true;
         }
         
         $columns = "jobs.id, jobs.title, jobs.state, jobs.salary, jobs.salary_end, jobs.description, 
@@ -134,6 +152,10 @@ class JobSearch {
         
         if (!empty($filter_salary)) {
             $match .= "AND ". $filter_salary. " ";
+        }
+        
+        if (!empty($filter_latest)) {
+            $match .= "AND ". $filter_latest. " ";
         }
         
         $order = $this->order_by;
@@ -172,7 +194,7 @@ class JobSearch {
     }
     
     public function search_using($_criterias) {
-        if (!empty($_criterias['employer'])) {
+        if (!empty($_criterias['employer']) && $_criteria['employer'] != 0) {
             $this->employer = $_criterias['employer'];
         }
         
@@ -197,6 +219,10 @@ class JobSearch {
             $this->salary = $_criterias['salary'];
         }
         
+        if (array_key_exists('salary_end', $_criterias)) {
+            $this->salary_end = $_criterias['salary_end'];
+        }
+        
         if (array_key_exists('order_by', $_criterias)) {
             $this->order_by = $_criterias['order_by'];
         }
@@ -207,6 +233,10 @@ class JobSearch {
         
         if (array_key_exists('offset', $_criterias)) {
             $this->offset = $_criterias['offset'];
+        }
+        
+        if (array_key_exists('special', $_criterias)) {
+            $this->special = $_criterias['special'];
         }
         
         $criteria = $this->make_query();
