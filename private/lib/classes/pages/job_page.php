@@ -60,7 +60,7 @@ class JobPage extends Page {
         }
         
         echo '</script>'. "\n";
-        // echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
+        echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
     }
     
     public function is_employee_viewing() {
@@ -293,7 +293,7 @@ class JobPage extends Page {
                                     <td>
                                         <input type="hidden" name="referrer_email" id="referrer_email" value="<?php echo $this->member->getId(); ?>" />
                                         <?php echo $this->member->getId(); ?>
-                                        </td>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="label"><label for="referrer_phone">Telephone:</label></td>
@@ -304,7 +304,12 @@ class JobPage extends Page {
                                     <td>
                                         <input type="hidden" name="referrer_name" id="referrer_name" value="<?php echo  $this->member->getFullName(); ?>" />
                                         <?php echo  $this->member->getFullName(); ?>
-                                        </td>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="note">Tip: To change your contact details, please update your Profile in the Profile page.</div>
+                                    </td>
                                 </tr>
                             <?php
                             } else {
@@ -321,6 +326,11 @@ class JobPage extends Page {
                                     <td class="label"><label for="referrer_name">Name:</label></td>
                                     <td><input type="text" class="field" name="referrer_name" id="referrer_name" value="" /></td>
                                 </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <div class="note">Tip: Sign up to have these fields pre-filled.</div>
+                                    </td>
+                                </tr>
                             <?php
                             }
                             ?>
@@ -329,7 +339,7 @@ class JobPage extends Page {
                         <td class="candidate">
                             <table class="candidate">
                                 <tr>
-                                    <td colspan="2" class="title">Candidate's Contact Details</td>
+                                    <td colspan="2" class="title">Candidate's Contact Details &amp; Resume</td>
                                 </tr>
                                 <tr>
                                     <td class="label"><label for="candidate_email">E-mail Address:</label></td>
@@ -360,11 +370,101 @@ class JobPage extends Page {
         
         <div id="apply_window" class="popup_window">
             <div class="popup_window_title">Apply for a Job</div>
+            <form id="apply_form" action="apply_action.php" method="post" enctype="multipart/form-data" target="upload_target">
+                <input type="hidden" name="job_id" value="<?php echo $this->job_id ?>" />
+                <table class="apply_form">
+                <?php
+                if (!is_null($this->member)) {
+                ?>
+                    <tr>
+                        <td class="label"><label for="apply_email">E-mail Address:</label></td>
+                        <td>
+                            <input type="hidden" name="apply_email" id="apply_email" value="<?php echo $this->member->getId(); ?>" />
+                            <?php echo $this->member->getId(); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_phone">Telephone:</label></td>
+                        <td><input type="text" class="field" name="apply_phone" id="apply_phone" value="<?php echo  $this->member->getPhone(); ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_name">Name:</label></td>
+                        <td>
+                            <input type="hidden" name="apply_name" id="apply_name" value="<?php echo  $this->member->getFullName(); ?>" />
+                            <?php echo  $this->member->getFullName(); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_resume">Resume:</label></td>
+                        <td>
+                            Choose: 
+                        <?php
+                        if ($this->member->hasResume()) {
+                        ?>
+                            <select id="resume">
+                                <option value=0 selected>from one of your pre-uploads</option>
+                                <option value=0 disabled>&nbsp;</option>
+                        <?php
+                                $criteria = array(
+                                    'columns' => 'id, file_name', 
+                                    'match' => "member = '". $this->member->getId(). "'"
+                                );
+
+                                $resume = new Resume();
+                                $result = $resume->find($criteria);
+                                foreach ($result as $row) {
+                        ?>
+                                <option value="<?php echo $row['id'] ?>"><?php echo $row['file_name'] ?></option>
+                        <?php
+                                }
+                        ?>
+                            </select>
+                        <?php
+                        }
+                        ?>
+                            or<br/>
+                            Upload New:
+                            <input type="file" name="apply_resume" id="apply_resume" value="" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div class="note">Tip: To change your contact details and update your list of resumes, please update your Profile in the Profile page and upload your resume in Resumes page.</div>
+                        </td>
+                    </tr>
+                <?php
+                } else {
+                ?>
+                    <tr>
+                        <td class="label"><label for="apply_email">E-mail Address:</label></td>
+                        <td><input type="text" class="field" name="apply_email" id="apply_email" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_phone">Telephone:</label></td>
+                        <td><input type="text" class="field" name="apply_phone" id="apply_phone" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_name">Name:</label></td>
+                        <td><input type="text" class="field" name="apply_name" id="apply_name" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_resume">Resume:</label></td>
+                        <td><input type="file" name="apply_resume" id="apply_resume" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div class="note">Tip: Sign up to have these fields pre-filled.</div>
+                        </td>
+                    </tr>
+                <?php
+                }
+                ?>
+                </table>                
+            </form>
             <div class="popup_window_buttons_bar">
                  <input type="button" value="Apply Now" onClick="close_apply_popup(true);" />
                  <input type="button" value="Cancel" onClick="close_apply_popup(false);" />
             </div>
-            
         </div>
         
         <!-- upload target -->

@@ -91,14 +91,19 @@
     width: 800px;
 }
 
-.refer_form {
+#apply_window {
+    width: 550px;
+}
+
+.refer_form, .apply_form {
     width: 99%;
     margin: auto;
 }
 
-.refer_form td {
+.refer_form td, 
+.apply_form td {
     padding: 3px 3px 3px 3px;
-    vertical-align: top;
+    vertical-align: baseline;
 }
 
 .refer_form td.referrer {
@@ -112,7 +117,8 @@
 }
 
 .referrer input.field, 
-.candidate input.field {
+.candidate input.field, 
+.apply_form input.field {
     width: 97%;
     font-size: 10pt;
 }
@@ -127,4 +133,12 @@
     background-color: #EEEEEE;
     font-weight: bold;
     font-size: 11pt;
+}
+
+.note {
+    font-style: italic;
+    font-size: 9pt;
+    text-align: center;
+    color: #AAAAAA;
+    margin-top: 5px;
 }

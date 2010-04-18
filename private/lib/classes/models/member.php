@@ -408,6 +408,18 @@ class Member implements Model {
         return $this->mysqli->query($query);
     }
     
+    public function hasResume() {
+        $query = "SELECT COUNT(*) AS has_resume 
+                  FROM resumes 
+                  WHERE member = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['has_resume'] > 0) {
+            return true;
+        }
+        
+        return false;
+    }
+    
     public function getApprovedPhotoURL() {
         $query = "SELECT * FROM member_photos 
                   WHERE member = '". $this->id. "' AND approved = 'Y' 
