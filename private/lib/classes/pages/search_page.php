@@ -145,7 +145,9 @@ class SearchPage extends Page {
                                 </span>
                                 &nbsp;
                                 <span class="controls">
-                                    <a class="no_link" onClick="show_refer_window(<?php echo $row['id'] ?>);">Refer Now</a>
+                                    <a href="./job/<?php echo $row['id'] ?>?refer=1">Refer Now</a>
+                                    |
+                                    <a href="./job/<?php echo $row['id'] ?>?apply=1">Apply Now</a>
                                     |
                                     <a href="./job/<?php echo $row['id']; ?>">View Details</a>
                                 </span>

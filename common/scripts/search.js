@@ -129,7 +129,7 @@ function show_jobs() {
                     job_short_details = job_short_details + '</span>' + "\n";
                     job_short_details = job_short_details + '&nbsp;<span class="reward">Potential Reward:' + currencies[i].childNodes[0].nodeValue + '$ ' + rewards[i].childNodes[0].nodeValue + '</span>' + "\n";
                     job_short_details = job_short_details + '&nbsp;<span class="controls">' + "\n";
-                    job_short_details = job_short_details + '<a class="no_link" onClick="show_refer_window(' + ids[0].childNodes[0].nodeValue  + ');">Refer Now</a> | <a href="./job/' + ids[i].childNodes[0].nodeValue + '">View Details</a>' + '</span>' + "\n";
+                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '?refer=1">Refer Now</a> | <a href="./job/' + ids[i].childNodes[0].nodeValue + '?apply=1">Apply Now</a> | <a href="./job/' + ids[i].childNodes[0].nodeValue + '">View Details</a>' + '</span>' + "\n";
                     job_short_details = job_short_details + '</div>' + "\n";
                     
                     job_short_details = job_short_details + '<div class="expire_on">Expires on ' + expire_ons[i].childNodes[0].nodeValue + '</div>' + "\n";
@@ -140,6 +140,10 @@ function show_jobs() {
                 
                 $('results').set('html', html);
                 window.scrollTo(0, 0);
+                
+                if ($('page') != null) {
+                    $('page').blur();
+                }
             }
             
             is_filter = false;

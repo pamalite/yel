@@ -379,6 +379,16 @@ class Member implements Model {
         return false;
     }
     
+    public function getPhone() {
+        $query = "SELECT phone_num 
+                  FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
+        if ($phone = $this->mysqli->query($query)) {
+            return $phone[0]['phone_num'];
+        }
+        
+        return false;
+    }
+    
     public function getCountry() {
         $query = "SELECT members.country, countries.country AS country_name 
                   FROM members 

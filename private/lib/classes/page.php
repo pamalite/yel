@@ -207,87 +207,90 @@ class Page {
             $i++;
         }
         ?>
+        
         <div class="top">
-            <div class="top_logo">
-                <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/index.php">
-                    <img name="logo" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/top.jpg" />
-                </a>
-            </div>
-            
-            <div class="top_search">
-                <form method="post" action="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/search.php" onSubmit="return verify_mini();">
-                    <?php
-                        $country = $_SESSION['yel']['country_code'];
+            <table class="top">
+                <tr>
+                    <td class="top_logo">
+                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/index.php">
+                            <img name="logo" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/top.jpg" />
+                        </a>
+                    </td>
+                    <td class="top_search">
+                        <form method="post" action="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/search.php" onSubmit="return verify_mini();">
+                            <?php
+                                $country = $_SESSION['yel']['country_code'];
+                                if (isset($_SESSION['yel']['member']) &&
+                                    !empty($_SESSION['yel']['member']['id']) && 
+                                    !empty($_SESSION['yel']['member']['sid']) && 
+                                    !empty($_SESSION['yel']['member']['hash'])) {
+                                    $member = new Member($_SESSION['yel']['member']['id']);
+                                    $country = $member->getCountry();
+                                }
+                            ?>
+                            <input type="hidden" name="country_code" value="<?php echo $country ?>" />
+                            <select id="mini_employer" name="employer">
+                                <option value="0">Any Employer</option>
+                                <option value="0" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($employers as $emp) {
+                                ?>
+                                <option value="<?php echo $emp['id'] ?>">
+                                    <?php echo desanitize($emp['name']); ?>
+                                </option>
+                                <?php
+                                }
+                                ?>
+                            </select>
+                            &nbsp;
+                            <select id="mini_industry" name="industry">
+                                <option value="0">Any Specialization</option>
+                                <option value="0" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($industries as $industry) {
+                                    if ($industry['is_main']) {
+                                        echo '<option value="'. $industry['id']. '" class="main_industry">';
+                                        echo $industry['name'];
+                                    } else {
+                                        echo '<option value="'. $industry['id']. '">';
+                                        echo '&nbsp;&nbsp;&nbsp;&nbsp;'. $industry['name'];
+                                    }
+
+                                    if ($industry['job_count'] > 0) {
+                                        echo '&nbsp;('. $industry['job_count']. ')';
+                                    }
+                                    echo '</option>'. "\n";
+                                }
+                                ?>
+                            </select>
+                            &nbsp;
+                            <input type="radio" id="local" name="is_local" value="1" checked />
+                            <label for="local">local jobs</label>
+                            &nbsp;
+                            <input type="radio" id="international" name="is_local" value="0" />
+                            <label for="international">international jobs</label>
+                            <br/>
+                            <input type="text" name="keywords" id="mini_keywords" alt="Job title or keywords" value="" />
+                            &nbsp;
+                            <input id="mini_search_button" type="submit" value="Search Jobs">
+                        </form>
+
+                        <?php
                         if (isset($_SESSION['yel']['member']) &&
                             !empty($_SESSION['yel']['member']['id']) && 
                             !empty($_SESSION['yel']['member']['sid']) && 
                             !empty($_SESSION['yel']['member']['hash'])) {
-                            $member = new Member($_SESSION['yel']['member']['id']);
-                            $country = $member->getCountry();
-                        }
-                    ?>
-                    <input type="hidden" name="country_code" value="<?php echo $country ?>" />
-                    <select id="mini_employer" name="employer">
-                        <option value="0">Any Employer</option>
-                        <option value="0" disabled>&nbsp;</option>
-                        <?php
-                        foreach ($employers as $emp) {
                         ?>
-                        <option value="<?php echo $emp['id'] ?>">
-                            <?php echo desanitize($emp['name']); ?>
-                        </option>
+                        <div class="reminder">
+                            <img class="reminder_warn" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/warning.jpg"/>
+                            Always remember to click on the <strong>'I'm Employed'</strong> button in the <strong><a href="applications.php">Applications</a></strong> section whenever you are employed by an employer.
+                        </div>
                         <?php
                         }
                         ?>
-                    </select>
-                    &nbsp;
-                    <select id="mini_industry" name="industry">
-                        <option value="0">Any Specialization</option>
-                        <option value="0" disabled>&nbsp;</option>
-                        <?php
-                        foreach ($industries as $industry) {
-                            if ($industry['is_main']) {
-                                echo '<option value="'. $industry['id']. '" class="main_industry">';
-                                echo $industry['name'];
-                            } else {
-                                echo '<option value="'. $industry['id']. '">';
-                                echo '&nbsp;&nbsp;&nbsp;&nbsp;'. $industry['name'];
-                            }
-                            
-                            if ($industry['job_count'] > 0) {
-                                echo '&nbsp;('. $industry['job_count']. ')';
-                            }
-                            echo '</option>'. "\n";
-                        }
-                        ?>
-                    </select>
-                    &nbsp;
-                    <input type="radio" id="local" name="is_local" value="1" checked />
-                    <label for="local">local jobs</label>
-                    &nbsp;
-                    <input type="radio" id="international" name="is_local" value="0" />
-                    <label for="international">international jobs</label>
-                    <br/>
-                    <input type="text" name="keywords" id="mini_keywords" alt="Job title or keywords" value="" />
-                    &nbsp;
-                    <input id="mini_search_button" type="submit" value="Search Jobs">
-                </form>
-                
-                <?php
-                if (isset($_SESSION['yel']['member']) &&
-                    !empty($_SESSION['yel']['member']['id']) && 
-                    !empty($_SESSION['yel']['member']['sid']) && 
-                    !empty($_SESSION['yel']['member']['hash'])) {
-                ?>
-                <div class="reminder">
-                    <img class="reminder_warn" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/warning.jpg"/>
-                    Always remember to click on the <strong>'I'm Employed'</strong> button in the <strong><a href="applications.php">Applications</a></strong> section whenever you are employed by an employer.
-                </div>
-                <?php
-                }
-                ?>
-                
-            </div>
+                    </td>
+                </tr>
+            </table>
         </div>
         <?php
     }

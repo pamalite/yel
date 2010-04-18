@@ -34,9 +34,9 @@ if (isset($_SESSION['yel']['member']) &&
     !empty($_SESSION['yel']['member']['id']) && 
     !empty($_SESSION['yel']['member']['sid']) && 
     !empty($_SESSION['yel']['member']['hash'])) {
-    $job = new JobPage($_SESSION['yel']['member'], $job_id, $criteria);
+    $job_page = new JobPage($_SESSION['yel']['member'], $job_id, $criteria);
 } else {
-    $job = new JobPage(NULL, $job_id, $criteria);
+    $job_page = new JobPage(NULL, $job_id, $criteria);
 }
 
 if (isset($_SESSION['yel']['employee']) && 
@@ -44,28 +44,38 @@ if (isset($_SESSION['yel']['employee']) &&
     !empty($_SESSION['yel']['employee']['id']) || 
     !empty($_SESSION['yel']['employee']['sid']) || 
     !empty($_SESSION['yel']['employee']['hash'])) {
-    $job->is_employee_viewing();
-}
-$mysqli = Database::connect();
-$query = "SELECT jobs.title, employers.name 
-          FROM jobs 
-          LEFT JOIN employers ON employers.id = jobs.employer 
-          WHERE jobs.id = ". $job_id. " LIMIT 1";
-$result = $mysqli->query($query);
-$job_title = 'Unknown Job';
-$employer = 'Unknown Employer';
-if (!is_null($result) && count($result) >= 0) {
-    $job_title = $result[0]['title'];
-    $employer = $result[0]['name'];
+    $job_page->is_employee_viewing();
 }
 
-$job->header(array(
+$criteria = array(
+    'columns' => 'jobs.title, jobs.alternate_employer, employers.name', 
+    'joins' => 'employers ON employers.id = jobs.employer', 
+    'match' => 'jobs.id = '. $job_id, 
+    'limit' => '1'
+);
+
+$job = new Job();
+$result = $job->find($criteria);
+$job_title = (!is_null($result[0]['title'])) ? $result[0]['title'] : 'Unknown Job';
+$employer = (!is_null($result[0]['name'])) ? $result[0]['name'] : 'Unknown Employer';
+if (!is_null($result[0]['alternate_employer'])) {
+    $employer = $result[0]['alternate_employer'];
+}
+
+$show_popup = '';
+if (isset($_GET['refer'])) {
+    $show_popup = 'refer';
+} else if (isset($_GET['apply'])) {
+    $show_popup = 'apply';
+}
+
+$job_page->header(array(
     'override_title' => true,
     'title' => $employer. ' - '. $job_title
 ));
-$job->insert_job_css();
-$job->insert_job_scripts();
-$job->insert_inline_scripts();
-$job->show($from_search);
-$job->footer();
+$job_page->insert_job_css();
+$job_page->insert_job_scripts();
+$job_page->insert_inline_scripts($show_popup);
+$job_page->show($from_search);
+$job_page->footer();
 ?>
