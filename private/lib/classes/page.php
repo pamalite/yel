@@ -58,7 +58,6 @@ class Page {
         <div class="footer">
             <p>
                 &copy;<?php echo date('Y'); ?> Yellow Elevator &nbsp; 
-                <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/tour.php">Take a Tour</a> &nbsp; 
                 <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/faq.php">FAQ</a> &nbsp; 
                 <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/about.php">About Us</a> &nbsp; 
     	        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/terms.php">Terms of Use</a> &nbsp; 
@@ -77,7 +76,7 @@ class Page {
         ?>
         <div class="top">
             <div id="welcome_top">
-                <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/yellowelevator-logo.gif" alt="Elevator" width="183" height="107" id="logo" />
+                <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/yellowelevator-logo.gif" alt="Elevator" id="logo" />
                 <div class="loginpanel">
                     <?php
                     if (isset($_SESSION['yel']['employer']) && 
@@ -94,19 +93,19 @@ class Page {
                         <?php
                     } else {
                         ?>
-                    Login as an <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/" class="employer"><strong>Employer</strong></a> <span class="spacer">or a</span> <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/" class="member"><strong>Member</strong></a>
+                    <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employers/"><strong>Employers Area</strong></a>&nbsp;|&nbsp;<a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/"><strong>Members Login</strong></a>
                     <?php
                     }
                     ?>
                 </div>
                 <div class="topmenu">
-                    <table border="0" cellspacing="0" cellpadding="0">
+                    <table>
                         <tr>
-                            <td class="tour" valign="bottom"><a href="#" onClick="show_tour();"><strong>TAKE A TOUR |</strong></a></td>
-                            <td class="topmenudivider"><strong> | </strong></td>
-                            <td class="aboutus" valign="bottom"><a href="about.php"><strong>ABOUT US</strong></a></td>
-                            <td class="topmenudivider"><strong> | </strong></td>
-                            <td class="contactus" valign="bottom"><a href="contact.php"><strong>CONTACT US</strong></a></td>
+                            <td class="member_signup" valign="bottom"><a href="members/sign_up.php"><strong>Sign Up Now</strong></a></td>
+                            <td class="topmenudivider"><!-- strong> | </strong --></td>
+                            <td class="aboutus" valign="bottom"><a href="about.php"><strong>About Us</strong></a></td>
+                            <td class="topmenudivider"><!-- strong> | </strong --></td>
+                            <td class="contactus" valign="bottom"><a href="contact.php"><strong>Contact Us</strong></a></td>
                         </tr>
                     </table>
                 </div>

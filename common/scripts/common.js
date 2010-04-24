@@ -26,6 +26,18 @@ function initialize_page() {
         });
     }
     
+    if ($('keywords') != undefined) {
+        var keywords_overtext = new OverText($('keywords'));
+        
+        var suggest_url = root + '/common/php/search_suggest.php';
+        new Autocompleter.Ajax.Json('keywords', suggest_url, {
+            'postVar': 'keywords',
+            'minLength' : 1,
+            'overflow' : true,
+            'delay' : 30
+        });
+    }
+    
     OverText.update();
 }
 

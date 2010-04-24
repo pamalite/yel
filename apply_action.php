@@ -162,12 +162,12 @@ $message = str_replace('%job_title%', $job->getTitle(), $message);
 
 $subject = "New Application for ". $job->getTitle(). " position";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-// mail($branch_email, $subject, $message, $headers);
+mail($branch_email, $subject, $message, $headers);
 
-$handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
-fwrite($handle, 'Subject: '. $subject. "\n\n");
-fwrite($handle, $message);
-fclose($handle);
+// $handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
+// fwrite($handle, 'Subject: '. $subject. "\n\n");
+// fwrite($handle, $message);
+// fclose($handle);
 
 ?>
     <script type="text/javascript">top.stop_apply(<?php echo '1'; ?>);</script>

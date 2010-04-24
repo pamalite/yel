@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
+require_once dirname(__FILE__). '/../htmltable.php';
 
 class WelcomePage extends Page {
     
@@ -24,157 +25,156 @@ class WelcomePage extends Page {
     }
     
     private function generate_top_jobs() {
-        $query = "SELECT jobs.id AS job_id, jobs.title AS position_title, jobs.salary AS salary_start, 
-                  jobs.salary_end AS salary_end, jobs.potential_reward AS potential_reward, 
-                  branches.currency, employers.name AS employer
-                  FROM jobs 
-                  LEFT JOIN job_index ON job_index.job = jobs.id 
-                  LEFT JOIN employers ON employers.id = jobs.employer 
-                  LEFT JOIN branches ON branches.id = employers.branch 
-                  WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() 
-                  -- AND jobs.id NOT IN (SELECT DISTINCT job FROM job_extensions) 
-                  ORDER BY jobs.salary DESC LIMIT 10";
-        $mysql = Database::connect();
-        $result = $mysql->query($query);
+        $criteria = array(
+            'columns' => "jobs.id AS job_id, jobs.title AS position_title, jobs.salary AS salary_start, 
+                          jobs.salary_end AS salary_end, jobs.potential_reward AS potential_reward, 
+                          branches.currency, employers.name AS employer", 
+            'joins' => "job_index ON job_index.job = jobs.id, 
+                        employers ON employers.id = jobs.employer, 
+                        branches ON branches.id = employers.branch", 
+            //'match' => "jobs.closed = 'N' AND jobs.expire_on >= NOW()", 
+            'order' => "jobs.salary DESC", 
+            'limit' => "10"
+        );
         
-        ?>
-    <table border="0" cellspacing="0" cellpadding="0" class="border">
-        <tr>
-          <td class="table-tl"></td>
-          <td class="table-tc"></td>
-          <td class="table-tr"></td>
-        </tr>
-        <tr>
-          <td class="table-cl"></td>
-          <td class="data">
-    <table class="top_jobs">
-        <?php
-        if (count($result) > 0 && !is_null($result)) {
-            ?>
-        <tr>
-            <td class="top_jobs_header">Job</td>
-            <td class="top_jobs_header">Employer</td>
-            <td class="top_jobs_header">Salary Range</td>
-            <td class="top_jobs_header">Potential Rewards</td>
-        </tr>
-            <?php
-            $odd = false;
-            foreach ($result as $job) {
-                if ($odd) {
-                    ?>
-        <tr>
-                    <?php
-                    $odd = false;
-                } else {
-                    ?>
-        <tr style="background-color: #EEEEEE;">
-                    <?php
-                    $odd = true;
-                }
-                ?>
-            <td class="top_jobs_item">
-                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/job/<?php echo $job['job_id']; ?>"><?php echo $job['position_title']; ?></a>
-            </td>
-            <td class="top_jobs_item"><?php echo $job['employer']; ?></td>
-            <td class="top_jobs_item">
-                <?php 
-                    if ($job['salary_end'] <= 0) {
-                        echo 'from '. $job['currency']. ' '. number_format($job['salary_start'], 0, '.', ', '); 
-                    } else {
-                        echo $job['currency']. ' '. number_format($job['salary_start'], 0, '.', ', '). ' - '. number_format($job['salary_end'], 0, '.', ', '); 
-                    }
-                ?>
-                </td>
-            <td class="top_jobs_item">
-                <?php 
-                    $total_potential_reward = $job['potential_reward'];
-                    $potential_token_reward = $total_potential_reward * 0.05;
-                    $potential_reward = $total_potential_reward - $potential_token_reward;
-                    echo $job['currency']. ' '. number_format($potential_reward, 0, '.', ', '); 
-                ?>
-            </td>
-        </tr>
-                <?php
+        $job = new Job();
+        $result = $job->find($criteria);
+        
+        $top_jobs_table = new HTMLTable('top_jobs_table', '');
+        
+        $top_jobs_table->set(0, 0, "Job", '', 'header');
+        $top_jobs_table->set(0, 1, "Employer", '', 'header');
+        $top_jobs_table->set(0, 2, "Salary Range", '', 'header actions');
+        $top_jobs_table->set(0, 3, "Potential Reward", '', 'header actions');
+        
+        foreach ($result as $i=>$job) {
+            $top_jobs_table->set($i+1, 0, '<a href="job/'. $job['job_id']. '">'. $job['position_title']. '</a>', '', '');
+            $top_jobs_table->set($i+1, 1, $job['employer'], '', '');
+            
+            $salary = $job['currency']. '$ '. $job['salary_start'];
+            if (!is_null($job['salary_end'])) {
+                $salary .= ' - '. $job['salary_end'];
             }
-        } else {
-            ?>
-        <tr>
-            <td class="top_jobs_item" style="text-align: center;">No open jobs at the moment.</td>
-        </tr>
-            <?php
+            $top_jobs_table->set($i+1, 2, $salary, '', '');
+            
+            $top_jobs_table->set($i+1, 3, $job['currency']. '$ '. $job['potential_reward'], '', '');
         }
-        ?>
-    </table>
-          </td>
-          <td class="table-cr"></td>
-        </tr>
-        <tr>
-          <td class="table-bl"></td>
-          <td class="table-bc"></td>
-          <td class="table-br"></td>
-        </tr>
-    </table>
-        <?php
+
+        echo $top_jobs_table->get_html();
+    }
+    
+    private function get_employers() {
+        $criteria = array(
+            'columns' => 'DISTINCT employers.id, employers.name', 
+            'joins' => 'jobs ON employers.id = jobs.employer',
+            // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'order' => 'employers.name ASC'
+        );
+        $employer = new Employer();
+        $employers = $employer->find($criteria);
+        if ($employers === false) {
+            $employers = array();
+        }
+        
+        return $employers;
+    }
+    
+    private function get_industries() {
+        $industries = array();
+        $main_industries = Industry::getMain(true);
+        $i = 0;
+        foreach ($main_industries as $main) {
+            $industries[$i]['id'] = $main['id'];
+            $industries[$i]['name'] = $main['industry'];
+            $industries[$i]['job_count'] = $main['job_count'];
+            $industries[$i]['is_main'] = true;
+            $subs = Industry::getSubIndustriesOf($main['id'], true);
+            foreach ($subs as $sub) {
+                $i++;
+
+                $industries[$i]['id'] = $sub['id'];
+                $industries[$i]['name'] = $sub['industry'];
+                $industries[$i]['job_count'] = $sub['job_count'];
+                $industries[$i]['is_main'] = false;
+            }
+            $i++;
+        }
+        
+        return $industries;
     }
     
     public function show() {
         $this->begin();
         $this->top_welcome();
+        
+        $employers = $this->get_employers();
+        $industries = $this->get_industries();
+        
+        $country = $_SESSION['yel']['country_code'];
+        if (isset($_SESSION['yel']['member']) &&
+            !empty($_SESSION['yel']['member']['id']) && 
+            !empty($_SESSION['yel']['member']['sid']) && 
+            !empty($_SESSION['yel']['member']['hash'])) {
+            $member = new Member($_SESSION['yel']['member']['id']);
+            $country = $member->getCountry();
+        }
+        
         ?>
-        <div id="search_info">
-            <div class="job_search">
-                <form method="post" action="search.php" onSubmit="return verify();">
-                    <div class="search_form">
-                        <span id="employer_drop_down"></span>
-                        <span id="industry_drop_down"></span><br/>
-                        <div style="padding-top: 5px;">
-                            <input type="text" name="keywords" id="keywords" value="Job title or keywords">
-                            <input type="image" name="submit" id="search_button" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/but-search.gif" value="Search" />
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="intro" style="font-size: 8pt;"> While you search for mid-high level job opportunities for yourself, you can also refer jobs to your contacts and earn rewards for every successful referral. Furthermore, we will contact you directly whenever there are job opportunities that match your resume. So sign up and upload your resume today!</div>
-            <a href="#" class="takeatour" onClick="show_tour();">
-                <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/take_a_tour.gif" />
-            </a>
-            <a href="members/sign_up.php" class="signup">
-                <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/sign_up_upload_resume.gif" />
-            </a>
-        </div>
-        <div id="action_buttons_jasmine">
-            <div class="box employer">
-                <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/but-be-emp.gif" width="257" height="28" class="title" />
-                <div class="descr">
-                    &gt; Better Screened Candidates<br/>
-                    &gt; Faster Turn Around Time<br/>
-                    &gt; <strong>Free Job Postings</strong><br/>
-                    &gt; <strong>Free Registration</strong><br/>
-                </div>
-                <a href="#" class="signup" onClick="show_contact_drop_form();"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/contact_sign_up.jpg" /></a>
-            </div>
-            <div class="box member"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/but-be-mem.gif" width="257" height="28" class="title" />
-                <div class="descr">
-                    &gt; Access To Mid-High Level Job Opportunities<br/>
-                    &gt; Greater Rewards For Every Successful Referral<br/>
-                    &gt; Effective Tracking Of Job Applications<br/>
-                    &gt; Bonus if you are hired<br/>
-                    &gt; <strong>Free Membership</strong><br/>
-                </div>
-                <a href="members/sign_up.php" class="signup2"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/click_sign_up.jpg" /></a>
-            </div>
-        </div>
-        <div id="sign_up_banner">
-            <a href="members/sign_up.php?indiv_hh=1"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/bigtitle.gif" /></a>
+        <div class="introduction_panels">
+            Introduction panels goes here.
+            <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
+            <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
+            <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
+            <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
         </div>
         
-        <div id="top_jobs">
-            <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/topjobs.gif" width="326" height="46" class="topjobs" />
-            <?php echo $this->generate_top_jobs() ?>
+        <div class="search">
+            <form method="post" action="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/search.php" onSubmit="return verify();">
+                <select id="employer" name="employer">
+                    <option value="0">Any Employer</option>
+                    <option value="0" disabled>&nbsp;</option>
+                    <?php
+                    foreach ($employers as $emp) {
+                    ?>
+                    <option value="<?php echo $emp['id'] ?>">
+                        <?php echo desanitize($emp['name']); ?>
+                    </option>
+                    <?php
+                    }
+                    ?>
+                </select>
+                <select id="industry" name="industry">
+                    <option value="0">Any Specialization</option>
+                    <option value="0" disabled>&nbsp;</option>
+                    <?php
+                    foreach ($industries as $industry) {
+                        if ($industry['is_main']) {
+                            echo '<option value="'. $industry['id']. '" class="main_industry">';
+                            echo $industry['name'];
+                        } else {
+                            echo '<option value="'. $industry['id']. '">';
+                            echo '&nbsp;&nbsp;&nbsp;&nbsp;'. $industry['name'];
+                        }
+
+                        if ($industry['job_count'] > 0) {
+                            echo '&nbsp;('. $industry['job_count']. ')';
+                        }
+                        echo '</option>'. "\n";
+                    }
+                    ?>
+                </select><br/>
+                <input type="text" name="keywords" id="keywords" value="" alt="Job title or keywords" />
+                <input type="submit" value="Search Jobs" /><br/>
+                <input type="radio" id="local" name="is_local" value="1" checked />
+                <label class="scope" for="local">local jobs</label>
+                &nbsp;
+                <input type="radio" id="international" name="is_local" value="0" />
+                <label class="scope" for="international">international jobs</label>
+            </form>
         </div>
         
-        <div class="rewards" id="total_potential_rewards">
-            Loading potential rewards...
+        <div class="top_jobs">
+            <?php $this->generate_top_jobs() ?>
         </div>
         
         <div id="top_employers">
@@ -241,46 +241,6 @@ class WelcomePage extends Page {
                     </tr>
                 </table>
             </div>
-        </div>
-        
-        <div style="width: 100%; margin:auto; text-align: center; padding-top: 30px;">
-            <a href="http://twitter.com/yellowelevator" target="_new">
-                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/twitter_button.jpg" />
-            </a>
-        </div>
-        
-        <div id="div_blanket"></div>
-        <div id="div_contact_drop_form">
-            <form method="post" id="contact_drop_form" onSubmit="return false;">
-                <table class="drop_contact">
-                    <tr>
-                        <td colspan="2" class="title">Drop Us Your Contact</td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="company">Company Name:</label></td>
-                        <td><input type="text" id="company" name="company" value=""></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="phone">Contact Number:</label></td>
-                        <td><input type="text" id="phone" name="phone" value=""></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="email">E-mail Address:</label></td>
-                        <td><input type="text" id="email" name="email" value=""></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="contact">Contact Person:</label></td>
-                        <td><input type="text" id="contact" name="contact" value=""></td>
-                    </tr>
-                    <tr>
-                        <td class="buttons" colspan="2">
-                            <input type="button" class="drop" onClick="close_contact_drop_form();" value="Cancel">
-                            &nbsp;
-                            <input type="button" class="drop" id="drop" value="Drop My Contact Now">
-                        </td>
-                    </tr>
-                </table>
-            </form>
         </div>
         
         <?php
