@@ -60,7 +60,7 @@ class JobPage extends Page {
         }
         
         echo '</script>'. "\n";
-        echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
+        // echo '<script type="text/javascript" src="http://w.sharethis.com/button/sharethis.js#publisher=abd4d798-c853-4cba-ad91-8cad043044b8&amp;type=website&amp;style=rotate&amp;post_services=email%2Creddit%2Cfacebook%2Ctwitter%2Cmyspace%2Cdigg%2Csms%2Cwindows_live%2Cdelicious%2Cgoogle_bmarks%2Clinkedin%2Cblogger%2Cwordpress"></script>';
     }
     
     public function is_employee_viewing() {
@@ -276,7 +276,11 @@ class JobPage extends Page {
         <!-- popup window goes here -->
         <div id="refer_window" class="popup_window">
             <div class="popup_window_title">Refer a Job</div>
-            <form id="refer_form" action="refer_action.php" method="post" enctype="multipart/form-data" target="upload_target">
+            <div id="refer_progress">
+                Please wait while your request is being processed... <br/><br/>
+                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
+            </div>
+            <form id="refer_form" action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/refer_action.php" method="post" enctype="multipart/form-data" target="upload_target">
                 <input type="hidden" name="job_id" value="<?php echo $this->job_id ?>" />
                 <table class="refer_form">
                     <tr>
@@ -370,7 +374,11 @@ class JobPage extends Page {
         
         <div id="apply_window" class="popup_window">
             <div class="popup_window_title">Apply for a Job</div>
-            <form id="apply_form" action="apply_action.php" method="post" enctype="multipart/form-data" target="upload_target">
+            <div id="apply_progress">
+                Please wait while your request is being processed... <br/><br/>
+                <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
+            </div>
+            <form id="apply_form" action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/apply_action.php" method="post" enctype="multipart/form-data" target="upload_target">
                 <input type="hidden" name="job_id" value="<?php echo $this->job_id ?>" />
                 <table class="apply_form">
                 <?php
@@ -401,9 +409,9 @@ class JobPage extends Page {
                         <?php
                         if ($this->member->hasResume()) {
                         ?>
-                            <select id="resume">
-                                <option value=0 selected>from one of your pre-uploads</option>
-                                <option value=0 disabled>&nbsp;</option>
+                            <select id="existing_resume" name="existing_resume" onChange="toggle_resume_upload();">
+                                <option value="0" selected>from one of your pre-uploads</option>
+                                <option value="0" disabled>&nbsp;</option>
                         <?php
                                 $criteria = array(
                                     'columns' => 'id, file_name', 
@@ -468,7 +476,7 @@ class JobPage extends Page {
         </div>
         
         <!-- upload target -->
-        <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:0px;height:0px;border:none;"></iframe>
+        <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:100%;height:500px;border:1px solid black;"></iframe>
         <?php
     }
 }

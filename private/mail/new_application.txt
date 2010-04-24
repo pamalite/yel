@@ -1,0 +1,8 @@
+Hi,
+
+A new application for %job_title% was made on %request_on%. 
+
+Candidate: %candidate% (%candidate_email%)
+
+Yellow Elevator
+Refer a job

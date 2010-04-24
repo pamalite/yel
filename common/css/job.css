@@ -142,3 +142,12 @@
     color: #AAAAAA;
     margin-top: 5px;
 }
+
+#refer_progress, #apply_progress {
+    display: none;
+    text-align: center; 
+    width: 99%; 
+    margin: auto;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}

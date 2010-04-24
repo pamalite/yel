@@ -34,7 +34,7 @@ class Resume implements Model{
         return true;
     }
     
-    private function getTextFromRTF($_file) {
+    public static function getTextFromRTF($_file) {
         $content = file_get_contents($_file);
         $text = '';
         $is_tag = false;
@@ -58,7 +58,7 @@ class Resume implements Model{
         return $text;
     }
     
-    private function getTextFromMsword($_userDoc) {
+    public static function getTextFromMsword($_userDoc) {
         $fileHandle = fopen($_userDoc, "r");
         $line = @fread($fileHandle, filesize($userDoc));
         $lines = explode(chr(0x0D),$line);
@@ -356,16 +356,16 @@ class Resume implements Model{
                                     }
                                     break;
                                 case 'application/msword':
-                                    $tmp = $this->getTextFromMsword($GLOBALS['resume_dir']. "/". $new_name);
+                                    $tmp = Resume::getTextFromMsword($GLOBALS['resume_dir']. "/". $new_name);
                                     if (empty($tmp)) {
-                                        $tmp = $this->getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
+                                        $tmp = Resume::getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
                                     }
                                     $resume_text = sanitize($tmp);
                                     break;
                                 case 'application/rtf':
-                                    $tmp = $this->getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
+                                    $tmp = Resume::getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
                                     if (empty($tmp)) {
-                                        $tmp = $this->getTextFromMsword($GLOBALS['resume_dir']. "/". $new_name);
+                                        $tmp = Resume::getTextFromMsword($GLOBALS['resume_dir']. "/". $new_name);
                                     }
                                     $resume_text = sanitize($tmp);
                                     break;

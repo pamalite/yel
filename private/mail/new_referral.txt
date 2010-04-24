@@ -1,0 +1,10 @@
+Hi,
+
+A new referral for %job_title% was made on %request_on%. 
+
+Referrer: %referrer% (%referrer_email%)
+Candidate: %candidate% (%candidate_email%)
+Has resume: %has_resume%
+
+Yellow Elevator
+Refer a job

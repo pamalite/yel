@@ -26,6 +26,11 @@ if (isset($_GET['id'])) {
     } else {
         $job_id = $url_elements[count($url_elements)-2];
     }
+    
+    $pos = stripos($job_id, '?');
+    if ($pos !== false) {
+        $job_id = substr($job_id, 0, $pos);
+    }
 }
 
 // 2. Generate page

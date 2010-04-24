@@ -255,6 +255,16 @@ class Job implements Model {
         return $this->mysqli->query($query);
     }
     
+    public function getTitle() {
+        $query = "SELECT title FROM jobs WHERE id = '". $this->id. "' LIMIT 1";
+        $result = $this->mysqli->query($query);
+        if ($result !== false) {
+            return $result[0]['title'];
+        }
+        
+        return false;
+    }
+    
     public function getId() {
         return $this->id;
     }
