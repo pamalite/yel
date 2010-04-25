@@ -241,14 +241,6 @@ class JobPage extends Page {
                         </div>
                         <div class="actions">
                             <div class="action_item">
-                                <script language="javascript" type="text/javascript">
-                                    SHARETHIS.addEntry({
-                                        title: '<?php echo $job['title']; ?> on YellowElevator.com',
-                                        summary: 'Check this job, by <?php echo $job['employer_name'] ?>, out at yellowelevator.com!'
-                                    }, {button:true} );
-                                </script>
-                            </div>
-                            <div class="action_item">
                                 <a class="no_link" onClick="show_refer_popup();">Refer Now</a>
                             </div>
                             <div class="action_item">
