@@ -266,7 +266,7 @@ class JobPage extends Page {
         
         <!-- popup window goes here -->
         <div id="refer_window" class="popup_window">
-            <div class="popup_window_title">Refer a Job</div>
+            <div class="popup_window_title">Refer <?php echo desanitize($job['title']); ?></div>
             <div id="refer_progress">
                 Please wait while your request is being processed... <br/><br/>
                 <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
@@ -364,7 +364,7 @@ class JobPage extends Page {
         </div>
         
         <div id="apply_window" class="popup_window">
-            <div class="popup_window_title">Apply for a Job</div>
+            <div class="popup_window_title">Apply for <?php echo desanitize($job['title']); ?></div>
             <div id="apply_progress">
                 Please wait while your request is being processed... <br/><br/>
                 <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />

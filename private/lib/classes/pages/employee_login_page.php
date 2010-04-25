@@ -25,34 +25,25 @@ class EmployeeLoginPage extends Page {
     
     public function show($_error = "") {
         $this->begin();
-        $this->top("Yellow Elevator - Employees");
+        $this->top('Employee Sign In');
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
-        <form method="post" id="login_form" onSubmit="return false">
-            <div class="login">
-                <table class="login">
-                    <tr>
-                        <td colspan="2" class="title">Employee Sign In</td>
-                    </tr>
-                    <tr>
-                        <td class="id"><label for="id">User ID:</label></td>
-                        <td><input type="text" id="id" name="id" value=""></td>
-                    </tr>
-                    <tr>
-                        <td class="password"><label for="password">Password:</label></td>
-                        <td><input type="password" id="password" name="password"></td>
-                    </tr>
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td>
-                            <input type="submit" class="login" id="login" value="Sign In">
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </form>
+        
+        <div class="login_form">
+            <form method="post" onSubmit="return false;">
+                <label for="id">User ID:</label><br/>
+                <input type="text" class="field" id="id" name="id" value="" />
+                <br/><br/>
+                <label for="password">Password:</label><br/>
+                <input type="password" class="field" id="password" name="password" />
+                <div class="button_bar right">
+                    <input type="submit" class="login" id="login" value="Sign In" />
+                </div>
+            </form>
+        </div>
+
         <?php
     }
 }

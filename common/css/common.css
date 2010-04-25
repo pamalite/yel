@@ -156,6 +156,12 @@ table.top {
     border-collapse: collapse;
 }
 
+table.top td.employee_help {
+    width: 1%;
+    vertical-align: bottom;
+    text-align: right;
+}
+
 div.top {
     padding-top: 5px;
     text-align: center;

@@ -28,14 +28,14 @@ class EmployeeHomePage extends Page {
     
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employee->id(). '";'. "\n";
+        echo 'var id = "'. $this->employee->getId(). '";'. "\n";
         echo '</script>'. "\n";
     }
     
     public function show() {
         $this->begin();
-        $this->top_employee($this->employee->get_name(). " - Home");
-        $this->menu_employee($this->clearances, 'home');
+        $this->top_employee('Home');
+        $this->menu_employee('home');
         
         ?>
         <div id="div_status" class="status">

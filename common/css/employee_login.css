@@ -1,57 +1,28 @@
-div.login {
-    text-align: center;
-    padding-top: 5px;
-}
-
-table.login {
-    /*border: 1px solid #6699FF;*/
-    border: 1px solid #CCCCCC;
-    width: 55%;
+.login_form {
+    width: 500px;
     margin: auto;
-    border-collapse: collapse;
+    border: 1px solid #CCCCCC;
+    padding: 5px 3px 35px 5px;
 }
 
-table.login td {
-    padding: 5px 5px 5px 5px;
-    vertical-align: middle;
+.button_bar {
+    margin-top: 5px;
+    width: 50%;
 }
 
-input.login {
-    font-size: 10pt;
-    /*height: 23px;*/
+.left {
+    float: left;
 }
 
-td.id, td.password {
+.right {
+    float: right;
     text-align: right;
-    padding: 10px;
-    width: 15%;
 }
 
-td.title {
-    text-align: center;
-    /*background-color: #6699FF;*/
-    background-color: #CCCCCC;
-    font-size: 10pt;
-    font-weight: bold;
-    padding-top: 3px;
-    padding-bottom: 3px;
+label, input {
+    font-size: 12pt;
 }
 
-#id, #password {
-    font-family: verdana, tahoma, arial;
-    font-size: 10pt;
+.field {
     width: 97%;
-    /*height: 23px;*/
-}
-
-td.login_status {
-    text-align: center;
-    font-size: 10pt;
-    font-weight: bold;
-}
-
-td.label {
-    text-align: right;
-    padding: 10px;
-    width: 28%;
 }
