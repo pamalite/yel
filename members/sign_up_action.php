@@ -6,9 +6,8 @@ session_start();
 $invited = false;
 $_SESSION['yel']['sign_up']['firstname'] = $_POST['firstname'];
 $_SESSION['yel']['sign_up']['lastname'] = $_POST['lastname'];
-$_SESSION['yel']['sign_up']['primary_industry'] = $_POST['primary_industry'];
-$_SESSION['yel']['sign_up']['secondary_industry'] = $_POST['secondary_industry'];
-$_SESSION['yel']['sign_up']['tertiary_industry'] = $_POST['tertiary_industry'];
+$_SESSION['yel']['sign_up']['citizenship'] = $_POST['citizenship'];
+$_SESSION['yel']['sign_up']['industry'] = $_POST['industry'];
 $_SESSION['yel']['sign_up']['email_addr'] = $_POST['email_addr'];
 $_SESSION['yel']['sign_up']['forget_question'] = $_POST['forget_password_question'];
 $_SESSION['yel']['sign_up']['forget_answer'] = $_POST['forget_password_answer'];
@@ -67,15 +66,13 @@ $member = new Member($_POST['email_addr']);
 $data = array();
 $data['firstname'] = $_POST['firstname'];
 $data['lastname'] = $_POST['lastname'];
-$data['primary_industry'] = $_POST['primary_industry'];
-$data['secondary_industry'] = $_POST['secondary_industry'];
-$data['tertiary_industry'] = $_POST['tertiary_industry'];
 $data['password'] = md5($_POST['password']);
 $data['forget_password_question'] = $_POST['forget_password_question'];
 $data['forget_password_answer'] = $_POST['forget_password_answer'];
 $data['phone_num'] = $_POST['phone_num'];
 $data['zip'] = $_POST['zip'];
 $data['country'] = $_POST['country'];
+$data['citizenship'] = $_POST['citizenship'];
 $data['address'] = $_POST['address'];
 $data['state'] = $_POST['state'];
 $data['like_newsletter'] = $_SESSION['yel']['sign_up']['like_newsletter'];
@@ -100,171 +97,11 @@ if (!$inactive) {
     }
 }
 
-// 3. Check whether the member has been invited. 
-// - If yes, 
-// - a. for each distinct invite create a member_referee record and approved them by default.
-// - b. for each distinct invite create a referral record.
+// 2.1 set the top 3 industries
+$industries = $_POST['industry'];
+$member->saveIndustries($industries);
 
-$query = "SELECT DISTINCT member, invited_on FROM member_invites 
-          WHERE referee_email = '". $_POST['email_addr']. "' AND 
-          (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
-$result = $mysqli->query($query);
-if (!empty($result)) {
-    foreach ($result as $row) {
-        $queries = "INSERT INTO member_referees SET 
-                    member = '". $row['member']. "', 
-                    referee = '". $_POST['email_addr']. "', 
-                    referred_on = '". $row['invited_on']. "', 
-                    approved = 'Y'; 
-                    INSERT INTO member_referees SET 
-                    member = '". $_POST['email_addr']. "', 
-                    referee = '". $row['member']. "', 
-                    referred_on = '". $row['invited_on']. "', 
-                    approved = 'Y'";
-        if (!$mysqli->transact($queries)) {
-            redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
-            //echo $query;
-            //exit();
-        }
-    }
-    
-    $query = "SELECT member, referred_job, invited_on, testimony FROM member_invites 
-              WHERE referee_email = '". $_POST['email_addr']. "' AND 
-              (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
-    $result = $mysqli->query($query);
-    if (empty($result)) {
-        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
-        //echo $query;
-        //exit();
-    }
-
-    foreach ($result as $i=>$row) {
-        $data = array();
-        $data['member'] = $row['member'];
-        $data['referee'] = $_POST['email_addr'];
-        $data['job'] = $row['referred_job'];
-        $data['referred_on'] = $row['invited_on'];
-        $data['testimony'] = $row['testimony'];
-
-        if (!Referral::create($data)) {
-            redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
-            //echo "cannot refer";
-            //exit();
-        }
-
-        $query = "UPDATE member_invites SET 
-                  signed_up_on = '". now(). "' 
-                  WHERE referee_email = '". $_POST['email_addr']. "' AND 
-                  member = '". $row['member']. "' AND 
-                  referred_job = ". $row['referred_job'];
-        if (!$mysqli->execute($query)) {
-            redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
-            //echo $query;
-            //exit();
-        }
-    }
-} 
-
-// 3.5 Check whether the member has been requestedly invited. 
-// - If yes, 
-// - a. for each distinct invite create a member_referee record and approved them by default, if has not been done.
-// - b. for each distinct invite create a referral request record.
-
-$query = "SELECT DISTINCT member, invited_on FROM referrer_invites 
-          WHERE referrer_email = '". $_POST['email_addr']. "' AND 
-          (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
-$result = $mysqli->query($query);
-if (!empty($result)) {
-    foreach ($result as $row) {
-        $query = "SELECT COUNT(*) AS connections FROM member_referees 
-                  WHERE ((member = '". $row['member']. "' AND referee = '". $_POST['email_addr']. "') OR 
-                  (member = '".  $_POST['email_addr']. "' AND referee = '". $row['member']. "')) AND
-                  approved = 'Y'";
-        
-        $result = $mysqli->query($query);
-        if ($result[0]['connections'] <= 0) {
-            $queries = "INSERT INTO member_referees SET 
-                        member = '". $row['member']. "', 
-                        referee = '". $_POST['email_addr']. "', 
-                        referred_on = '". $row['invited_on']. "', 
-                        approved = 'Y'; 
-                        INSERT INTO member_referees SET 
-                        member = '". $_POST['email_addr']. "', 
-                        referee = '". $row['member']. "', 
-                        referred_on = '". $row['invited_on']. "', 
-                        approved = 'Y'";
-
-            if (!$mysqli->transact($queries)) {
-                redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
-                //echo $query;
-                //exit();
-            }
-        }
-    }
-    
-    $query = "SELECT member, requested_job, invited_on, resume FROM referrer_invites 
-              WHERE referrer_email = '". $_POST['email_addr']. "' AND 
-              (signed_up_on IS NULL OR signed_up_on = '0000-00-00 00:00:00')";
-    $result = $mysqli->query($query);
-    if (empty($result)) {
-        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
-        //echo $query;
-        //exit();
-    }
-
-    foreach ($result as $i=>$row) {
-        $data = array();
-        $data['member'] = $row['member'];
-        $data['referrer'] = $_POST['email_addr'];
-        $data['job'] = $row['requested_job'];
-        $data['requested_on'] = $row['invited_on'];
-        $data['resume'] = $row['resume'];
-
-        if (!ReferralRequests::create($data)) {
-            redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
-            //echo "cannot request";
-            //exit();
-        }
-
-        $query = "UPDATE referrer_invites SET 
-                  signed_up_on = '". now(). "' 
-                  WHERE referrer_email = '". $_POST['email_addr']. "' AND 
-                  member = '". $row['member']. "' AND 
-                  requested_job = ". $row['requested_job'];
-        if (!$mysqli->execute($query)) {
-            redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/errors/failed_to_create_member.php');
-            //echo $query;
-            //exit();
-        }
-    }
-} 
-
-// 4. Add the closest branch as a friend and pre-approve it.
-$query = "SELECT DISTINCT country FROM branches";
-$result = $mysqli->query($query);
-$available_branches = array();
-foreach ($result as $row) {
-    $available_branches[] = $row['country'];
-}
-
-$team = 'team.my@yellowelevator.com';
-if (in_array($member->get_country_code(), $available_branches)) {
-    $team = 'team.'. strtolower($member->get_country_code()). '@yellowelevator.com';
-} 
-
-$query = "INSERT INTO member_referees SET 
-          `member` = '". $member->id(). "', 
-          `referee` = '". $team. "', 
-          `referred_on` = NOW(), 
-          `approved` = 'Y'; 
-          INSERT INTO member_referees SET 
-          `referee` = '". $member->id(). "', 
-          `member` = '". $team. "', 
-          `referred_on` = NOW(), 
-          `approved` = 'Y'";
-$mysqli->transact($query);
-
-// 5. Create activation token and email
+// 3. Create activation token and email
 $activation_id = microtime(true);
 $query = "INSERT INTO member_activation_tokens SET 
           id = '". $activation_id. "', 
@@ -287,22 +124,41 @@ $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
 $message = str_replace('%root%', $GLOBALS['root'], $message);
 $subject = "Member Activation Required";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-mail($_POST['email_addr'], $subject, $message, $headers);
+//mail($_POST['email_addr'], $subject, $message, $headers);
 
-// $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
-// fwrite($handle, 'Subject: '. $subject. "\n\n");
-// fwrite($handle, $message);
-// fclose($handle);
+$handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
+fwrite($handle, 'Subject: '. $subject. "\n\n");
+fwrite($handle, $message);
+fclose($handle);
 
-// 6. If it is individual headhunter, notify ourselves.
+// 4. If it is individual headhunter, notify ourselves.
 
 if ($data['individual_headhunter'] == 'Y') {
     $message = 'Name: '. $data['firstname']. ', '. $data['lastname']. "\n";
     $message .= 'Phone Num: '. $data['phone_num']. "\n";
     $message .= 'E-mail address: '. $data['email_addr']. "\n";
-    $message .= 'Primary Industry: '. Industry::get_industry_from_id($data['primary_industry']). "\n";
-    $message .= 'Secondary Industry: '. Industry::get_industry_from_id($data['secondary_industry']). "\n";
-    $message .= 'Tertiary Industry: '. Industry::get_industry_from_id($data['tertiary_industry']). "\n";
+    
+    $tmp = implode(', ', $industries);
+    $criteria = array(
+        'columns' => "industry", 
+        'match' => "id IN (". $tmp. ")"
+    );
+    $result = Industry::find($criteria);
+    
+    $selected_industry = '';
+    if ($result === false || is_null($result) || empty($result)) {
+        $selected_industry = 'No industry selected.';
+    } else {
+        foreach ($result as $i=>$industry) {
+            $selected_industry .= $industry['industry'];
+
+            if ($i < count($result) - 1) {
+                $selected_industry .= ', ';
+            }
+        }
+    }
+    $message .= 'Industries: '. $selected_industry. "\n";
+    
     $message .= 'Country: '. Country::getCountryFrom($data['country']). "\n";
     $subject = 'New IRC: '. $data['firstname']. ', '. $data['lastname']. "\n";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>'. "\n". 'Reply-To: '. $data['email_addr'];
@@ -316,7 +172,12 @@ if ($data['individual_headhunter'] == 'Y') {
             break;
         }
     }
-    mail($sales_email_addr, $subject, $message, $headers);
+    // mail($sales_email_addr, $subject, $message, $headers);
+    
+    $handle = fopen('/tmp/email_to_'. $sales_email_addr. '_token.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);
 }
 
 redirect_to('login.php?signed_up=success');

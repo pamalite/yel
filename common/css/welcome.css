@@ -7,6 +7,13 @@ body {
     background-repeat: repeat-x;
 }
 
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
 #welcome_top {
     width: 750px;
     background-image: url(../images/welcome_top_bg.jpg);
@@ -135,6 +142,7 @@ label.overTxtLabel {
     background-color: white;
     margin: auto;
     margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 #top_jobs_table {

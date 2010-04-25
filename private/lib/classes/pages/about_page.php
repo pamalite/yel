@@ -25,7 +25,7 @@ class AboutPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">About Us</span>");
+        $this->top("About Us");
         ?>
         <div class="content">
             <table class="content">

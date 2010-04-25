@@ -2,53 +2,72 @@ div.profile {
     padding-top: 20px;
 }
 
-table.profile_form {
-    width: 80%;
+.profile_form {
+    width: 55%;
     margin: auto;
 }
 
-table.profile_form td.label {
-    width: 35%;
-    text-align: right;
-    padding-right: 20px;
-    vertical-align: top;
+.profile_form td {
+    padding: 3px 3px 3px 3px;
 }
 
-table.profile_form td.title {
+.profile_form td.section_title {
+    font-size: 14pt;
+    font-weight: bold;
     text-align: center;
     border: 1px solid #CCCCCC;
-    font-weight: bold;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
-table.profile_form td.instruction {
+.profile_form td.instruction {
     text-align: center;
     font-style: italic;
     padding-top: 10px;
     padding-bottom: 10px;
+    font-size: 12pt;
 }
 
-table.profile_form td.buttons_bar {
+.profile_form td.note {
+    font-size: 9pt;
+    color: #666666;
+    font-style: italic;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.profile_form td.label {
+    width: 45%;
+    font-size: 12pt;
+}
+
+.profile_form .center {
+    text-align: center;
+}
+
+.profile_form td.buttons_bar {
     text-align: right;
-    background-color: #CCCCCC;
+    border-top: 1px solid #CCCCCC;
+    font-size: 12pt;
 }
 
-input, table.profile_form td.field {
-    font-size: 10pt;
+input {
+    font-size: 12pt;
 }
 
 input.field, select.field {
     width: 98%;
-    font-size: 10pt;
+    font-size: 12pt;
+}
+
+select.multiselect {
+    height: 250px;
+    font-size: 12pt;
 }
 
 textarea {
-    font-size: 10pt;
+    font-size: 12pt;
     width: 99%;
     height: 90px;
 }
 
-p.note {
-    font-size: 9pt;
-    color: #666666;
-    font-style: italic;
-}

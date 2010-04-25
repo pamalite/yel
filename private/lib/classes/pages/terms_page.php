@@ -25,7 +25,7 @@ class TermsPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top("Yelow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Terms of Use</span>");
+        $this->top("Terms of Use");
         ?>
         <div class="content">
             <span class="title">Definitions</span><br/> 

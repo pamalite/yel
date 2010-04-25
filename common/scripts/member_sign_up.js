@@ -19,32 +19,12 @@ function validate() {
         field.style.borderStyle = '';
     }
     
-    if ($('primary_industry').options[$('primary_industry').selectedIndex].value == 0) {
-        alert('You must at least choose a primary industry.');
-        $('primary_industry').setStyle('border', '2px solid #FF0000');
+    if ($('citizenship').options[$('citizenship').selectedIndex].value == 0) {
+        alert('Nationality must be provided.');
+        $('citizenship').setStyle('border', '2px solid #FF0000');
         return false;
     } else {
-        var field = $('primary_industry');
-        field.style.borderColor = '';
-        field.style.borderStyle = '';
-    }
-    
-    if ($('secondary_industry').options[$('secondary_industry').selectedIndex].value == 0) {
-        alert('You must at least choose a secondary industry.');
-        $('secondary_industry').setStyle('border', '2px solid #FF0000');
-        return false;
-    } else {
-        var field = $('secondary_industry');
-        field.style.borderColor = '';
-        field.style.borderStyle = '';
-    }
-    
-    if ($('tertiary_industry').options[$('tertiary_industry').selectedIndex].value == 0) {
-        alert('You must at least choose a tertiary industry.');
-        $('tertiary_industry').setStyle('border', '2px solid #FF0000');
-        return false;
-    } else {
-        var field = $('tertiary_industry');
+        var field = $('country');
         field.style.borderColor = '';
         field.style.borderStyle = '';
     }
@@ -162,6 +142,18 @@ function validate() {
         return false;
     }
     
+    var selected_count = 0;
+    for (var i=0; i < $('industry').options.length; i++) {
+        if ($('industry').options[i].selected) {
+            selected_count++;
+        }
+    }
+    
+    if (selected_count <= 0) {
+        alert('You need to select at least 1 specialization or major.');
+        return false;
+    }
+    
     return true;
 }
 
@@ -171,6 +163,20 @@ function onDomReady() {
     if (!isEmpty(error_message)) {
         set_status(error_message);
     }
+    
+    $('industry').addEvent('change', function() {
+        var count = 0;
+        for (var i=0; i < $('industry').options.length; i++) {
+            if ($('industry').options[i].selected) {
+                count++;
+            }
+            
+            if (count > 3) {
+                $('industry').options[i].selected = false;
+                break;
+            }
+        }
+    });
     
     $('profile').addEvent('submit', validate);
 }

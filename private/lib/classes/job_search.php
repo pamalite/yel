@@ -194,7 +194,7 @@ class JobSearch {
     }
     
     public function search_using($_criterias) {
-        if (!empty($_criterias['employer']) && $_criteria['employer'] != 0) {
+        if (!empty($_criterias['employer']) && $_criterias['employer'] != '0') {
             $this->employer = $_criterias['employer'];
         }
         

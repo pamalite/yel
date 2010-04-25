@@ -85,3 +85,7 @@ td.buttons {
     width: 99%;
     height: 23px;
 }
+
+label {
+    font-size: 12pt;
+}

@@ -40,27 +40,29 @@ class WelcomePage extends Page {
         $job = new Job();
         $result = $job->find($criteria);
         
-        $top_jobs_table = new HTMLTable('top_jobs_table', '');
-        
-        $top_jobs_table->set(0, 0, "Job", '', 'header');
-        $top_jobs_table->set(0, 1, "Employer", '', 'header');
-        $top_jobs_table->set(0, 2, "Salary Range", '', 'header actions');
-        $top_jobs_table->set(0, 3, "Potential Reward", '', 'header actions');
-        
-        foreach ($result as $i=>$job) {
-            $top_jobs_table->set($i+1, 0, '<a href="job/'. $job['job_id']. '">'. $job['position_title']. '</a>', '', '');
-            $top_jobs_table->set($i+1, 1, $job['employer'], '', '');
-            
-            $salary = $job['currency']. '$ '. $job['salary_start'];
-            if (!is_null($job['salary_end'])) {
-                $salary .= ' - '. $job['salary_end'];
-            }
-            $top_jobs_table->set($i+1, 2, $salary, '', '');
-            
-            $top_jobs_table->set($i+1, 3, $job['currency']. '$ '. $job['potential_reward'], '', '');
-        }
+        if (count($result) > 0) {
+            $top_jobs_table = new HTMLTable('top_jobs_table', '');
 
-        echo $top_jobs_table->get_html();
+            $top_jobs_table->set(0, 0, "Job", '', 'header');
+            $top_jobs_table->set(0, 1, "Employer", '', 'header');
+            $top_jobs_table->set(0, 2, "Salary Range", '', 'header actions');
+            $top_jobs_table->set(0, 3, "Potential Reward", '', 'header actions');
+
+            foreach ($result as $i=>$job) {
+                $top_jobs_table->set($i+1, 0, '<a href="job/'. $job['job_id']. '">'. $job['position_title']. '</a>', '', '');
+                $top_jobs_table->set($i+1, 1, $job['employer'], '', '');
+
+                $salary = $job['currency']. '$ '. number_format($job['salary_start'], 0, '.', ',');
+                if (!is_null($job['salary_end'])) {
+                    $salary .= ' - '. number_format($job['salary_start'], 0, '.', ',');
+                }
+                $top_jobs_table->set($i+1, 2, $salary, '', '');
+
+                $top_jobs_table->set($i+1, 3, $job['currency']. '$ '. number_format($job['potential_reward'], 0, '.', ','), '', '');
+            }
+
+            echo $top_jobs_table->get_html();
+        } 
     }
     
     private function get_employers() {

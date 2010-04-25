@@ -1,6 +1,11 @@
 var has_industries = false;
 
 function validate() {
+    if ($('citizenship').options[$('citizenship').selectedIndex].value == 0) {
+        alert('Nationality must be provided.');
+        return false;
+    }
+    
     if ($('forget_password_answer').value == '') {
         alert('Forgot password answer cannot be empty');
         return false;
@@ -76,13 +81,14 @@ function save_profile() {
     }
     
     var params = 'id=' + id + '&action=save_profile';
+    params = params + '&citizenship=' + $('citizenship').options[$('citizenship').selectedIndex].value;
     params = params + '&forget_password_question=' + $('forget_password_question').value;
     params = params + '&forget_password_answer=' + $('forget_password_answer').value;
     params = params + '&phone_num=' + $('phone_num').value;
     params = params + '&address=' + $('address').value;
     params = params + '&state=' + $('state').value;
     params = params + '&zip=' + $('zip').value;
-    params = params + '&country=' + $('country').value;
+    params = params + '&country=' + $('country').options[$('country').selectedIndex].value;
     
     if (password != '') {
         params = params + '&password=' + password;

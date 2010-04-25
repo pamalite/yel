@@ -69,7 +69,10 @@ class SearchPage extends Page {
     public function show() {
         $this->begin();
         $this->top_search("Searched Jobs");
-        $this->menu('member');
+        
+        if ($this->member != NULL) {
+            $this->menu('member');
+        }
         
         $results = $this->job_search->search_using($this->criterias);
         

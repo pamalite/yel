@@ -30,14 +30,14 @@ class MemberProfilePage extends Page {
         echo '</script>'. "\n";
     }
     
-    private function generate_countries($_selected) {
+    private function generate_countries($_selected, $_name = 'country') {
         $criteria = array(
             'columns' => "country_code, country", 
             'order' => "country"
         );
         $countries = Country::find($criteria);
         
-        echo '<select class="field" id="country" name="country">'. "\n";
+        echo '<select class="field" id="'. $_name. '" name="'. $_name. '">'. "\n";
         
         foreach ($countries as $country) {
             if ($country['country_code'] != $_selected) {
@@ -50,7 +50,7 @@ class MemberProfilePage extends Page {
         echo '</select>'. "\n";
     }
     
-    private function generate_password_reset_questions($selected) {
+    private function generate_password_reset_questions($_selected) {
         $mysqli = Database::connect();
         $query = "SELECT * FROM password_reset_questions";
         $questions = $mysqli->query($query);
@@ -58,7 +58,7 @@ class MemberProfilePage extends Page {
         echo '<select class="field" id="forget_password_question" name="forget_password_question">'. "\n";
         
         foreach ($questions as $question) {
-            if ($question['id'] != $selected) {
+            if ($question['id'] != $_selected) {
                 echo '<option value="'. $question['id']. '">'. $question['question']. '</option>'. "\n";
             } else {
                 echo '<option value="'. $question['id']. '" selected>'. $question['question']. '</option>'. "\n";
@@ -161,59 +161,65 @@ class MemberProfilePage extends Page {
                         <td class="label">Last Name / Surname:</td>
                         <td class="field"><?php echo $profile[0]['lastname']; ?></td>
                     </tr>
-                        <tr>
-                            <td class="title" colspan="2">Sign In Details</td>
-                        </tr>
-                        <tr>
-                            <td class="label">E-mail Address:</td>
-                            <td class="field">
-                                <input id="email_addr" type="hidden" value="<?php echo $profile[0]['email_addr']; ?>" />
-                                <?php echo $profile[0]['email_addr']; ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="password">New Password:</label></td>
-                            <td class="field"><input class="field" type="password" id="password" name="password" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="password_confirm">Confirm New Password:</label></td>
-                            <td class="field"><input class="field" type="password" id="password_confirm" name="password_confirm" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="forget_password_question">Forgot password question:</label></td>
-                            <td class="field">
-                                <?php $this->generate_password_reset_questions($profile[0]['forget_password_question']); ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="forget_password_answer">Forgot passsword answer:</label></td>
-                            <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" value="<?php echo $profile[0]['forget_password_answer'] ?>" /></td>
-                        </tr>
-                        <tr>
-                            <td class="title" colspan="2">Contact Details</td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="phone_num">Telephone Number:</label></td>
-                            <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile[0]['phone_num']; ?>" maxlength="20" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="address">Mailing Address:</label></td>
-                            <td class="field"><textarea id="address" name="address"><?php echo $profile[0]['address']; ?></textarea></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="state">State/Province:</label></td>
-                            <td class="field"><input class="field" type="text" id="state" name="state" value="<?php echo $profile[0]['state']; ?>" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="zip">Zip/Postal Code:</label></td>
-                            <td class="field"><input class="field" type="text" id="zip" name="zip" value="<?php echo $profile[0]['zip']; ?>" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="country">Country:</label></td>
-                            <td class="field">
-                                <?php $this->generate_countries($profile[0]['country']) ?>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td class="label">Nationality:</td>
+                        <td class="field">
+                            <?php $this->generate_countries($profile[0]['citizenship'], 'citizenship'); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                         <td class="title" colspan="2">Sign In Details</td>
+                     </tr>
+                     <tr>
+                         <td class="label">E-mail Address:</td>
+                         <td class="field">
+                             <input id="email_addr" type="hidden" value="<?php echo $profile[0]['email_addr']; ?>" />
+                             <?php echo $profile[0]['email_addr']; ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="password">New Password:</label></td>
+                        <td class="field"><input class="field" type="password" id="password" name="password" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="password_confirm">Confirm New Password:</label></td>
+                        <td class="field"><input class="field" type="password" id="password_confirm" name="password_confirm" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="forget_password_question">Forgot password question:</label></td>
+                        <td class="field">
+                            <?php $this->generate_password_reset_questions($profile[0]['forget_password_question']); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="forget_password_answer">Forgot passsword answer:</label></td>
+                        <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" value="<?php echo $profile[0]['forget_password_answer'] ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="title" colspan="2">Contact Details</td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="phone_num">Telephone Number:</label></td>
+                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile[0]['phone_num']; ?>" maxlength="20" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="address">Mailing Address:</label></td>
+                        <td class="field"><textarea id="address" name="address"><?php echo $profile[0]['address']; ?></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="state">State/Province:</label></td>
+                        <td class="field"><input class="field" type="text" id="state" name="state" value="<?php echo $profile[0]['state']; ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="zip">Zip/Postal Code:</label></td>
+                        <td class="field"><input class="field" type="text" id="zip" name="zip" value="<?php echo $profile[0]['zip']; ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="country">Country:</label></td>
+                        <td class="field">
+                            <?php $this->generate_countries($profile[0]['country']) ?>
+                        </td>
+                    </tr>
                     
                     <!-- expertise -->
                     <tr>

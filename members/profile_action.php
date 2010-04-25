@@ -26,6 +26,7 @@ if ($_POST['action'] == 'save_profile') {
     $member = new Member($_POST['id'], $_SESSION['yel']['member']['sid']);
 
     $data = array();
+    $data['citizenship'] = $_POST['citizenship'];
     $data['forget_password_question'] = $_POST['forget_password_question'];
     $data['forget_password_answer'] = $_POST['forget_password_answer'];
     $data['phone_num'] = $_POST['phone_num'];

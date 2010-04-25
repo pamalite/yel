@@ -25,7 +25,7 @@ class FaqPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Frequently Asked Questions</span>");
+        $this->top("Frequently Asked Questions");
         ?>
         <div class="questions">
             <div class="general">

@@ -12,7 +12,7 @@ class FeedbackPage extends Page {
     public function insert_feedback_css() {
         $this->insert_css();
         
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/feedback.css">'. "\n";
+        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/member_sign_up.css">'. "\n";
     }
     
     public function insert_feedback_scripts() {
@@ -28,8 +28,10 @@ class FeedbackPage extends Page {
     }
     
     private function generateCountries($selected) {
-        //$countries = Country::getAllWithDisplay();
-        $countries = Country::getAll();
+        $criteria = array(
+            'columns' => "country_code, country"
+        );
+        $countries = Country::find($criteria);
         
         echo '<select class="field" id="country" name="country">'. "\n";
         if (empty($selected) || is_null($selected) || $selected == '0') {
@@ -66,7 +68,7 @@ class FeedbackPage extends Page {
     }
     public function show($_session) {
         $this->begin();
-        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Feedback</span>");
+        $this->top("Feedback");
         
         if ($this->success) {
             ?>
@@ -79,45 +81,46 @@ class FeedbackPage extends Page {
             <div id="div_status" class="status">
                 <span id="span_status" class="status"></span>
             </div>
+            
             <div class="profile">
                 <form id="profile" method="post" action="feedback_action.php" onSubmit="return validate();">
                     <table class="profile_form">
                         <tr>
-                            <td class="title" colspan="2">Feedback Form</td>
+                            <td class="instruction" colspan="2">Please fill up <span style="font-weight: bold; text-decoration: underline;">ALL</span> fields.</td>
                         </tr>
                         <tr>
-                            <td class="instruction" colspan="2">Please fill up all fields, and fields marked with * are mandatory.</td>
+                            <td class="section_title" colspan="2">About You &amp; Your Feedback</td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="firstname">* First Name / Given Names:</label></td>
+                            <td class="label"><label for="firstname">First Name / Given Names:</label></td>
                             <td class="field"><input class="field" type="text" id="firstname" name="firstname" value="<?php echo $_session['firstname'] ?>" /></td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="lastname">* Last Name / Surname:</label></td>
+                            <td class="label"><label for="lastname">Last Name / Surname:</label></td>
                             <td class="field">
                                 <input class="field" type="text" id="lastname" name="lastname" value="<?php echo $_session['lastname'] ?>" />
                             </td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="email_addr">* E-mail Address:</label></td>
+                            <td class="label"><label for="email_addr">E-mail Address:</label></td>
                             <td class="field">
                                 <input class="field" type="text" id="email_addr" name="email_addr" value="<?php echo $_session['email_addr'] ?>" />
                             </td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="country">* Country:</label></td>
+                            <td class="label"><label for="country">Country:</label></td>
                             <td class="field">
                                 <?php $this->generateCountries($_session['country']) ?>
                             </td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="feedback">* Feedback:</label></td>
+                            <td class="label"><label for="feedback">Feedback:</label></td>
                             <td class="field">
                                 <textarea class="field" id="feedback" name="feedback"><?php echo $_session['feedback'] ?></textarea>
                             </td>
                         </tr>
                         <tr>
-                            <td class="title" colspan="2">* Security</td>
+                            <td class="section_title" colspan="2">Security</td>
                         </tr>
                         <tr>
                             <td class="instruction" colspan="2">Please type the characters as shown on the left.</td>
