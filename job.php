@@ -68,10 +68,14 @@ if (!is_null($result[0]['alternate_employer'])) {
 }
 
 $show_popup = '';
-if (isset($_GET['refer'])) {
-    $show_popup = 'refer';
-} else if (isset($_GET['apply'])) {
-    $show_popup = 'apply';
+$url_elements = explode('/', $_SERVER['REQUEST_URI']);
+$popup_params = explode('?', $url_elements[count($url_elements)-1]);
+if (count($popup_params) > 1) {
+    if ($popup_params[1] == 'refer=1') {
+        $show_popup = 'refer';
+    } else if ($popup_params[1] == 'apply=1') {
+        $show_popup = 'apply';
+    }
 }
 
 $job_page->header(array(
