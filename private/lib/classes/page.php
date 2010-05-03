@@ -120,36 +120,10 @@ class Page {
         <?php
     }
     
-    protected function top_employee($_page_title) {
-        ?>
-        <div class="top">
-            <table class="top">
-                <tr>
-                    <td class="logo">
-                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/index.php">
-                            <img name="logo" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/top.jpg" />
-                        </a>
-                    </td>
-                    <td><div class="page_title"><?php echo $_page_title ?></div></td>
-                    <td class="employee_help">
-                        <a target="_new" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/help/employees/">Help</a>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <?php
-    }
-    
     protected function top($_page_title) {
         ?>
         <div class="top">
             <table class="top">
-                <?php
-                if (isset($_SESSION['yel']['employer']) &&
-                    !empty($_SESSION['yel']['employer']['id']) && 
-                    !empty($_SESSION['yel']['employer']['sid']) && 
-                    !empty($_SESSION['yel']['employer']['hash'])) {
-                ?>
                 <tr>
                     <td class="logo">
                         <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/index.php">
@@ -157,21 +131,19 @@ class Page {
                         </a>
                     </td>
                     <td><div class="page_title"><?php echo $_page_title ?></div></td>
-                </tr>
-                <?php
-                } else {
-                ?>
-                <tr>
-                    <td class="logo">
-                        <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/index.php">
-                            <img name="logo" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/top.jpg" />
-                        </a>
+                    <?php
+                    if (isset($_SESSION['yel']['employee']) &&
+                        !empty($_SESSION['yel']['employee']['id']) && 
+                        !empty($_SESSION['yel']['employee']['sid']) && 
+                        !empty($_SESSION['yel']['employee']['hash'])) {
+                    ?>
+                    <td class="employee_help">
+                        <a target="_new" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/help/employees/">Help</a>
                     </td>
-                    <td><div class="page_title"><?php echo $_page_title ?></div></td>
+                    <?php
+                    } 
+                    ?>
                 </tr>
-                <?php
-                } 
-                ?>
             </table>
         </div>
         <?php
@@ -365,7 +337,6 @@ class Page {
     }
     
     protected function menu_employee($_page = '', $_clearances = array()) {
-        $style = 'style="border: 1px solid #0000FF;"';
         $style = 'style="background-color: #CCCCCC;"';
         
         ?>

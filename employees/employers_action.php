@@ -1,51 +1,61 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
-require_once dirname(__FILE__). "/paid_postings_invoice.php";
-require_once dirname(__FILE__). "/../private/config/subscriptions_rate.inc";
-require_once dirname(__FILE__). "/../employers/subscription_invoice.php";
+//require_once dirname(__FILE__). "/paid_postings_invoice.php";
+//require_once dirname(__FILE__). "/../private/config/subscriptions_rate.inc";
+//require_once dirname(__FILE__). "/../employers/subscription_invoice.php";
 
 session_start();
 
 if (!isset($_POST['id'])) {
-    echo "ko";
-    exit();
-    //redirect_to('login.php');
+    redirect_to('employers.php');
+}
+
+if (!isset($_POST['action'])) {
+    redirect_to('employers.php');
 }
 
 $xml_dom = new XMLDOM();
 
-if (!isset($_POST['action'])) {
+if ($_POST['action'] == 'get_employers') {
     $order_by = 'employers.joined_on desc';
-    
+
+    $employee = new Employee($_POST['id']);
+    $branch = $employee->getBranch();
+
     if (isset($_POST['order_by'])) {
         $order_by = $_POST['order_by'];
     }
-    
-    $query = "SELECT employers.id, employers.name, employers.active, 
-              CONCAT(employees.firstname, ', ', employees.lastname) AS employee, 
-              DATE_FORMAT(employers.joined_on, '%e %b, %Y') AS formatted_joined_on, 
-              DATE_FORMAT(employer_sessions.first_login, '%e %b, %Y') AS formatted_first_login 
-              FROM employers 
-              LEFT JOIN employer_sessions ON employer_sessions.employer = employers.id 
-              LEFT JOIN employees ON employees.id = employers.registered_by 
-              WHERE employees.branch = ". $_SESSION['yel']['employee']['branch']['id']. "
-              ORDER BY ". $_POST['order_by'];
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
+
+    $criteria = array(
+        'columns' => "employers.id, employers.name AS name, employers.phone_num, 
+                      employers.email_addr, employers.fax_num, employers.contact_person, 
+                      employers.active, 
+                      DATE_FORMAT(employers.joined_on, '%e %b, %Y') AS formatted_joined_on, 
+                      DATE_FORMAT(employer_sessions.first_login, '%e %b, %Y') AS formatted_first_login, 
+                      CONCAT(employees.firstname, ', ', employees.lastname) AS employee", 
+        'joins' => "employer_sessions ON employer_sessions.employer = employers.id, 
+                    employees ON employees.id = employers.registered_by", 
+        'match' => "employees.branch = ". $branch[0]['id'], 
+        'order' => $order_by
+    );
+
+    $employer = new Employer();
+    $result = $employer->find($criteria);
+
     if (count($result) <= 0 || is_null($result)) {
         echo '0';
         exit();
     }
-    
+
     if (!$result) {
         echo 'ko';
         exit();
     }
-    
+
     foreach($result as $i=>$row) {
         $result[$i]['employer'] = htmlspecialchars_decode($row['employer']);
     }
-    
+
     $response = array('employers' => array('employer' => $result));
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
@@ -53,50 +63,87 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'deactivate') {
-    if (!isset($_POST['payload'])) {
-        echo "ko";
+    $data = array();
+    $data['active'] = 'N';
+    
+    $employer = new Employer($_POST['id']);
+    $employer->setAdmin(true);
+    if ($employer->update($data) === false) {
+        echo 'ko';
         exit();
     }
     
-    $xml_dom->load_from_xml($_POST['payload']);
-    $employers = $xml_dom->get('id');
-    $query = "UPDATE employers SET active = 'N' WHERE id IN (";
-    $i = 0;
-    foreach ($employers as $employer) {
-        $query .= "'". $employer->nodeValue. "'";
-        
-        if ($i < $employers->length-1) {
-            $query .= ", ";
-        }
-        
-        $i++;
-    }
-    $query .= ")";
-
-    $mysqli = Database::connect();
-    if (!$mysqli->execute($query)) {
-        echo "ko";
-        exit();
-    }
-    
-    echo "ok";
+    echo 'ok';
     exit();
 }
 
 if ($_POST['action'] == 'activate') {
-    $query = "UPDATE employers SET active = 'Y' 
-              WHERE id = '". $_POST['id'] . "'";
+    $new_password = generate_random_string_of(6);
+    $data = array();
+    $data['active'] = 'Y';
+    $data['password'] = md5($new_password);
     
-    $mysqli = Database::connect();
-    if (!$mysqli->execute($query)) {
-        echo "ko";
+    $employer = new Employer($_POST['id']);
+    $employer->setAdmin(true);
+    if ($employer->update($data) === false) {
+        echo 'ko';
         exit();
     }
     
-    echo "ok";
+    $lines = file(dirname(__FILE__). '/../private/mail/employer_password_reset_admin.txt');
+    $message = '';
+    foreach($lines as $line) {
+        $message .= $line;
+    }
+    
+    $message = str_replace('%user_id%', $_POST['id'], $message);
+    $message = str_replace('%temporary_password%', $new_password, $message);
+    $subject = "Employer Password Reset";
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    // mail($employer->getEmailAddress(), $subject, $message, $headers);
+    
+    $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);
+    
+    echo 'ok';
     exit();
 }
 
+if ($_POST['action'] == 'reset_password') {
+    $new_password = generate_random_string_of(6);
+    $data = array();
+    $data['password'] = md5($new_password);
+    $employer = new Employer($_POST['id']);
+    $employer->setAdmin(true);
+    if ($employer->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    $lines = file(dirname(__FILE__). '/../private/mail/employer_password_reset_admin.txt');
+    $message = '';
+    foreach($lines as $line) {
+        $message .= $line;
+    }
+    
+    $message = str_replace('%user_id%', $_POST['id'], $message);
+    $message = str_replace('%temporary_password%', $new_password, $message);
+    $subject = "Employer Password Reset";
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    // mail($employer->getEmailAddress(), $subject, $message, $headers);
+    
+    $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);
+    
+    echo 'ok';
+    exit();
+}
+
+/*
 if ($_POST['action'] == 'get_employer') {
     $employer = new Employer($_POST['id']);
     $result = $employer->get();
@@ -160,34 +207,6 @@ if ($_POST['action'] == 'get_employer') {
     exit();
 }
 
-if ($_POST['action'] == 'reset_password') {
-    $new_password = generate_random_string_of(6);
-    $data = array();
-    $data['password'] = md5($new_password);
-    $employer = new Employer($_POST['id']);
-    if (!$employer->update($data, true)) {
-        echo "ko";
-        exit();
-    }
-    
-    $query = "SELECT email_addr FROM employers WHERE id = '". $_POST['id']. "' LIMIT 1";
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    $lines = file(dirname(__FILE__). '/../private/mail/employer_password_reset_admin.txt');
-    $message = '';
-    foreach($lines as $line) {
-        $message .= $line;
-    }
-    
-    $message = str_replace('%user_id%', $_POST['id'], $message);
-    $message = str_replace('%temporary_password%', $new_password, $message);
-    $subject = "Employer Password Reset";
-    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    mail($result[0]['email_addr'], $subject, $message, $headers);
-    
-    echo 'ok';
-    exit();
-}
 
 if ($_POST['action'] == 'save_profile') {
     $today = now();
@@ -812,5 +831,5 @@ if ($_POST['action'] == 'save_extra_charge') {
     echo 'ok';
     exit();
 }
-
+*/
 ?>

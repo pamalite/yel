@@ -345,7 +345,7 @@ class Employee implements Model {
     }
     
     public function getBranch() {
-        $query = "SELECT * 
+        $query = "SELECT branches.* 
                   FROM branches 
                   LEFT JOIN employees ON branches.id = employees.branch 
                   WHERE employees.id = ". $this->id. " LIMIT 1";

@@ -1,5 +1,4 @@
-var order_by = 'employers.joined_on';
-var order = 'desc';
+var is_profile_dirty = false;
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -19,105 +18,13 @@ function sort_by(_table, _column) {
     }
 }
 
-function show_employers() {
-    var params = 'id=' + user_id + '&order_by=' + order_by + ' ' + order;
-    params = params + '&action=get_employers';
-    
-    var uri = root + "/employees/employers_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            // set_status('<pre>' + txt + '</pre>');
-            // return;
-            if (txt == 'ko') {
-                alert('An error occured while loading employers.');
-                return false;
-            }
-            
-            if (txt == '0') {
-                $('div_employers').set('html', '<div class="empty_results">No employers at this moment.</div>');
-            } else {
-                var ids = xml.getElementsByTagName('id');
-                var employers = xml.getElementsByTagName('name');
-                var phone_nums = xml.getElementsByTagName('phone_num');
-                var faxes = xml.getElementsByTagName('fax_num');
-                var emails = xml.getElementsByTagName('email_addr');
-                var contacts = xml.getElementsByTagName('contact_person');
-                var registered_bys = xml.getElementsByTagName('employee');
-                var joined_ons = xml.getElementsByTagName('formatted_joined_on');
-                var first_logins = xml.getElementsByTagName('formatted_first_login');
-                var is_actives = xml.getElementsByTagName('active');
-                
-                var employers_table = new FlexTable('employers_table', 'employers');
-
-                var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('employers', 'employers.joined_on');\">Joined On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('employers', 'employers.name');\">Employer</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('employers', 'employees.lastname');\">Registered By</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('employers', 'employer_sessions.first_login');\">First Login</a>", '', 'header'));
-                header.set(4, new Cell('&nbsp;', '', 'header action'));
-                employers_table.set(0, header);
-                
-                for (var i=0; i < ids.length; i++) {
-                    var row = new Row('');
-                    
-                    row.set(0, new Cell(joined_ons[i].childNodes[0].nodeValue, '', 'cell'));
-                    
-                    var short_desc = '<a class="no_link employer_link" onClick="show_employer(\'' + ids[i].childNodes[0].nodeValue + '\');">' + employers[i].childNodes[0].nodeValue + '</a>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + phone_nums[i].childNodes[0].nodeValue + '</div>' + "\n";
-                    
-                    var fax = '';
-                    if (faxes[i].childNodes.length > 0) {
-                        fax = faxes[i].childNodes[0].nodeValue;
-                    }
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Fax:</span> ' + fax + '</div>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> ' + emails[i].childNodes[0].nodeValue + '</div>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Contact:</span> ' + contacts[i].childNodes[0].nodeValue + '</div>' + "\n";
-                    row.set(1, new Cell(short_desc, '', 'cell'));
-                    
-                    row.set(2, new Cell(registered_bys[i].childNodes[0].nodeValue, '', 'cell'));
-                    
-                    var first_login = '';
-                    if (first_logins[i].childNodes.length > 0) {
-                        first_login = first_logins[i].childNodes[0].nodeValue;
-                    }
-                    row.set(3, new Cell(first_login, '', 'cell'));
-                    
-                    var actions = '';
-                    if (is_actives[i].childNodes[0].nodeValue == 'Y') {
-                        actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_employer(\'' + ids[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                        actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
-                    } else {
-                        actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_employer(\'' + ids[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                        actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + ids[i].childNodes[0].nodeValue + '\');" disabled />';
-                    }
-                    actions = actions + '<input type="button" value="New From" onClick="add_new_employer(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
-                    
-                    row.set(4, new Cell(actions, '', 'cell action'));
-                    employers_table.set((parseInt(i)+1), row);
-                }
-                
-                $('div_employers').set('html', employers_table.get_html());
-                set_status('');
-            }
-        },
-        onRequest: function(instance) {
-            set_status('Loading employers...');
-        }
-    });
-    
-    request.send(params);
-    
-}
-
-function reset_password(_id) {
+function reset_password() {
     var proceed = confirm('Are you sure to reset the password?');
     if (!proceed) {
         return false;
     }
     
-    var params = 'id=' + _id;
+    var params = 'id=' + employer_id;
     params = params + '&action=reset_password';
     
     var uri = root + "/employees/employers_action.php";
@@ -140,118 +47,166 @@ function reset_password(_id) {
     request.send(params);
 }
 
-function deactivate_employer(_id, _idx) {
-    var proceed = confirm('Are you sure to de-activate employer?');
-    if (!proceed) {
+function profile_is_dirty() {
+    is_profile_dirty = true;
+}
+
+function validate_profile_form() {
+    if (isEmpty($('business_license').value)) {
+        alert('Business license cannot be empty.');
         return false;
     }
     
-    var params = 'id=' + _id + '&action=deactivate';
+    // is new employer?
+    if (isEmpty($('employer_id').value)) {
+        if (isEmpty($('user_id').value)) {
+            alert('User ID cannot be empty');
+            return false;
+        }
+        
+        /*if (isEmpty($('free_postings').value) || isNaN($('free_postings').value)) {
+            $('free_postings').value = '0';
+        }
+        
+        if (parseInt($('free_postings').value) < 0) {
+            set_status('Free Job Postings must be either 0 or more.');
+            return false;
+        }
+        
+        if (isEmpty($('paid_postings').value) || isNaN($('paid_postings').value)) {
+            $('paid_postings').value = '0';
+        }
+        
+        if (parseInt($('paid_postings').value) < 0) {
+            set_status('Paid Job Postings must be either 0 or more.');
+            return false;
+        }*/
+    }
     
-    var uri = root + "/employees/employers_action.php";
+    if (!isEmail($('email').value)) {
+        alert('Please provide a valid e-mail address.');
+        return false;
+    }
+    
+    if (isEmpty($('name').value)) {
+        alert('Business name cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('contact_person').value)) {
+        alert('Contact person cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('phone_num').value)) {
+        alert('Telephone number cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('zip').value)) {
+        alert('Zip/Postal code cannot be empty.');
+        return false;
+    }
+    
+    if ($('country').options[$('country').selectedIndex].value == '0') {
+        alert('You need to select a country where this employer is located at.');
+        return false;
+    }
+    
+    /*if (isEmpty($('working_months').value)) {
+        set_status('Working months cannot be empty.');
+        return false;
+    } else if (!isNumeric($('working_months').value)) {
+        set_status('Working months must be a number from 1-12.');
+        return false;
+    } else if (parseInt($('working_months').value) < 1 || parseInt($('working_months').value) > 12) {
+        set_status('Working months must be a number from 1-12.');
+        return false;
+    }*/
+    
+    return true;
+    
+}
+
+function show_profile() {
+    $('employer_profile').setStyle('display', 'block');
+    // $('employer_fees').setStyle('display', 'none');
+    // $('employer_jobs').setStyle('display', 'none');
+    // $('employer_subscriptions').setStyle('display', 'none');
+    
+    $('item_profile').setStyle('background-color', '#CCCCCC');
+    $('item_fees').setStyle('background-color', '');
+    $('item_jobs').setStyle('background-color', '');
+    $('item_subscriptions').setStyle('background-color', '');
+}
+
+function save_profile() {
+    if (!validate_profile_form()) {
+        return false;
+    }
+    
+    var mode = 'update';
+    if (isEmpty(employer_id)) {
+        employer_id = $('user_id').value;
+        mode = 'create';
+    }
+    
+    var params = 'id=' + employer_id;
+    params = params + '&action=save_profile';
+    params = params + '&employee=' + id;
+    params = params + '&license_num=' + $('business_license').value
+    params = params + '&email_addr=' + $('email').value;
+    params = params + '&name=' + $('name').value;
+    params = params + '&contact_person=' + $('contact_person').value;
+    params = params + '&phone_num=' + $('phone_num').value;
+    params = params + '&address=' + $('address').value;
+    params = params + '&state=' + $('state').value;
+    params = params + '&zip=' + $('zip').value;
+    params = params + '&country=' + $('country').options[$('country').selectedIndex].value;
+    params = params + '&website_url=' + $('website_url').value;
+    // params = params + '&working_months=' + $('working_months').value;
+    //     params = params + '&payment_terms_days=' + $('payment_terms_days').options[$('payment_terms_days').selectedIndex].value;
+    // params = params + '&paid_postings=' + $('paid_postings').value;
+    //     params = params + '&subscription_period=' + $('subscription_period').options[$('subscription_period').selectedIndex].value;
+    
+    if (mode == 'create') {
+        params = params + '&new=1';
+        // params = params + '&free_postings=' + $('free_postings').value;
+    } else {
+        params = params + '&new=0';
+    }
+    
+    var uri = root + "/employees/employer_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
             if (txt == 'ko') {
-                alert('An error occured while deactivating employer.');
+                alert('An error occured while saving profile. Please makesure the Business License and User ID do not already exist in the system.');
                 return false;
             }
             
-            set_status('');
-            $('activate_button_' + _idx).value = 'Activate';
-            $('password_reset_' + _idx).disabled = true;
+            if (mode == 'create') {
+                if (!isEmpty(from_employer)) {
+                    var proceed_copy = confirm('Do you want the service fees and extra fees to be copied too?');
+                    if (proceed_copy) {
+                        // copy_fees_and_extras();
+                    }
+                }
+            }
+            
+            is_profile_dirty = false;
+            show_profile();
         },
         onRequest: function(instance) {
-            set_status('De-activating employers...');
+            set_status('Saving profile...');
         }
     });
     
     request.send(params);
-}
-
-function activate_employer(_id, _idx) {
-    if ($('activate_button_' + _idx).value == 'De-activate') {
-        return deactivate_employer(_id, _idx);
-    }
-    
-    var proceed = confirm('Are you sure to activate employer?');
-    if (!proceed) {
-        return false;
-    }
-    
-    var params = 'id=' + _id + '&action=activate';
-    
-    var uri = root + "/employees/employers_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                alert('An error occured while activating employer.');
-                return false;
-            }
-            
-            set_status('');
-            $('activate_button_' + _idx).value = 'De-activate';
-            $('password_reset_' + _idx).disabled = false;
-        },
-        onRequest: function(instance) {
-            set_status('Activating employers...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function show_employer(_id) {
-    $('id').value = _id;
-    $('from_employer').value = '';
-    $('employer_page_form').submit();
-}
-
-function add_new_employer() {
-    $('id').value = '';
-    $('from_employer').value = '';
-    if (arguments.length > 0) {
-        $('from_employer').value = arguments[0];
-    }
-    
-    $('employer_page_form').submit();
 }
 
 /*
-function is_valid_user_id(_user_id) {
-    if (_user_id.length > 10) {
-        return false;
-    }
-    
-    var allowed_characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_';
-    for (var i=0; i < _user_id.length; i++) {
-        var allowed = false;
-        for (var j=0; j < allowed_characters.length; j++) {
-            if (_user_id.charAt(i) == allowed_characters.charAt(j)) {
-                allowed = true;
-                break;
-            }
-        }
-        
-        if (!allowed) {
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-function count_user_id_characters() {
-    if (!is_valid_user_id($('user_id').value)) {
-        $('user_id_warning').set('html', 'Over 10 Characters!!!');
-    } else {
-        $('user_id_warning').set('html', '');
-    }
-}
-
 
 function copy_fees_and_extras() {
     var params = 'id=' + $('employer_id').value + '&employer=' + copy_from_employer + '&action=copy_fees_and_extras';
@@ -881,78 +836,6 @@ function activate_employer(_employer_id) {
 }
 
 
-function save_profile() {
-    if (!validate_profile_form()) {
-        return false;
-    }
-    
-    var mode = 'update';
-    var employer_id = $('employer_id').value;
-    if (employer_id == '0') {
-        employer_id = $('user_id').value;
-        mode = 'create';
-    }
-    
-    var params = 'id=' + $('employer_id').value;
-    params = params + '&action=save_profile';
-    params = params + '&employee=' + id;
-    params = params + '&license_num=' + $('business_license').value
-    params = params + '&email_addr=' + $('email').value;
-    params = params + '&name=' + $('name').value;
-    params = params + '&contact_person=' + $('contact_person').value;
-    params = params + '&phone_num=' + $('phone_num').value;
-    params = params + '&address=' + $('address').value;
-    params = params + '&state=' + $('state').value;
-    params = params + '&zip=' + $('zip').value;
-    params = params + '&country=' + $('country_dropdown').options[$('country_dropdown').selectedIndex].value;
-    params = params + '&working_months=' + $('working_months').value;
-    //params = params + '&bonus_months=' + $('bonus_months').value;
-    params = params + '&payment_terms_days=' + $('payment_terms_days').options[$('payment_terms_days').selectedIndex].value;
-    params = params + '&website_url=' + $('website_url').value;
-    params = params + '&paid_postings=' + $('paid_postings').value;
-    params = params + '&subscription_period=' + $('subscription_period').options[$('subscription_period').selectedIndex].value;
-    
-    if (mode == 'create') {
-        params = params + '&user_id=' + $('user_id').value;
-        params = params + '&password=' + $('password').value;
-        params = params + '&free_postings=' + $('free_postings').value;
-    }
-    
-    var uri = root + "/employees/employers_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while saving profile. Please makesure the Business License and User ID do not already exist in the system.');
-                return false;
-            }
-            
-            if (mode == 'create') {
-                if (employer_id.length > 10) {
-                    employer_id = employer_id.substr(0, 10);
-                }
-                $('employer_id').value = employer_id;
-                
-                if (copy_from_employer != '0') {
-                    var proceed_copy = confirm('Do you want the service fees and extra fees to be copied too?');
-                    if (proceed_copy) {
-                        copy_fees_and_extras();
-                    }
-                }
-            }
-            
-            is_profile_dirty = false;
-            show_employer_profile();
-            set_status('Profile successfully saved!');
-        },
-        onRequest: function(instance) {
-            set_status('Saving profile...');
-        }
-    });
-    
-    request.send(params);
-}
 
 function save_service_fee() {
     if (!isNumeric($('salary_start').value)) {

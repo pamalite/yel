@@ -34,7 +34,7 @@ class EmployeeHomePage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top_employee('Home');
+        $this->top('Home');
         $this->menu_employee('home');
         
         ?>
