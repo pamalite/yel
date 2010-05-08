@@ -43,8 +43,20 @@ class EmployeeEmployerPage extends Page {
         echo '<script type="text/javascript">'. "\n";
         echo 'var id = "'. $this->employee->getId(). '";'. "\n";
         echo 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
-        echo 'var employer_id = "'. $this->employer->getId(). '";'. "\n";
         echo 'var current_page = "'. $this->current_page. '";'. "\n";
+        
+        if ($this->is_new) {
+            echo 'var employer_id = "0";'. "\n";
+            
+            if (!is_null($this->employer)) {
+                echo 'var from_employer = "'. $this->employer->getId(). '"'. "\n";
+            } else {
+                echo 'var from_employer = ""'. "\n";
+            }
+        } else {
+            echo 'var employer_id = "'. $this->employer->getId(). '";'. "\n";
+        }
+        
         echo '</script>'. "\n";
     }
     
@@ -77,8 +89,33 @@ class EmployeeEmployerPage extends Page {
         $branch = $this->employee->getBranch();
         $available_subscriptions = $subscriptions_rates[Currency::getSymbolFromCountryCode($branch[0]['country_code'])];
         
-        $raw_data = $this->employer->get();
-        $profile = $raw_data[0];
+        $raw_data = array();
+        $profile = array();
+        $fees = array();
+        if (!$this->is_new) {
+            // get profile
+            $raw_data = $this->employer->get();
+            $profile = $raw_data[0];
+            
+            // get fees
+            $raw_data = $this->employer->getFees();
+            $fees = $raw_data;
+        } else {
+            $profile = array(
+                'license_num' => '',
+                'working_months' => '12',
+                'payment_terms_days' => '30',
+                'email_addr' => '',
+                'contact_person' => '',
+                'name' => '',
+                'website_url' => '',
+                'phone_num' => '',
+                'address' => '',
+                'state' => '',
+                'zip' => '',
+                'country' => $branch[0]['country_code']
+            );
+        }
         
         ?>
         <!-- submenu -->
@@ -106,7 +143,7 @@ class EmployeeEmployerPage extends Page {
                     </tr>
                     <tr>
                         <td class="label"><label for="business_license">Company/Business Registration No.:</label></td>
-                        <td class="field"><input class="field" type="text" id="business_license" name="business_license" value="<?php echo $profile['license_num'] ?>" onChange="profile_is_dirty();" /></td>
+                        <td class="field"><input class="field" type="text" id="business_license" name="business_license" value="<?php echo $profile['license_num'] ?>" /></td>
                     </tr>
                     <tr>
                         <td class="title" colspan="2">Sign In Details</td>
@@ -117,7 +154,7 @@ class EmployeeEmployerPage extends Page {
                             <?php
                             if ($this->is_new) {
                             ?>
-                            <input class="field" type="text" id="user_id" value="" onChange="profile_is_dirty();" maxlength="10" />
+                            <input class="field" type="text" id="user_id" value=""  maxlength="10" />
                             <?php
                             } else {
                                 echo $profile['id'];
@@ -146,31 +183,31 @@ class EmployeeEmployerPage extends Page {
                     </tr>
                     <tr>
                         <td class="label"><label for="email">E-mail Address:</label></td>
-                        <td class="field"><input class="field" type="text" id="email" name="email" value="<?php echo $profile['email_addr'] ?>"  onChange="profile_is_dirty();" /></td>
+                        <td class="field"><input class="field" type="text" id="email" name="email" value="<?php echo $profile['email_addr'] ?>"   /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="name">Business Name:</label></td>
-                        <td class="field"><input class="field" type="text" id="name" name="name" value="<?php echo htmlspecialchars_decode(stripslashes($profile['name'])) ?>" onChange="profile_is_dirty();" /></td>
+                        <td class="field"><input class="field" type="text" id="name" name="name" value="<?php echo htmlspecialchars_decode(stripslashes($profile['name'])) ?>"  /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="contact_person">Contact Person:</label></td>
-                        <td class="field"><input class="field" type="text" id="contact_person" name="contact_person" value="<?php echo htmlspecialchars_decode(stripslashes($profile['contact_person'])) ?>" onChange="profile_is_dirty();" /></td>
+                        <td class="field"><input class="field" type="text" id="contact_person" name="contact_person" value="<?php echo htmlspecialchars_decode(stripslashes($profile['contact_person'])) ?>"  /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="phone_num">Telephone Number:</label></td>
-                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile['phone_num'] ?>" onChange="profile_is_dirty();" /></td>
+                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile['phone_num'] ?>"  /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="address">Mailing Address:</label></td>
-                        <td class="field"><textarea id="address" name="address" onChange="profile_is_dirty();"><?php echo htmlspecialchars_decode(stripslashes($profile['address'])) ?></textarea></td>
+                        <td class="field"><textarea id="address" name="address" ><?php echo htmlspecialchars_decode(stripslashes($profile['address'])) ?></textarea></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="state">State/Province/Area:</label></td>
-                        <td class="field"><input class="field" type="text" id="state" name="state" value="<?php echo $profile['state'] ?>"  onChange="profile_is_dirty();" /></td>
+                        <td class="field"><input class="field" type="text" id="state" name="state" value="<?php echo $profile['state'] ?>"   /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="zip">Zip/Postal Code:</label></td>
-                        <td class="field"><input class="field" type="text" id="zip" name="zip" value="<?php echo $profile['zip'] ?>" onChange="profile_is_dirty();" /></td>
+                        <td class="field"><input class="field" type="text" id="zip" name="zip" value="<?php echo $profile['zip'] ?>"  /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="country">Country:</label></td>
@@ -180,7 +217,7 @@ class EmployeeEmployerPage extends Page {
                     </tr>
                     <tr>
                         <td class="label"><label for="website_url">Web-site URL:</label></td>
-                        <td class="field"><input class="field" type="text" id="website_url" name="website_url" value="<?php echo htmlspecialchars_decode(stripslashes($profile['website_url'])) ?>" onChange="profile_is_dirty();" /></td>
+                        <td class="field"><input class="field" type="text" id="website_url" name="website_url" value="<?php echo htmlspecialchars_decode(stripslashes($profile['website_url'])) ?>"  /></td>
                     </tr>
                     <tr>
                         <td class="buttons_bar" colspan="2"><input type="button" onClick="save_profile();" value="Save &amp; Update Profile" /></td>
@@ -194,19 +231,60 @@ class EmployeeEmployerPage extends Page {
                 <table class="payment_terms_table">
                     <tr>
                         <td class="label"><label for="working_months">Working Months:</label></td>
-                        <td class="field"><input class="field_number" type="text" id="working_months" name="working_months" value="12" maxlength="2" onChange="profile_is_dirty();" /></td>
+                        <td class="field"><input class="field_number" type="text" id="working_months" name="working_months" value="<?php echo $profile['working_months']; ?>" maxlength="2" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="payment_terms_days">Payment Terms:</label></td>
                         <td class="field">
-                            <select id="payment_terms_days" name="payment_terms_days"  onChange="profile_is_dirty();">
-                                <option value="30" selected>30 days</option>
-                                <option value="60">60 days</option>
-                                <option value="90">90 days</option>
+                            <?php
+                            $is_selected = array(
+                                '30' => '',
+                                '60' => '',
+                                '90' => ''
+                            );
+                            $is_selected[$profile['payment_terms_days']] = 'selected';
+                            ?>
+                            <select id="payment_terms_days" name="payment_terms_days"  >
+                                <option value="30" <?php echo $is_selected['30']; ?>>30 days</option>
+                                <option value="60" <?php echo $is_selected['60']; ?>>60 days</option>
+                                <option value="90" <?php echo $is_selected['90']; ?>>90 days</option>
                             </select>
                         </td>
                     </tr>
                 </table>
+            </div>
+            
+            <div class="buttons_bar">
+                <input class="button" type="button" value="Add" onClick="add_new_fee();" />
+            </div>
+            <div id="fees" class="fees">
+            <?php
+                $fees_table = new HTMLTable('fees_table', 'fees_table');
+                
+                $fees_table->set(0, 0, "Annual Salary From", '', 'header');
+                $fees_table->set(0, 1, "Annual Salary Until", '', 'header');
+                $fees_table->set(0, 2, "Guaranteed Period (in months)", '', 'header');
+                $fees_table->set(0, 3, "Service Fee (%)", '', 'header');
+                $fees_table->set(0, 4, "Reward (%)", '', 'header');
+                $fees_table->set(0, 5, "&nbsp;", '', 'header action');
+                
+                foreach ($fees as $i=>$fee) {
+                    $fees_table->set($i+1, 0, number_format($fee['salary_start'], 2, '.', ','), '', 'cell');
+                    $fees_table->set($i+1, 1, number_format($fee['salary_end'], 2, '.', ','), '', 'cell');
+                    $fees_table->set($i+1, 2, $fee['guarantee_months'], '', 'cell center');
+                    $fees_table->set($i+1, 3, $fee['service_fee'], '', 'cell center');
+                    $fees_table->set($i+1, 4, $fee['reward_percentage'], '', 'cell center');
+                    
+                    $actions = '<input type="button" value="Delete" onClick="delete_fee('. $fee['id']. ');" />';
+                    $actions .= '<input type="button" value="Update" onClick="show_fee_window('. $fee['id']. ', '. number_format($fee['salary_start'], 2, '.', ','). ', '. number_format($fee['salary_end'], 2, '.', ','). ', '. $fee['guarantee_months']. ', '. $fee['service_fee']. ', '. $fee['reward_percentage']. ');" />';
+                    $fees_table->set($i+1, 5, $actions, '', 'cell action');
+                }
+
+                echo $fees_table->get_html();
+            ?>
+            </div>
+            <div class="buttons_bar">
+                <input class="button" type="button" value="Add" onClick="add_new_fee();" />
             </div>
         </div>
         
@@ -223,7 +301,7 @@ class EmployeeEmployerPage extends Page {
                             <tr>
                                 <td><label for="subscription_period">Purchase:</label></td>
                                 <td>
-                                    <select id="subscription_period" name="subscription_period"  onChange="profile_is_dirty();">
+                                    <select id="subscription_period" name="subscription_period"  >
                                         <option value="0">None</option>
                                         <option value="0" disabled>&nbsp;</option>
                                         <option value="1">1 month</option>
@@ -242,7 +320,7 @@ class EmployeeEmployerPage extends Page {
                 </tr>
                 <tr>
                     <td class="label"><label for="free_postings">Free Job Postings:</label></td>
-                    <td class="field"><input class="field_number" type="text" id="free_postings" name="free_postings" value="1" maxlength="2" onChange="profile_is_dirty();" /></td>
+                    <td class="field"><input class="field_number" type="text" id="free_postings" name="free_postings" value="1" maxlength="2" /></td>
                 </tr>
                 <tr>
                     <td class="label"><label for="paid_postings">Paid Job Postings:</label></td>
@@ -250,71 +328,51 @@ class EmployeeEmployerPage extends Page {
                         <span id="paid_postings_label">0</span>
                         &nbsp;
                         Add: 
-                        <input class="field_number" type="text" id="paid_postings" name="paid_postings" value="0" maxlength="2" onChange="profile_is_dirty();" />
+                        <input class="field_number" type="text" id="paid_postings" name="paid_postings" value="0" maxlength="2"  />
                     </td>
                 </tr>
             </table>
         </div>
         
-        <!-- div id="div_employer">
-            
-            <div id="div_service_fees">
-                <table class="buttons">
-                    <tr>
-                        <td class="left"><input class="button" type="button" id="delete_service_fees" name="delete_service_fees" value="Delete Selected Fees" onClick="delete_fees();" /></td>
-                        <td class="right"><input class="button" type="button" id="add_new_service_fee" name="add_new_service_fee" value="Add New Fee" /></td>
-                    </tr>
-                </table>
-                <table class="header">
-                    <tr>
-                        <td class="checkbox"><input type="checkbox" id="delete_all_service_fees" /></td>
-                        <td class="salary_start_title">Annual Salary Start</td>
-                        <td class="salary_end_title">Annual Salary End</td>
-                        <td class="guaranteed_months_title">Guaranteed Period (in months)</td>
-                        <td class="service_fee_title">Service Fee (%)</td>
-                        <td class="discount_title">Discount (%)</td>
-                        <td class="reward_percentage_title">Reward (%)</td>
-                        <td class="actions">&nbsp;</td>
-                    </tr>
-                </table>
-                <div id="div_service_fees_list">
-                </div>
-                <table class="buttons">
-                    <tr>
-                        <td class="left"><input class="button" type="button" id="delete_service_fees_1" name="delete_service_fees_1" value="Delete Selected Fees" onClick="delete_fees();" /></td>
-                        <td class="right"><input class="button" type="button" id="add_new_service_fee_1" name="add_new_service_fee_1" value="Add New Fee" /></td>
-                    </tr>
-                </table>
+        
+        <!-- popup windows goes here -->
+        <div id="fee_window" class="popup_window">
+            <div class="popup_window_title">Service Fee</div>
+            <div class="popup_fee">
+                <div class="note">NOTE: Enter 0 to represent &infin; for Salary End.</div>
+                <form id="service_fee_form" method="post" onSubmit="return false;">
+                    <input type="hidden" id="id" name="id" value="0" />
+                    <table class="service_fee_form">
+                        <tr>
+                            <td class="label"><label for="salary_start">Salary Start:</label></td>
+                            <td class="field"><input class="field" type="text" id="salary_start" name="salary_start" value="1.00" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="salary_end">Salary End:</label></td>
+                            <td class="field"><input class="field" type="text" id="salary_end" name="salary_end" value="0.00" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="Guaranteed Months">Guaranteed Months:</label></td>
+                            <td class="field"><input class="field" type="text" id="guarantee_months" name="guarantee_months" value="1" maxlength="2" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="service_fee">Service Fee (%):</label></td>
+                            <td class="field"><input class="field" type="text" id="service_fee" name="service_fee" value="" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="reward_percentage">Reward (%):</label></td>
+                            <td class="field"><input class="field" type="text" id="reward_percentage" name="reward_percentage" value="25.00" /></td>
+                        </tr>
+                    </table>
+                </form>
             </div>
-            
-            <div id="div_extra_fees">
-                <table class="buttons">
-                    <tr>
-                        <td class="left"><input class="button" type="button" id="delete_extra_fees" name="delete_extra_fees" value="Delete Selected Charges" onClick="delete_charges();" /></td>
-                        <td class="right"><input class="button" type="button" id="add_new_extra_fee" name="add_new_extra_fee" value="Add New Charge" /></td>
-                    </tr>
-                </table>
-                <table class="header">
-                    <tr>
-                        <td class="checkbox"><input type="checkbox" id="delete_all_extra_fees" /></td>
-                        <td class="charge_label">Charge</td>
-                        <td class="amount_title">Amount</td>
-                        <td class="actions">&nbsp;</td>
-                    </tr>
-                </table>
-                <div id="div_extra_fees_list">
-                </div>
-                <table class="buttons">
-                    <tr>
-                        <td class="left"><input class="button" type="button" id="delete_extra_fees_1" name="delete_extra_fees_1" value="Delete Selected Charges" onClick="delete_charges();" /></td>
-                        <td class="right"><input class="button" type="button" id="add_new_extra_fee_1" name="add_new_extra_fee_1" value="Add New Charge" /></td>
-                    </tr>
-                </table>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save &amp; Close" onClick="close_service_fee_popup(true);" />
+                <input type="button" value="Close" onClick="close_service_fee_popup(false);" />
             </div>
-            
         </div>
         
-        <div id="div_blanket"></div>
+        <!-- div id="div_blanket"></div>
         <div id="div_service_fee_form">
             <p class="instructions">Please enter the following details for this service fee:</p>
             <p class="tiny_note">NOTE: Enter 0 to represent &infin; for Salary End.</p>

@@ -101,7 +101,7 @@ class Employer implements Model {
         } else {
             $query .= ", `id` = '". $this->id. "'";
         }
-
+        
         if ($this->mysqli->execute($query)) {
             return true;
         }

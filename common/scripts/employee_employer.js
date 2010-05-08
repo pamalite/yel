@@ -58,7 +58,7 @@ function validate_profile_form() {
     }
     
     // is new employer?
-    if (isEmpty($('employer_id').value)) {
+    if (employer_id == '0') {
         if (isEmpty($('user_id').value)) {
             alert('User ID cannot be empty');
             return false;
@@ -130,9 +130,9 @@ function validate_profile_form() {
 
 function show_profile() {
     $('employer_profile').setStyle('display', 'block');
-    // $('employer_fees').setStyle('display', 'none');
-    // $('employer_jobs').setStyle('display', 'none');
-    // $('employer_subscriptions').setStyle('display', 'none');
+    $('employer_fees').setStyle('display', 'none');
+    $('employer_jobs').setStyle('display', 'none');
+    $('employer_subscriptions').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '#CCCCCC');
     $('item_fees').setStyle('background-color', '');
@@ -146,14 +146,13 @@ function save_profile() {
     }
     
     var mode = 'update';
-    if (isEmpty(employer_id)) {
-        employer_id = $('user_id').value;
+    if (employer_id == '0') {
         mode = 'create';
     }
     
     var params = 'id=' + employer_id;
     params = params + '&action=save_profile';
-    params = params + '&employee=' + id;
+    params = params + '&employee=' + user_id;
     params = params + '&license_num=' + $('business_license').value
     params = params + '&email_addr=' + $('email').value;
     params = params + '&name=' + $('name').value;
@@ -170,33 +169,38 @@ function save_profile() {
     //     params = params + '&subscription_period=' + $('subscription_period').options[$('subscription_period').selectedIndex].value;
     
     if (mode == 'create') {
-        params = params + '&new=1';
+        params = params + '&user_id=' + $('user_id').value;
         // params = params + '&free_postings=' + $('free_postings').value;
-    } else {
-        params = params + '&new=0';
-    }
+    } 
     
     var uri = root + "/employees/employer_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
             if (txt == 'ko') {
                 alert('An error occured while saving profile. Please makesure the Business License and User ID do not already exist in the system.');
                 return false;
             }
             
             if (mode == 'create') {
+                employer_id = $('user_id').value;
+                
                 if (!isEmpty(from_employer)) {
-                    var proceed_copy = confirm('Do you want the service fees and extra fees to be copied too?');
+                    var proceed_copy = confirm('Do you want the service feess to be copied too?');
                     if (proceed_copy) {
-                        // copy_fees_and_extras();
+                        copy_fees();
                     }
                 }
             }
             
             is_profile_dirty = false;
+            
             show_profile();
+            
         },
         onRequest: function(instance) {
             set_status('Saving profile...');
@@ -206,22 +210,20 @@ function save_profile() {
     request.send(params);
 }
 
-/*
-
-function copy_fees_and_extras() {
-    var params = 'id=' + $('employer_id').value + '&employer=' + copy_from_employer + '&action=copy_fees_and_extras';
+function copy_fees() {
+    var params = 'id=' + employer_id + '&employer=' + from_employer + '&action=copy_fees';
     
-    var uri = root + "/employees/employers_action.php";
+    var uri = root + "/employees/employer_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
             if (txt == 'ko') {
-                set_status('An error occured while copying service fees and extra fees.');
+                alert('An error occured while copying service fees.');
                 return false;
             }
             
-            copy_from_employer = '0';
+            from_employer = '0';
             set_status('');
         },
         onRequest: function(instance) {
@@ -232,348 +234,72 @@ function copy_fees_and_extras() {
     request.send(params);
 }
 
-function show_employers() {
-    $('div_employers').setStyle('display', 'block');
-    $('div_employer').setStyle('display', 'none');
+function show_fees() {
+    $('employer_profile').setStyle('display', 'none');
+    $('employer_fees').setStyle('display', 'block');
+    $('employer_jobs').setStyle('display', 'none');
+    $('employer_subscriptions').setStyle('display', 'none');
     
+    $('item_profile').setStyle('background-color', '');
+    $('item_fees').setStyle('background-color', '#CCCCCC');
+    $('item_jobs').setStyle('background-color', '');
+    $('item_subscriptions').setStyle('background-color', '');
 }
 
-function add_new_employer() {
-    $('employer_id').value = '0';
-    copy_from_employer = '0';
-    $('div_employers').setStyle('display', 'none');
-    $('div_employer').setStyle('display', 'block');
-    
-    selected_tab = 'li_profile';
-    $('li_profile').setStyle('border', '1px solid #CCCCCC');
-    $('li_service_fees').setStyle('border', '1px solid #0000FF');
-    $('li_extra_fees').setStyle('border', '1px solid #0000FF');
-    $('div_profile').setStyle('display', 'block');
-    $('div_service_fees').setStyle('display', 'none');
-    $('div_extra_fees').setStyle('display', 'none');
-    
-    $('user_id_placeholder').set('html', '<input class="field" type="text" id="user_id" name="user_id" value="" maxlength="10" onChange="count_user_id_characters(); profile_is_dirty();" /><br/><span style="font-size:9pt; color: #666666;">Acceptable characters are a-z, A-Z, 0-9.<br/>No spacing allowed, but underscore (_) is permitted.</span>');
-    $('password_placeholder').set('html', '<input class="field" type="password" id="password" name="password" value="'+ generate_random_string_of(6) + '" disabled />');
-    $('business_license').value = '';
-    $('name').value = '';
-    $('email').value = '';
-    $('contact_person').value = '';
-    $('phone_num').value = '';
-    $('address').value = '';
-    $('state').value = '';
-    $('zip').value = '';
-    $('website_url').value = '';
-    list_countries_in('0', 'country_dropdown_list', 'country_dropdown', 'country_dropdown', false, 'profile_is_dirty();');
-    $('working_months').value = '12';
-    //$('bonus_months').value = '1';
-    $('payment_terms_days').selectedIndex = 0;
-    $('subscription_period_label').setStyle('display', 'none');
-    $('subscription_period').setStyle('display', 'block');
-    $('subscription_period').selectedIndex = 0;
-    $('free_postings').value = '1';
-    $('free_postings').disabled = false;
-    $('paid_postings').value = '0';
-    $('paid_postings_label').set('html', '0');
-}
-
-function new_from_employer(_employer_id) {
-    $('employer_id').value = '0';
-    copy_from_employer = _employer_id;
-    $('div_employers').setStyle('display', 'none');
-    $('div_employer').setStyle('display', 'block');
-
-    selected_tab = 'li_profile';
-    $('li_profile').setStyle('border', '1px solid #CCCCCC');
-    $('li_service_fees').setStyle('border', '1px solid #0000FF');
-    $('li_extra_fees').setStyle('border', '1px solid #0000FF');
-    $('div_profile').setStyle('display', 'block');
-    $('div_service_fees').setStyle('display', 'none');
-    $('div_extra_fees').setStyle('display', 'none');
-    
-    var params = 'id=' + _employer_id + '&action=get_employer';
-    
-    var uri = root + "/employees/employers_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading employer.');
-                return false;
-            }
-            
-            var ids = xml.getElementsByTagName('id');
-            var licenses = xml.getElementsByTagName('license_num');
-            var names = xml.getElementsByTagName('name');
-            var phone_nums = xml.getElementsByTagName('phone_num');
-            var email_addrs = xml.getElementsByTagName('email_addr');
-            var contact_persons = xml.getElementsByTagName('contact_person');
-            var addresses = xml.getElementsByTagName('address');
-            var states = xml.getElementsByTagName('state');
-            var zips = xml.getElementsByTagName('zip');
-            var countries = xml.getElementsByTagName('country');
-            var website_urls = xml.getElementsByTagName('website_url');
-            var working_months = xml.getElementsByTagName('working_months');
-            //var bonus_months = xml.getElementsByTagName('bonus_months');
-            var payment_terms_days = xml.getElementsByTagName('payment_terms_days');
-            
-            var new_user_id = ids[0].childNodes[0].nodeValue + '_1';
-            if (new_user_id.length > 10) {
-                var temp = '';
-                for(var i=0; i < 8; i++) {
-                    temp = temp + new_user_id.charAt(i);
-                }
-                
-                new_user_id = temp + '_1';
-            }
-            
-            $('user_id_placeholder').set('html', '<input class="field" type="text" id="user_id" name="user_id" value="' + new_user_id + '" maxlength="10" /><br/><span style="font-size:9pt; color: #666666;">Acceptable characters are a-z, A-Z, 0-9.<br/>No spacing allowed, but underscore (_) is permitted.</span>');
-            $('password_placeholder').set('html', '<input class="field" type="password" id="password" name="password" value="' + generate_random_string_of(6) + '" disabled />');
-            $('business_license').value = '';
-            $('name').value = names[0].childNodes[0].nodeValue;
-            $('email').value = email_addrs[0].childNodes[0].nodeValue;
-            $('contact_person').value = contact_persons[0].childNodes[0].nodeValue;
-            $('phone_num').value = phone_nums[0].childNodes[0].nodeValue;
-            
-            var address = '';
-            if (addresses[0].childNodes.length > 0) {
-                address = addresses[0].childNodes[0].nodeValue;
-            }
-            $('address').value = address;
-            
-            var state = '';
-            if (states[0].childNodes.length > 0) {
-                state = states[0].childNodes[0].nodeValue;
-            }
-            $('state').value = state;
-            
-            $('zip').value = zips[0].childNodes[0].nodeValue;
-            list_countries_in(countries[0].childNodes[0].nodeValue, 'country_dropdown_list', 'country_dropdown', 'country_dropdown', false, 'profile_is_dirty();');
-            $('working_months').value = working_months[0].childNodes[0].nodeValue;
-            //$('bonus_months').value = bonus_months[0].childNodes[0].nodeValue;
-            
-            $('payment_terms_days').selectedIndex = 0;
-            for (var i=0; i < $('payment_terms_days').options.length; i++) {
-                if ($('payment_terms_days').options[i].value == payment_terms_days[0].childNodes[0].nodeValue) {
-                    $('payment_terms_days').selectedIndex = i;
-                    break;
-                }
-            }
-            
-            $('subscription_period_label').setStyle('display', 'none');
-            $('subscription_period').setStyle('display', 'block');
-            $('subscription_period').selectedIndex = 0;
-            $('free_postings').value = '1';
-            $('free_postings').disabled = false;
-            $('paid_postings').value = '0';
-            $('paid_postings_label').set('html', '0');
-            
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading employer profile...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function show_employer(_employer_id) {
-    $('employer_id').value = _employer_id;
-    copy_from_employer = '0';
-    show_employer_profile();
-}
-
-function show_employer_profile() {
-    $('div_employers').setStyle('display', 'none');
-    $('div_employer').setStyle('display', 'block');
-
-    selected_tab = 'li_profile';
-    $('li_profile').setStyle('border', '1px solid #CCCCCC');
-    $('li_service_fees').setStyle('border', '1px solid #0000FF');
-    $('li_extra_fees').setStyle('border', '1px solid #0000FF');
-    $('div_profile').setStyle('display', 'block');
-    $('div_service_fees').setStyle('display', 'none');
-    $('div_extra_fees').setStyle('display', 'none');
-    
-    if ($('employer_id').value == '0') {
-        if (copy_from_employer != '0') {
-            new_from_employer(copy_from_employer);
-        } else {
-            add_new_employer();
-        }
-        return;
-    }
-    
-    var params = 'id=' + $('employer_id').value + '&action=get_employer';
-    
-    var uri = root + "/employees/employers_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading employer.');
-                return false;
-            }
-            
-            var ids = xml.getElementsByTagName('id');
-            var licenses = xml.getElementsByTagName('license_num');
-            var names = xml.getElementsByTagName('name');
-            var phone_nums = xml.getElementsByTagName('phone_num');
-            var email_addrs = xml.getElementsByTagName('email_addr');
-            var contact_persons = xml.getElementsByTagName('contact_person');
-            var addresses = xml.getElementsByTagName('address');
-            var states = xml.getElementsByTagName('state');
-            var zips = xml.getElementsByTagName('zip');
-            var countries = xml.getElementsByTagName('country');
-            var website_urls = xml.getElementsByTagName('website_url');
-            var working_months = xml.getElementsByTagName('working_months');
-            //var bonus_months = xml.getElementsByTagName('bonus_months');
-            var payment_terms_days = xml.getElementsByTagName('payment_terms_days');
-            var website_urls = xml.getElementsByTagName('website_url');
-            var subscription_expire_ons = xml.getElementsByTagName('formatted_subscription_expire_on');
-            var free_postings = xml.getElementsByTagName('free_postings_left');
-            var paid_postings = xml.getElementsByTagName('paid_postings_left');
-            
-            $('user_id_placeholder').set('html', ids[0].childNodes[0].nodeValue);
-            $('password_placeholder').set('html', '<input type="button" value="Reset Password" onClick="reset_password();" />');
-            $('business_license').value = licenses[0].childNodes[0].nodeValue;
-            $('name').value = names[0].childNodes[0].nodeValue;
-            $('email').value = email_addrs[0].childNodes[0].nodeValue;
-            $('contact_person').value = contact_persons[0].childNodes[0].nodeValue;
-            $('phone_num').value = phone_nums[0].childNodes[0].nodeValue;
-            
-            var address = '';
-            if (addresses[0].childNodes.length > 0) {
-                address = addresses[0].childNodes[0].nodeValue;
-            }
-            $('address').value = address;
-            
-            var state = '';
-            if (states[0].childNodes.length > 0) {
-                state = states[0].childNodes[0].nodeValue;
-            }
-            $('state').value = state;
-            
-            $('zip').value = zips[0].childNodes[0].nodeValue;
-            list_countries_in(countries[0].childNodes[0].nodeValue, 'country_dropdown_list', 'country_dropdown', 'country_dropdown', false, 'profile_is_dirty();');
-            $('working_months').value = working_months[0].childNodes[0].nodeValue;
-            //$('bonus_months').value = bonus_months[0].childNodes[0].nodeValue;
-            
-            $('payment_terms_days').selectedIndex = 0;
-            for (var i=0; i < $('payment_terms_days').options.length; i++) {
-                if ($('payment_terms_days').options[i].value == payment_terms_days[0].childNodes[0].nodeValue) {
-                    $('payment_terms_days').selectedIndex = i;
-                    break;
-                }
-            }
-            
-            $('website_url').value = '';
-            if (website_urls[0].childNodes.length > 0) {
-                $('website_url').value = website_urls[0].childNodes[0].nodeValue;
-            }
-            
-            $('subscription_period_label').setStyle('display', 'block');
-            $('subscription_period_label').setStyle('color', '#666666');
-            $('subscription_period_label').set('html', 'Expires On: ' + subscription_expire_ons[0].childNodes[0].nodeValue);
-            $('subscription_period').selectedIndex = 0;
-            
-            $('free_postings').disabled = true;
-            $('free_postings').value = free_postings[0].childNodes[0].nodeValue;
-            
-            $('paid_postings_label').set('html', paid_postings[0].childNodes[0].nodeValue);
-            $('paid_postings').value = '0';
-            
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading employer profile...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function show_service_fees() {
-    if (is_profile_dirty) {
-        alert('Please save the profile before proceeding.');
-        return false;
-    }
-    
-    $('div_employers').setStyle('display', 'none');
-    $('div_employer').setStyle('display', 'block');
-    
-    selected_tab = 'li_service_fees';
-    $('li_profile').setStyle('border', '1px solid #0000FF');
-    $('li_service_fees').setStyle('border', '1px solid #CCCCCC');
-    $('li_extra_fees').setStyle('border', '1px solid #0000FF');
-    $('div_profile').setStyle('display', 'none');
-    $('div_service_fees').setStyle('display', 'block');
-    $('div_extra_fees').setStyle('display', 'none');
-    
-    var employer_id = $('employer_id').value;
-    if (copy_from_employer != '0') {
-        employer_id = copy_from_employer;
-    }
-    
+function show_updated_fees() {
     var params = 'id=' + employer_id + '&action=get_fees';
     
-    var uri = root + "/employees/employers_action.php";
+    var uri = root + "/employees/employer_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
             if (txt == 'ko') {
-                set_status('An error occured while loading service fees.');
+                a('An error occured while loading fees.');
                 return false;
             }
             
-            var html = '<table id="service_fees_list" class="list">';
             if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There is no service fee created for this employer.</div>';
-                
-                $('delete_service_fees').disabled = true;
-                $('delete_service_fees_1').disabled = true;
+                $('fees').set('html', '<div class="empty_results">No fees set at this moment.</div>');
             } else {
                 var ids = xml.getElementsByTagName('id');
                 var salary_starts = xml.getElementsByTagName('salary_start');
                 var salary_ends = xml.getElementsByTagName('salary_end');
-                var guarantee_months = xml.getElementsByTagName('guarantee_months');
                 var service_fees = xml.getElementsByTagName('service_fee');
-                var discounts = xml.getElementsByTagName('discount');
                 var reward_percentages = xml.getElementsByTagName('reward_percentage');
+                var guarantee_months = xml.getElementsByTagName('guarantee_months');
+                
+                var fees_table = new FlexTable('fees_table', 'fees_table');
+
+                var header = new Row('');
+                header.set(0, new Cell('Annual Salary From', '', 'header'));
+                header.set(1, new Cell('Annual Salary Until', '', 'header'));
+                header.set(2, new Cell('Guaranteed Period (in months)', '', 'header'));
+                header.set(3, new Cell('Service Fee (%)', '', 'header'));
+                header.set(4, new Cell('Reward (%)', '', 'header'));
+                header.set(5, new Cell('&nbsp;', '', 'header action'));
+                fees_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
-                    var service_fee_id = ids[i].childNodes[0].nodeValue;
+                    var row = new Row('');
                     
-                    html = html + '<tr id="'+ service_fee_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="checkbox"><input type="checkbox" id="'+ service_fee_id + '" /></td>' + "\n";
-                    html = html + '<td class="salary_start">' + salary_starts[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    row.set(0, new Cell(salary_starts[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(1, new Cell(salary_ends[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(2, new Cell(guarantee_months[i].childNodes[0].nodeValue, '', 'cell center'));
+                    row.set(3, new Cell(service_fees[i].childNodes[0].nodeValue, '', 'cell center'));
+                    row.set(4, new Cell(reward_percentages[i].childNodes[0].nodeValue, '', 'cell center'));
                     
-                    var salary_end = salary_ends[i].childNodes[0].nodeValue;
-                    if (parseFloat(salary_end) == 0.00) {
-                        salary_end = '&infin;';
-                    }
-                    html = html + '<td class="salary_end">' + salary_end + '</td>' + "\n";
-                    html = html + '<td class="guaranteed_months">' + guarantee_months[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="service_fee">' + service_fees[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="discount">' + discounts[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="reward_percentage">' + reward_percentages[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    
-                    html = html + '<td class="actions"><input type="button" value="Update" onClick="show_service_fee_form(\'' + service_fee_id + '\');" /></td>' + "\n";               
-                    html = html + '</tr>' + "\n";
+                    var actions = '<input type="button" value="Delete" onClick="delete_fee(' + ids[i].childNodes[0].nodeValue + ');" />';
+                    actions = actions + '<input type="button" value="Update" onClick="show_fee_window(' + ids[i].childNodes[0].nodeValue + ', ' + salary_starts[i].childNodes[0].nodeValue + ', ' + salary_ends[i].childNodes[0].nodeValue + ', ' + guarantee_months[i].childNodes[0].nodeValue + ', ' + service_fees[i].childNodes[0].nodeValue + ', ' + reward_percentages[i].childNodes[0].nodeValue + ');" />';
+                    row.set(5, new Cell(actions, '', 'cell action'));
+                    fees_table.set((parseInt(i)+1), row);
                 }
                 
-                $('delete_service_fees').disabled = false;
-                $('delete_service_fees_1').disabled = false;
-                
+                $('fees').set('html', fees_table.get_html());
+                set_status('');
             }
-            html = html + '</table>';
-            
-            $('div_service_fees_list').set('html', html);
-            $('div_service_fees_list').setStyle('display', 'block');
-            set_status('');
         },
         onRequest: function(instance) {
             set_status('Loading fees...');
@@ -582,6 +308,39 @@ function show_service_fees() {
     
     request.send(params);
 }
+
+function delete_fee(_id) {
+    var proceed = confirm('Are you sure to delete the service fee?');
+    if (!proceed) {
+        return false;
+    }
+    
+    var params = 'id=' + _id;
+    params = params + '&action=delete_fee';
+    
+    var uri = root + "/employees/employer_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            set_status('');
+            
+            if (txt == 'ko') {
+                alert('An error occured while deleting fee.');
+                return false;
+            }
+            
+            show_updated_fees();
+        },
+        onRequest: function(instance) {
+            set_status('Loading service fee...');
+        }
+    });
+    
+    request.send(params);
+}
+
+/*
 
 function close_service_fee_form() {
     $('service_fee_id').value = '0';
@@ -662,178 +421,6 @@ function show_service_fee_form(_id) {
     $('div_service_fee_form').setStyle('display', 'block');
 }
 
-function show_extra_fees() {
-    if (is_profile_dirty) {
-        alert('Please save the profile before proceeding.');
-        return false;
-    }
-    
-    $('div_employers').setStyle('display', 'none');
-    $('div_employer').setStyle('display', 'block');
-    
-    selected_tab = 'li_extra_fees';
-    $('li_profile').setStyle('border', '1px solid #0000FF');
-    $('li_service_fees').setStyle('border', '1px solid #0000FF');
-    $('li_extra_fees').setStyle('border', '1px solid #CCCCCC');
-    $('div_profile').setStyle('display', 'none');
-    $('div_service_fees').setStyle('display', 'none');
-    $('div_extra_fees').setStyle('display', 'block');
-    
-    var employer_id = $('employer_id').value;
-    if (copy_from_employer != '0') {
-        employer_id = copy_from_employer;
-    }
-    
-    var params = 'id=' + employer_id + '&action=get_charges';
-    
-    var uri = root + "/employees/employers_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading extra charges.');
-                return false;
-            }
-            
-            var html = '<table id="extra_fees_list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There is no extra charges imposed on this employer.</div>';
-                
-                $('delete_extra_fees').disabled = true;
-                $('delete_extra_fees_1').disabled = true;
-            } else {
-                var ids = xml.getElementsByTagName('id');
-                var labels = xml.getElementsByTagName('label');
-                var charges = xml.getElementsByTagName('charges');
-                
-                for (var i=0; i < ids.length; i++) {
-                    var extra_fee_id = ids[i].childNodes[0].nodeValue;
-                    
-                    html = html + '<tr id="'+ extra_fee_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="checkbox"><input type="checkbox" id="'+ extra_fee_id + '" /></td>' + "\n";
-                    html = html + '<td class="charge_label">' + labels[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="amount">' + charges[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="actions"><input type="button" value="Update" onClick="show_extra_fee_form(\'' + extra_fee_id + '\');" /></td>' + "\n";               
-                    html = html + '</tr>' + "\n";
-                }
-                
-                $('delete_extra_fees').disabled = false;
-                $('delete_extra_fees_1').disabled = false;
-                
-            }
-            html = html + '</table>';
-            
-            $('div_extra_fees_list').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading extra charges...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function close_extra_fee_form() {
-    $('extra_fee_id').value = '0';
-    $('div_extra_fee_form').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
-}
-
-function show_new_extra_fee_form() {
-    show_extra_fee_form(0);
-}
-
-function show_extra_fee_form(_id) {
-    $('extra_fee_id').value = _id;
-    
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_extra_fee_form').getStyle('height'));
-    var div_width = parseInt($('div_extra_fee_form').getStyle('width'));
-    
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
-    } else {
-        window_height = document.documentElement.clientHeight;
-    }
-    
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
-    }
-    
-    $('div_extra_fee_form').setStyle('top', ((window_height - div_height) / 2));
-    $('div_extra_fee_form').setStyle('left', ((window_width - div_width) / 2));
-    
-    if (_id != '0') {
-        var params = 'id=' + _id + '&action=get_charge';
-
-        var uri = root + "/employees/employers_action.php";
-        var request = new Request({
-            url: uri,
-            method: 'post',
-            onSuccess: function(txt, xml) {
-                if (txt == 'ko') {
-                    alert('An error occured while loading extra fee.');
-                    return false;
-                }
-
-                if (txt != '0') {
-                    var ids = xml.getElementsByTagName('id');
-                    var labels = xml.getElementsByTagName('label');
-                    var charges = xml.getElementsByTagName('charges');
-                    
-                    $('charge_label').value = labels[0].childNodes[0].nodeValue;
-                    $('amount').value = charges[0].childNodes[0].nodeValue;
-                }
-
-                set_status('');
-            },
-            onRequest: function(instance) {
-                set_status('Loading fee...');
-            }
-        });
-
-        request.send(params);
-    }
-    
-    $('div_blanket').setStyle('display', 'block');
-    $('div_extra_fee_form').setStyle('display', 'block');
-}
-
-
-function activate_employer(_employer_id) {
-    var proceed = confirm('Are you sure to activate the employer?');
-    if (!proceed) {
-        return false;
-    }
-    
-    var params = 'id=' + _employer_id;
-    params = params + '&action=activate';
-    
-    var uri = root + "/employees/employers_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while activating employer.');
-                return false;
-            }
-            
-            set_status('');
-            show_employers();
-        },
-        onRequest: function(instance) {
-            set_status('Loading employers...');
-        }
-    });
-    
-    request.send(params);
-}
 
 
 
@@ -930,58 +517,6 @@ function save_service_fee() {
         },
         onRequest: function(instance) {
             set_status('Saving service fee...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function delete_fees() {
-    var inputs = $('service_fees_list').getElementsByTagName('input');
-    var payload = '<fees>' + "\n";
-    var count = 0;
-    
-    for(i=0; i < inputs.length; i++) {
-        var attributes = inputs[i].attributes;
-        if (attributes.getNamedItem('type').value == 'checkbox') {
-            if (inputs[i].checked) {
-                payload = payload + '<id>' + inputs[i].id + '</id>' + "\n";
-                count++;
-            }
-        }
-    }
-    
-    payload = payload + '</fees>';
-    
-    if (count <= 0) {
-        set_status('Please select at least one service fee.');
-        return false;
-    }
-    
-    var proceed = confirm('Are you sure to delete the selected service fees?');
-    if (!proceed) {
-        return false;
-    }
-    
-    var params = 'id=0';
-    params = params + '&action=delete_fees';
-    params = params + '&payload=' + payload;
-    
-    var uri = root + "/employees/employers_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while deleting selected fees.');
-                return false;
-            }
-            
-            set_status('');
-            show_service_fees();
-        },
-        onRequest: function(instance) {
-            set_status('Loading service fees...');
         }
     });
     

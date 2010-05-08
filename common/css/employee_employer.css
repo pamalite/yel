@@ -1,3 +1,10 @@
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
 a.menu {
     cursor: pointer;
 }
@@ -6,12 +13,18 @@ input, select, textarea {
     font-size: 12pt;
 }
 
-table.profile_form {
+table.profile_form, 
+table.payment_terms_table {
     width: 80%;
     margin: auto;
 }
 
-table.profile_form td {
+table.payment_terms_table {
+    width: 25%;
+}
+
+table.profile_form td, 
+table.payment_terms_table td {
     font-size: 12pt;
     padding: 3px 3px 3px 3px;
 }
@@ -49,6 +62,61 @@ textarea {
     display: none;
 }
 
+#fees_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#fees_table td { 
+    vertical-align: baseline;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.action {
+    width: 20%;
+    text-align: center;
+}
+
+#fees_table td.action {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+#fees_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+.center {
+    text-align: center;
+}
+
+div.buttons_bar {
+    text-align: right;
+    background-color: #CCCCCC;
+    padding: 3px 3px 3px 3px;
+}
+
+#fee_window {
+    display: none;
+    width: 500px;
+}
 
 
 /* old */

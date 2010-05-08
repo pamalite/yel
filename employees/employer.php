@@ -49,10 +49,9 @@ if (isset($_POST['id'])) {
     redirect_to('employers.php');
 }
 
-$new_from_employer = '';
 if (empty($employer_id)) {
     if (isset($_POST['from_employer']) || isset($_GET['from_employer'])) {
-        $new_from_employer = (isset($_POST['from_employer'])) ? $_POST['from_employer'] : $_GET['from_employer'];
+        $employer_id = (isset($_POST['from_employer'])) ? $_POST['from_employer'] : $_GET['from_employer'];
     }
     
     $is_new = true;
