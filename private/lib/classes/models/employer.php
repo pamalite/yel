@@ -420,6 +420,12 @@ class Employer implements Model {
         return $this->mysqli->execute($query);
     }
     
+    public function addFreeJobPosting($_postings) {
+        $query = "UPDATE employers SET free_postings_left = free_postings_left + (". $_postings. ") 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
     public function hasPaidJobPostings() {
         $query = "SELECT paid_postings_left FROM employers 
                   WHERE id = '". $this->id. "'";
@@ -438,7 +444,7 @@ class Employer implements Model {
     }
     
     public function addPaidJobPosting($_postings) {
-        $query = "UPDATE employers SET paid_postings_left = paid_postings_left + $_postings 
+        $query = "UPDATE employers SET paid_postings_left = paid_postings_left + (". $_postings. ") 
                   WHERE id = '". $this->id. "'";
         return $this->mysqli->execute($query);
     }
@@ -545,7 +551,7 @@ class Employer implements Model {
                     $query .= $key. " = ". $value;
                 }
                 
-                if ($i < count($data) - 1) {
+                if ($i < count($data) - 2) {
                     $query .= ", ";
                 }
                 
@@ -578,7 +584,7 @@ class Employer implements Model {
     }
     
     public function deleteFee($_id) {
-        if (empty($id)) {
+        if (empty($_id)) {
             return false;
         }
         

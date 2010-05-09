@@ -125,8 +125,8 @@ class EmployeeEmployerPage extends Page {
                 
                 <li id="item_profile" style="<?php echo ($this->current_page == 'profile') ? $style : ''; ?>"><a class="menu" onClick="show_profile();">Profile</a></li>
                 <li id="item_fees" style="<?php echo ($this->current_page == 'fees') ? $style : ''; ?>"><a class="menu" onClick="show_fees();">Fees</a></li>
-                <li id="item_jobs" style="<?php echo  ($this->current_page == 'jobs') ? $style : ''; ?>"><a class="menu" onClick="show_jobs();">Jobs</a></li>
                 <li id="item_subscriptions" style="<?php echo ($this->current_page == 'subscriptions') ? $style : ''; ?>"><a class="menu" onClick="show_subscriptions();">Subscriptions</a></li>
+                <li id="item_jobs" style="<?php echo  ($this->current_page == 'jobs') ? $style : ''; ?>"><a class="menu" onClick="show_jobs();">Jobs</a></li>
             </ul>
         </div>
         <!-- end submenu -->
@@ -259,28 +259,34 @@ class EmployeeEmployerPage extends Page {
             </div>
             <div id="fees" class="fees">
             <?php
-                $fees_table = new HTMLTable('fees_table', 'fees_table');
-                
-                $fees_table->set(0, 0, "Annual Salary From", '', 'header');
-                $fees_table->set(0, 1, "Annual Salary Until", '', 'header');
-                $fees_table->set(0, 2, "Guaranteed Period (in months)", '', 'header');
-                $fees_table->set(0, 3, "Service Fee (%)", '', 'header');
-                $fees_table->set(0, 4, "Reward (%)", '', 'header');
-                $fees_table->set(0, 5, "&nbsp;", '', 'header action');
-                
-                foreach ($fees as $i=>$fee) {
-                    $fees_table->set($i+1, 0, number_format($fee['salary_start'], 2, '.', ','), '', 'cell');
-                    $fees_table->set($i+1, 1, number_format($fee['salary_end'], 2, '.', ','), '', 'cell');
-                    $fees_table->set($i+1, 2, $fee['guarantee_months'], '', 'cell center');
-                    $fees_table->set($i+1, 3, $fee['service_fee'], '', 'cell center');
-                    $fees_table->set($i+1, 4, $fee['reward_percentage'], '', 'cell center');
-                    
-                    $actions = '<input type="button" value="Delete" onClick="delete_fee('. $fee['id']. ');" />';
-                    $actions .= '<input type="button" value="Update" onClick="show_fee_window('. $fee['id']. ', '. number_format($fee['salary_start'], 2, '.', ','). ', '. number_format($fee['salary_end'], 2, '.', ','). ', '. $fee['guarantee_months']. ', '. $fee['service_fee']. ', '. $fee['reward_percentage']. ');" />';
-                    $fees_table->set($i+1, 5, $actions, '', 'cell action');
-                }
+                if (is_null($fees) || empty($fees) || $fees === false) {
+            ?>
+                <div class="empty_results">There is no fee structure set for this employer yet.</div>
+            <?php
+                } else {
+                    $fees_table = new HTMLTable('fees_table', 'fees_table');
 
-                echo $fees_table->get_html();
+                    $fees_table->set(0, 0, "Annual Salary From", '', 'header');
+                    $fees_table->set(0, 1, "Annual Salary Until", '', 'header');
+                    $fees_table->set(0, 2, "Guaranteed Period (in months)", '', 'header');
+                    $fees_table->set(0, 3, "Service Fee (%)", '', 'header');
+                    $fees_table->set(0, 4, "Reward (%)", '', 'header');
+                    $fees_table->set(0, 5, "&nbsp;", '', 'header action');
+
+                    foreach ($fees as $i=>$fee) {
+                        $fees_table->set($i+1, 0, number_format($fee['salary_start'], 2, '.', ','), '', 'cell');
+                        $fees_table->set($i+1, 1, number_format($fee['salary_end'], 2, '.', ','), '', 'cell');
+                        $fees_table->set($i+1, 2, $fee['guarantee_months'], '', 'cell center');
+                        $fees_table->set($i+1, 3, $fee['service_fee'], '', 'cell center');
+                        $fees_table->set($i+1, 4, $fee['reward_percentage'], '', 'cell center');
+
+                        $actions = '<input type="button" value="Delete" onClick="delete_fee('. $fee['id']. ');" />';
+                        $actions .= '<input type="button" value="Update" onClick="show_fee_window('. $fee['id']. ', \''. number_format($fee['salary_start'], 2, '.', ','). '\', \''. number_format($fee['salary_end'], 2, '.', ','). '\', \''. $fee['guarantee_months']. '\', \''. $fee['service_fee']. '\', \''. $fee['reward_percentage']. '\');" />';
+                        $fees_table->set($i+1, 5, $actions, '', 'cell action');
+                    }
+
+                    echo $fees_table->get_html();
+                }
             ?>
             </div>
             <div class="buttons_bar">
@@ -288,67 +294,79 @@ class EmployeeEmployerPage extends Page {
             </div>
         </div>
         
-        <div id="employer_jobs">
-        </div>
-        
         <div id="employer_subscriptions">
-            <table>
+            <table class="subscription_form">
                 <tr>
                     <td class="label"><label for="subscription_period">Subscription:</label></td>
                     <td class="field">
-                        <div><span id="subscription_period_label"></span></div>
-                        <table>
-                            <tr>
-                                <td><label for="subscription_period">Purchase:</label></td>
-                                <td>
-                                    <select id="subscription_period" name="subscription_period"  >
-                                        <option value="0">None</option>
-                                        <option value="0" disabled>&nbsp;</option>
-                                        <option value="1">1 month</option>
-                                    <?php
-                                    foreach ($available_subscriptions as $month => $price) {
-                                    ?>
-                                        <option value="<?php echo $month; ?>"><?php echo $month; ?> months</option>
-                                    <?php
-                                    }
-                                    ?>
-                                    </select>
-                                </td>
-                            </tr>
-                        </table>
+                        <?php
+                            $expiry = new DateTime($profile['subscription_expire_on']);
+                            $today = new DateTime(date('Y-m-d'));
+                            $expiry_date = $expiry->format('j M, Y');
+                            
+                            $expired = '';
+                            if ($today->diff($expiry)->format('%d') > 0) {
+                                $expired = 'color: #ff0000;';
+                            }
+                        ?>
+                        <div>Expires On: <span id="expiry" style="<?php echo $expired ?>"><?php echo $expiry_date; ?></span></div>
+                        <div>Purchase: 
+                            <select id="subscription_period" name="subscription_period"  >
+                                <option value="0" selected>None</option>
+                                <option value="0" disabled>&nbsp;</option>
+                                <option value="1">1 month</option>
+                            <?php
+                            foreach ($available_subscriptions as $month => $price) {
+                            ?>
+                                <option value="<?php echo $month; ?>"><?php echo $month; ?> months</option>
+                            <?php
+                            }
+                            ?>
+                            </select>
+                        </div>
                     </td>
                 </tr>
                 <tr>
                     <td class="label"><label for="free_postings">Free Job Postings:</label></td>
-                    <td class="field"><input class="field_number" type="text" id="free_postings" name="free_postings" value="1" maxlength="2" /></td>
+                    <td class="field">
+                        <span id="free_postings_label"><?php echo $profile['free_postings_left'] ?></span>
+                        &nbsp;
+                        Add: 
+                        <input class="field_number" type="text" id="free_postings" name="free_postings" value="0" maxlength="2" /> 
+                    </td>
                 </tr>
                 <tr>
                     <td class="label"><label for="paid_postings">Paid Job Postings:</label></td>
                     <td class="field">
-                        <span id="paid_postings_label">0</span>
+                        <span id="paid_postings_label"><?php echo $profile['paid_postings_left'] ?></span>
                         &nbsp;
                         Add: 
                         <input class="field_number" type="text" id="paid_postings" name="paid_postings" value="0" maxlength="2"  />
                     </td>
                 </tr>
             </table>
+            <div class="buttons_bar">
+                <input class="button" type="button" value="Save" onClick="save_subscriptions();" />
+            </div>
         </div>
         
+        <div id="employer_jobs">
+        </div>
         
         <!-- popup windows goes here -->
         <div id="fee_window" class="popup_window">
             <div class="popup_window_title">Service Fee</div>
             <div class="popup_fee">
-                <div class="note">NOTE: Enter 0 to represent &infin; for Salary End.</div>
+                <div class="note">NOTE: Enter 0 to represent &infin; for Annual Salary Until.</div>
                 <form id="service_fee_form" method="post" onSubmit="return false;">
                     <input type="hidden" id="id" name="id" value="0" />
                     <table class="service_fee_form">
                         <tr>
-                            <td class="label"><label for="salary_start">Salary Start:</label></td>
+                            <td class="label"><label for="salary_start">Annual Salary Start:</label></td>
                             <td class="field"><input class="field" type="text" id="salary_start" name="salary_start" value="1.00" /></td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="salary_end">Salary End:</label></td>
+                            <td class="label"><label for="salary_end">Annual Salary Until:</label></td>
                             <td class="field"><input class="field" type="text" id="salary_end" name="salary_end" value="0.00" /></td>
                         </tr>
                         <tr>
@@ -367,64 +385,11 @@ class EmployeeEmployerPage extends Page {
                 </form>
             </div>
             <div class="popup_window_buttons_bar">
-                <input type="button" value="Save &amp; Close" onClick="close_service_fee_popup(true);" />
-                <input type="button" value="Close" onClick="close_service_fee_popup(false);" />
+                <input type="button" value="Save &amp; Close" onClick="close_fee_window(true);" />
+                <input type="button" value="Close" onClick="close_fee_window(false);" />
             </div>
         </div>
         
-        <!-- div id="div_blanket"></div>
-        <div id="div_service_fee_form">
-            <p class="instructions">Please enter the following details for this service fee:</p>
-            <p class="tiny_note">NOTE: Enter 0 to represent &infin; for Salary End.</p>
-            <form id="service_fee_form" method="post" onSubmit="return false;">
-                <input type="hidden" id="service_fee_id" name="service_fee_id" value="0" />
-                <table class="service_fee_form">
-                    <tr>
-                        <td class="label"><label for="salary_start">Salary Start:</label></td>
-                        <td class="field"><input class="field" type="text" id="salary_start" name="salary_start" value="1.00" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="salary_end">Salary End:</label></td>
-                        <td class="field"><input class="field" type="text" id="salary_end" name="salary_end" value="0.00" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="Guaranteed Months">Guaranteed Months:</label></td>
-                        <td class="field"><input class="field" type="text" id="guarantee_months" name="guarantee_months" value="1" maxlength="2" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="service_fee">Service Fee (%):</label></td>
-                        <td class="field"><input class="field" type="text" id="service_fee" name="service_fee" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="discount">Discount (%):</label></td>
-                        <td class="field"><input class="field" type="text" id="discount" name="discount" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="reward_percentage">Reward (%):</label></td>
-                        <td class="field"><input class="field" type="text" id="reward_percentage" name="reward_percentage" value="25.00" /></td>
-                    </tr>
-                </table>
-                <p class="button"><input type="button" value="Cancel" onClick="close_service_fee_form();" />&nbsp;<input type="button" value="Save" onClick="save_service_fee();" /></p>
-            </form>
-        </div>
-        
-        <div id="div_extra_fee_form">
-            <p class="instructions">Please enter the following details for this extra charge:</p>
-            <form id="service_fee_form" method="post" onSubmit="return false;">
-                <input type="hidden" id="extra_fee_id" name="extra_fee_id" value="0" />
-                <table class="extra_fee_form">
-                    <tr>
-                        <td class="label"><label for="charge_label">Charge:</label></td>
-                        <td class="field"><input class="field" type="text" id="charge_label" name="charge_label" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="amount">Amount:</label></td>
-                        <td class="field"><input class="field" type="text" id="amount" name="amount" value="1.00" /></td>
-                    </tr>
-                </table>
-                <p class="button"><input type="button" value="Cancel" onClick="close_extra_fee_form();" />&nbsp;<input type="button" value="Save" onClick="save_extra_fee();" /></p>
-            </form>
-        </div -->
         <?php
     }
 }

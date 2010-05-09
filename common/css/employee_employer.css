@@ -118,6 +118,38 @@ div.buttons_bar {
     width: 500px;
 }
 
+#fee_window .service_fee_form {
+    width: 99%;
+    margin: auto;
+}
+
+#fee_window .note {
+    text-align: center;
+    padding: 5px 5px 5px 5px;
+    font-size: 9pt;
+    color: #777777;
+}
+
+#employer_subscriptions div.buttons_bar {
+    width: 50%;
+    margin: auto;
+}
+
+table.subscription_form {
+    width: 50%;
+    margin: auto;
+}
+
+table.subscription_form td, 
+table.subscription_form td div {
+    font-size: 12pt;
+    padding: 3px 3px 3px 3px;
+    vertical-align: baseline;
+}
+
+#expiry {
+    font-weight: bold;
+}
 
 /* old */
 
