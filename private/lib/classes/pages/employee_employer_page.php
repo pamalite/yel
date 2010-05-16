@@ -439,6 +439,7 @@ class EmployeeEmployerPage extends Page {
                         $jobs_table->set($i+1, 2, $expiry, '', 'cell');
                         
                         $actions = '<input type="button" value="Delete" onClick="delete_job('. $job['id']. ');" />';
+                        $actions .= '<input type="button" value="Extend" onClick="extend_job('. $job['id']. ');" />';
                         $jobs_table->set($i+1, 3, $actions, '', 'cell action');
                     }
 

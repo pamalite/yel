@@ -308,5 +308,34 @@ class Job implements Model {
         
         return ((($salary * $total_fees) * $discount) * $reward_percentage);
     }
+    
+    public function extend() {
+        $query = "INSERT INTO job_extensions 
+                  SELECT 0, id, created_on, expire_on, for_replacement, invoiced 
+                  FROM jobs 
+                  WHERE id = ". $this->id;
+        if ($this->mysqli->execute($query) === false) {
+            return false;
+        }
+        
+        $query = "SELECT expire_on FROM jobs 
+                  WHERE id = ". $this->id. " LIMIT 1";
+        $result = $this->mysqli->query($query);
+        $is_expired = (sql_date_diff($result[0]['expire_on'], now()) <= 0) ? true : false;
+        $expire_on = $result[0]['expire_on'];
+        if ($is_expired) {
+            $expire_on = now();
+        }
+
+        $data = array();
+        $data['created_on'] = $expire_on;
+        $data['expire_on'] = sql_date_add($data['created_on'], 30, 'day');
+        $data['closed'] = 'N';
+        if ($this->update($data) == false) {
+            return false;
+        }
+        
+        return true;
+    }
 }
 ?>

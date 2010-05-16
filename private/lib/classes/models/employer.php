@@ -610,13 +610,16 @@ class Employer implements Model {
             }
         }
         
-        $query = "SELECT id, title, 
-                  DATE_FORMAT(created_on, '%e %b, %Y') AS formatted_created_on, 
-                  DATEDIFF(expire_on, NOW()) AS expired, 
-                  DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on 
+        $query = "SELECT jobs.id, jobs.title, 
+                  IFNULL(MIN(job_extensions.previously_created_on), jobs.created_on) AS created_on, 
+                  IFNULL(DATE_FORMAT(MIN(job_extensions.previously_created_on), '%e %b, %Y'), DATE_FORMAT(jobs.created_on, '%e %b, %Y')) AS formatted_created_on, 
+                  DATEDIFF(jobs.expire_on, NOW()) AS expired, 
+                  DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS formatted_expire_on 
                   FROM jobs  
-                  WHERE employer = '". $this->id. "' AND 
-                  deleted = FALSE 
+                  LEFT JOIN job_extensions ON job_extensions.job = jobs.id 
+                  WHERE jobs.employer = '". $this->id. "' AND 
+                  jobs.deleted = FALSE 
+                  GROUP BY jobs.id 
                   ". $order. " ". $limit;
         return $this->mysqli->query($query);
     }

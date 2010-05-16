@@ -580,8 +580,8 @@ function show_updated_jobs() {
 
                 var header = new Row('');
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('jobs', 'created_on');\">Created On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('jobs', 'title');\">Job</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('jobs', 'expire_on');\">Expire On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('jobs', 'jobs.title');\">Job</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('jobs', 'jobs.expire_on');\">Expire On</a>", '', 'header'));
                 header.set(3, new Cell('&nbsp;', '', 'header action'));
                 jobs_table.set(0, header);
 
@@ -598,6 +598,7 @@ function show_updated_jobs() {
                     row.set(2, new Cell(expiry, '', 'cell'));
                     
                     var actions = '<input type="button" value="Delete" onClick="delete_job(' + ids[i].childNodes[0].nodeValue + ');" />';
+                    actions = actions + '<input type="button" value="Extend" onClick="extend_job(' + ids[i].childNodes[0].nodeValue + ');" />';
                     row.set(3, new Cell(actions, '', 'cell action'));
                     jobs_table.set((parseInt(i)+1), row);
                 }
@@ -636,6 +637,41 @@ function delete_job(_id) {
         },
         onRequest: function(instance) {
             set_status('Deleting job...');
+        }
+    });
+
+    request.send(params);
+}
+
+function extend_job(_id) {
+    var proceed = confirm('Are you sure to extend job for another 30 days?');
+    if (!proceed) {
+        return;
+    }
+    
+    var params = 'id=' + _id + '&action=extend_job&employer=' + employer_id;
+    
+    var uri = root + "/employees/employer_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while extending job.');
+                return false;
+            } else if (txt == '-1') {
+                alert('The account is not set up yet');
+                return false;
+            } else if (txt == '-2') {
+                alert('The employer\'s subscription has expired/suspended.');
+                return false;
+            }
+            
+            show_updated_jobs();
+        },
+        onRequest: function(instance) {
+            set_status('Extending job...');
         }
     });
 

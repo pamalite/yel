@@ -636,20 +636,20 @@ if ($_POST['action'] == 'save_job') {
     
     // check whether employer can use free job posting?
     if ($employer->hasFreeJobPostings() === false) {
-          // check whether employer has paid job postings?
-          if ($employer->hasPaidJobPostings() === false) {
-              // check whether subscription has expired
-              $result = $employer->getSubscriptionsDetails();
-              if ($result[0]['expired'] < 0 || $result[0]['subscription_suspended'] != '0') {
-                  echo '-2';
-                  exit();
-              }
-          } else {
-              $employer->usedPaidJobPosting();
-          }
-      } else {
-          $employer->usedFreeJobPosting();
-      }
+        // check whether employer has paid job postings?
+        if ($employer->hasPaidJobPostings() === false) {
+            // check whether subscription has expired
+            $result = $employer->getSubscriptionsDetails();
+            if ($result[0]['expired'] < 0 || $result[0]['subscription_suspended'] != '0') {
+                echo '-2';
+                exit();
+            }
+        } else {
+            $employer->usedPaidJobPosting();
+        }
+    } else {
+        $employer->usedFreeJobPosting();
+    }
     
     $id = $_POST['id'];
     $job = '';
@@ -744,5 +744,35 @@ if ($_POST['action'] == 'save_job') {
     echo 'ok';
     exit();
     
+}
+
+if ($_POST['action'] == 'extend_job') {
+    $employer = new Employer($_POST['employer']);
+    
+    // check whether employer can use free job posting?
+    if ($employer->hasFreeJobPostings() === false) {
+        // check whether employer has paid job postings?
+        if ($employer->hasPaidJobPostings() === false) {
+            // check whether subscription has expired
+            $result = $employer->getSubscriptionsDetails();
+            if ($result[0]['expired'] < 0 || $result[0]['subscription_suspended'] != '0') {
+                echo '-2';
+                exit();
+            }
+        } else {
+            $employer->usedPaidJobPosting();
+        }
+    } else {
+        $employer->usedFreeJobPosting();
+    }
+    
+    $job = new Job($_POST['id']);
+    if ($job->extend() === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
 }
 ?>

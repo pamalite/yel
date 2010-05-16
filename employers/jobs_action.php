@@ -55,8 +55,9 @@ if ($_POST['action'] == 'get_job_desc') {
                       industries.industry, jobs.description, jobs.contact_carbon_copy, 
                       jobs.alternate_employer, 
                       DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on, 
-                      DATE_FORMAT(created_on, '%e %b, %Y') AS formatted_created_on", 
-        'joins' => "industries ON industries.id = jobs.industry", 
+                      IFNULL(DATE_FORMAT(MIN(job_extensions.previously_created_on), '%e %b, %Y'), DATE_FORMAT(jobs.created_on, '%e %b, %Y')) AS formatted_created_on", 
+        'joins' => "industries ON industries.id = jobs.industry, 
+                    job_extensions ON job_extensions.job = jobs.id", 
         'match' => "jobs.id = ". $_POST['id']
     );
     

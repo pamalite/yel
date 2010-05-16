@@ -33,20 +33,6 @@ class EmployerJobsPage extends Page {
         echo '</script>'. "\n";
     }
     
-    private function get_jobs() {
-        $job = new Job();
-        
-        $criteria = array(
-            'columns' => "id, title, 
-                          DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on, 
-                          DATE_FORMAT(created_on, '%e %b, %Y') AS formatted_created_on", 
-            'match' => "employer = '". $this->employer->getId(). "' AND deleted = FALSE",
-            'order' => "created_on DESC"
-        );
-        
-        return $job->find($criteria);
-    }
-    
     public function show() {
         $this->begin();
         $this->support($this->employer->getId());
@@ -78,7 +64,7 @@ class EmployerJobsPage extends Page {
             $free_postings_left = 0;
         }
         
-        $jobs = $this->get_jobs();
+        $jobs = $this->employer->getJobs();
         
         ?>
         <div style="padding-bottom: 25px;">
