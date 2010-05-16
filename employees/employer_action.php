@@ -573,4 +573,176 @@ if ($_POST['action'] == 'save_subscriptions') {
     echo 'ok';
     exit();
 }
+
+if ($_POST['action'] == 'get_jobs') {
+    $employer = new Employer($_POST['id']);
+    
+    $result = $employer->getJobs($_POST['order']);
+    
+    if (is_null($result) || empty($result)) {
+        echo '0';
+        exit();
+    }
+    
+    if ($result === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    foreach ($result as $i=>$row) {
+        $result[$i]['title'] = htmlspecialchars_decode(stripslashes($row['title']));
+    }
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('jobs' => array('job' => $result)));
+    exit();
+}
+
+if ($_POST['action'] == 'delete_job') {
+    $job = new Job($_POST['id']);
+    if ($job->delete() === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'get_job') {
+    $job = new Job($_POST['id']);
+    $result = $job->get();
+    
+    $result[0]['title'] = htmlspecialchars_decode(stripslashes($result[0]['title']));
+    $result[0]['description'] = htmlspecialchars_decode(stripslashes($result[0]['description']));
+    $result[0]['description'] = str_replace('<br/>', "\n", $result[0]['description']);
+    
+    $criteria = array(
+        'columns' => "job_index.state",
+        'joins' => "job_index ON job_index.job = jobs.id",
+        'match' => "jobs.id = ". $_POST['id'],
+        'limit' => "1"
+    );
+    $tmp = $job->find($criteria);
+    $result[0]['state'] = $tmp[0]['state'];
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('job' => $result));
+    exit();
+}
+
+if ($_POST['action'] == 'save_job') {
+    $employer = new Employer($_POST['employer']);
+    
+    // check whether employer can use free job posting?
+    if ($employer->hasFreeJobPostings() === false) {
+          // check whether employer has paid job postings?
+          if ($employer->hasPaidJobPostings() === false) {
+              // check whether subscription has expired
+              $result = $employer->getSubscriptionsDetails();
+              if ($result[0]['expired'] < 0 || $result[0]['subscription_suspended'] != '0') {
+                  echo '-2';
+                  exit();
+              }
+          } else {
+              $employer->usedPaidJobPosting();
+          }
+      } else {
+          $employer->usedFreeJobPosting();
+      }
+    
+    $id = $_POST['id'];
+    $job = '';
+    
+    if ($id <= 0) {
+        $job = new Job();
+    } else {
+        $job = new Job($id);
+    }
+    
+    $data = array();
+    $data['employer'] = $_POST['employer'];
+    $data['industry'] = $_POST['industry'];
+    $data['country'] = $_POST['country'];
+    $data['state'] = $_POST['state'];
+    $data['salary'] = $_POST['salary'];
+    $data['salary_end'] = $_POST['salary_end'];
+    $data['salary_negotiable'] = $_POST['salary_negotiable'];
+    $data['title'] = $_POST['title'];
+    $data['description'] = str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['description']);
+    $data['acceptable_resume_type'] = 'A';
+    $data['closed'] = 'N';
+    
+    $new_id = 0;
+    if ($id <= 0) {
+        $data['created_on'] = now();
+        $data['expire_on'] = sql_date_add($data['created_on'], 30, 'day');
+        if (($new_id = $job->create($data)) === false) {
+            echo 'ko';
+            exit();
+        }
+    } else {
+        if ($job->update($data) == false) {
+            echo 'ko';
+            exit();
+        }
+    }
+    
+    $data = array();
+    $salary_end = $_POST['salary_end'];
+    if ($salary_end <= 0) {
+        $salary_end = $_POST['salary'];
+        $data['salary_end'] = 'NULL';
+    }
+    $data['potential_reward'] = $job->getPotentialReward();
+    
+    // Check whether employer's account is ready.
+    if ($data['potential_reward'] <= 0) {
+        echo '-1';
+        exit();
+    }
+    
+    $job->update($data);
+    
+    $tmp = explode('/', $GLOBALS['root']);
+    $is_test_site = false;
+    foreach ($tmp as $t) {
+        if ($t == 'yel') {
+            $is_test_site = true;
+            break;
+        }
+    }
+    
+    // Tweet about this job, if it is new
+    if ($new_id > 0 && !$is_test_site) {
+        $employer = htmlspecialchars_decode(stripslashes($employer->getName()));
+        $url = $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $new_id;
+        $status = $data['title']. ' ('. $employer. ') - '. $url;
+        $twitter_username = 'yellowelevator';
+        $twitter_password = 'yellow123456';
+        $tweetUrl = 'http://www.twitter.com/statuses/update.xml';
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $tweetUrl);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 2);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, "status=". $status);
+        curl_setopt($curl, CURLOPT_USERPWD, $twitter_username. ':'. $twitter_password);
+
+        $result = curl_exec($curl);
+        
+        // Don't bother to check because if Twitter fails, it doesn't matter.
+        //$resultArray = curl_getinfo($curl);
+        //if ($resultArray['http_code'] != 200) {
+        //    echo 'ko';
+        //}
+
+        curl_close($curl);
+    }
+    
+    echo 'ok';
+    exit();
+    
+}
 ?>

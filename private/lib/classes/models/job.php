@@ -161,15 +161,6 @@ class Job implements Model {
                 }
             }
             
-            if (array_key_exists('currency', $data)) {
-                if ($need_update) {
-                    $query .= ", currency = '". $data['currency']. "'";
-                } else {
-                    $query .= "currency = '". $data['currency']. "'";
-                    $need_update = true;
-                }
-            }
-            
             if (array_key_exists('title', $data)) {
                 if ($need_update) {
                     $query .= ", title = '". $data['title']. "'";
@@ -198,7 +189,8 @@ class Job implements Model {
     }
     
     public function delete() {
-        // Reserved for future use.
+        $query = "UPDATE jobs SET deleted = TRUE WHERE id = ". $this->id;
+        return $this->mysqli->execute($query);
     }
     
     public function find($_criteria) {

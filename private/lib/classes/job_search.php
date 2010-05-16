@@ -145,10 +145,11 @@ class JobSearch {
             $match .= $match_against. " AND ";
         } 
        
-        $match .= $filter_job_status. " 
-                  AND ". $filter_industry. " 
-                  AND ". $filter_country. " 
-                  AND ". $filter_employer. " "; 
+        $match .= "jobs.deleted = FALSE 
+                   AND ". $filter_job_status. " 
+                   AND ". $filter_industry. " 
+                   AND ". $filter_country. " 
+                   AND ". $filter_employer. " "; 
         
         if (!empty($filter_salary)) {
             $match .= "AND ". $filter_salary. " ";

@@ -1,4 +1,5 @@
-var is_profile_dirty = false;
+var order = 'desc';
+var order_by = 'created_on';
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -10,10 +11,10 @@ function ascending_or_descending() {
 
 function sort_by(_table, _column) {
     switch (_table) {
-        case 'employers':
+        case 'jobs':
             order_by = _column;
             ascending_or_descending();
-            show_employers();
+            show_updated_jobs();
             break;
     }
 }
@@ -45,10 +46,6 @@ function reset_password() {
     });
     
     request.send(params);
-}
-
-function profile_is_dirty() {
-    is_profile_dirty = true;
 }
 
 function is_valid_user_id(_user_id) {
@@ -156,6 +153,7 @@ function show_profile() {
     $('employer_fees').setStyle('display', 'none');
     $('employer_jobs').setStyle('display', 'none');
     $('employer_subscriptions').setStyle('display', 'none');
+    $('job').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '#CCCCCC');
     $('item_fees').setStyle('background-color', '');
@@ -186,14 +184,9 @@ function save_profile() {
     params = params + '&zip=' + $('zip').value;
     params = params + '&country=' + $('country').options[$('country').selectedIndex].value;
     params = params + '&website_url=' + $('website_url').value;
-    // params = params + '&working_months=' + $('working_months').value;
-    //     params = params + '&payment_terms_days=' + $('payment_terms_days').options[$('payment_terms_days').selectedIndex].value;
-    // params = params + '&paid_postings=' + $('paid_postings').value;
-    //     params = params + '&subscription_period=' + $('subscription_period').options[$('subscription_period').selectedIndex].value;
     
     if (mode == 'create') {
         params = params + '&user_id=' + $('user_id').value;
-        // params = params + '&free_postings=' + $('free_postings').value;
     } 
     
     var uri = root + "/employees/employer_action.php";
@@ -219,8 +212,6 @@ function save_profile() {
                     }
                 }
             }
-            
-            is_profile_dirty = false;
             
             show_profile();
             
@@ -262,6 +253,7 @@ function show_fees() {
     $('employer_fees').setStyle('display', 'block');
     $('employer_jobs').setStyle('display', 'none');
     $('employer_subscriptions').setStyle('display', 'none');
+    $('job').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
     $('item_fees').setStyle('background-color', '#CCCCCC');
@@ -279,7 +271,7 @@ function show_updated_fees() {
         onSuccess: function(txt, xml) {
             set_status('');
             if (txt == 'ko') {
-                a('An error occured while loading fees.');
+                alert('An error occured while loading fees.');
                 return false;
             }
             
@@ -492,6 +484,7 @@ function show_subscriptions() {
     $('employer_fees').setStyle('display', 'none');
     $('employer_jobs').setStyle('display', 'none');
     $('employer_subscriptions').setStyle('display', 'block');
+    $('job').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
     $('item_fees').setStyle('background-color', '');
@@ -549,13 +542,312 @@ function show_jobs() {
     $('employer_fees').setStyle('display', 'none');
     $('employer_jobs').setStyle('display', 'block');
     $('employer_subscriptions').setStyle('display', 'none');
+    $('job').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
     $('item_fees').setStyle('background-color', '');
     $('item_jobs').setStyle('background-color', '#CCCCCC');
     $('item_subscriptions').setStyle('background-color', '');
+}
+
+function show_updated_jobs() {
+    var params = 'id=' + employer_id + '&action=get_jobs';
+    params = params + '&order=' + order_by +  ' ' + order;
     
-    // TODO: get jobs
+    var uri = root + "/employees/employer_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while loading jobs.');
+                return false;
+            }
+
+            if (txt == '0') {
+                $('fees').set('html', '<div class="empty_results">There is no job added for this employer yet.</div>');
+            } else {
+                var ids = xml.getElementsByTagName('id');
+                var expireds = xml.getElementsByTagName('expired');
+                var titles = xml.getElementsByTagName('title');
+                var created_ons = xml.getElementsByTagName('formatted_created_on');
+                var expire_ons = xml.getElementsByTagName('formatted_expire_on');
+
+                var jobs_table = new FlexTable('jobs_table', 'jobs_table');
+
+                var header = new Row('');
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('jobs', 'created_on');\">Created On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('jobs', 'title');\">Job</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('jobs', 'expire_on');\">Expire On</a>", '', 'header'));
+                header.set(3, new Cell('&nbsp;', '', 'header action'));
+                jobs_table.set(0, header);
+
+                for (var i=0; i < ids.length; i++) {
+                    var row = new Row('');
+
+                    row.set(0, new Cell(created_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(1, new Cell('<a class="no_link" onClick="show_job_form_with(' + ids[i].childNodes[0].nodeValue + ');">' + titles[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
+                    
+                    var expiry = expire_ons[i].childNodes[0].nodeValue;
+                    if (parseInt(expireds[i].childNodes[0].nodeValue) <= 0) {
+                        expiry = '<span style="font-weight: bold; color: #ff0000;">' + expiry + '</span>';
+                    }
+                    row.set(2, new Cell(expiry, '', 'cell'));
+                    
+                    var actions = '<input type="button" value="Delete" onClick="delete_job(' + ids[i].childNodes[0].nodeValue + ');" />';
+                    row.set(3, new Cell(actions, '', 'cell action'));
+                    jobs_table.set((parseInt(i)+1), row);
+                }
+
+                $('jobs').set('html', jobs_table.get_html());
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Loading jobs...');
+        }
+    });
+
+    request.send(params);
+}
+
+function delete_job(_id) {
+    var proceed = confirm('Are you sure to delete job?');
+    if (!proceed) {
+        return;
+    }
+    
+    var params = 'id=' + _id + '&action=delete_job';
+    
+    var uri = root + "/employees/employer_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while deleting job.');
+                return false;
+            }
+            
+            show_updated_jobs();
+        },
+        onRequest: function(instance) {
+            set_status('Deleting job...');
+        }
+    });
+
+    request.send(params);
+}
+
+function show_job_form_with() {
+    $('job_id').value = '0';
+    $('job.title').value = '';
+    $('job.alternate_employer').value = '';
+    $('job.contact_carbon_copy').value = '';
+    $('job.state').value = '';
+    $('job.salary').value = '';
+    $('job.salary_end').value = '';
+    $('job.salary_negotiable').checked = false;
+    $('job.description').value = '';
+    $('job.country').selectedIndex = 0;
+    $('job.industry').selectedIndex = 0;
+    
+    if (arguments.length > 0) {
+        $('job_id').value = arguments[0];
+        
+        var params = 'id=' + arguments[0] + '&action=get_job';
+        
+        var uri = root + "/employees/employer_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                // set_status('<pre>' + txt + '</pre>');
+                // return;
+                set_status('');
+                if (txt == 'ko') {
+                    alert('An error occured while loading job.');
+                    return false;
+                }
+                
+                var title = xml.getElementsByTagName('title');
+                var alternate_employer = xml.getElementsByTagName('alternate_employer');
+                var industry = xml.getElementsByTagName('industry');
+                var contact_carbon_copy = xml.getElementsByTagName('contact_carbon_copy');
+                var country = xml.getElementsByTagName('country');
+                var state = xml.getElementsByTagName('state');
+                var salary = xml.getElementsByTagName('salary');
+                var salary_end = xml.getElementsByTagName('salary_end');
+                var salary_negotiable = xml.getElementsByTagName('salary_negotiable');
+                var description = xml.getElementsByTagName('description');
+                
+                $('job.title').value = title[0].childNodes[0].nodeValue;
+                
+                $('job.alternate_employer').value = '';
+                if (alternate_employer[0].childNodes.length > 0) {
+                    $('job.alternate_employer').value = alternate_employer[0].childNodes[0].nodeValue;
+                }
+                
+                $('job.contact_carbon_copy').value = '';
+                if (contact_carbon_copy[0].childNodes.length > 0) {
+                    $('job.contact_carbon_copy').value = contact_carbon_copy[0].childNodes[0].nodeValue;
+                }
+                
+                $('job.state').value = '';
+                if (state[0].childNodes.length > 0) {
+                    $('job.state').value = state[0].childNodes[0].nodeValue;
+                }
+                
+                $('job.salary').value = salary[0].childNodes[0].nodeValue;
+                
+                $('job.salary_end').value = '';
+                if (salary_end[0].childNodes.length > 0) {
+                    $('job.salary_end').value = salary_end[0].childNodes[0].nodeValue;
+                }
+                
+                $('job.salary_negotiable').checked = false;
+                if (salary_negotiable[0].childNodes[0].nodeValue == 'Y') {
+                    $('job.salary_negotiable').checked = true;
+                }
+                
+                $('job.description').value = description[0].childNodes[0].nodeValue;
+                
+                for (var i=0; i < $('job.country').options.length; i++) {
+                    if ($('job.country').options[i].value == country[0].childNodes[0].nodeValue) {
+                        $('job.country').selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                for (var i=0; i < $('job.industry').options.length; i++) {
+                    if ($('job.industry').options[i].value == industry[0].childNodes[0].nodeValue) {
+                        $('job.industry').selectedIndex = i;
+                        break;
+                    }
+                }
+            },
+            onRequest: function(instance) {
+                set_status('Loading job...');
+            }
+        });
+
+        request.send(params);
+    }
+    
+    $('employer_profile').setStyle('display', 'none');
+    $('employer_fees').setStyle('display', 'none');
+    $('employer_jobs').setStyle('display', 'none');
+    $('employer_subscriptions').setStyle('display', 'none');
+    $('job').setStyle('display', 'block');
+    
+    $('item_profile').setStyle('background-color', '');
+    $('item_fees').setStyle('background-color', '');
+    $('item_jobs').setStyle('background-color', '#CCCCCC');
+    $('item_subscriptions').setStyle('background-color', '');
+}
+
+function validate_job() {
+    if ($('job.title').value == '') {
+        alert('Title cannot be empty.');
+        return false;
+    } 
+    
+    if ($('job.industry').options[$('job.industry').selectedIndex].value == '0') {
+        alert('You need to select an industry.');
+        return false;
+    }
+    
+    if ($('job.country').options[$('job.country').selectedIndex].value == '0') {
+        alert('You need to select a country.');
+        return false;
+    }
+    
+    if ($('job.salary').value == '' || parseFloat($('job.salary').value) <= 0.00) {
+        alert('Monthly Pay field must be at least 1.00 for us to calculate the potential rewards.');
+        return false;
+    } else {
+        if (!isNumeric($('job.salary').value)) {
+            alert('Monthly Pay must be in numeric numbers only.');
+            return false;
+        }
+    }
+    
+    if (!isEmpty($('job.salary_end').value)) {
+        if (!isNumeric($('job.salary_end').value)) {
+            alert('Monthly Pay range must be in numeric numbers only.');
+            return false;
+        } else {
+            if (parseFloat($('job.salary_end').value) < parseFloat($('job.salary').value)) {
+                alert('Monthly Pay range is invalid.');
+                return false;
+            }
+        }
+    }
+    
+    if ($('job.description').value == '') {
+        alert('Description cannot be empty.');
+        return false;
+    }
+    
+    return true;
+}
+
+function save_job() {
+    if (!validate_job()) {
+        return false;
+    }
+    
+    var salary_negotiable = 'N';
+    if ($('job.salary_negotiable').checked) {
+        salary_negotiable = 'Y';
+    }
+    
+    var params = 'id=' + $('job_id').value + '&action=save_job';
+    params = params + '&employer=' + employer_id;
+    params = params + '&title=' + encodeURIComponent($('job.title').value);
+    params = params + '&industry=' + $('job.industry').options[$('job.industry').selectedIndex].value;
+    params = params + '&country=' + $('job.country').options[$('job.country').selectedIndex].value;
+    params = params + '&state=' + $('job.state').value;
+    params = params + '&salary=' + $('job.salary').value;
+    
+    var salary_end = $('job.salary_end').value;
+    if (salary_end <= 0 || isEmpty(salary_end)) {
+        salary_end = 0;
+    }
+    params = params + '&salary_end=' + salary_end;
+    params = params + '&salary_negotiable=' + salary_negotiable;
+    params = params + '&description=' + encodeURIComponent($('job.description').value);
+    
+    var uri = root + "/employees/employer_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            if (txt == 'ko') {
+                alert('An error occured while publishing job.');
+                return false;
+            } else if (txt == '-1') {
+                alert('The account is not set up yet');
+                return false;
+            } else if (txt == '-2') {
+                alert('The employer\'s subscription has expired/suspended.');
+                return false;
+            }
+            
+            show_jobs();
+            show_updated_jobs();
+        },
+        onRequest: function(instance) {
+            set_status('Saving and updating...');
+        }
+    });
+    
+    request.send(params);
 }
 
 function onDomReady() {

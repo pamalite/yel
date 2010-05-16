@@ -58,7 +58,8 @@ textarea {
     height: 90px;
 }
 
-#employer_fees, #employer_jobs, #employer_subscriptions {
+#employer_fees, #employer_jobs, 
+#employer_subscriptions, #job {
     display: none;
 }
 
@@ -149,6 +150,41 @@ table.subscription_form td div {
 
 #expiry {
     font-weight: bold;
+}
+
+#jobs_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#jobs_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+#job_form {
+    margin: auto;
+    width: 65%;
+    border-spacing: 5px;
+}
+
+#job_form td {
+    padding: 3px 3px 3px 3px;
+    font-size: 12pt;
+    vertical-align: top;
+}
+
+#job_form td.label {
+    width: 15%;
+}
+
+#industry {
+    font-size: 12pt;
+    width: 98%;
+}
+
+.job_description {
+    height: 550px;
 }
 
 /* old */

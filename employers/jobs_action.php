@@ -26,7 +26,7 @@ if ($_POST['action'] == 'get_jobs') {
         'columns' => "id, title, 
                       DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on, 
                       DATE_FORMAT(created_on, '%e %b, %Y') AS formatted_created_on", 
-        'match' => "employer = '". $_POST['id']. "'",
+        'match' => "employer = '". $_POST['id']. "' AND deleted = FALSE",
         'order' => $order_by
     );
     

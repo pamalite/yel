@@ -592,5 +592,33 @@ class Employer implements Model {
         
         return $this->mysqli->execute($query);
     }
+    
+    public function getJobs($_order = '', $_limit = 0, $_offset = 0) {
+        $order = "ORDER BY ";
+        if (empty($_order)) {
+            $order .= "created_on DESC";
+        } else {
+            $order .= $_order;
+        }
+        
+        $limit = "";
+        if ($_limit > 0) {
+            if ($_offset > 0) {
+                $limit = "LIMIT ". $_offset. ", ". $_limit;
+            } else {
+                $limit = "LIMIT ". $_limit;
+            }
+        }
+        
+        $query = "SELECT id, title, 
+                  DATE_FORMAT(created_on, '%e %b, %Y') AS formatted_created_on, 
+                  DATEDIFF(expire_on, NOW()) AS expired, 
+                  DATE_FORMAT(expire_on, '%e %b, %Y') AS formatted_expire_on 
+                  FROM jobs  
+                  WHERE employer = '". $this->id. "' AND 
+                  deleted = FALSE 
+                  ". $order. " ". $limit;
+        return $this->mysqli->query($query);
+    }
 }
 ?>

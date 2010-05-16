@@ -69,12 +69,63 @@ class EmployeeEmployerPage extends Page {
         
         echo '<select class="field" id="'. $_name. '" name="'. $_name. '">'. "\n";
         
+        if (empty($_selected) || is_null($_selected)) {
+            echo '<option value="" selected>Select a Country</option>'. "\n";
+            echo '<option value="" disabled>&nbsp;</option>'. "\n";
+        }
+        
         foreach ($countries as $country) {
             if ($country['country_code'] != $_selected) {
                 echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
             } else {
                 echo '<option value="'. $country['country_code']. '" selected>'. $country['country']. '</option>'. "\n";
             }
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
+    private function generate_industries($_selected, $_name = 'industry') {
+        $industries = array();
+        $main_industries = Industry::getMain();
+        $i = 0;
+        foreach ($main_industries as $main) {
+            $industries[$i]['id'] = $main['id'];
+            $industries[$i]['name'] = $main['industry'];
+            $industries[$i]['is_main'] = true;
+            $subs = Industry::getSubIndustriesOf($main['id']);
+            foreach ($subs as $sub) {
+                $i++;
+
+                $industries[$i]['id'] = $sub['id'];
+                $industries[$i]['name'] = $sub['industry'];
+                $industries[$i]['is_main'] = false;
+            }
+            $i++;
+        }
+        
+        echo '<select class="field" id="'. $_name. '" name="'. $_name. '">'. "\n";
+        
+        if (empty($_selected) || is_null($_selected)) {
+            echo '<option value="0" selected>Select a Specialization</option>'. "\n";
+            echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        }
+        
+        foreach ($industries as $industry) {
+            $selected = '';
+            if ($industry['id'] == $_selected) {
+                $selected = 'selected';
+            }
+            
+            if ($industry['is_main']) {
+                echo '<option value="'. $industry['id']. '" class="main_industry" '. $selected. '>';
+                echo $industry['name'];
+            } else {
+                echo '<option value="'. $industry['id']. '"'. $selected. '>';
+                echo '&nbsp;&nbsp;&nbsp;&nbsp;'. $industry['name'];
+            }
+
+            echo '</option>'. "\n";
         }
         
         echo '</select>'. "\n";
@@ -92,14 +143,17 @@ class EmployeeEmployerPage extends Page {
         $raw_data = array();
         $profile = array();
         $fees = array();
+        $jobs = array();
         if (!$this->is_new) {
             // get profile
             $raw_data = $this->employer->get();
             $profile = $raw_data[0];
             
             // get fees
-            $raw_data = $this->employer->getFees();
-            $fees = $raw_data;
+            $fees = $this->employer->getFees();
+            
+            // get jobs
+            $jobs = $this->employer->getJobs();
         } else {
             $profile = array(
                 'license_num' => '',
@@ -126,7 +180,13 @@ class EmployeeEmployerPage extends Page {
                 <li id="item_profile" style="<?php echo ($this->current_page == 'profile') ? $style : ''; ?>"><a class="menu" onClick="show_profile();">Profile</a></li>
                 <li id="item_fees" style="<?php echo ($this->current_page == 'fees') ? $style : ''; ?>"><a class="menu" onClick="show_fees();">Fees</a></li>
                 <li id="item_subscriptions" style="<?php echo ($this->current_page == 'subscriptions') ? $style : ''; ?>"><a class="menu" onClick="show_subscriptions();">Subscriptions</a></li>
+            <?php
+            if (!$this->is_new) {
+            ?>
                 <li id="item_jobs" style="<?php echo  ($this->current_page == 'jobs') ? $style : ''; ?>"><a class="menu" onClick="show_jobs();">Jobs</a></li>
+            <?php
+            }
+            ?>
             </ul>
         </div>
         <!-- end submenu -->
@@ -351,6 +411,94 @@ class EmployeeEmployerPage extends Page {
         </div>
         
         <div id="employer_jobs">
+            <div class="buttons_bar">
+                <input class="button" type="button" value="Add" onClick="show_job_form_with();" />
+            </div>
+            <div id="jobs" class="jobs">
+            <?php
+                if (is_null($jobs) || empty($jobs) || $jobs === false) {
+            ?>
+                <div class="empty_results">There is no job added for this employer yet.</div>
+            <?php
+                } else {
+                    $jobs_table = new HTMLTable('jobs_table', 'jobs_table');
+
+                    $jobs_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('jobs', 'created_on');\">Created On</a>", '', 'header');
+                    $jobs_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('jobs', 'title');\">Job</a>", '', 'header');
+                    $jobs_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('jobs', 'expire_on');\">Expire On</a>", '', 'header');
+                    $jobs_table->set(0, 3, "&nbsp;", '', 'header action');
+
+                    foreach ($jobs as $i=>$job) {
+                        $jobs_table->set($i+1, 0, $job['formatted_created_on'], '', 'cell');
+                        $jobs_table->set($i+1, 1, '<a class="no_link" onClick="show_job_form_with('. $job['id']. ');">'. htmlspecialchars_decode(stripslashes($job['title'])) . '</a>', '', 'cell');
+                        
+                        $expiry = $job['formatted_expire_on'];
+                        if ($job['expired'] <= 0) {
+                            $expiry = '<span style="font-weight: bold; color: #ff0000;">'. $expiry. '</span>';
+                        }
+                        $jobs_table->set($i+1, 2, $expiry, '', 'cell');
+                        
+                        $actions = '<input type="button" value="Delete" onClick="delete_job('. $job['id']. ');" />';
+                        $jobs_table->set($i+1, 3, $actions, '', 'cell action');
+                    }
+
+                    echo $jobs_table->get_html();
+                }
+            ?>
+            </div>
+            <div class="buttons_bar">
+                <input class="button" type="button" value="Add" onClick="show_job_form_with();" />
+            </div>
+        </div>
+        
+        <div id="job">
+            <form method="post"onSubmit="return false;">
+                <input type="hidden" id="job_id" value="0" />
+                <table id="job_form" class="job_form">
+                    <tr>
+                        <td class="label"><label for="job.title">Title:</label></td>
+                        <td class="field"><input class="field" type="text" id="job.title" name="title" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="job.alternate_employer">Alternate Employer:</label></td>
+                        <td class="field"><input class="field" type="text" id="job.alternate_employer" name="alternate_employer" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="job.contact_carbon_copy">Extra Contacts:</label></td>
+                        <td class="field"><input class="field" type="text" id="job.contact_carbon_copy" name="contact_carbon_copy" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="job.industry">Specialization:</label></td>
+                        <td class="field"><?php $this->generate_industries('', 'job.industry'); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="job.country">Country:</label></td>
+                        <td class="field"><?php $this->generate_countries('', 'job.country'); ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="job.state">State/Province/Area:</label></td>
+                        <td class="field"><input type="text" class="field" id="job.state" name="state" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="job.salary">Monthly Salary:</label></td>
+                        <td class="field">
+                            <?php echo $branch[0]['currency']; ?>$ <input class="salary" type="text" id="job.salary" name="salary" />&nbsp;-&nbsp;<input class="salary" type="text" id="job.salary_end" name="salary_end" /><br>
+                            <input type="checkbox" id="job.salary_negotiable" name="salary_negotiable" /> <label for="job.salary_negotiable">Negotiable</label><br/>
+                            <p class="small_notes">This account allows you to create job ads with salary in <span id="job.employer.currency_2"></span> only. If you wish to create job ads with salary in other currencies, please log into the relevant accounts.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label center" colspan="2"><label for="job.description">Description:</label></td>
+                    </tr>
+                    <tr>
+                        <td class="field center" colspan="2"><textarea id="job.description" name="description" class="job_description"></textarea></td>
+                    </tr>
+                </table>
+                <div class="buttons_bar">
+                    <input class="button" type="button" value="Cancel" onClick="show_jobs();" />
+                    <input class="button" type="button" value="Publish" onClick="save_job();" />
+                </div>
+            </form>
         </div>
         
         <!-- popup windows goes here -->
