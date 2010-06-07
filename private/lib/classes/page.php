@@ -125,24 +125,28 @@ class Page {
         <div class="top">
             <table class="top">
                 <tr>
+        <?php
+        if (isset($_SESSION['yel']['employee']) &&
+            !empty($_SESSION['yel']['employee']['id']) && 
+            !empty($_SESSION['yel']['employee']['sid']) && 
+            !empty($_SESSION['yel']['employee']['hash'])) {
+        ?>
+                    <td><div class="page_title"><?php echo $_page_title ?></div></td>
+                    <td class="employee_help">
+                        <a target="_new" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/help/employees/">Help</a>
+                    </td>
+        <?php
+        } else {
+        ?>
                     <td class="logo">
                         <a href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/index.php">
                             <img name="logo" src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/logos/top.jpg" />
                         </a>
                     </td>
                     <td><div class="page_title"><?php echo $_page_title ?></div></td>
-                    <?php
-                    if (isset($_SESSION['yel']['employee']) &&
-                        !empty($_SESSION['yel']['employee']['id']) && 
-                        !empty($_SESSION['yel']['employee']['sid']) && 
-                        !empty($_SESSION['yel']['employee']['hash'])) {
-                    ?>
-                    <td class="employee_help">
-                        <a target="_new" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root'] ?>/help/employees/">Help</a>
-                    </td>
-                    <?php
-                    } 
-                    ?>
+        <?php
+        }
+        ?>
                 </tr>
             </table>
         </div>
@@ -342,9 +346,10 @@ class Page {
         ?>
         <div class="menu">
             <ul class="menu">
+                <li><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/index.php">&bull;</a></li>
                 <li <?php echo ($_page == 'home') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/home.php">Home</a></li>
                 <li <?php echo ($_page == 'employers') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/employers.php">Employers</a></li>
-                <li <?php echo ($_page == 'members') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/admin_members.php">Members</a></li>
+                <li <?php echo ($_page == 'members') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/members.php">Members</a></li>
                 <li <?php echo ($page == 'invoices') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/invoices.php">Invoices &amp; Receipts</a></li>
                 <li <?php echo ($page == 'rewards') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/rewards.php">Rewards</a></li>
                 <li <?php echo ($page == 'applications') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/applications.php">Applications</a></li>

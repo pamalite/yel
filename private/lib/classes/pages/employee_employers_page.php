@@ -91,7 +91,7 @@ class EmployeeEmployersPage extends Page {
                 
                 $employer_short_details = '<a class="no_link employer_link" onClick="show_employer(\''. $employer['id']. '\');">'. desanitize($employer['employer']). '</a>'. "\n";
                 $employer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $employer['phone_num']. '</div>'. "\n";
-                $employer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Fax: </span>'. $employer['phone_num']. '</div>'. "\n";
+                $employer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Fax: </span>'. $employer['fax_num']. '</div>'. "\n";
                 $employer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $employer['email_addr']. '">'. $employer['email_addr']. '</a></div>'. "\n";
                 $employer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Contact:</span> '. $employer['contact_person']. '</div>'. "\n";
                 $employers_table->set($i+1, 1, $employer_short_details, '', 'cell');

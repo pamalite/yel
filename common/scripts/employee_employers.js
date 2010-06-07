@@ -72,7 +72,7 @@ function show_employers() {
                         fax = faxes[i].childNodes[0].nodeValue;
                     }
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Fax:</span> ' + fax + '</div>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> ' + emails[i].childNodes[0].nodeValue + '</div>' + "\n";
+                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto: ' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Contact:</span> ' + contacts[i].childNodes[0].nodeValue + '</div>' + "\n";
                     row.set(1, new Cell(short_desc, '', 'cell'));
                     

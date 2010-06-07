@@ -1,0 +1,75 @@
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+a.menu {
+    cursor: pointer;
+}
+
+#members, #member_search {
+    display: none;
+}
+
+#members_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#members_table td { 
+    vertical-align: baseline;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.action {
+    width: 20%;
+    text-align: center;
+}
+
+#members_table td.action {
+    vertical-align: middle;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+#members_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+.small_contact {
+    font-size: 9pt;
+    font-style: italic;
+    color: #666666;
+}
+
+.member_link {
+    font-weight: bold;
+    font-size: 12pt;
+}
+
+.buttons_bar {
+    background-color: #CCCCCC;
+    text-align: right;
+    padding: 3px 3px 3px 3px;
+}
+
+.member_form {
+    display: none;
+}
