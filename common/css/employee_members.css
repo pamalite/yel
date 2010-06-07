@@ -23,6 +23,32 @@ a.menu {
     vertical-align: baseline;
 }
 
+#applications_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#applications_table td { 
+    vertical-align: baseline;
+}
+
+#members_table td.action {
+    vertical-align: middle;
+}
+
+#members_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+#applications_table td.action {
+    vertical-align: middle;
+}
+
+#applications_table tr:hover  {
+    background-color: #FFFF00;
+}
+
 .header {
     padding: 5px 5px 5px 5px;
     font-weight: bold;
@@ -41,16 +67,8 @@ a.menu {
     text-align: center;
 }
 
-#members_table td.action {
-    vertical-align: middle;
-}
-
 .cell:hover {
     background-color: #BBFCA1;
-}
-
-#members_table tr:hover  {
-    background-color: #FFFF00;
 }
 
 .small_contact {

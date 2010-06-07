@@ -60,7 +60,7 @@ class EmployeeMembersPage extends Page {
         return $results;
     }
     
-    private function get_applications($_employee_branch_id) {
+    private function get_applications() {
         $results = array();
         $criteria = array(
             'columns' => "id, candidate_email, candidate_phone, candidate_name, 
@@ -83,7 +83,7 @@ class EmployeeMembersPage extends Page {
         
         $branch = $this->employee->getBranch();
         $members = $this->get_members($branch[0]['id']);
-        $applications = $this->get_applications($branch[0]['id']);
+        $applications = $this->get_applications();
         
         ?>
         <!-- submenu -->
@@ -103,7 +103,7 @@ class EmployeeMembersPage extends Page {
         
         <div id="applications">
         <?php
-        if (is_null($requests) || count($requests) <= 0 || $requests === false) {
+        if (is_null($applications) || count($applications) <= 0 || $applications === false) {
         ?>
             <div class="empty_results">No applications at this moment.</div>
         <?php
@@ -113,32 +113,48 @@ class EmployeeMembersPage extends Page {
             <?php
                 $applications_table = new HTMLTable('applications_table', 'applications');
 
-                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('applications', 'applications.joined_on');\">Joined On</a>", '', 'header');
-                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('applications', 'applications.lastname');\">Member</a>", '', 'header');
-                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('applications', 'employees.lastname');\">Added By</a>", '', 'header');
-                $applications_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('applications', 'application_sessions.first_login');\">Last Login</a>", '', 'header');
-                $applications_table->set(0, 4, 'Quick Actions', '', 'header action');
+                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Requested On</a>", '', 'header');
+                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.referral_name');\">Referrer</a>", '', 'header');
+                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header');
+                $applications_table->set(0, 3, "Testimony", '', 'header');
+                $applications_table->set(0, 4, "Resume", '', 'header');
+                $applications_table->set(0, 5, 'Quick Actions', '', 'header action');
 
                 foreach ($applications as $i=>$application) {
-                    $applications_table->set($i+1, 0, $application['formatted_joined_on'], '', 'cell');
-
-                    $application_short_details = '<a class="no_link application_link" onClick="show_application(\''. $application['email_addr']. '\');">'. desanitize($application['application']). '</a>'. "\n";
-                    $application_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['phone_num']. '</div>'. "\n";
-                    $application_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['email_addr']. '">'. $application['email_addr']. '</a></div>'. "\n";
-                    $applications_table->set($i+1, 1, $application_short_details, '', 'cell');
-                    $applications_table->set($i+1, 2, $application['employee'], '', 'cell');
-                    $applications_table->set($i+1, 3, $application['formatted_last_login'], '', 'cell');
-
-                    $actions = '';
-                    if ($application['active'] == 'Y') {
-                        $actions = '<input type="button" id="activate_button_'. $i. '" value="De-activate" onClick="activate_application(\''. $application['email_addr']. '\', \''. $i. '\');" />';
-                        $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $application['email_addr']. '\');" />';
+                    $applications_table->set($i+1, 0, $application['formatted_requested_on'], '', 'cell');
+                    
+                    $referrer_short_details = '';
+                    if (substr($application['referrer_email'], 0, 5) == 'team.' && 
+                        substr($application['referrer_email'], 7) == '@yellowelevator.com') {
+                        $referrer_short_details = 'Self Applied';
                     } else {
-                        $actions = '<input type="button" id="activate_button_'. $i. '" value="Activate" onClick="activate_application(\''. $application['email_addr']. '\', \''. $i. '\');" />';
-                        $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $application['email_addr']. '\');" disabled />';
+                        $referrer_short_details = '<a class="no_link application_link" onClick="show_application(\''. $application['id']. '\');">'. desanitize($application['referrer_name']). '</a>'. "\n";
+                        $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['referrer_phone']. '</div>'. "\n";
+                        $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['referrer_email']. '">'. $application['email_addr']. '</a></div>'. "\n";
+                    }
+                    $applications_table->set($i+1, 1, $referrer_short_details, '', 'cell');
+                    
+                    $candidate_short_details = '<a class="no_link application_link" onClick="show_application(\''. $application['id']. '\');">'. desanitize($application['candidate_name']). '</a>'. "\n";
+                    $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['candidate_phone']. '</div>'. "\n";
+                    $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['candidate_email']. '">'. $application['candidate_email']. '</a></div>'. "\n";
+                    $applications_table->set($i+1, 2, $candidate_short_details, '', 'cell');
+                    
+                    if ($application['has_testimony'] == '1') {
+                        $applications_table->set($i+1, 3, '<a href="show_testimony_window(\''. $application['id']. '\');">Update</a>', '', 'cell');
+                    } else {
+                        $applications_table->set($i+1, 3, '<a href="show_testimony_window(\''. $application['id']. '\');">Add</a>', '', 'cell');
                     }
                     
-                    $applications_table->set($i+1, 4, $actions, '', 'cell action');
+                    if (!is_null($application['existing_resume_id']) && 
+                        !empty($application['existing_resume_id'])) {
+                        $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['existing_resume_id']. '">View Resume</a>', '', 'cell');
+                    } else {
+                        $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['id']. '&hash='. $application['resume_file_hash']. '">View Resume</a>', '', 'cell');
+                    }
+                    
+                    $actions = '<input type="button" value="Delete" onClick="delete_application(\''. $application['id']. '\');" />';
+                    $actions .= '<input type="button" value="Make Member" onClick="make_member_from(\''. $application['id']. '\');" />';
+                    $applications_table->set($i+1, 5, $actions, '', 'cell action');
                 }
 
                 echo $applications_table->get_html();
