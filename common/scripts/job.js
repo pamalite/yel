@@ -1,27 +1,3 @@
-function stop_refer(_success) {
-    var result = '';
-    $('refer_progress').setStyle('display', 'none');
-    $('refer_form').setStyle('display', 'block');
-    if (_success == 1) {
-        close_window('refer_window');
-    } else {
-        alert('An error occured while submitting your request. The following may trigger the error:' + "\n\n1. You have referred the same candidate to the same job before.\n2. The resume you uploaded exceeds 1MB and is not of DOC, PDF, TXT and HTML format.");
-        return false;
-    }
-}
-
-function stop_apply(_success) {
-    var result = '';
-    $('apply_progress').setStyle('display', 'none');
-    $('apply_form').setStyle('display', 'block');
-    if (_success == 1) {
-        close_window('apply_window');
-    } else {
-        alert('An error occured while submitting your request. The following may trigger the error:' + "\n\n1. You have applied for the same job before.\n2. The resume you uploaded exceeds 1MB and is not of DOC, PDF, TXT and HTML format.");
-        return false;
-    }
-}
-
 function close_refer_popup(_proceed_refer) {
     if (_proceed_refer) {
         if (!isEmail($('referrer_email').value)) {
@@ -62,7 +38,7 @@ function close_refer_popup(_proceed_refer) {
             }
         }
         
-        $('refer_form').submit();
+        // $('refer_form').submit();
         $('refer_progress').setStyle('display', 'block');
         $('refer_form').setStyle('display', 'none');
         
@@ -113,7 +89,7 @@ function close_apply_popup(_proceed_refer) {
             }
         }
         
-        $('apply_form').submit();
+        // $('apply_form').submit();
         $('apply_progress').setStyle('display', 'block');
         $('apply_form').setStyle('display', 'none');
         
@@ -136,6 +112,14 @@ function onDomReady() {
         } else if (show_popup == 'apply') {
             show_apply_popup();
         }
+    }
+    
+    if (alert_error) {
+        alert('An error occured while submitting your request. The following may trigger the error:' + "\n\n1. You have referred the same candidate to, or applied for, the same job before.\n2. The resume you uploaded exceeds 1MB and is not of DOC, PDF, TXT and HTML format.");
+    }
+    
+    if (alert_success) {
+        alert('Your request was successfully submitted.' + "\n\nWe will contact the candidate shortly.");
     }
 }
 

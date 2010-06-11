@@ -68,13 +68,26 @@ if (!is_null($result[0]['alternate_employer'])) {
 }
 
 $show_popup = '';
+$action_response = -1;
 $url_elements = explode('/', $_SERVER['REQUEST_URI']);
 $popup_params = explode('?', $url_elements[count($url_elements)-1]);
 if (count($popup_params) > 1) {
-    if ($popup_params[1] == 'refer=1') {
-        $show_popup = 'refer';
-    } else if ($popup_params[1] == 'apply=1') {
-        $show_popup = 'apply';
+    switch ($popup_params[1]) {
+        case 'refer=1':
+            $show_popup = 'refer';
+            break;
+        case 'apply=1':
+            $show_popup = 'apply';
+            break;
+        case 'success=1':
+            $job_page->set_request_status(0);
+            break;
+        case 'error=1':
+        case 'error=2':
+        case 'error=3':
+            $response = explode('=', $popup_params[1]);
+            $job_page->set_request_status($response[1]);
+            break;
     }
 }
 

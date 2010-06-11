@@ -36,9 +36,7 @@ $data['job'] = $job->getId();
 $referral_buffer = new ReferralBuffer();
 $buffer_id = $referral_buffer->create($data);
 if ($buffer_id === false) {
-    ?>
-        <script type="text/javascript">top.stop_apply(<?php echo '0'; ?>);</script>
-    <?php
+    redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
     exit();
 }
 
@@ -125,9 +123,7 @@ if (!empty($_FILES['apply_resume']['name'])) {
             }
         }
     } else {
-        ?>
-            <script type="text/javascript">top.stop_apply(<?php echo '0'; ?>);</script>
-        <?php
+        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=2');
         exit();
     }
 } else {
@@ -141,9 +137,7 @@ if (!empty($_FILES['apply_resume']['name'])) {
         $data['resume_file_text'] = 'NULL';
         $referral_buffer->update($data);
     } else {
-        ?>
-            <script type="text/javascript">top.stop_apply(<?php echo '0'; ?>);</script>
-        <?php
+        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=3');
         exit();
     }
 }
@@ -162,15 +156,13 @@ $message = str_replace('%job_title%', $job->getTitle(), $message);
 
 $subject = "New Application for ". $job->getTitle(). " position";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-mail($branch_email, $subject, $message, $headers);
+// mail($branch_email, $subject, $message, $headers);
 
-// $handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
-// fwrite($handle, 'Subject: '. $subject. "\n\n");
-// fwrite($handle, $message);
-// fclose($handle);
+$handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
+fwrite($handle, 'Subject: '. $subject. "\n\n");
+fwrite($handle, $message);
+fclose($handle);
 
-?>
-    <script type="text/javascript">top.stop_apply(<?php echo '1'; ?>);</script>
-<?php
+redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?success=1');
 exit();
 ?>

@@ -32,9 +32,7 @@ $data['job'] = $job->getId();
 $referral_buffer = new ReferralBuffer();
 $buffer_id = $referral_buffer->create($data);
 if ($buffer_id === false) {
-    ?>
-        <script type="text/javascript">top.stop_refer(<?php echo '0'; ?>);</script>
-    <?php
+    redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
     exit();
 }
 
@@ -122,9 +120,7 @@ if (!empty($_FILES['candidate_resume']['name'])) {
             }
         }
     } else {
-        ?>
-            <script type="text/javascript">top.stop_refer(<?php echo '0'; ?>);</script>
-        <?php
+        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=2');
         exit();
     }
 }
@@ -154,15 +150,13 @@ $message = str_replace('%has_resume%', $has_resume, $message);
 
 $subject = "New Referral for ". $job->getTitle(). " position";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-mail($branch_email, $subject, $message, $headers);
+// mail($branch_email, $subject, $message, $headers);
 
-// $handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
-// fwrite($handle, 'Subject: '. $subject. "\n\n");
-// fwrite($handle, $message);
-// fclose($handle);
+$handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
+fwrite($handle, 'Subject: '. $subject. "\n\n");
+fwrite($handle, $message);
+fclose($handle);
 
-?>
-    <script type="text/javascript">top.stop_refer(<?php echo '1'; ?>);</script>
-<?php
+redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?success=1');
 exit();
 ?>

@@ -6,6 +6,8 @@ class JobPage extends Page {
     private $job_id = 0;
     private $criterias = NULL;
     private $is_employee_viewing = false;
+    private $action_has_error = false;
+    private $action_responded = false;
     
     function __construct($_session = NULL, $_job_id, $_criterias = NULL) {
         if (!is_null($_session)) {
@@ -19,6 +21,13 @@ class JobPage extends Page {
         }
         
         $this->criterias = $_criterias;
+    }
+    
+    function set_request_status($_error_number = 0) {
+        $this->action_responded = true;
+        if ($_error_number > 0) {
+            $this->action_has_error = true;
+        }
     }
     
     public function insert_inline_css() {
@@ -57,6 +66,18 @@ class JobPage extends Page {
         } else {
             echo 'var industry = "";'. "\n";
             echo 'var keywords = "";'. "\n";
+        }
+        
+        if ($this->action_responded && $this->action_has_error) {
+            echo 'var alert_error = true;'; 
+            echo 'var alert_success = false;'; 
+        } else {
+            echo 'var alert_error = false;'; 
+            if ($this->action_responded) {
+                echo 'var alert_success = true;'; 
+            } else {
+                echo 'var alert_success = false;'; 
+            }
         }
         
         echo '</script>'. "\n";
@@ -271,7 +292,7 @@ class JobPage extends Page {
                 Please wait while your request is being processed... <br/><br/>
                 <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
             </div>
-            <form id="refer_form" action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/refer_action.php" method="post" enctype="multipart/form-data" target="upload_target">
+            <form id="refer_form" action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/refer_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_refer_popup(true);">
                 <input type="hidden" name="job_id" value="<?php echo $this->job_id ?>" />
                 <table class="refer_form">
                     <tr>
@@ -356,11 +377,11 @@ class JobPage extends Page {
                         </td>
                     </tr>
                 </table>
+                <div class="popup_window_buttons_bar">
+                     <input type="submit" value="Refer Now" />
+                     <input type="button" value="Cancel" onClick="close_refer_popup(false);" />
+                </div>
             </form>
-            <div class="popup_window_buttons_bar">
-                 <input type="button" value="Refer Now" onClick="close_refer_popup(true);" />
-                 <input type="button" value="Cancel" onClick="close_refer_popup(false);" />
-            </div>
         </div>
         
         <div id="apply_window" class="popup_window">
@@ -369,7 +390,7 @@ class JobPage extends Page {
                 Please wait while your request is being processed... <br/><br/>
                 <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" />
             </div>
-            <form id="apply_form" action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/apply_action.php" method="post" enctype="multipart/form-data" target="upload_target">
+            <form id="apply_form" action="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/apply_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_apply_popup(true);">
                 <input type="hidden" name="job_id" value="<?php echo $this->job_id ?>" />
                 <table class="apply_form">
                 <?php
@@ -459,15 +480,13 @@ class JobPage extends Page {
                 }
                 ?>
                 </table>                
+                <div class="popup_window_buttons_bar">
+                    <input type="submit" value="Apply Now" />
+                    <input type="button" value="Cancel" onClick="close_apply_popup(false);" />
+                </div>
             </form>
-            <div class="popup_window_buttons_bar">
-                 <input type="button" value="Apply Now" onClick="close_apply_popup(true);" />
-                 <input type="button" value="Cancel" onClick="close_apply_popup(false);" />
-            </div>
         </div>
         
-        <!-- upload target -->
-        <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:0%;height:0px;border:none;"></iframe>
         <?php
     }
 }

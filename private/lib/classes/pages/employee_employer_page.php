@@ -360,16 +360,17 @@ class EmployeeEmployerPage extends Page {
                     <td class="label"><label for="subscription_period">Subscription:</label></td>
                     <td class="field">
                         <?php
-                            $expiry = new DateTime($profile['subscription_expire_on']);
-                            $today = new DateTime(date('Y-m-d'));
-                            $expiry_date = $expiry->format('j M, Y');
+                            $expiry = $profile['formatted_subscription_expire_on'];
+                            if (empty($expiry) || is_null($expiry)) {
+                                $expiry = 'No subscription purchased.';
+                            }
                             
                             $expired = '';
-                            if ($today->diff($expiry)->format('%d') > 0) {
+                            if ($profile['is_expired'] > 0) {
                                 $expired = 'color: #ff0000;';
                             }
                         ?>
-                        <div>Expires On: <span id="expiry" style="<?php echo $expired ?>"><?php echo $expiry_date; ?></span></div>
+                        <div>Expires On: <span id="expiry" style="<?php echo $expired ?>"><?php echo $expiry; ?></span></div>
                         <div>Purchase: 
                             <select id="subscription_period" name="subscription_period"  >
                                 <option value="0" selected>None</option>

@@ -40,9 +40,6 @@ function send_invoice(&$_employer, $_paid_postings, $_subscription_period) {
         $data['employer'] = $_POST['id'];
         $data['payable_by'] = sql_date_add($today, $_employer->getPaymentTermsInDays(), 'day');
         
-        $issued_on = new DateTime($data['issued_on']);
-        $payable_by = new DateTime($data['payable_by']);
-        
         $invoice = Invoice::create($data);
         if ($invoice === false) {
             echo 'ko';
@@ -80,10 +77,10 @@ function send_invoice(&$_employer, $_paid_postings, $_subscription_period) {
         $pdf->Cell(60, 5, pad($invoice, 11, '0'),1,0,'C');
         $pdf->Cell(1);
         
-        $pdf->Cell(33, 5, $issued_on->format('j M, Y'),1,0,'C');
+        $pdf->Cell(33, 5, sql_date_format($data['issued_on']),1,0,'C');
         $pdf->Cell(1);
         
-        $pdf->Cell(33, 5, $payable_by->format('j M, Y'),1,0,'C');
+        $pdf->Cell(33, 5, sql_date_format($data['payable_by']),1,0,'C');
         $pdf->Cell(1);
         $pdf->Cell(0, 5, number_format($amount, '2', '.', ', '),1,0,'C');
         $pdf->Ln(6);
@@ -187,9 +184,6 @@ function send_invoice(&$_employer, $_paid_postings, $_subscription_period) {
         $data['employer'] = $_employer->getId();
         $data['payable_by'] = sql_date_add($today, $_employer->getPaymentTermsInDays(), 'day');
         
-        $issued_on = new DateTime($data['issued_on']);
-        $payable_by = new DateTime($data['payable_by']);
-        
         $invoice = Invoice::create($data);
         if ($invoice === false) {
             echo 'ko';
@@ -228,10 +222,10 @@ function send_invoice(&$_employer, $_paid_postings, $_subscription_period) {
         $pdf->Cell(60, 5, pad($invoice, 11, '0'),1,0,'C');
         $pdf->Cell(1);
         
-        $pdf->Cell(33, 5, $issued_on->format('j M, Y'),1,0,'C');
+        $pdf->Cell(33, 5, sql_date_format($data['issued_on']),1,0,'C');
         $pdf->Cell(1);
         
-        $pdf->Cell(33, 5, $payable_by->format('j M, Y'),1,0,'C');
+        $pdf->Cell(33, 5, sql_date_format($data['payable_by']),1,0,'C');
         $pdf->Cell(1);
         $pdf->Cell(0, 5, number_format($total, '2', '.', ', '),1,0,'C');
         $pdf->Ln(6);

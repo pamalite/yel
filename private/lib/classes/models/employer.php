@@ -166,7 +166,10 @@ class Employer implements Model {
     }
     
     public function get() {
-        $query = "SELECT * FROM employers WHERE id = '". $this->id. "' LIMIT 1";
+        $query = "SELECT *, 
+                  date_format(subscription_expire_on, '%e %b, %Y') AS formatted_subscription_expire_on, 
+                  datediff(now(), subscription_expire_on) AS is_expired 
+                  FROM employers WHERE id = '". $this->id. "' LIMIT 1";
         return $this->mysqli->query($query);
     }
     
