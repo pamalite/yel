@@ -38,6 +38,7 @@ function close_refer_popup(_proceed_refer) {
             }
         }
         
+        close_safari_connection();
         // $('refer_form').submit();
         $('refer_progress').setStyle('display', 'block');
         $('refer_form').setStyle('display', 'none');
@@ -89,6 +90,7 @@ function close_apply_popup(_proceed_refer) {
             }
         }
         
+        close_safari_connection();
         // $('apply_form').submit();
         $('apply_progress').setStyle('display', 'block');
         $('apply_form').setStyle('display', 'none');

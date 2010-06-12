@@ -985,6 +985,17 @@ function list_available_industries(_industry) {
     request.send(params);
 }
 
+function close_safari_connection() {
+    if (Browser.Engine.webkit && Browser.Platform.mac) {
+        var request = new Request({
+            url: root + "/safari_close.php",
+            method: 'post',
+            async: false
+        });
+        request.send();
+    }
+}
+
 // function post_to_paypal_with(_hash_value_pairs) {
 //     if (_hash_value_pairs.getLength() <= 0) {
 //         return;
