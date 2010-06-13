@@ -110,6 +110,15 @@ class EmployeeMembersPage extends Page {
         <?php
         } else {
         ?>
+            <div class="buttons_bar">
+                Filter: 
+                <select id="applications_filter" onChange="filter_applications();">
+                    <option value="" selected>All</option>
+                    <option value="" disabled>&nbsp;</option>
+                    <option value="self_applied">Self Applied</option>
+                    <option value="referred">Referred</option>
+                </select>
+            </div>
             <div id="div_applications">
             <?php
                 $applications_table = new HTMLTable('applications_table', 'applications');
@@ -141,9 +150,9 @@ class EmployeeMembersPage extends Page {
                     $applications_table->set($i+1, 2, $candidate_short_details, '', 'cell');
                     
                     if ($application['has_testimony'] == '1') {
-                        $applications_table->set($i+1, 3, '<a href="show_testimony_window(\''. $application['id']. '\');">Update</a>', '', 'cell');
+                        $applications_table->set($i+1, 3, '<a class="no_link" onClick="show_testimony_window(\''. $application['id']. '\');">Update</a>', '', 'cell');
                     } else {
-                        $applications_table->set($i+1, 3, '<a href="show_testimony_window(\''. $application['id']. '\');">Add</a>', '', 'cell');
+                        $applications_table->set($i+1, 3, '<a  class="no_link" onClick="show_testimony_window(\''. $application['id']. '\');">Add</a>', '', 'cell');
                     }
                     
                     if (!is_null($application['existing_resume_id']) && 

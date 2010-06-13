@@ -64,21 +64,31 @@ if ($_POST['action'] == 'get_members') {
 
 if ($_POST['action'] == 'get_applications') {
     $order_by = 'requested_on desc';
-
+    $filter_by = "referrer_email LIKE '%'";
+    
     //$employee = new Employee($_POST['id']);
     //$branch = $employee->getBranch();
 
     if (isset($_POST['order_by'])) {
         $order_by = $_POST['order_by'];
     }
-
+    
+    if (isset($_POST['filter'])) {
+        if ($_POST['filter'] == 'self_applied') {
+            $filter_by = "referrer_email LIKE 'team%@yellowelevator.com'";
+        } else if ($_POST['filter'] == 'referred') {
+            $filter_by = "referrer_email NOT LIKE 'team%@yellowelevator.com'";
+        } 
+    }
+    
     $criteria = array(
         'columns' => "id, candidate_email, candidate_phone, candidate_name, 
                       referrer_email, referrer_phone, referrer_name, 
                       existing_resume_id, resume_file_hash, 
                       IF(testimony IS NULL OR testimony = '', 0, 1) AS has_testimony,
                       DATE_FORMAT(requested_on, '%e %b, %Y') AS formatted_requested_on", 
-        'order' => "requested_on DESC"
+        'match' => $filter_by, 
+        'order' => $order_by
     );
 
     $referral_buffer = new ReferralBuffer();
@@ -95,8 +105,8 @@ if ($_POST['action'] == 'get_applications') {
     }
 
     foreach($result as $i=>$row) {
-        $result[$i]['referrer_name'] = htmlspecialchars_decode($row['referrer_name']);
-        $result[$i]['candidate_name'] = htmlspecialchars_decode($row['candidate_name']);
+        $result[$i]['referrer_name'] = htmlspecialchars_decode(stripslashes($row['referrer_name']));
+        $result[$i]['candidate_name'] = htmlspecialchars_decode(stripslashes($row['candidate_name']));
     }
 
     $response = array('applications' => array('application' => $result));

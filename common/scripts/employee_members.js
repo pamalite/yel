@@ -2,6 +2,7 @@ var order_by = 'members.joined_on';
 var order = 'desc';
 var applications_order_by = 'requested_on';
 var applications_order = 'desc';
+var applications_filter = '';
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -27,7 +28,7 @@ function sort_by(_table, _column) {
             show_members();
             break;
         case 'applications':
-            order_by = _column;
+            applications_order_by = _column;
             applications_ascending_or_descending();
             show_applications();
             break;
@@ -107,131 +108,6 @@ function show_members() {
                         last_login = last_logins[i].childNodes[0].nodeValue;
                     }
                     row.set(3, new Cell(last_login, '', 'cell'));
-                    
-                    var actions = '';
-                    if (is_actives[i].childNodes[0].nodeValue == 'Y') {
-                        actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                        actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
-                    } else {
-                        actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                        actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" disabled />';
-                    }
-                    
-                    row.set(4, new Cell(actions, '', 'cell action'));
-                    members_table.set((parseInt(i)+1), row);
-                }
-                
-                $('div_members').set('html', members_table.get_html());
-                set_status('');
-            }
-        },
-        onRequest: function(instance) {
-            set_status('Loading members...');
-        }
-    });
-    
-    request.send(params);
-    
-}
-
-function show_applications() {
-    $('applications').setStyle('display', 'block');
-    $('members').setStyle('display', 'none');
-    $('member_search').setStyle('display', 'none');
-    
-    $('item_applications').setStyle('background-color', '#CCCCCC');
-    $('item_members').setStyle('background-color', '');
-    $('item_search').setStyle('background-color', '');
-    
-    if (arguments.length > 0) {
-        // do not load from db unless is being sorted
-        return;
-    }
-    
-    var params = 'id=' + user_id + '&order_by=' + order_by + ' ' + order;
-    params = params + '&action=get_applications';
-    
-    var uri = root + "/employees/members_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            //set_status('<pre>' + txt + '</pre>');
-            //return;
-            if (txt == 'ko') {
-                alert('An error occured while loading applications.');
-                return false;
-            }
-            
-            if (txt == '0') {
-                $('div_applications').set('html', '<div class="empty_results">No applications at this moment.</div>');
-            } else {
-                var ids = xml.getElementsByTagName('id');
-                var referrer_emails = xml.getElementsByTagName('referrer_email');
-                var referrer_names = xml.getElementsByTagName('referrer_name');
-                var referrer_phones = xml.getElementsByTagName('referrer_phone');
-                var candidate_emails = xml.getElementsByTagName('candidate_email');
-                var candidate_names = xml.getElementsByTagName('candidate_name');
-                var candidate_phones = xml.getElementsByTagName('candidate_phone');
-                var resume_ids = xml.getElementsByTagName('existing_resume_id');
-                var resume_file_hashes = xml.getElementsByTagName('resume_file_hash');
-                var requested_ons = xml.getElementsByTagName('formatted_requested_on');
-                var has_testimonys = xml.getElementsByTagName('has_testimony');
-                
-                var applications_table = new FlexTable('applications_table', 'applications');
-
-                var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Requested On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.referrer_name');\">Referrer</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header'));
-                header.set(3, new Cell('Notes', '', 'header'));
-                header.set(4, new Cell('Resume', '', 'header'));
-                header.set(5, new Cell('Quick Action', '', 'header action'));
-                applications_table.set(0, header);
-                
-                for (var i=0; i < ids.length; i++) {
-                    var row = new Row('');
-                    
-                    row.set(0, new Cell(requested_ons[i].childNodes[0].nodeValue, '', 'cell'));
-                    
-                    // referrer column
-                    var referrer_phone_num = 'Not Provided';
-                    var referrer_email = 'Not Provided';
-                    if (referrer_phones[i].childNodes.length > 0) {
-                        referrer_phone_num = referrer_phones[i].childNodes[0].nodeValue;
-                    }
-                    
-                    if (referrer_emails[i].childNodes.length > 0) {
-                        referrer_email = referrer_emails[i].childNodes[0].nodeValue;
-                    }
-                    
-                    var short_desc = '<a class="no_link member_link" onClick="show_member(\'' + referrer_email + '\');">' + referrer_names[i].childNodes[0].nodeValue + '</a>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + referrer_phone_num + '</div>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + referrer_email + '">' + referrer_email + '</a></div>' + "\n";
-                    row.set(1, new Cell(short_desc, '', 'cell'));
-                    
-                    // candidate column
-                    var candidate_phone_num = 'Not Provided';
-                    var candidate_email = 'Not Provided';
-                    if (candidate_phones[i].childNodes.length > 0) {
-                        candidate_phone_num = candidate_phones[i].childNodes[0].nodeValue;
-                    }
-                    
-                    if (candidate_emails[i].childNodes.length > 0) {
-                        candidate_email = candidate_emails[i].childNodes[0].nodeValue;
-                    }
-                    
-                    short_desc = '<a class="no_link member_link" onClick="show_member(\'' + candidate_email + '\');">' + candidate_names[i].childNodes[0].nodeValue + '</a>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + candidate_phone_num + '</div>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + candidate_email + '">' + candidate_email + '</a></div>' + "\n";
-                    row.set(2, new Cell(short_desc '', 'cell'));
-                    
-                    if (has_testimonys[i].childNodes[0].value == '1') {
-                        row.set(3, new Cell('<a ', '', 'cell'));
-                    } else {
-                        row.set(3, new Cell('', '', 'cell'));
-                    }
-                    
                     
                     var actions = '';
                     if (is_actives[i].childNodes[0].nodeValue == 'Y') {
@@ -370,6 +246,11 @@ function add_new_member() {
     $('member_page_form').submit();
 }
 
+function filter_applications() {
+    applications_filter = $('applications_filter').options[$('applications_filter').selectedIndex].value;
+    show_applications();
+}
+
 function show_applications() {
     $('applications').setStyle('display', 'block');
     $('members').setStyle('display', 'none');
@@ -383,6 +264,120 @@ function show_applications() {
         // do not load from db unless is being sorted
         return;
     }
+    
+    var params = 'id=' + user_id + '&order_by=' + applications_order_by + ' ' + applications_order;
+    params = params + '&action=get_applications';
+    params = params + '&filter=' + applications_filter;
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            if (txt == 'ko') {
+                alert('An error occured while loading applications.');
+                return false;
+            }
+            
+            if (txt == '0') {
+                $('div_applications').set('html', '<div class="empty_results">No applications at this moment.</div>');
+            } else {
+                var ids = xml.getElementsByTagName('id');
+                var referrer_emails = xml.getElementsByTagName('referrer_email');
+                var referrer_names = xml.getElementsByTagName('referrer_name');
+                var referrer_phones = xml.getElementsByTagName('referrer_phone');
+                var candidate_emails = xml.getElementsByTagName('candidate_email');
+                var candidate_names = xml.getElementsByTagName('candidate_name');
+                var candidate_phones = xml.getElementsByTagName('candidate_phone');
+                var resume_ids = xml.getElementsByTagName('existing_resume_id');
+                var resume_file_hashes = xml.getElementsByTagName('resume_file_hash');
+                var requested_ons = xml.getElementsByTagName('formatted_requested_on');
+                var has_testimonys = xml.getElementsByTagName('has_testimony');
+                
+                var applications_table = new FlexTable('applications_table', 'applications');
+
+                var header = new Row('');
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Requested On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.referrer_name');\">Referrer</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header'));
+                header.set(3, new Cell('Notes', '', 'header'));
+                header.set(4, new Cell('Resume', '', 'header'));
+                header.set(5, new Cell('Quick Action', '', 'header action'));
+                applications_table.set(0, header);
+                
+                for (var i=0; i < ids.length; i++) {
+                    var row = new Row('');
+                    
+                    row.set(0, new Cell(requested_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    
+                    // referrer column
+                    if (referrer_emails[i].childNodes[0].nodeValue.substr(0, 5) == 'team.' &&
+                        referrer_emails[i].childNodes[0].nodeValue.substr(7) == '@yellowelevator.com') {
+                        row.set(1, new Cell('Self Applied', '', 'cell'));
+                    } else {
+                        var referrer_phone_num = 'Not Provided';
+                        var referrer_email = 'Not Provided';
+                        if (referrer_phones[i].childNodes.length > 0) {
+                            referrer_phone_num = referrer_phones[i].childNodes[0].nodeValue;
+                        }
+
+                        if (referrer_emails[i].childNodes.length > 0) {
+                            referrer_email = referrer_emails[i].childNodes[0].nodeValue;
+                        }
+
+                        var short_desc = '<a class="no_link application_link" onClick="show_application(\'' + referrer_email + '\');">' + referrer_names[i].childNodes[0].nodeValue + '</a>' + "\n";
+                        short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + referrer_phone_num + '</div>' + "\n";
+                        short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + referrer_email + '"> ' + referrer_email + '</a></div>' + "\n";
+                        row.set(1, new Cell(short_desc, '', 'cell'));
+                    }
+                    
+                    // candidate column
+                    var candidate_phone_num = 'Not Provided';
+                    var candidate_email = 'Not Provided';
+                    if (candidate_phones[i].childNodes.length > 0) {
+                        candidate_phone_num = candidate_phones[i].childNodes[0].nodeValue;
+                    }
+                    
+                    if (candidate_emails[i].childNodes.length > 0) {
+                        candidate_email = candidate_emails[i].childNodes[0].nodeValue;
+                    }
+                    
+                    short_desc = '<a class="no_link application_link" onClick="show_application\'' + candidate_email + '\');">' + candidate_names[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + candidate_phone_num + '</div>' + "\n";
+                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + candidate_email + '"> ' + candidate_email + '</a></div>' + "\n";
+                    row.set(2, new Cell(short_desc, '', 'cell'));
+                    
+                    var add_update_testimony = 'Add';
+                    if (has_testimonys[i].childNodes[0].nodeValue == '1') {
+                        add_update_testimony = 'Update';
+                    }
+                    row.set(3, new Cell('<a class="no_link" onClick="show_testimony_window(\'' + ids[i].childNodes[0].nodeValue +  '\');">' + add_update_testimony + '</a>', '', 'cell'));
+                    
+                    if (resume_ids[i].childNodes.length > 0) {
+                        row.set(4, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
+                    } else {
+                        row.set(4, new Cell('<a href="resume.php?id=' + ids[i].childNodes[0].nodeValue + '&hash=' + resume_file_hashes[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
+                    }
+                    
+                    var actions = '';
+                    actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                    actions = actions + '<input type="button" value="Make Member" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                    row.set(5, new Cell(actions, '', 'cell action'));
+                    applications_table.set((parseInt(i)+1), row);
+                }
+                
+                $('div_applications').set('html', applications_table.get_html());
+                set_status('');
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Loading applications...');
+        }
+    });
+    
+    request.send(params);
 }
 
 function show_search_members() {
