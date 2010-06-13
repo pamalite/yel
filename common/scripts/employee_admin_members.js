@@ -1,5 +1,7 @@
-var order_by = 'joined_on';
+var order_by = 'members.joined_on';
 var order = 'desc';
+var applications_order_by = 'requested_on';
+var applications_order = 'desc';
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -9,10 +11,32 @@ function ascending_or_descending() {
     }
 }
 
+function applications_ascending_or_descending() {
+    if (applications_order == 'desc') {
+        applications_order = 'asc';
+    } else {
+        applications_order = 'desc';
+    }
+}
+
+function sort_by(_table, _column) {
+    switch (_table) {
+        case 'members':
+            order_by = _column;
+            ascending_or_descending();
+            show_members();
+            break;
+        case 'applications':
+            applications_order_by = _column;
+            ascending_or_descending();
+            show_applications();
+    }
+}
+
 function show_members() {
-    var params = 'id=0&order_by=' + order_by + ' ' + order;
+    var params = 'id=0&action=get_members&order_by=' + order_by + ' ' + order;
     
-    var uri = root + "/employees/admin_members_action.php";
+    var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
@@ -71,7 +95,7 @@ function reset_password(_id) {
     var params = 'id=' + _id;
     params = params + '&action=reset_password';
     
-    var uri = root + "/employees/admin_members_action.php";
+    var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
@@ -100,7 +124,7 @@ function activate_member(_id) {
     var params = 'id=' + _id;
     params = params + '&action=activate';
     
-    var uri = root + "/employees/admin_members_action.php";
+    var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
         method: 'post',

@@ -352,7 +352,7 @@ class Page {
                 <li <?php echo ($_page == 'members') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/members.php">Members</a></li>
                 <li <?php echo ($page == 'invoices') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/invoices.php">Invoices &amp; Receipts</a></li>
                 <li <?php echo ($page == 'rewards') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/rewards.php">Rewards</a></li>
-                <li <?php echo ($page == 'applications') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/applications.php">Applications</a></li>
+                <li <?php echo ($page == 'status') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/status.php">Status</a></li>
                 <li><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/logout.php">Logout</a></li>
             </ul>
         </div>

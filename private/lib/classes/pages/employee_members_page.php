@@ -51,7 +51,8 @@ class EmployeeMembersPage extends Page {
                         employees ON employees.id = members.added_by, 
                         countries ON countries.country_code = members.country", 
             'match' => "employees.branch = ". $_employee_branch_id ." AND 
-                        members.email_addr <> 'initial@yellowelevator.com'", 
+                        members.email_addr <> 'initial@yellowelevator.com' AND 
+                        members.email_addr NOT LIKE 'team%@yellowelevator.com'", 
             'order' => "members.joined_on DESC"
         );
 
@@ -116,7 +117,7 @@ class EmployeeMembersPage extends Page {
                 $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Requested On</a>", '', 'header');
                 $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.referral_name');\">Referrer</a>", '', 'header');
                 $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header');
-                $applications_table->set(0, 3, "Testimony", '', 'header');
+                $applications_table->set(0, 3, "Notes", '', 'header');
                 $applications_table->set(0, 4, "Resume", '', 'header');
                 $applications_table->set(0, 5, 'Quick Actions', '', 'header action');
 
@@ -128,13 +129,13 @@ class EmployeeMembersPage extends Page {
                         substr($application['referrer_email'], 7) == '@yellowelevator.com') {
                         $referrer_short_details = 'Self Applied';
                     } else {
-                        $referrer_short_details = '<a class="no_link application_link" onClick="show_application(\''. $application['id']. '\');">'. desanitize($application['referrer_name']). '</a>'. "\n";
+                        $referrer_short_details = '<a class="no_link application_link" onClick="show_application(\''. $application['id']. '\');">'. htmlspecialchars_decode(desanitize($application['referrer_name'])). '</a>'. "\n";
                         $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['referrer_phone']. '</div>'. "\n";
-                        $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['referrer_email']. '">'. $application['email_addr']. '</a></div>'. "\n";
+                        $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['referrer_email']. '">'. $application['referrer_email']. '</a></div>'. "\n";
                     }
                     $applications_table->set($i+1, 1, $referrer_short_details, '', 'cell');
                     
-                    $candidate_short_details = '<a class="no_link application_link" onClick="show_application(\''. $application['id']. '\');">'. desanitize($application['candidate_name']). '</a>'. "\n";
+                    $candidate_short_details = '<a class="no_link application_link" onClick="show_application(\''. $application['id']. '\');">'. htmlspecialchars_decode(desanitize($application['candidate_name'])). '</a>'. "\n";
                     $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['candidate_phone']. '</div>'. "\n";
                     $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['candidate_email']. '">'. $application['candidate_email']. '</a></div>'. "\n";
                     $applications_table->set($i+1, 2, $candidate_short_details, '', 'cell');

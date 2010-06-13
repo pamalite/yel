@@ -34,7 +34,8 @@ if ($_POST['action'] == 'get_members') {
                     employees ON employees.id = members.added_by, 
                     countries ON countries.country_code = members.country", 
         'match' => "employees.branch = ". $branch[0]['id'] ." AND 
-                    members.email_addr <> 'initial@yellowelevator.com'",
+                    members.email_addr <> 'initial@yellowelevator.com' AND 
+                    members.email_addr NOT LIKE 'team%@yellowelevator.com'",
         'order' => $order_by
     );
 
@@ -56,6 +57,49 @@ if ($_POST['action'] == 'get_members') {
     }
 
     $response = array('members' => array('a_member' => $result));
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
+if ($_POST['action'] == 'get_applications') {
+    $order_by = 'requested_on desc';
+
+    //$employee = new Employee($_POST['id']);
+    //$branch = $employee->getBranch();
+
+    if (isset($_POST['order_by'])) {
+        $order_by = $_POST['order_by'];
+    }
+
+    $criteria = array(
+        'columns' => "id, candidate_email, candidate_phone, candidate_name, 
+                      referrer_email, referrer_phone, referrer_name, 
+                      existing_resume_id, resume_file_hash, 
+                      IF(testimony IS NULL OR testimony = '', 0, 1) AS has_testimony,
+                      DATE_FORMAT(requested_on, '%e %b, %Y') AS formatted_requested_on", 
+        'order' => "requested_on DESC"
+    );
+
+    $referral_buffer = new ReferralBuffer();
+    $result = $referral_buffer->find($criteria);
+
+    if (count($result) <= 0 || is_null($result)) {
+        echo '0';
+        exit();
+    }
+
+    if (!$result) {
+        echo 'ko';
+        exit();
+    }
+
+    foreach($result as $i=>$row) {
+        $result[$i]['referrer_name'] = htmlspecialchars_decode($row['referrer_name']);
+        $result[$i]['candidate_name'] = htmlspecialchars_decode($row['candidate_name']);
+    }
+
+    $response = array('applications' => array('application' => $result));
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
     exit();
