@@ -85,7 +85,7 @@ if ($_POST['action'] == 'get_applications') {
         'columns' => "id, candidate_email, candidate_phone, candidate_name, 
                       referrer_email, referrer_phone, referrer_name, 
                       existing_resume_id, resume_file_hash, 
-                      IF(testimony IS NULL OR testimony = '', 0, 1) AS has_testimony,
+                      IF(notes IS NULL OR notes = '', 0, 1) AS has_notes,
                       DATE_FORMAT(requested_on, '%e %b, %Y') AS formatted_requested_on", 
         'match' => $filter_by, 
         'order' => $order_by

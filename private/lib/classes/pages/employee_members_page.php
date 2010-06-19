@@ -67,7 +67,7 @@ class EmployeeMembersPage extends Page {
             'columns' => "id, candidate_email, candidate_phone, candidate_name, 
                           referrer_email, referrer_phone, referrer_name, 
                           existing_resume_id, resume_file_hash, 
-                          IF(testimony IS NULL OR testimony = '', 0, 1) AS has_testimony,
+                          IF(notes IS NULL OR notes = '', 0, 1) AS has_notes,
                           DATE_FORMAT(requested_on, '%e %b, %Y') AS formatted_requested_on", 
             'order' => "requested_on DESC"
         );
@@ -149,10 +149,10 @@ class EmployeeMembersPage extends Page {
                     $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['candidate_email']. '">'. $application['candidate_email']. '</a></div>'. "\n";
                     $applications_table->set($i+1, 2, $candidate_short_details, '', 'cell');
                     
-                    if ($application['has_testimony'] == '1') {
-                        $applications_table->set($i+1, 3, '<a class="no_link" onClick="show_testimony_window(\''. $application['id']. '\');">Update</a>', '', 'cell');
+                    if ($application['has_notes'] == '1') {
+                        $applications_table->set($i+1, 3, '<a class="no_link" onClick="show_notes_window(\''. $application['id']. '\');">Update</a>', '', 'cell');
                     } else {
-                        $applications_table->set($i+1, 3, '<a  class="no_link" onClick="show_testimony_window(\''. $application['id']. '\');">Add</a>', '', 'cell');
+                        $applications_table->set($i+1, 3, '<a  class="no_link" onClick="show_notes_window(\''. $application['id']. '\');">Add</a>', '', 'cell');
                     }
                     
                     if (!is_null($application['existing_resume_id']) && 
@@ -163,7 +163,8 @@ class EmployeeMembersPage extends Page {
                     }
                     
                     $actions = '<input type="button" value="Delete" onClick="delete_application(\''. $application['id']. '\');" />';
-                    $actions .= '<input type="button" value="Make Member" onClick="make_member_from(\''. $application['id']. '\');" />';
+                    $actions .= '<input type="button" value="Sign Up" onClick="make_member_from(\''. $application['id']. '\');" />';
+                    $actions .= '<input type="button" value="Refer Job" onClick="show_refer_form(\''. $application['id']. '\');" />';
                     $applications_table->set($i+1, 5, $actions, '', 'cell action');
                 }
 
@@ -210,9 +211,10 @@ class EmployeeMembersPage extends Page {
                     if ($member['active'] == 'Y') {
                         $actions = '<input type="button" id="activate_button_'. $i. '" value="De-activate" onClick="activate_member(\''. $member['email_addr']. '\', \''. $i. '\');" />';
                         $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" />';
+                        $actions .= '<input type="button" value="Refer Job" onClick="show_refer_form(\''. $member['email_addr']. '\');" />';
                     } else {
                         $actions = '<input type="button" id="activate_button_'. $i. '" value="Activate" onClick="activate_member(\''. $member['email_addr']. '\', \''. $i. '\');" />';
-                        $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" disabled />';
+                        // $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" disabled />';
                     }
                     
                     $members_table->set($i+1, 4, $actions, '', 'cell action');

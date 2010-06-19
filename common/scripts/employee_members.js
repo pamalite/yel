@@ -113,9 +113,9 @@ function show_members() {
                     if (is_actives[i].childNodes[0].nodeValue == 'Y') {
                         actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
                         actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
+                        actions = actions + '<input type="button" value="Refer Job" onClick="show_refer_form(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
                     } else {
                         actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                        actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" disabled />';
                     }
                     
                     row.set(4, new Cell(actions, '', 'cell action'));
@@ -294,7 +294,7 @@ function show_applications() {
                 var resume_ids = xml.getElementsByTagName('existing_resume_id');
                 var resume_file_hashes = xml.getElementsByTagName('resume_file_hash');
                 var requested_ons = xml.getElementsByTagName('formatted_requested_on');
-                var has_testimonys = xml.getElementsByTagName('has_testimony');
+                var has_notes = xml.getElementsByTagName('has_notes');
                 
                 var applications_table = new FlexTable('applications_table', 'applications');
 
@@ -349,11 +349,11 @@ function show_applications() {
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + candidate_email + '"> ' + candidate_email + '</a></div>' + "\n";
                     row.set(2, new Cell(short_desc, '', 'cell'));
                     
-                    var add_update_testimony = 'Add';
-                    if (has_testimonys[i].childNodes[0].nodeValue == '1') {
-                        add_update_testimony = 'Update';
+                    var add_update_notes = 'Add';
+                    if (has_notes[i].childNodes[0].nodeValue == '1') {
+                        add_update_notes = 'Update';
                     }
-                    row.set(3, new Cell('<a class="no_link" onClick="show_testimony_window(\'' + ids[i].childNodes[0].nodeValue +  '\');">' + add_update_testimony + '</a>', '', 'cell'));
+                    row.set(3, new Cell('<a class="no_link" onClick="show_notes_window(\'' + ids[i].childNodes[0].nodeValue +  '\');">' + add_update_notes + '</a>', '', 'cell'));
                     
                     if (resume_ids[i].childNodes.length > 0) {
                         row.set(4, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
@@ -363,7 +363,8 @@ function show_applications() {
                     
                     var actions = '';
                     actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
-                    actions = actions + '<input type="button" value="Make Member" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                    actions = actions + '<input type="button" value="Sign Up" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                    actions = actions + '<input type="button" value="Refer Job" onClick="show_refer_form(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
                     row.set(5, new Cell(actions, '', 'cell action'));
                     applications_table.set((parseInt(i)+1), row);
                 }
