@@ -156,9 +156,12 @@ function show_profile() {
     $('job').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '#CCCCCC');
-    $('item_fees').setStyle('background-color', '');
-    $('item_jobs').setStyle('background-color', '');
-    $('item_subscriptions').setStyle('background-color', '');
+    
+    if (employer_id != '0') {
+        $('item_fees').setStyle('background-color', '');
+        $('item_subscriptions').setStyle('background-color', '');
+        $('item_jobs').setStyle('background-color', '');
+    }
 }
 
 function save_profile() {
@@ -208,9 +211,12 @@ function save_profile() {
                 if (!isEmpty(from_employer)) {
                     var proceed_copy = confirm('Do you want the service feess to be copied too?');
                     if (proceed_copy) {
-                        copy_fees();
+                        copy_fees(false);
                     }
                 }
+                
+                location.replace('employer.php?id=' + employer_id);
+                return;
             }
             
             show_profile();
@@ -227,10 +233,16 @@ function save_profile() {
 function copy_fees() {
     var params = 'id=' + employer_id + '&employer=' + from_employer + '&action=copy_fees';
     
+    var is_async = true;
+    if (arguments.length == 1) {
+        is_async = false;
+    }
+    
     var uri = root + "/employees/employer_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
+        async: is_async, 
         onSuccess: function(txt, xml) {
             if (txt == 'ko') {
                 alert('An error occured while copying service fees.');

@@ -230,19 +230,11 @@ function activate_member(_id, _idx) {
 
 function show_member(_email_addr) {
     $('member_email_addr').value = _email_addr;
-    $('referral_buffer_id').value = '';
-    $('member_page_form').submit();
-}
-
-function show_application(_id) {
-    $('member_email_addr').value = '';
-    $('referral_buffer_id').value = _id;
     $('member_page_form').submit();
 }
 
 function add_new_member() {
     $('member_email_addr').value = '';
-    $('referral_buffer_id').value = '';
     $('member_page_form').submit();
 }
 
@@ -327,7 +319,7 @@ function show_applications() {
                             referrer_email = referrer_emails[i].childNodes[0].nodeValue;
                         }
 
-                        var short_desc = '<a class="no_link application_link" onClick="show_application(\'' + referrer_email + '\');">' + referrer_names[i].childNodes[0].nodeValue + '</a>' + "\n";
+                        var short_desc = '<span style="font-weight: bold;">' + referrer_names[i].childNodes[0].nodeValue + '</span>' + "\n";
                         short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + referrer_phone_num + '</div>' + "\n";
                         short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + referrer_email + '"> ' + referrer_email + '</a></div>' + "\n";
                         row.set(1, new Cell(short_desc, '', 'cell'));
@@ -344,7 +336,7 @@ function show_applications() {
                         candidate_email = candidate_emails[i].childNodes[0].nodeValue;
                     }
                     
-                    short_desc = '<a class="no_link application_link" onClick="show_application\'' + candidate_email + '\');">' + candidate_names[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    short_desc = '<span style="font-weight: bold;">' + candidate_names[i].childNodes[0].nodeValue + '</span>' + "\n";
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + candidate_phone_num + '</div>' + "\n";
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + candidate_email + '"> ' + candidate_email + '</a></div>' + "\n";
                     row.set(2, new Cell(short_desc, '', 'cell'));

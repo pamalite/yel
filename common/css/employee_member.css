@@ -1,0 +1,126 @@
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+a.menu {
+    cursor: pointer;
+}
+
+input, select, textarea {
+    font-size: 12pt;
+}
+
+table.profile_form {
+    width: 80%;
+    margin: auto;
+}
+
+table.profile_form td {
+    font-size: 12pt;
+    padding: 3px 3px 3px 3px;
+}
+
+table.profile_form td.buttons_bar {
+    text-align: right;
+    background-color: #CCCCCC;
+}
+
+table.profile_form td.label {
+    width: 35%;
+
+}
+
+table.profile_form td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+input.field, select.field {
+    width: 98%;
+}
+
+input.field_number {
+    width: 25px;
+}
+
+textarea {
+    width: 99%;
+    height: 90px;
+}
+
+#member_resumes, $member_notes, 
+#member_applications, #job {
+    display: none;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.action {
+    width: 20%;
+    text-align: center;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+.center {
+    text-align: center;
+}
+
+div.buttons_bar {
+    text-align: right;
+    background-color: #CCCCCC;
+    padding: 3px 3px 3px 3px;
+}
+
+
+#jobs_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#jobs_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+#job_form {
+    margin: auto;
+    width: 65%;
+    border-spacing: 5px;
+}
+
+#job_form td {
+    padding: 3px 3px 3px 3px;
+    font-size: 12pt;
+    vertical-align: top;
+}
+
+#job_form td.label {
+    width: 15%;
+}
+
+#industry {
+    font-size: 12pt;
+    width: 98%;
+}
+
+.job_description {
+    height: 550px;
+}

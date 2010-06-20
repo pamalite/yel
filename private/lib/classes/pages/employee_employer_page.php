@@ -138,7 +138,7 @@ class EmployeeEmployerPage extends Page {
         
         $subscriptions_rates = $GLOBALS['subscriptions_rates'];
         $branch = $this->employee->getBranch();
-        $available_subscriptions = $subscriptions_rates[Currency::getSymbolFromCountryCode($branch[0]['country_code'])];
+        $available_subscriptions = $subscriptions_rates[Currency::getSymbolFromCountryCode($branch[0]['country'])];
         
         $raw_data = array();
         $profile = array();
@@ -167,7 +167,7 @@ class EmployeeEmployerPage extends Page {
                 'address' => '',
                 'state' => '',
                 'zip' => '',
-                'country' => $branch[0]['country_code']
+                'country' => $branch[0]['country']
             );
         }
         
@@ -178,11 +178,11 @@ class EmployeeEmployerPage extends Page {
             <ul class="menu">
                 
                 <li id="item_profile" style="<?php echo ($this->current_page == 'profile') ? $style : ''; ?>"><a class="menu" onClick="show_profile();">Profile</a></li>
-                <li id="item_fees" style="<?php echo ($this->current_page == 'fees') ? $style : ''; ?>"><a class="menu" onClick="show_fees();">Fees</a></li>
-                <li id="item_subscriptions" style="<?php echo ($this->current_page == 'subscriptions') ? $style : ''; ?>"><a class="menu" onClick="show_subscriptions();">Subscriptions</a></li>
             <?php
             if (!$this->is_new) {
             ?>
+                <li id="item_fees" style="<?php echo ($this->current_page == 'fees') ? $style : ''; ?>"><a class="menu" onClick="show_fees();">Fees</a></li>
+                <li id="item_subscriptions" style="<?php echo ($this->current_page == 'subscriptions') ? $style : ''; ?>"><a class="menu" onClick="show_subscriptions();">Subscriptions</a></li>
                 <li id="item_jobs" style="<?php echo  ($this->current_page == 'jobs') ? $style : ''; ?>"><a class="menu" onClick="show_jobs();">Jobs</a></li>
             <?php
             }

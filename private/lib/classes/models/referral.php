@@ -24,6 +24,11 @@ class Referral implements Model {
         return true;
     }
     
+    private function simplify($_data) {
+        $_data = htmlspecialchars_decode($_data);
+        return str_replace('<br/>', "\n", $_data);
+    }
+    
     public function create($_data) {
         if (!$this->hasData($_data)) {
             return false;
@@ -33,6 +38,18 @@ class Referral implements Model {
             !array_key_exists('referee', $_data) || 
             !array_key_exists('job', $_data)) {
             return false;
+        }
+        
+        $simplified_notes = '';
+        if (array_key_exists('notes', $_data)) {
+            $simplified_notes = $this->simplify($_data['notes']);
+            $simplified_notes = addslashes($simplified_notes);
+        }
+        
+        $simplified_testimony = '';
+        if (array_key_exists('testimony', $_data)) {
+            $simplified_testimony = $this->simplify($_data['testimony']);
+            $simplified_testimony = addslashes($simplified_testimony);
         }
         
         $data = sanitize($_data);
@@ -61,6 +78,11 @@ class Referral implements Model {
         }
         
         if (($this->id = $this->mysqli->execute($query, true)) > 0) {
+            $query = "INSERT INTO `referral_index` SET 
+                      `referral` = ". $this->id. ", 
+                      `notes` = '". $simplified_notes. "', 
+                      `testimony` = '". $simplified_testimony. "'";
+            $this->mysqli->execute($query);
             return $this->id;
         }
         
@@ -74,6 +96,18 @@ class Referral implements Model {
         
         if ($this->id <= 0) {
             return false;
+        }
+        
+        $simplified_notes = '';
+        if (array_key_exists('notes', $_data)) {
+            $simplified_notes = $this->simplify($_data['notes']);
+            $simplified_notes = addslashes($simplified_notes);
+        }
+        
+        $simplified_testimony = '';
+        if (array_key_exists('testimony', $_data)) {
+            $simplified_testimony = $this->simplify($_data['testimony']);
+            $simplified_testimony = addslashes($simplified_testimony);
         }
         
         $data = sanitize($_data);
@@ -103,8 +137,16 @@ class Referral implements Model {
             $i++;
         }
         $query .= "WHERE id = '". $this->id. "'";
-    
-        return $this->mysqli->execute($query);
+        
+        if ($this->mysqli->execute($query)) {
+            $query = "UPDATE `referral_index` SET 
+                      `notes` = '". $simplified_notes. "', 
+                      `testimony` = '". $simplified_testimony. "' 
+                      WHERE referral = ". $this->id;
+            return $this->mysqli->execute($query);
+        }
+        
+        return false;
     }
     
     public function delete() {

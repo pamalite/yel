@@ -138,13 +138,13 @@ class EmployeeMembersPage extends Page {
                         substr($application['referrer_email'], 7) == '@yellowelevator.com') {
                         $referrer_short_details = 'Self Applied';
                     } else {
-                        $referrer_short_details = '<a class="no_link application_link" onClick="show_application(\''. $application['id']. '\');">'. htmlspecialchars_decode(desanitize($application['referrer_name'])). '</a>'. "\n";
+                        $referrer_short_details = '<span style="font-weight: bold;">'. htmlspecialchars_decode(desanitize($application['referrer_name'])). '</span>'. "\n";
                         $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['referrer_phone']. '</div>'. "\n";
                         $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['referrer_email']. '">'. $application['referrer_email']. '</a></div>'. "\n";
                     }
                     $applications_table->set($i+1, 1, $referrer_short_details, '', 'cell');
                     
-                    $candidate_short_details = '<a class="no_link application_link" onClick="show_application(\''. $application['id']. '\');">'. htmlspecialchars_decode(desanitize($application['candidate_name'])). '</a>'. "\n";
+                    $candidate_short_details = '<span style="font-weight: bold;">'. htmlspecialchars_decode(desanitize($application['candidate_name'])). '</span>'. "\n";
                     $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['candidate_phone']. '</div>'. "\n";
                     $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['candidate_email']. '">'. $application['candidate_email']. '</a></div>'. "\n";
                     $applications_table->set($i+1, 2, $candidate_short_details, '', 'cell');
@@ -230,7 +230,6 @@ class EmployeeMembersPage extends Page {
             
             <form id="member_page_form" method="post" action="member.php">
                 <input type="hidden" id="member_email_addr" name="member_email_addr" value="" />
-                <input type="hidden" id="referral_buffer_id" name="referral_buffer_id" value="" />
             </form>
         <?php
         }
