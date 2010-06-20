@@ -11,7 +11,10 @@ class EmployeeEmployerPage extends Page {
     
     function __construct($_session, $_employer_id = '') {
         $this->employee = new Employee($_session['id'], $_session['sid']);
-        $this->employer = new Employer($_employer_id);
+        
+        if (!empty($_employer_id)) {
+            $this->employer = new Employer($_employer_id);
+        }
     }
     
     public function new_employer($_is_new) {
@@ -154,6 +157,10 @@ class EmployeeEmployerPage extends Page {
             
             // get jobs
             $jobs = $this->employer->getJobs();
+        } else if ($this->is_new && !is_null($this->employer)) {
+            // get profile
+            $raw_data = $this->employer->get();
+            $profile = $raw_data[0];
         } else {
             $profile = array(
                 'license_num' => '',
