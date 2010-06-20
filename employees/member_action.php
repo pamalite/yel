@@ -87,6 +87,32 @@ if ($_POST['action'] == 'save_profile') {
     exit();
 }
 
+if ($_POST['action'] == 'approve_photo') {
+    $member = new Member($_POST['id']);
+    $member->setAdmin(true);
+    $photo_info = $member->getPhotoFileInfo();
+    if ($member->approvePhoto($photo_info['id']) === false) {
+        echo 'ko';
+    } else {
+        echo 'ok';
+    }
+    
+    exit();
+}
+
+if ($_POST['action'] == 'reject_photo') {
+    $member = new Member($_POST['id']);
+    $member->setAdmin(true);
+    $photo_info = $member->getPhotoFileInfo();
+    if ($member->deletePhoto($photo_info['id']) === false) {
+        echo 'ko';
+    } else {
+        echo 'ok';
+    }
+    
+    exit();
+}
+
 if ($_POST['action'] == 'get_jobs') {
     $employer = new Employer($_POST['id']);
     

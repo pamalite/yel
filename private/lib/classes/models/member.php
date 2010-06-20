@@ -439,6 +439,18 @@ class Member implements Model {
         return false;
     }
     
+    public function isPhotoApproved() {
+        $query = "SELECT approved 
+                  FROM member_photos 
+                  WHERE member = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['approved'] == 'Y') {
+            return true;
+        }
+        
+        return false;
+    }
+    
     public function getPhotoFileInfo() {
         $photo = array();
         $query = "SELECT id, photo_hash, photo_type 

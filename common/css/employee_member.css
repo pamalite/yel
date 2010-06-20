@@ -13,13 +13,44 @@ input, select, textarea {
     font-size: 12pt;
 }
 
+.photo_image {
+    border: none;
+    vertical-align: middle;    
+}
+
+div.photo {
+    border: 1px solid #CCCCCC;
+    width: 205px;
+    height: 225px;
+    margin: auto;
+    text-align: center;
+    font-size: 9pt;
+    overflow: auto;
+    color: #666666;
+}
+
+table.profile {
+    width: 90%;
+    margin: auto;
+}
+
+table.profile td {
+    vertical-align: top;
+    text-align: center;
+}
+
+table.profile td.photo {
+    width: 50px;
+}
+
 table.profile_form {
-    width: 80%;
+    width: 99%;
     margin: auto;
 }
 
 table.profile_form td {
     font-size: 12pt;
+    text-align: left;
     padding: 3px 3px 3px 3px;
 }
 
@@ -89,6 +120,11 @@ div.buttons_bar {
     padding: 3px 3px 3px 3px;
 }
 
+.photo_buttons {
+    text-align: center;
+    background-color: #CCCCCC;
+    padding: 3px 3px 3px 3px;
+}
 
 #jobs_table {
     margin: auto;

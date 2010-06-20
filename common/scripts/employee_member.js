@@ -189,6 +189,66 @@ function save_profile() {
     request.send(params);
 }
 
+function approve_photo() {
+    var params = 'id=' + member_id;
+    params = params + '&action=approve_photo';
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while approving photo.');
+                return false;
+            }
+            
+            $('accept_btn').disabled = true;
+        },
+        onRequest: function(instance) {
+            set_status('Approving photo...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function reject_photo() {
+    var confirm = window.confirm('Are you sure to reject the uploaded photo?' + "\n\nOnce rejected, the photo will be deleted.");
+    if (!confirm) {
+        return false;
+    }
+    
+    var params = 'id=' + member_id;
+    params = params + '&action=reject_photo';
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while rejecting photo.');
+                return false;
+            }
+            
+            $('photo_buttons').setStyle('display', 'none');
+            $('photo_area').set('html', 'Photo rejected.');
+        },
+        onRequest: function(instance) {
+            set_status('Rejecting photo...');
+        }
+    });
+    
+    request.send(params);
+}
+
 function onDomReady() {
     initialize_page();
     

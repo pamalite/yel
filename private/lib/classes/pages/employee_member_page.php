@@ -179,142 +179,191 @@ class EmployeeMemberPage extends Page {
         </div>
         
         <div id="member_profile">
-            <form id="profile" method="post" onSubmit="return false;">
-                <table class="profile_form">
-                    <tr>
-                        <td class="buttons_bar" colspan="2"><input type="button" onClick="save_profile();" value="Save &amp; Update Profile" /></td>
-                    </tr>
-                    <tr>
-                        <td class="title" colspan="2">Sign In Details</td>
-                    </tr>
-                    <tr>
-                        <td class="label">Email Address:</td>
-                        <td class="field">
-                            <?php
+            <table class="profile">
+                <tr>
+                    <td class="photo">
+                        <div id="photo_area" class="photo">
+                    <?php
+                        if (!$this->is_new && $this->member->hasPhoto()) {
+                     ?>
+                            <img class="photo_image" src="member_photo.php?id=<?php echo $profile['email_addr']; ?>" />
+                     <?php
+                        } else {
+                    ?>
+                            <div style="text-align: center; margin: auto;">
+                    <?php
                             if ($this->is_new) {
-                            ?>
-                            <input class="field" type="text" id="email_addr" value=""  maxlength="50" />
-                            <?php
+                                echo 'Not allowed to upload photo without an account.';
                             } else {
-                                echo $profile['email_addr'];
+                                echo 'No photo uploaded.';
                             }
-                            ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="password">Password:</label></td>
-                        <td class="field">
-                            <?php
-                            if ($this->is_new) {
-                            ?>
-                            <input type="button" value="Reset Password" onClick="reset_password();" disabled />
-                            <?php
+                    ?>
+                            </div>
+                    <?php
+                        }
+                    ?>
+                        </div>
+                    <?php
+                        if (!$this->is_new) {
+                    ?>
+                        <div id="photo_buttons" class="photo_buttons">
+                    <?php
+                            if (!$this->member->isPhotoApproved()) {
+                    ?>
+                            <input type="button" id="accept_btn" value="Accept" onClick="approve_photo();" />
+                    <?php
                             } else {
-                            ?>
-                            <input type="button" value="Reset Password" onClick="reset_password();" />
-                            <?php
+                    ?>
+                            <input type="button" value="Accept" disabled />
+                    <?php
                             }
-                            ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="title" colspan="2">Citizenship</td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="citizenship">Citizen of:</label></td>
-                        <td class="field">
-                            <?php echo $this->generate_countries($profile['citizenship'], 'citizenship'); ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="title" colspan="2">Contact Details</td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="firstname">First Name:</label></td>
-                        <td class="field"><input class="field" type="text" id="firstname" name="firstname" value="<?php echo htmlspecialchars_decode(stripslashes($profile['firstname'])) ?>"  /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="lastname">Last Name:</label></td>
-                        <td class="field"><input class="field" type="text" id="lastname" name="lastname" value="<?php echo htmlspecialchars_decode(stripslashes($profile['lastname'])) ?>"  /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="phone_num">Telephone Number:</label></td>
-                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile['phone_num'] ?>"  /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="address">Mailing Address:</label></td>
-                        <td class="field"><textarea id="address" name="address" ><?php echo htmlspecialchars_decode(stripslashes($profile['address'])) ?></textarea></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="state">State/Province/Area:</label></td>
-                        <td class="field"><input class="field" type="text" id="state" name="state" value="<?php echo $profile['state'] ?>"   /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="zip">Zip/Postal Code:</label></td>
-                        <td class="field"><input class="field" type="text" id="zip" name="zip" value="<?php echo $profile['zip'] ?>"  /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="country">Country:</label></td>
-                        <td class="field">
-                            <?php echo $this->generate_countries($profile['country']); ?>
-                        </</td>
-                    </tr>
-                    <tr>
-                        <td class="title" colspan="2">HRM Census Form</td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="gender">Gender:</label></td>
-                        <td class="field">
-                            <select id="gender" name="hrm_gender">
-                            <?php
-                                if ($this->is_new) {
-                            ?>
-                                <option value="" selected>Select One</option>
-                                <option value="" disabled>&nbsp;</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                            <?php
-                                } else {
-                            ?>
-                                <option value="">Select One</option>
-                                <option value="" disabled>&nbsp;</option>
-                            <?php
-                                    if ($profile['hrm_gender'] == 'male') {
-                            ?>
-                                <option value="male" selected>Male</option>
-                                <option value="female">Female</option>
-                            <?php
-                                    } else {
-                            ?>
-                                <option value="male">Male</option>
-                                <option value="female" selected>Female</option>
-                            <?php
-                                    }
-                                }
-                            ?>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="birthdate_month">Birthdate:</label></td>
-                        <td class="field">
-                        <?php
-                            $birthdate = explode('-', $profile['hrm_birthdate']);
-                            echo generate_month_dropdown('birthdate_month', '', $birthdate[1]);
-                            echo generate_dropdown('birthdate_day', '', 1, 31, $birthdate[2], 2, 'Day');
-                        ?>
-                            <input maxlength="4" style="width: 50px;" type="text" id="birthdate_year" name="birthdate_year" value="<?php echo $birthdate[0] ?>" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="ethnicity">Ethnicity:</label></td>
-                        <td class="field"><input class="field" type="text" id="ethnicity" name="ethnicity" value="<?php echo $profile['hrm_ethnicity'] ?>"  /></td>
-                    </tr>
-                    <tr>
-                        <td class="buttons_bar" colspan="2"><input type="button" onClick="save_profile();" value="Save &amp; Update Profile" /></td>
-                    </tr>
-                </table>
-            </form>
+                    ?>
+                            <input type="button" value="Reject" onClick="reject_photo();" />
+                        </div>
+                    <?php
+                        }
+                    ?>
+                    </td>
+                    <td>
+                        <form id="profile" method="post" onSubmit="return false;">
+                            <table class="profile_form">
+                                <tr>
+                                    <td class="buttons_bar" colspan="2"><input type="button" onClick="save_profile();" value="Save &amp; Update Profile" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="title" colspan="2">Sign In Details</td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Email Address:</td>
+                                    <td class="field">
+                                        <?php
+                                        if ($this->is_new) {
+                                        ?>
+                                        <input class="field" type="text" id="email_addr" value=""  maxlength="50" />
+                                        <?php
+                                        } else {
+                                            echo $profile['email_addr'];
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="password">Password:</label></td>
+                                    <td class="field">
+                                        <?php
+                                        if ($this->is_new) {
+                                        ?>
+                                        <input type="button" value="Reset Password" onClick="reset_password();" disabled />
+                                        <?php
+                                        } else {
+                                        ?>
+                                        <input type="button" value="Reset Password" onClick="reset_password();" />
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="title" colspan="2">Citizenship</td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="citizenship">Citizen of:</label></td>
+                                    <td class="field">
+                                        <?php echo $this->generate_countries($profile['citizenship'], 'citizenship'); ?>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="title" colspan="2">Contact Details</td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="firstname">First Name:</label></td>
+                                    <td class="field"><input class="field" type="text" id="firstname" name="firstname" value="<?php echo htmlspecialchars_decode(stripslashes($profile['firstname'])) ?>"  /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="lastname">Last Name:</label></td>
+                                    <td class="field"><input class="field" type="text" id="lastname" name="lastname" value="<?php echo htmlspecialchars_decode(stripslashes($profile['lastname'])) ?>"  /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="phone_num">Telephone Number:</label></td>
+                                    <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile['phone_num'] ?>"  /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="address">Mailing Address:</label></td>
+                                    <td class="field"><textarea id="address" name="address" ><?php echo htmlspecialchars_decode(stripslashes($profile['address'])) ?></textarea></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="state">State/Province/Area:</label></td>
+                                    <td class="field"><input class="field" type="text" id="state" name="state" value="<?php echo $profile['state'] ?>"   /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="zip">Zip/Postal Code:</label></td>
+                                    <td class="field"><input class="field" type="text" id="zip" name="zip" value="<?php echo $profile['zip'] ?>"  /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="country">Country:</label></td>
+                                    <td class="field">
+                                        <?php echo $this->generate_countries($profile['country']); ?>
+                                    </</td>
+                                </tr>
+                                <tr>
+                                    <td class="title" colspan="2">HRM Census Form</td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="gender">Gender:</label></td>
+                                    <td class="field">
+                                        <select id="gender" name="hrm_gender">
+                                        <?php
+                                            if ($this->is_new) {
+                                        ?>
+                                            <option value="" selected>Select One</option>
+                                            <option value="" disabled>&nbsp;</option>
+                                            <option value="male">Male</option>
+                                            <option value="female">Female</option>
+                                        <?php
+                                            } else {
+                                        ?>
+                                            <option value="">Select One</option>
+                                            <option value="" disabled>&nbsp;</option>
+                                        <?php
+                                                if ($profile['hrm_gender'] == 'male') {
+                                        ?>
+                                            <option value="male" selected>Male</option>
+                                            <option value="female">Female</option>
+                                        <?php
+                                                } else {
+                                        ?>
+                                            <option value="male">Male</option>
+                                            <option value="female" selected>Female</option>
+                                        <?php
+                                                }
+                                            }
+                                        ?>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="birthdate_month">Birthdate:</label></td>
+                                    <td class="field">
+                                    <?php
+                                        $birthdate = explode('-', $profile['hrm_birthdate']);
+                                        echo generate_month_dropdown('birthdate_month', '', $birthdate[1]);
+                                        echo generate_dropdown('birthdate_day', '', 1, 31, $birthdate[2], 2, 'Day');
+                                    ?>
+                                        <input maxlength="4" style="width: 50px;" type="text" id="birthdate_year" name="birthdate_year" value="<?php echo $birthdate[0] ?>" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="ethnicity">Ethnicity:</label></td>
+                                    <td class="field"><input class="field" type="text" id="ethnicity" name="ethnicity" value="<?php echo $profile['hrm_ethnicity'] ?>"  /></td>
+                                </tr>
+                                <tr>
+                                    <td class="buttons_bar" colspan="2"><input type="button" onClick="save_profile();" value="Save &amp; Update Profile" /></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </td>
+                </tr>
+            </table>
         </div>
         
         <div id="member_resumes">
