@@ -41,9 +41,7 @@ if (isset($_SESSION['yel']['employee']['dev'])) {
 
 $member_id = '';
 $is_new = false;
-if (isset($_POST['member_email_addr'])) {
-    $member_id = $_POST['member_email_addr'];
-} else if (isset($_GET['member_email_addr'])) {
+if (isset($_GET['member_email_addr'])) {
     $member_id = $_GET['member_email_addr'];
 } else {
     redirect_to('members.php');
@@ -61,6 +59,11 @@ if (isset($_POST['page'])) {
 }
 
 $page = new EmployeeMemberPage($_SESSION['yel']['employee'], $member_id);
+
+if (isset($_GET['error'])) {
+    $page->set_error($_GET['error']);
+}
+
 $page->new_member($is_new);
 $page->set_page($section);
 $page->header(array('root_dir' => '../', 

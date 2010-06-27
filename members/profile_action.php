@@ -141,11 +141,11 @@ if ($_POST['action'] == 'upload') {
     $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
     
     if ($member->savePhoto($data) === false) {
-        ?><script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script><?php
+        redirect_to('profile.php?error=1');
         exit();
     }
     
-    ?><script type="text/javascript">top.stop_upload(<?php echo "1"; ?>);</script><?php
+    redirect_to('profile.php');
     exit();
 }
 ?>

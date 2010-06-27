@@ -19,6 +19,11 @@ if (!isset($_SESSION['yel']['member']) ||
 }
 
 $home = new MemberProfilePage($_SESSION['yel']['member']);
+
+if (isset($_GET['error'])) {
+    $home->set_error($_GET['error']);
+}
+
 $home->header(array('root_dir' => '../', 
                     'title' => 'Profile'));
 $home->insert_member_profile_css();

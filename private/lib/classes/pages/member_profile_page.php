@@ -8,6 +8,16 @@ class MemberProfilePage extends Page {
         $this->member = new Member($_session['id'], $_session['sid']);
     }
     
+    public function set_error($_error) {
+        switch ($_error) {
+            case '1':
+                $this->error_message = 'An error occured when trying to upload your photo.\\n\\nPlease try again later. Please make sure that the file you are uploading is listed in the resume upload window.\\n\\nIf problem persist, please contact our technical support for further assistance.';
+                break;
+            default:
+                $this->error_message = '';
+        }
+    }
+    
     public function insert_inline_css() {
         // TODO: Any inline CSS for home page goes here.
     }
@@ -27,6 +37,11 @@ class MemberProfilePage extends Page {
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
         echo 'var id = "'. $this->member->getId(). '";'. "\n";
+        
+        if (!empty($this->error_message)) {
+            echo "alert(\"". $this->error_message. "\");\n";
+        }
+        
         echo '</script>'. "\n";
     }
     
@@ -316,7 +331,7 @@ class MemberProfilePage extends Page {
         <!-- popup windows go here -->
         <div id="upload_photo_window" class="popup_window">
             <div class="popup_window_title">Upload Photo</div>
-            <form id="upload_photo_form" action="profile_action.php" method="post" enctype="multipart/form-data" target="upload_target">
+            <form id="upload_photo_form" action="profile_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_upload_photo_popup(true);">
                 <div class="upload_photo_form">
                     <br/>
                     <input type="hidden" name="id" value="<?php echo $this->member->getId(); ?>" />
@@ -337,11 +352,11 @@ class MemberProfilePage extends Page {
                         </div>
                     </div>
                 </div>
+                <div class="popup_window_buttons_bar">
+                    <input type="submit" value="Upload Photo" />
+                    <input type="button" value="Close" onClick="close_upload_photo_popup(false);" />
+                </div>
             </form>
-            <div class="popup_window_buttons_bar">
-                <input type="button" value="Upload Photo" onClick="close_upload_photo_popup(true);" />
-                <input type="button" value="Close" onClick="close_upload_photo_popup(false);" />
-            </div>
         </div>
         
         <div id="unsubscribe_window" class="popup_window">
@@ -357,9 +372,6 @@ class MemberProfilePage extends Page {
                 <input type="button" value="Cancel" onClick="close_unsubscribe_popup(false);" />
             </div>
         </div>
-        
-        <!-- upload target -->
-        <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:0px;height:0px;border:none;"></iframe>
         
         <?php
     }

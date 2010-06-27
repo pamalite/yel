@@ -53,18 +53,14 @@ if ($_POST['action'] == 'upload') {
     if ($_POST['id'] == '0') {
         $resume = new Resume($member->getId());
         if (!$resume->create($data)) {
-            ?>
-                <script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script>
-            <?php
+            redirect_to('resumes.php?error=1');
             exit();
         }
     } else {
         $resume = new Resume($member->getId(), $_POST['id']);
         $is_update = true;
         if (!$resume->update($data)) {
-            ?>
-                <script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script>
-            <?php
+            redirect_to('resumes.php?error=2');
             exit();
         }
     }
@@ -81,11 +77,11 @@ if ($_POST['action'] == 'upload') {
                   DELETE FROM resumes WHERE id = ". $resume->getId();
         $mysqli = Database::connect();
         $mysqli->transact($query);
-        ?><script type="text/javascript">top.stop_upload(<?php echo "0"; ?>);</script><?php
+        redirect_to('resumes.php?error=3');
         exit();
     }
     
-    ?><script type="text/javascript">top.stop_upload(<?php echo "1"; ?>);</script><?php
+    redirect_to('resumes.php');
     exit();
 }
 

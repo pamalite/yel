@@ -1,7 +1,7 @@
-var order = 'desc';
-var order_by = 'created_on';
+var resumes_order = 'desc';
+var resumes_order_by = 'modified_on';
 
-function ascending_or_descending() {
+function resumes_ascending_or_descending() {
     if (order == 'desc') {
         order = 'asc';
     } else {
@@ -11,10 +11,10 @@ function ascending_or_descending() {
 
 function sort_by(_table, _column) {
     switch (_table) {
-        case 'jobs':
+        case 'resumes':
             order_by = _column;
             ascending_or_descending();
-            show_updated_jobs();
+            show_resumes();
             break;
     }
 }
@@ -121,7 +121,6 @@ function show_profile() {
     $('member_resumes').setStyle('display', 'none');
     $('member_notes').setStyle('display', 'none');
     $('member_applications').setStyle('display', 'none');
-    $('job').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '#CCCCCC');
     
@@ -243,6 +242,103 @@ function reject_photo() {
         },
         onRequest: function(instance) {
             set_status('Rejecting photo...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function show_resumes() {
+    $('member_profile').setStyle('display', 'none');
+    $('member_resumes').setStyle('display', 'block');
+    $('member_notes').setStyle('display', 'none');
+    $('member_applications').setStyle('display', 'none');
+    
+    $('item_profile').setStyle('background-color', '');
+    $('item_resumes').setStyle('background-color', '#CCCCCC');
+    $('item_notes').setStyle('background-color', '');
+    $('item_applications').setStyle('background-color', '');
+}
+
+function update_resume(_resume_id) {
+    show_upload_resume_popup(_resume_id);
+}
+
+function show_upload_resume_popup(_resume_id) {
+    $('resume_id').value = _resume_id;
+    $('upload_field').setStyle('display', 'block');
+    show_window('upload_resume_window');
+    window.scrollTo(0, 0);
+}
+
+function close_upload_resume_popup(_is_upload) {
+    if (_is_upload) {
+        if (isEmpty($('my_file').value)) {
+            alert('You need to select a resume to upload.');
+            return false;
+        }
+        
+        close_safari_connection();
+        return true;
+    } else {
+        close_window('upload_resume_window');
+    }
+}
+
+function show_notes() {
+    $('member_profile').setStyle('display', 'none');
+    $('member_resumes').setStyle('display', 'none');
+    $('member_notes').setStyle('display', 'block');
+    $('member_applications').setStyle('display', 'none');
+    
+    $('item_profile').setStyle('background-color', '');
+    $('item_resumes').setStyle('background-color', '');
+    $('item_notes').setStyle('background-color', '#CCCCCC');
+    $('item_applications').setStyle('background-color', '');
+}
+
+function save_notes() {
+    if (isNaN($('expected_salary').value) || isNaN($('expected_salary_end').value) ||
+        isNaN($('current_salary').value) || isNaN($('current_salary_end').value)) {
+        alert('Salary fields must be a number.' + "\n\nEnter 0 if no value required.");
+        return false;
+    }
+    
+    if (isNaN($('notice_period').value)) {
+        alert('Notice period must be a number.' + "\n\nEnter 0 if no value required.");
+        return false;
+    }
+    
+    var params = 'id=' + member_id;
+    params = params + '&action=save_notes';
+    params = params + '&employee=' + user_id;
+    params = params + '&is_active_seeking_job=' + $('is_active_seeking_job').options[$('is_active_seeking_job').selectedIndex].value;
+    params = params + '&seeking=' + encodeURIComponent($('seeking').value);
+    params = params + '&expected_salary=' + $('expected_salary').value;
+    params = params + '&expected_salary_end=' + $('expected_salary_end').value;
+    params = params + '&can_travel_relocate=' + $('can_travel_relocate').options[$('can_travel_relocate').selectedIndex].value;
+    params = params + '&reason_for_leaving=' + encodeURIComponent($('reason_for_leaving').value);
+    params = params + '&current_position=' + encodeURIComponent($('current_position').value);
+    params = params + '&current_salary=' + $('current_salary').value;
+    params = params + '&current_salary_end=' + $('current_salary_end').value;
+    params = params + '&notice_period=' + $('notice_period').value;
+    params = params + '&notes=' + encodeURIComponent($('extra_notes').value);
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while saving notes.');
+                return false;
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Saving notes...');
         }
     });
     

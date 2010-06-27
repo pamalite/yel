@@ -113,6 +113,50 @@ if ($_POST['action'] == 'reject_photo') {
     exit();
 }
 
+if ($_POST['action'] == 'upload_resume') {
+    $resume = NULL;
+    $member = new Member($_POST['member']);
+    $is_update = false;
+    $data = array();
+    $data['modified_on'] = now();
+    $data['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_file']['name']));
+    $data['private'] = 'N';
+    
+    if ($_POST['id'] == '0') {
+        $resume = new Resume($member->getId());
+        if (!$resume->create($data)) {
+            redirect_to('member.php?member_email_addr='. $member->getId(). '&page=resumes&error=1');
+            exit();
+        }
+    } else {
+        $resume = new Resume($member->getId(), $_POST['id']);
+        $is_update = true;
+        if (!$resume->update($data)) {
+            redirect_to('member.php?member_email_addr='. $member->getId(). '&page=resumes&error=2');
+            exit();
+        }
+    }
+    
+    $data = array();
+    $data['FILE'] = array();
+    $data['FILE']['type'] = $_FILES['my_file']['type'];
+    $data['FILE']['size'] = $_FILES['my_file']['size'];
+    $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_file']['name']));
+    $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
+    
+    if ($resume->uploadFile($data, $is_update) === false) {
+        $query = "DELETE FROM resume_index WHERE resume = ". $resume->getId(). ";
+                  DELETE FROM resumes WHERE id = ". $resume->getId();
+        $mysqli = Database::connect();
+        $mysqli->transact($query);
+        redirect_to('member.php?member_email_addr='. $member->getId(). '&page=resumes&error=3');
+        exit();
+    }
+    
+    redirect_to('member.php?member_email_addr='. $member->getId(). '&page=resumes');
+    exit();
+}
+
 if ($_POST['action'] == 'get_jobs') {
     $employer = new Employer($_POST['id']);
     
@@ -134,6 +178,35 @@ if ($_POST['action'] == 'get_jobs') {
     
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array(array('jobs' => array('job' => $result)));
+    exit();
+}
+
+if ($_POST['action'] == 'save_notes') {
+    $member = new Member($_POST['id']);
+    
+    $data = array();
+    $data['is_active_seeking_job'] = $_POST['is_active_seeking_job'];
+    $data['seeking'] = addslashes($_POST['seeking']);
+    $data['expected_salary'] = $_POST['expected_salary'];
+    $data['expected_salary_end'] = $_POST['expected_salary_end'];
+    $data['can_travel_relocate'] = $_POST['can_travel_relocate'];
+    $data['reason_for_leaving'] = addslashes($_POST['reason_for_leaving']);
+    $data['current_position'] = addslashes($_POST['current_position']);
+    $data['current_salary'] = $_POST['current_salary'];
+    $data['current_salary_end'] = $_POST['current_salary_end'];
+    $data['notice_period'] = $_POST['notice_period'];
+    
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    if ($member->saveNotes($_POST['notes']) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
     exit();
 }
 

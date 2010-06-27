@@ -200,7 +200,7 @@ class EmployeeMembersPage extends Page {
                 foreach ($members as $i=>$member) {
                     $members_table->set($i+1, 0, $member['formatted_joined_on'], '', 'cell');
 
-                    $member_short_details = '<a class="no_link member_link" onClick="show_member(\''. $member['email_addr']. '\');">'. desanitize($member['member']). '</a>'. "\n";
+                    $member_short_details = '<a class="member_link" href="member.php?member_email_addr='. $member['email_addr']. '">'. desanitize($member['member']). '</a>'. "\n";
                     $member_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $member['phone_num']. '</div>'. "\n";
                     $member_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $member['email_addr']. '">'. $member['email_addr']. '</a></div>'. "\n";
                     $members_table->set($i+1, 1, $member_short_details, '', 'cell');

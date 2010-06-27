@@ -230,26 +230,6 @@ function show_unsubscribe_popup() {
     window.scrollTo(0, 0);
 }
 
-function start_upload() {
-    $('upload_progress').setStyle('display', 'block');
-    $('upload_field').setStyle('display', 'none');
-    return true;
-}
-
-function stop_upload(_success) {
-    var result = '';
-    $('upload_progress').setStyle('display', 'none');
-    if (_success == 1) {
-        close_window('upload_photo_window');
-        location.reload();
-        return true;
-    } else {
-        $('upload_field').setStyle('display', 'block');
-        alert('An error occured while uploading your photo. Make sure your photo meets the conditions stated.');
-        return false;
-    }
-}
-
 function close_upload_photo_popup(_is_upload) {
     if (_is_upload) {
         if (isEmpty($('my_file').value)) {
@@ -257,8 +237,8 @@ function close_upload_photo_popup(_is_upload) {
             return false;
         }
         
-        $('upload_photo_form').submit();
-        start_upload();
+        close_safari_connection();
+        return true;
     } else {
         close_window('upload_photo_window');
     }

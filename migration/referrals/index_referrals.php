@@ -6,7 +6,7 @@ require_once dirname(__FILE__). "/../../private/lib/utilities.php";
 $mysqli = Database::connect();
 
 // 1. Get all referrals and their notes and testimony
-$query = "SELECT id, notes, testimony
+$query = "SELECT id, testimony
           FROM referrals";
 $result = $mysqli->query($query);
 

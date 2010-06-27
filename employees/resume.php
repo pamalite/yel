@@ -74,7 +74,7 @@ $cover = $resume->get();
 $member = new Member($cover[0]['member']);
 $query = "SELECT COUNT(*) AS has_photo 
           FROM member_photos 
-          WHERE member = '". $member->id(). "'";
+          WHERE member = '". $member->getId(). "'";
 $mysqli = Database::connect();
 $result = $mysqli->query($query);
 
@@ -93,7 +93,7 @@ if (!is_null($cover[0]['file_name'])) {
             </div>
             <br/>
             <div style="text-align: center;">
-                <img src="candidate_photo.php?id=<?php echo $member->id() ?>" style="border: none;" />
+                <img src="member_photo.php?id=<?php echo $member->getId() ?>" style="border: none;" />
             </div>
         <?php
     } else {
@@ -153,7 +153,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
                 ?>
         <tr>
             <td colspan="2" class="title" style="border: none; ">
-                <img style="border: none; vertical-align: top;" src="candidate_photo.php?id=<?php echo $member->id(); ?>" />
+                <img style="border: none; vertical-align: top;" src="candidate_photo.php?id=<?php echo $member->getId(); ?>" />
             </td>
         </tr>
         <tr>

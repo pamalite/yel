@@ -126,30 +126,33 @@ div.buttons_bar {
     padding: 3px 3px 3px 3px;
 }
 
-#jobs_table {
+#resumes_table {
     margin: auto;
     width: 100%;
     border-collapse: collapse;
 }
 
-#jobs_table tr:hover  {
+#resumes_table td { 
+    vertical-align: baseline;
+}
+
+#resumes_table td.actions {
+    vertical-align: middle;
+    text-align: center;
+}
+
+#resumes_table tr:hover  {
     background-color: #FFFF00;
 }
 
-#job_form {
+table.buttons {
+    width: 100%;
     margin: auto;
-    width: 65%;
-    border-spacing: 5px;
+    background-color: #CCCCCC;
 }
 
-#job_form td {
-    padding: 3px 3px 3px 3px;
-    font-size: 12pt;
-    vertical-align: top;
-}
-
-#job_form td.label {
-    width: 15%;
+table.buttons td.right {
+    text-align: right;
 }
 
 #industry {
@@ -157,6 +160,60 @@ div.buttons_bar {
     width: 98%;
 }
 
-.job_description {
-    height: 550px;
+#upload_resume_window {
+    width: 450px;
+    display: none;
+}
+
+#upload_progress {
+    display: none;
+}
+
+.upload_resume_form {
+    width: 99%;
+    height: 165px;
+    margin: auto;
+    overflow: auto;
+}
+
+.upload_field {
+    margin-top: 3px;
+    text-align: center;
+    margin: auto;
+    width: 100%;
+}
+
+table.notes_form {
+    width: 75%;
+    margin: auto;
+}
+
+table.notes_form td {
+    font-size: 12pt;
+    text-align: left;
+    padding: 3px 3px 3px 3px;
+}
+
+table.notes_form td.buttons_bar {
+    text-align: right;
+    background-color: #CCCCCC;
+}
+
+table.notes_form td.label {
+    width: 35%;
+
+}
+
+table.notes_form td.title {
+    text-align: center;
+    border: 1px solid #CCCCCC;
+    font-weight: bold;
+}
+
+.salary {
+    width: 10%;
+}
+
+#extra_notes {
+    height: 250px;
 }

@@ -77,42 +77,18 @@ function close_upload_resume_popup(_is_upload) {
             return false;
         }
         
-        $('upload_resume_form').submit();
-        start_upload();
+        close_safari_connection();
+        return true;
     } else {
         close_window('upload_resume_window');
     }
 }
 
 function show_upload_resume_popup(_resume_id) {
-    /*if (Browser.Engine.webkit) {
-        var msg = 'NOTE: To Safari/Chrome (WebKit) on Mac OS X users, the mentioned browsers have a problem uploading any file through this page.\n\nPlease try Firefox to upload your resume.';
-        alert(msg);
-    }*/
-    
     $('resume_id').value = _resume_id;
     $('upload_field').setStyle('display', 'block');
     show_window('upload_resume_window');
     window.scrollTo(0, 0);
-}
-
-function start_upload() {
-    $('upload_progress').setStyle('display', 'block');
-    $('upload_field').setStyle('display', 'none');
-    return true;
-}
-
-function stop_upload(_success) {
-    var result = '';
-    $('upload_progress').setStyle('display', 'none');
-    if (_success == 1) {
-        close_window('upload_resume_window');
-        show_resumes();
-    } else {
-        $('upload_field').setStyle('display', 'block');
-        alert('An error occured while uploading your resume. Make sure your resume file meets the conditions stated.');
-        return false;
-    }
 }
 
 function onDomReady() {

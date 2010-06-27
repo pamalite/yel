@@ -662,5 +662,31 @@ class Member implements Model {
         }
         return $this->mysqli->transact($query);
     }
+    
+    public function getNotes() {
+        $query = "SELECT notes FROM member_index WHERE member = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        return $result[0]['notes'];
+    }
+    
+    public function saveNotes($_notes) {
+        $simplified_notes = '';
+        $simplified_notes = htmlspecialchars_decode($_notes);
+        $simplified_notes = str_replace('<br/>', "\n", $simplified_notes);
+        $simplified_notes = addslashes($simplified_notes);
+        
+        $query = "SELECT COUNT(*) AS is_exists FROM member_index WHERE member = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['is_exists'] > 0) {
+            $query = "UPDATE member_index SET notes = '". $simplified_notes. "' 
+                      WHERE member = '". $this->id. "'";
+        } else {
+            $query = "INSERT INTO member_index SET 
+                      notes = '". $simplified_notes. "', 
+                      member = '". $this->id. "'";
+        }
+        
+        return $this->mysqli->execute($query);
+    }
 }
 ?>

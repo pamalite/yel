@@ -7,6 +7,7 @@ class EmployeeMemberPage extends Page {
     private $member = NULL;
     private $is_new = false;
     private $current_page = 'profile';
+    private $error_message = '';
     
     function __construct($_session, $_member_id = '') {
         $this->employee = new Employee($_session['id'], $_session['sid']);
@@ -19,6 +20,22 @@ class EmployeeMemberPage extends Page {
     
     public function set_page($_page) {
         $this->current_page = $_page;
+    }
+    
+    public function set_error($_error) {
+        switch ($_error) {
+            case '1':
+                $this->error_message = 'An error occured when trying to create a new resume placeholder.';
+                break;
+            case '2':
+                $this->error_message = 'An error occured when trying to update your resume.';
+                break;
+            case '3':
+                $this->error_message = 'An error occured when uploading your resume. \\n\\nPlease make sure that the file you are uploading is listed in the resume upload window.';
+                break;
+            default:
+                $this->error_message = '';
+        }
     }
     
     public function insert_inline_css() {
@@ -43,6 +60,10 @@ class EmployeeMemberPage extends Page {
         echo 'var id = "'. $this->employee->getId(). '";'. "\n";
         echo 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
         echo 'var current_page = "'. $this->current_page. '";'. "\n";
+        
+        if (!empty($this->error_message)) {
+            echo "alert(\"". $this->error_message. "\");\n";
+        }
         
         if ($this->is_new) {
             echo 'var member_id = "0";'. "\n";
@@ -124,6 +145,18 @@ class EmployeeMemberPage extends Page {
         echo '</select>'. "\n";
     }
     
+    private function get_resumes() {
+        $resume = new Resume();
+        
+        $criteria = array(
+            'columns' => "id, file_name, DATE_FORMAT(modified_on, '%e %b, %Y') AS formatted_modified_on", 
+            'match' => "member = '". $this->member->getId(). "' AND deleted = 'N'", 
+            'order' => "modified_on DESC"
+        );
+        
+        return $resume->find($criteria);
+    }
+    
     public function show() {
         $this->begin();
         $this->top('Member');
@@ -137,6 +170,12 @@ class EmployeeMemberPage extends Page {
             // get profile
             $raw_data = $this->member->get();
             $profile = $raw_data[0];
+            
+            // get resumes
+            $profile['resumes'] = $this->get_resumes();
+            
+            // get notes
+            $profile['notes'] = $this->member->getNotes();
         } else {
             $profile = array(
                 'email_addr' => '',
@@ -150,7 +189,8 @@ class EmployeeMemberPage extends Page {
                 'hrm_gender' => '',
                 'hrm_ethicnity' => '',
                 'hrm_birthdate' => '1957-08-31',
-                'citizenship' => $branch[0]['country']
+                'citizenship' => $branch[0]['country'],
+                'resumes' => array()
             );
         }
         
@@ -164,9 +204,9 @@ class EmployeeMemberPage extends Page {
             <?php
             if (!$this->is_new) {
             ?>
-                <li id="item_resumes" style="<?php echo ($this->current_page == 'resumes') ? $style : ''; ?>"><a class="menu" onClick="show_resumes();">Resumes</a></li>
-                <li id="item_notes" style="<?php echo ($this->current_page == 'notes') ? $style : ''; ?>"><a class="menu" onClick="show_notes();">Notes</a></li>
-                <li id="item_applications" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_applications();">Applications</a></li>
+                <li id="item_resumes" style="<?php echo ($this->current_page == 'resumes') ? $style : ''; ?>"><a class="menu" onClick="show_resumes(false);">Resumes</a></li>
+                <li id="item_notes" style="<?php echo ($this->current_page == 'notes') ? $style : ''; ?>"><a class="menu" onClick="show_notes(false);">Notes</a></li>
+                <li id="item_applications" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_applications(false);">Applications</a></li>
             <?php
             }
             ?>
@@ -367,65 +407,155 @@ class EmployeeMemberPage extends Page {
         </div>
         
         <div id="member_resumes">
+            <table class="buttons">
+                <tr>
+                    <td class="right">
+                        <input type="button" id="upload_new_resume" name="upload_new_resume" value="Upload Resume" onClick="show_upload_resume_popup(0);" />
+                    </td>
+                </tr>
+            </table>
+            <div id="div_resumes">
+            <?php
+                if (empty($profile['resumes'])) {
+            ?>
+                <div class="empty_results">No resumes uploaded.</div>
+            <?php
+                } else {
+                    $resumes_table = new HTMLTable('resumes_table', 'resumes');
+
+                    $resumes_table->set(0, 0, "Modified On", '', 'header');
+                    $resumes_table->set(0, 1, "Resume", '', 'header');
+                    $resumes_table->set(0, 2, "&nbsp;", '', 'header actions');
+
+                    foreach ($profile['resumes'] as $i=>$resume) {
+                        $resumes_table->set($i+1, 0, $resume['formatted_modified_on'], '', 'cell');
+                        $resumes_table->set($i+1, 1, '<a href="resume.php?id='. $resume['id']. '">'. $resume['file_name']. '</a>', '', 'cell');
+                        $resumes_table->set($i+1, 2, '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>', '', 'cell actions');
+                        //$resumes_table->set($i+1, 2, '<a class="no_link" onClick="delete_resume('. $resume['id']. ');">Delete</a>&nbsp;|&nbsp;<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>', '', 'cell actions');
+                    }
+
+                    echo $resumes_table->get_html();
+                }
+            ?>
+            </div>
+            <table class="buttons">
+                <tr>
+                    <td class="right">
+                        <input type="button" id="upload_new_resume" name="upload_new_resume" value="Upload Resume" onClick="show_upload_resume_popup(0);" />
+                    </td>
+                </tr>
+            </table>
         </div>
         
         <div id="member_notes">
+            <form id="notes" method="post" onSubmit="return false;">
+                <table class="notes_form">
+                    <tr>
+                        <td class="buttons_bar" colspan="2"><input type="button" onClick="save_notes();" value="Save &amp; Update Notes" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="is_active_seeking_job">Seeking for a Job:</label></td>
+                        <td class="field">
+                            <select id="is_active_seeking_job">
+                            <?php
+                                if ($profile['is_active_seeking_job'] == '1') {
+                            ?>
+                                <option value="1" selected>Yes</option>
+                                <option value="0">No</option>
+                            <?php
+                                } else {
+                            ?>
+                                <option value="1">Yes</option>
+                                <option value="0" selected>No</option>
+                            <?php
+                                }
+                            ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="seeking">Job Seeking:</label></td>
+                        <td class="field"><textarea id="seeking"><?php echo htmlspecialchars_decode(stripslashes($profile['seeking'])) ?></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="expected_salary">Expected Salary:</label></td>
+                        <td class="field"><?php echo $branch[0]['currency']; ?>$ &nbsp;<input class="salary" type="text" id="expected_salary" value="<?php echo $profile['expected_salary'] ?>" /> - <input class="salary" type="text" id="expected_salary_end" value="<?php echo $profile['expected_salary_end'] ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="can_travel_relocate">Willing to Travel or Relocate:</label></td>
+                        <td class="field">
+                            <select id="can_travel_relocate">
+                            <?php
+                                if ($profile['can_travel_relocate'] == 'Y') {
+                            ?>
+                                <option value="Y" selected>Yes</option>
+                                <option value="N">No</option>
+                            <?php
+                                } else {
+                            ?>
+                                <option value="Y">Yes</option>
+                                <option value="N" selected>No</option>
+                            <?php
+                                }
+                            ?>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="reason_for_leaving">Reason for leaving:</label></td>
+                        <td class="field"><textarea id="reason_for_leaving"><?php echo htmlspecialchars_decode(stripslashes($profile['reason_for_leaving'])) ?></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="current_position">Current position:</label></td>
+                        <td class="field"><textarea id="current_position"><?php echo htmlspecialchars_decode(stripslashes($profile['current_position'])) ?></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="current_salary">Current Salary:</label></td>
+                        <td class="field"><?php echo $branch[0]['currency']; ?>$ &nbsp;<input class="salary" type="text" id="current_salary" value="<?php echo $profile['current_salary'] ?>" /> - <input class="salary" type="text" id="current_salary_end" value="<?php echo $profile['current_salary_end'] ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="notice_period">Notice Period:</label></td>
+                        <td class="field"><input class="salary" type="text" id="notice_period" value="<?php echo $profile['notice_period'] ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="extra_notes">Extra Notes/Remarks:</label></td>
+                        <td class="field"><textarea id="extra_notes"><?php echo htmlspecialchars_decode(stripslashes($profile['notes'])) ?></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="buttons_bar" colspan="2"><input type="button" onClick="save_notes();" value="Save &amp; Update Notes" /></td>
+                    </tr>
+                </table>
+            </form>
         </div>
         
         <div id="member_applications">
         </div>
         
-        <div id="job">
-            <form method="post"onSubmit="return false;">
-                <input type="hidden" id="job_id" value="0" />
-                <table id="job_form" class="job_form">
-                    <tr>
-                        <td class="label"><label for="job.title">Title:</label></td>
-                        <td class="field"><input class="field" type="text" id="job.title" name="title" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="job.alternate_member">Alternate Employer:</label></td>
-                        <td class="field"><input class="field" type="text" id="job.alternate_member" name="alternate_member" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="job.contact_carbon_copy">Extra Contacts:</label></td>
-                        <td class="field"><input class="field" type="text" id="job.contact_carbon_copy" name="contact_carbon_copy" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="job.industry">Specialization:</label></td>
-                        <td class="field"><?php $this->generate_industries('', 'job.industry'); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="job.country">Country:</label></td>
-                        <td class="field"><?php $this->generate_countries('', 'job.country'); ?></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="job.state">State/Province/Area:</label></td>
-                        <td class="field"><input type="text" class="field" id="job.state" name="state" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="job.salary">Monthly Salary:</label></td>
-                        <td class="field">
-                            <?php echo $branch[0]['currency']; ?>$ <input class="salary" type="text" id="job.salary" name="salary" />&nbsp;-&nbsp;<input class="salary" type="text" id="job.salary_end" name="salary_end" /><br>
-                            <input type="checkbox" id="job.salary_negotiable" name="salary_negotiable" /> <label for="job.salary_negotiable">Negotiable</label><br/>
-                            <p class="small_notes">This account allows you to create job ads with salary in <span id="job.member.currency_2"></span> only. If you wish to create job ads with salary in other currencies, please log into the relevant accounts.</p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label center" colspan="2"><label for="job.description">Description:</label></td>
-                    </tr>
-                    <tr>
-                        <td class="field center" colspan="2"><textarea id="job.description" name="description" class="job_description"></textarea></td>
-                    </tr>
-                </table>
-                <div class="buttons_bar">
-                    <input class="button" type="button" value="Cancel" onClick="show_jobs();" />
-                    <input class="button" type="button" value="Publish" onClick="save_job();" />
+        <!-- popup windows goes here -->
+        <div id="upload_resume_window" class="popup_window">
+            <div class="popup_window_title">Upload Resume</div>
+            <form id="upload_resume_form" action="member_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_upload_resume_popup(true);">
+                <div class="upload_resume_form">
+                    <input type="hidden" id="resume_id" name="id" value="0" />
+                    <input type="hidden" name="member" value="<?php echo $this->member->getId(); ?>" />
+                    <input type="hidden" name="action" value="upload_resume" />
+                    <div id="upload_field" class="upload_field">
+                        <input id="my_file" name="my_file" type="file" />
+                        <div style="font-size: 9pt; margin-top: 15px;">
+                            <ol>
+                                <li>Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 1MB are allowed.</li>
+                                <li>You can upload as many resumes as you want and designate them for different job applications.</li>
+                                <li>You can update your resume by clicking &quot;Update&quot; then upload an updated version.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup_window_buttons_bar">
+                     <input type="submit" value="Upload" />
+                     <input type="button" value="Cancel" onClick="close_upload_resume_popup(false);" />
                 </div>
             </form>
         </div>
-        
-        <!-- popup windows goes here -->
         
         <?php
     }

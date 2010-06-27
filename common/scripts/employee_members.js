@@ -90,7 +90,7 @@ function show_members() {
                     
                     row.set(0, new Cell(joined_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
-                    var short_desc = '<a class="no_link member_link" onClick="show_member(\'' + emails[i].childNodes[0].nodeValue + '\');">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
                     
                     var phone_num = '';
                     if (phone_nums[i].childNodes.length > 0) {

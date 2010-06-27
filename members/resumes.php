@@ -19,6 +19,11 @@ if (!isset($_SESSION['yel']['member']) ||
 }
 
 $home = new MemberResumesPage($_SESSION['yel']['member']);
+
+if (isset($_GET['error'])) {
+    $home->set_error($_GET['error']);
+}
+
 $home->header(array('root_dir' => '../', 
                     'title' => 'Resumes'));
 $home->insert_member_resumes_css();

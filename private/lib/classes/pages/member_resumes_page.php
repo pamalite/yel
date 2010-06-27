@@ -4,9 +4,26 @@ require_once dirname(__FILE__). '/../htmltable.php';
 
 class MemberResumesPage extends Page {
     private $member = NULL;
+    private $error_message = '';
     
     function __construct($_session) {
         $this->member = new Member($_session['id'], $_session['sid']);
+    }
+    
+    public function set_error($_error) {
+        switch ($_error) {
+            case '1':
+                $this->error_message = 'An error occured when trying to create a new resume placeholder.\\n\\nPlease try again later. If problem persist, please contact our technical support for further assistance.';
+                break;
+            case '2':
+                $this->error_message = 'An error occured when trying to update your resume.\\n\\nPlease try again later. If problem persist, please contact our technical support for further assistance.';
+                break;
+            case '3':
+                $this->error_message = 'An error occured when uploading your resume. \\n\\nPlease try again later. Please make sure that the file you are uploading is listed in the resume upload window.\\n\\nIf problem persist, please contact our technical support for further assistance.';
+                break;
+            default:
+                $this->error_message = '';
+        }
     }
     
     public function insert_inline_css() {
@@ -29,6 +46,11 @@ class MemberResumesPage extends Page {
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
         echo 'var id = "'. $this->member->getId(). '";'. "\n";
+        
+        if (!empty($this->error_message)) {
+            echo "alert(\"". $this->error_message. "\");\n";
+        }
+        
         echo '</script>'. "\n";
     }
     
@@ -98,7 +120,7 @@ class MemberResumesPage extends Page {
         <!-- popups goes here -->
         <div id="upload_resume_window" class="popup_window">
             <div class="popup_window_title">Upload Resume</div>
-            <form id="upload_resume_form" action="resumes_action.php" method="post" enctype="multipart/form-data" target="upload_target">
+            <form id="upload_resume_form" action="resumes_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_upload_resume_popup(true);">
                 <div class="upload_resume_form">
                     <input type="hidden" id="resume_id" name="id" value="0" />
                     <input type="hidden" name="member" value="<?php echo $this->member->getId(); ?>" />
@@ -118,16 +140,12 @@ class MemberResumesPage extends Page {
                         </div>
                     </div>
                 </div>
+                <div class="popup_window_buttons_bar">
+                     <input type="submit" value="Upload" />
+                     <input type="button" value="Cancel" onClick="close_upload_resume_popup(false);" />
+                </div>
             </form>
-            <div class="popup_window_buttons_bar">
-                 <input type="button" value="Upload" onClick="close_upload_resume_popup(true);" />
-                 <input type="button" value="Cancel" onClick="close_upload_resume_popup(false);" />
-            </div>
         </div>
-        
-        <!-- upload target -->
-        <iframe id="upload_target" name="upload_target" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/blank.php" style="width:0px;height:0px;border:none;"></iframe>
-        
         <?php
     }
 }
