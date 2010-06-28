@@ -120,6 +120,7 @@ function show_profile() {
     $('member_profile').setStyle('display', 'block');
     $('member_resumes').setStyle('display', 'none');
     $('member_notes').setStyle('display', 'none');
+    $('member_connections').setStyle('display', 'none');
     $('member_applications').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '#CCCCCC');
@@ -127,6 +128,7 @@ function show_profile() {
     if (member_id != "0") {
         $('item_resumes').setStyle('background-color', '');
         $('item_notes').setStyle('background-color', '');
+        $('item_connections').setStyle('background-color', '');
         $('item_applications').setStyle('background-color', '');
     }
 }
@@ -252,11 +254,13 @@ function show_resumes() {
     $('member_profile').setStyle('display', 'none');
     $('member_resumes').setStyle('display', 'block');
     $('member_notes').setStyle('display', 'none');
+    $('member_connections').setStyle('display', 'none');
     $('member_applications').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
     $('item_resumes').setStyle('background-color', '#CCCCCC');
     $('item_notes').setStyle('background-color', '');
+    $('item_connections').setStyle('background-color', '');
     $('item_applications').setStyle('background-color', '');
 }
 
@@ -289,11 +293,13 @@ function show_notes() {
     $('member_profile').setStyle('display', 'none');
     $('member_resumes').setStyle('display', 'none');
     $('member_notes').setStyle('display', 'block');
+    $('member_connections').setStyle('display', 'none');
     $('member_applications').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
     $('item_resumes').setStyle('background-color', '');
     $('item_notes').setStyle('background-color', '#CCCCCC');
+    $('item_connections').setStyle('background-color', '');
     $('item_applications').setStyle('background-color', '');
 }
 
@@ -344,6 +350,21 @@ function save_notes() {
     
     request.send(params);
 }
+
+function show_connections() {
+    $('member_profile').setStyle('display', 'none');
+    $('member_resumes').setStyle('display', 'none');
+    $('member_notes').setStyle('display', 'none');
+    $('member_connections').setStyle('display', 'block');
+    $('member_applications').setStyle('display', 'none');
+    
+    $('item_profile').setStyle('background-color', '');
+    $('item_resumes').setStyle('background-color', '');
+    $('item_notes').setStyle('background-color', '');
+    $('item_connections').setStyle('background-color', '#CCCCCC');
+    $('item_applications').setStyle('background-color', '');
+}
+
 
 function onDomReady() {
     initialize_page();

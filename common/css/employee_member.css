@@ -83,8 +83,8 @@ textarea {
     height: 90px;
 }
 
-#member_resumes, $member_notes, 
-#member_applications, #job {
+#member_resumes, #member_notes, 
+#member_applications, #member_connections {
     display: none;
 }
 
@@ -212,6 +212,54 @@ table.notes_form td.title {
 
 .salary {
     width: 10%;
+}
+
+#connections {
+    text-align: center;
+    margin: auto;
+    width: 100%;
+}
+
+#connections_table {
+    margin: auto;
+    width: 100%;
+}
+
+#connections_table td.connections {
+    width: 50%;
+    vertical-align: top;
+    text-align: center;
+}
+
+#connections_table td.border {
+    width: 5px;
+    border-left: 1px dashed #CCCCCC;
+}
+
+#div_referrers, #div_referees {
+    width: 99%;
+}
+
+#referrers_table, #referees_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#referrers_table td, #referees_table td {
+    vertical-align: baseline;
+}
+
+#referrers_table td.actions, 
+#referees_table td.actions {
+    vertical-align: middle;
+    text-align: center;
+    width: 5%;
+}
+
+#referrers_table tr:hover, 
+#referees_table tr:hover {
+    background-color: #FFFF00;
 }
 
 #extra_notes {

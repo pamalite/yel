@@ -157,9 +157,31 @@ class EmployeeMemberPage extends Page {
         return $resume->find($criteria);
     }
     
+    private function get_referrers() {
+        $criteria = array(
+            'columns' => "members.email_addr, CONCAT(members.firstname, ', ', members.lastname) AS referrer",
+            'joins' => "member_referees ON members.email_addr = member_referees.member", 
+            'match' => "member_referees.referee = '". $this->member->getId(). "'", 
+            'order' => "members.lastname ASC"
+        );
+        
+        return $this->member->find($criteria);
+    }
+    
+    private function get_referees() {
+        $criteria = array(
+            'columns' => "members.email_addr, CONCAT(members.firstname, ', ', members.lastname) AS referee",
+            'joins' => "member_referees ON members.email_addr = member_referees.referee", 
+            'match' => "member_referees.member = '". $this->member->getId(). "'", 
+            'order' => "members.lastname ASC"
+        );
+        
+        return $this->member->find($criteria);
+    }
+    
     public function show() {
         $this->begin();
-        $this->top('Member');
+        $this->top('Member - '. htmlspecialchars_decode(stripslashes($this->member->getFullName())));
         $this->menu_employee('members');
         
         $branch = $this->employee->getBranch();
@@ -176,6 +198,11 @@ class EmployeeMemberPage extends Page {
             
             // get notes
             $profile['notes'] = $this->member->getNotes();
+            
+            // get the referrers and referees
+            //$profile['referrers'] = $this->get_referrers();
+            $profile['referrers'] = $this->get_referees();
+            $profile['referees'] = $this->get_referees();
         } else {
             $profile = array(
                 'email_addr' => '',
@@ -206,6 +233,7 @@ class EmployeeMemberPage extends Page {
             ?>
                 <li id="item_resumes" style="<?php echo ($this->current_page == 'resumes') ? $style : ''; ?>"><a class="menu" onClick="show_resumes(false);">Resumes</a></li>
                 <li id="item_notes" style="<?php echo ($this->current_page == 'notes') ? $style : ''; ?>"><a class="menu" onClick="show_notes(false);">Notes</a></li>
+                <li id="item_connections" style="<?php echo ($this->current_page == 'connections') ? $style : ''; ?>"><a class="menu" onClick="show_connections(false);">Connections</a></li>
                 <li id="item_applications" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_applications(false);">Applications</a></li>
             <?php
             }
@@ -430,8 +458,7 @@ class EmployeeMemberPage extends Page {
                     foreach ($profile['resumes'] as $i=>$resume) {
                         $resumes_table->set($i+1, 0, $resume['formatted_modified_on'], '', 'cell');
                         $resumes_table->set($i+1, 1, '<a href="resume.php?id='. $resume['id']. '">'. $resume['file_name']. '</a>', '', 'cell');
-                        $resumes_table->set($i+1, 2, '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>', '', 'cell actions');
-                        //$resumes_table->set($i+1, 2, '<a class="no_link" onClick="delete_resume('. $resume['id']. ');">Delete</a>&nbsp;|&nbsp;<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>', '', 'cell actions');
+                        $resumes_table->set($i+1, 2, '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>&nbsp;<a class="no_link" onClick="apply_job_with('. $resume['id']. ');">Applu Job</a>', '', 'cell actions');
                     }
 
                     echo $resumes_table->get_html();
@@ -526,6 +553,78 @@ class EmployeeMemberPage extends Page {
                     </tr>
                 </table>
             </form>
+        </div>
+        
+        <div id="member_connections">
+            <table class="buttons">
+                <tr>
+                    <td class="right">
+                        <input type="button" value="Add Referrers" onClick="show_add_referrers_popup();" />
+                        <input type="button" value="Add Candidates" onClick="show_add_candidates_popup();" />
+                    </td>
+                </tr>
+            </table>
+            <div id="connections">
+                <table id="connections_table">
+                    <tr>
+                        <td class="connections">
+                            <div id="div_referrers">
+                            <?php
+                                if (empty($profile['referrers'])) {
+                            ?>
+                                <div class="empty_results">No referrers found.</div>
+                            <?php
+                                } else {
+                                    $referrers_table = new HTMLTable('referrers_table', 'referrers');
+
+                                    $referrers_table->set(0, 0, "Referrer (Who referred me?)", '', 'header');
+                                    $referrers_table->set(0, 1, "&nbsp;", '', 'header actions');
+
+                                    foreach ($profile['referrers'] as $i=>$referrer) {
+                                        $referrers_table->set($i+1, 0, '<a href="member.php?member_email_addr='. $referrer['email_addr']. '">'. $referrer['referrer']. '</a>', '', 'cell');
+                                        $referrers_table->set($i+1, 1, '<a class="no_link" onClick="remove_referrer('. $referrer['email_addr']. ');">Remove</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a class="no_link" onClick="reward('. $referrer['email_addr']. ');">Reward</a>', '', 'cell actions');
+                                    }
+
+                                    echo $referrers_table->get_html();
+                                }
+                            ?>
+                            </div>
+                        </td>
+                        <td class="border">&nbsp;</td>
+                        <td class="connections">
+                            <div id="div_referees">
+                            <?php
+                                if (empty($profile['referees'])) {
+                            ?>
+                                <div class="empty_results">No candidates found.</div>
+                            <?php
+                                } else {
+                                    $referees_table = new HTMLTable('referees_table', 'referees');
+
+                                    $referees_table->set(0, 0, "Candidate (I referred who?)", '', 'header');
+                                    $referees_table->set(0, 1, "&nbsp;", '', 'header actions');
+
+                                    foreach ($profile['referees'] as $i=>$referee) {
+                                        $referees_table->set($i+1, 0, '<a href="member.php?member_email_addr='. $referee['email_addr']. '">'. $referee['referee']. '</a>', '', 'cell');
+                                        $referees_table->set($i+1, 1, '<a class="no_link" onClick="remove_referee('. $referee['email_addr']. ');">Remove</a>', '', 'cell actions');
+                                    }
+
+                                    echo $referees_table->get_html();
+                                }
+                            ?>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <table class="buttons">
+                <tr>
+                    <td class="right">
+                        <input type="button" value="Add Referrers" onClick="show_add_referrers_popup();" />
+                        <input type="button" value="Add Candidates" onClick="show_add_candidates_popup();" />
+                    </td>
+                </tr>
+            </table>
         </div>
         
         <div id="member_applications">
