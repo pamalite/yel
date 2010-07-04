@@ -556,18 +556,17 @@ class EmployeeMemberPage extends Page {
         </div>
         
         <div id="member_connections">
-            <table class="buttons">
-                <tr>
-                    <td class="right">
-                        <input type="button" value="Add Referrers" onClick="show_add_referrers_popup();" />
-                        <input type="button" value="Add Candidates" onClick="show_add_candidates_popup();" />
-                    </td>
-                </tr>
-            </table>
             <div id="connections">
                 <table id="connections_table">
                     <tr>
                         <td class="connections">
+                            <table class="buttons">
+                                <tr>
+                                    <td class="right">
+                                        <input type="button" value="Add Referrer" onClick="show_add_referrers_popup();" />
+                                    </td>
+                                </tr>
+                            </table>
                             <div id="div_referrers">
                             <?php
                                 if (empty($profile['referrers'])) {
@@ -589,9 +588,23 @@ class EmployeeMemberPage extends Page {
                                 }
                             ?>
                             </div>
+                            <table class="buttons">
+                                <tr>
+                                    <td class="right">
+                                        <input type="button" value="Add Referrer" onClick="show_add_referrers_popup();" />
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                         <td class="border">&nbsp;</td>
                         <td class="connections">
+                            <table class="buttons">
+                                <tr>
+                                    <td class="right">
+                                        <input type="button" value="Add Candidate" onClick="show_add_candidates_popup();" />
+                                    </td>
+                                </tr>
+                            </table>
                             <div id="div_referees">
                             <?php
                                 if (empty($profile['referees'])) {
@@ -613,18 +626,17 @@ class EmployeeMemberPage extends Page {
                                 }
                             ?>
                             </div>
+                            <table class="buttons">
+                                <tr>
+                                    <td class="right">
+                                        <input type="button" value="Add Candidate" onClick="show_add_candidates_popup();" />
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
             </div>
-            <table class="buttons">
-                <tr>
-                    <td class="right">
-                        <input type="button" value="Add Referrers" onClick="show_add_referrers_popup();" />
-                        <input type="button" value="Add Candidates" onClick="show_add_candidates_popup();" />
-                    </td>
-                </tr>
-            </table>
         </div>
         
         <div id="member_applications">
