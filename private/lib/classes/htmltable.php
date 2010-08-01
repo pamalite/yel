@@ -1,6 +1,7 @@
 <?php
 class HTMLTable {
     private $id = '';
+    private $is_tr_id = false;
     private $css_class = '';
     private $items = array();
     
@@ -12,6 +13,10 @@ class HTMLTable {
         if (!empty($_css_class)) {
             $this->css_class = $_css_class;
         }
+    }
+    
+    function is_tr_id($_is_tr_id) {
+        $this->is_tr_id = $_is_tr_id;
     }
     
     function set($_row, $_column, $_content = '', $_id = '', $_css_class = '') {
@@ -59,8 +64,8 @@ class HTMLTable {
     function get_html() {
         $html = '<table id="'. $this->id. '" class="'. $this->css_class. '">'. "\n";
         
-        foreach ($this->items as $columns) {
-            $html .= '<tr>'. "\n";
+        foreach ($this->items as $i=>$columns) {
+            $html .= ($this->is_tr_id) ? '<tr id="'. $i. '">'. "\n" : '<tr>'. "\n";
             foreach ($columns as $column) {
                 $html .= $column;
             }

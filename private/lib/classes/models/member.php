@@ -688,5 +688,37 @@ class Member implements Model {
         
         return $this->mysqli->execute($query);
     }
+    
+    public function getReferees() {
+        $query = "SELECT members.email_addr, CONCAT(members.firstname, ', ', members.lastname) AS referee 
+                  FROM members 
+                  LEFT JOIN member_referees ON members.email_addr = member_referees.referee 
+                  WHERE member_referees.member = '". $this->id. "' 
+                  ORDER BY members.lastname ASC";
+        return $this->mysqli->query($query);
+    }
+    
+    public function getReferrers() {
+        $query = "SELECT members.email_addr, CONCAT(members.firstname, ', ', members.lastname) AS referrer 
+                  FROM members 
+                  LEFT JOIN member_referees ON members.email_addr = member_referees.member 
+                  WHERE member_referees.referee = '". $this->id. "' 
+                  ORDER BY members.lastname ASC";
+        return $this->mysqli->query($query);
+    }
+    
+    public function removeReferee($_referee_email) {
+        $_referee_email = addslashes(stripslashes($_referee_email));
+        $query = "DELETE FROM member_referees WHERE 
+                  member = '". $this->id. "' AND referee = '". $_referee_email. "'";
+        return $this->mysqli->execute($query);
+    }
+    
+    public function removeReferrer($_referrer_email) {
+        $_referrer_email = addslashes(stripslashes($_referrer_email));
+        $query = "DELETE FROM member_referees WHERE 
+                  member = '". $_referrer_email. "' AND referee = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
 }
 ?>

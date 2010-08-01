@@ -231,4 +231,57 @@ if ($_POST['action'] == 'get_job') {
     echo $xml_dom->get_xml_from_array(array('job' => $result));
     exit();
 }
+
+if ($_POST['action'] == 'get_referees') {
+    $member = new Member($_POST['id']);
+    $result = $member->getReferees();
+    
+    foreach($result as $i=>$row) {
+        foreach($row as $col=>$value) {
+            $result[$i][$col] = stripslashes($value);
+        }
+    }
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('candidates' => array('candidate' => $result)));
+    exit();
+}
+
+if ($_POST['action'] == 'get_referrers') {
+    $member = new Member($_POST['id']);
+    $result = $member->getReferrers();
+    
+    foreach($result as $i=>$row) {
+        foreach($row as $col=>$value) {
+            $result[$i][$col] = stripslashes($value);
+        }
+    }
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('referrers' => array('record' => $result)));
+    exit();
+    
+}
+
+if ($_POST['action'] == 'remove_referee') {
+    $member = new Member($_POST['id']);
+    if (!$member->removeReferee($_POST['referee'])) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'remove_referrer') {
+    $member = new Member($_POST['id']);
+    if (!$member->removeReferrer($_POST['referrer'])) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
 ?>

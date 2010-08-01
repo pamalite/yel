@@ -365,6 +365,176 @@ function show_connections() {
     $('item_applications').setStyle('background-color', '');
 }
 
+function update_referees() {
+    var params = 'id=' + member_id;
+    params = params + '&action=get_referees';
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            //set_status('<pre>' + txt + '</pre>');
+            //return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while getting candidates.');
+                return false;
+            }
+            
+            if (txt == '0') {
+                $('div_referees').set('html', '<div class="empty_results">No candidates found.</div>');
+                return;
+            } else {
+                var candidates = xml.getElementsByTagName('referee');
+                var email_addrs = xml.getElementsByTagName('email_addr');
+                
+                var referees_table = new FlexTable('referees_table', 'referees');
+                var header = new Row('');
+                header.set(0, new Cell("Candidate (I referred who?)", '', 'header'));
+                header.set(1, new Cell("&nbsp;", '', 'header actions'));
+                referees_table.set(0, header);
+                
+                for (var i=0; i < candidates.length; i++) {
+                    var row = new Row('');
+                    row.set(0, new Cell('<a href="member.php?member_email_addr=' + email_addrs[i].childNodes[0].nodeValue + '">' + candidates[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
+                    
+                    var action = '<a class="no_link" onClick="remove_referee(\'' + add_slashes(email_addrs[i].childNodes[0].nodeValue) + '\');">Remove</a>'
+                    row.set(1, new Cell(action, '', 'cell actions'));
+                    
+                    referees_table.set((parseInt(i)+1), row);
+                }
+                
+                $('div_referees').set('html', referees_table.get_html());
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Loading connections...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function update_referrers() {
+    var params = 'id=' + member_id;
+    params = params + '&action=get_referrers';
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            //set_status('<pre>' + txt + '</pre>');
+            //return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while getting referrers.');
+                return false;
+            }
+            
+            if (txt == '0') {
+                $('div_referrers').set('html', '<div class="empty_results">No referrers found.</div>');
+                return;
+            } else {
+                var referrers = xml.getElementsByTagName('referer');
+                var email_addrs = xml.getElementsByTagName('email_addr');
+                
+                var referrers_table = new FlexTable('referrers_table', 'referrers');
+                var header = new Row('');
+                header.set(0, new Cell("Referrer (Who referred me?)", '', 'header'));
+                header.set(1, new Cell("&nbsp;", '', 'header actions'));
+                referrers_table.set(0, header);
+                
+                for (var i=0; i < referrers.length; i++) {
+                    var row = new Row('');
+                    row.set(0, new Cell('<a href="member.php?member_email_addr=' + email_addrs[i].childNodes[0].nodeValue + '">' + referrers[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
+                    
+                    var action = '<a class="no_link" onClick="remove_referrer(\'' + add_slashes(email_addrs[i].childNodes[0].nodeValue) + '\');">Remove</a>&nbsp|&nbsp;<a class="no_link" onClick="reward(\'' + add_slashes(email_addrs[i].childNodes[0].nodeValue) + '\');">Reward</a>'
+                    row.set(1, new Cell(action, '', 'cell actions'));
+                    
+                    referrers_table.set((parseInt(i)+1), row);
+                }
+                
+                $('div_referrers').set('html', referrers_table.get_html());
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Loading connections...');
+        }
+    });
+    
+    request.send(params);
+    
+}
+
+function remove_referrer(_referrer_email) {
+    var is_confirm = confirm("Are you sure to remove referrer (" + _referrer_email + ")?");
+    if (!is_confirm) {
+        return;
+    }
+    
+    var params = 'id=' + member_id;
+    params = params + '&action=remove_referrer';
+    params = params + '&employee=' + user_id;
+    params = params + '&referer=' + _referrer_email;
+
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while removing referrer from connection.');
+                return false;
+            }
+            
+            update_referrers();
+        },
+        onRequest: function(instance) {
+            set_status('Saving connections...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function remove_referee(_referee_email) {
+    var is_confirm = confirm("Are you sure to remove candidate (" + _referee_email + ")?");
+    if (!is_confirm) {
+        return;
+    }
+    
+    var params = 'id=' + member_id;
+    params = params + '&action=remove_referee';
+    params = params + '&employee=' + user_id;
+    params = params + '&referee=' + _referee_email;
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while removing candidate from connection.');
+                return false;
+            }
+            
+            update_referees();
+        },
+        onRequest: function(instance) {
+            set_status('Saving connections...');
+        }
+    });
+    
+    request.send(params);
+}
 
 function onDomReady() {
     initialize_page();
