@@ -1,7 +1,7 @@
-var resumes_order = 'desc';
-var resumes_order_by = 'modified_on';
+var order = 'desc';
+var order_by = 'referrals.referred_on';
 
-function resumes_ascending_or_descending() {
+function ascending_or_descending() {
     if (order == 'desc') {
         order = 'asc';
     } else {
@@ -11,10 +11,10 @@ function resumes_ascending_or_descending() {
 
 function sort_by(_table, _column) {
     switch (_table) {
-        case 'resumes':
+        case 'referrals':
             order_by = _column;
             ascending_or_descending();
-            show_resumes();
+            update_applications();
             break;
     }
 }
@@ -437,7 +437,7 @@ function update_referrers() {
                 $('div_referrers').set('html', '<div class="empty_results">No referrers found.</div>');
                 return;
             } else {
-                var referrers = xml.getElementsByTagName('referer');
+                var referrers = xml.getElementsByTagName('referrer');
                 var email_addrs = xml.getElementsByTagName('email_addr');
                 
                 var referrers_table = new FlexTable('referrers_table', 'referrers');
@@ -465,7 +465,6 @@ function update_referrers() {
     });
     
     request.send(params);
-    
 }
 
 function remove_referrer(_referrer_email) {
@@ -477,8 +476,8 @@ function remove_referrer(_referrer_email) {
     var params = 'id=' + member_id;
     params = params + '&action=remove_referrer';
     params = params + '&employee=' + user_id;
-    params = params + '&referer=' + _referrer_email;
-
+    params = params + '&referrer=' + _referrer_email;
+    
     var uri = root + "/employees/member_action.php";
     var request = new Request({
         url: uri,
@@ -534,6 +533,280 @@ function remove_referee(_referee_email) {
     });
     
     request.send(params);
+}
+
+function show_add_referrers_popup() {
+    show_window('add_referrers_window');
+    window.scrollTo(0, 0);
+}
+
+function close_add_referrers_popup(_is_submit) {
+    if (_is_submit) {
+        var potentials = new Array();
+        var counter = 0;
+        for (var i=0; i < $('referrers').options.length; i++) {
+            if ($('referrers').options[i].selected) {
+                potentials[counter] = $('referrers').options[i].value;
+                counter++;
+            }
+        }
+        
+        if (potentials.length <= 0) {
+            alert('You need to select at least one referrer.');
+            return false;
+        }
+        
+        var referrers = '';
+        for (var i=0; i < potentials.length; i++) {
+            referrers = referrers + potentials[i];
+            if (i < potentials.length - 1) {
+                referrers = referrers + ';';
+            }
+        }
+        
+        var params = 'id=' + member_id;
+        params = params + '&action=add_referrer';
+        params = params + '&employee=' + user_id;
+        params = params + '&referrers=' + referrers;
+        
+        var uri = root + "/employees/member_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                // set_status('<pre>' + txt + '</pre>');
+                // return;
+                set_status('');
+                if (txt == 'ko') {
+                    alert('An error occured while adding referrers.');
+                    return false;
+                }
+                
+                close_window('add_referrers_window');
+                update_referrers();
+            },
+            onRequest: function(instance) {
+                set_status('Added referrers...');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('add_referrers_window');
+    }
+}
+
+function show_add_candidates_popup() {
+    show_window('add_candidates_window');
+    window.scrollTo(0, 0);
+}
+
+function close_add_candidates_popup(_is_submit) {
+    if (_is_submit) {
+        var potentials = new Array();
+        var counter = 0;
+        for (var i=0; i < $('candidates').options.length; i++) {
+            if ($('candidates').options[i].selected) {
+                potentials[counter] = $('candidates').options[i].value;
+                counter++;
+            }
+        }
+        
+        if (potentials.length <= 0) {
+            alert('You need to select at least one candidate.');
+            return false;
+        }
+        
+        var candidates = '';
+        for (var i=0; i < potentials.length; i++) {
+            candidates = candidates + potentials[i];
+            if (i < potentials.length - 1) {
+                candidates = candidates + ';';
+            }
+        }
+        
+        var params = 'id=' + member_id;
+        params = params + '&action=add_referee';
+        params = params + '&employee=' + user_id;
+        params = params + '&referees=' + candidates;
+        
+        var uri = root + "/employees/member_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                // set_status('<pre>' + txt + '</pre>');
+                // return;
+                set_status('');
+                if (txt == 'ko') {
+                    alert('An error occured while adding candidates.');
+                    return false;
+                }
+                
+                close_window('add_candidates_window');
+                update_referees();
+            },
+            onRequest: function(instance) {
+                set_status('Added candidates...');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('add_candidates_window');
+    }
+}
+
+function show_applications() {
+    $('member_profile').setStyle('display', 'none');
+    $('member_resumes').setStyle('display', 'none');
+    $('member_notes').setStyle('display', 'none');
+    $('member_connections').setStyle('display', 'none');
+    $('member_applications').setStyle('display', 'block');
+    
+    $('item_profile').setStyle('background-color', '');
+    $('item_resumes').setStyle('background-color', '');
+    $('item_notes').setStyle('background-color', '');
+    $('item_connections').setStyle('background-color', '');
+    $('item_applications').setStyle('background-color', '#CCCCCC');
+}
+
+function update_applications() {
+    var params = 'id=' + member_id;
+    params = params + '&action=get_applications';
+    params = params + '&order_by=' + order_by + ' ' + order;
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            //set_status('<pre>' + txt + '</pre>');
+            //return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while getting applications.');
+                return false;
+            }
+            
+            if (txt == '0') {
+                $('applications').set('html', '<div class="empty_results">No applications found.</div>');
+                return;
+            } else {
+                var ids = xml.getElementsByTagName('id');
+                var jobs = xml.getElementsByTagName('job');
+                var job_ids = xml.getElementsByTagName('job_id');
+                var employers = xml.getElementsByTagName('employer');
+                var employer_ids = xml.getElementsByTagName('employer_id');
+                var referrer_names = xml.getElementsByTagName('referrer_name');
+                var referrers = xml.getElementsByTagName('referrer');
+                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
+                var viewed_ons = xml.getElementsByTagName('formatted_employer_agreed_terms_on');
+                var has_testimonies = xml.getElementsByTagName('has_testimony');
+                
+                var applications_table = new FlexTable('applications_table', 'applications');
+                var header = new Row('');
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'employers.name');\">Employers</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'members.lastname');\">Referrer</a>", '', 'header'));
+                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
+                header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.employer_agreed_terms_on');\">Employer Viewed On</a>", '', 'header'));
+                header.set(5, new Cell("Testimony", '', 'header'));
+                applications_table.set(0, header);
+                
+                for (var i=0; i < ids.length; i++) {
+                    var row = new Row('');
+                    row.set(0, new Cell('<a href="employer.php?id=' + employer_ids[i].childNodes[0].nodeValue + '">' + employers[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
+                    row.set(1, new Cell('<a class="no_link" onClick="show_job_desc(' + job_ids[i].childNodes[0].nodeValue + ');">' + jobs[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
+                    row.set(2, new Cell('<a href="member.php?member_email_addr=' + add_slashes(referrers[i].childNodes[0].nodeValue) + '">' + referrer_names[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
+                    row.set(3, new Cell(referred_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    
+                    var viewed_on = 'Not Viewed Yet';
+                    if (viewed_ons[i].childNodes.length > 0) {
+                        viewed_on = viewed_ons[i].childNodes[0].nodeValue;
+                    }
+                    row.set(4, new Cell(viewed_on, '', 'cell'));
+                    
+                    var testimony = 'None Provided';
+                    if (has_testimonies[i].childNodes[0].nodeValue == '1') {
+                        testimony = '<a class="no_link" onClick="show_testimony(' + ids[i].childNodes[0].nodeValue + ');">Show</a>';
+                    }
+                    row.set(5, new Cell(testimony, '', 'cell testimony'));
+                    
+                    applications_table.set((parseInt(i)+1), row);
+                }
+                
+                $('applications').set('html', applications_table.get_html());
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Loading connections...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function show_testimony(_referral_id) {
+    var params = 'id=' + _referral_id;
+    params = params + '&action=get_testimony';
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (isEmpty(txt)) {
+                alert('Testimony not found!');
+                return;
+            }
+            
+            $('testimony').set('html', txt);
+            set_status('');
+            show_window('testimony_window');
+            window.scrollTo(0, 0);
+        },
+        onRequest: function(instance) {
+            set_status('Loading testimony...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_testimony() {
+    close_window('testimony_window');
+}
+
+function show_job_desc(_job_id) {
+    var params = 'id=' + _job_id;
+    params = params + '&action=get_job_desc';
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (isEmpty(txt)) {
+                alert('Job not found!');
+                return;
+            }
+            
+            $('job_desc').set('html', txt);
+            set_status('');
+            show_window('job_desc_window');
+            window.scrollTo(0, 0);
+        },
+        onRequest: function(instance) {
+            set_status('Loading job desccription...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_job_desc() {
+    close_window('job_desc_window');
 }
 
 function onDomReady() {

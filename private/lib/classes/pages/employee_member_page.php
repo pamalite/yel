@@ -157,6 +157,60 @@ class EmployeeMemberPage extends Page {
         return $resume->find($criteria);
     }
     
+    private function get_potential_referrers() {
+        $criteria = array(
+            'columns' => "email_addr, CONCAT(lastname, ', ', firstname) AS member_name", 
+            'match' => "email_addr <> '". $this->member->getId(). "' AND 
+                        email_addr NOT IN (
+                            SELECT DISTINCT member FROM member_referees 
+                            WHERE referee = '". $this->member->getId(). "' 
+                        ) AND 
+                        email_addr NOT LIKE 'team.%@yellowelevator.com' AND 
+                        email_addr <> 'initial@yellowelevator.com'", 
+            'order' => "member_name"
+        );
+        
+        return $this->member->find($criteria);
+    }
+    
+    private function get_potential_candidates() {
+        $criteria = array(
+            'columns' => "email_addr, CONCAT(lastname, ', ', firstname) AS member_name", 
+            'match' => "email_addr <> '". $this->member->getId(). "' AND 
+                        email_addr NOT IN (
+                            SELECT DISTINCT referee FROM member_referees 
+                            WHERE member = '". $this->member->getId(). "' 
+                        ) AND 
+                        email_addr NOT LIKE 'team.%@yellowelevator.com' AND 
+                        email_addr <> 'initial@yellowelevator.com'", 
+            'order' => "member_name"
+        );
+        
+        return $this->member->find($criteria);
+    }
+    
+    private function get_applications() {
+        $criteria = array(
+            'columns' => "referrals.id, referrals.member AS referrer, 
+                         jobs.title AS job, jobs.id AS job_id, 
+                         employers.name AS employer, employers.id AS employer_id, 
+                         CONCAT(members.lastname, ', ', members.firstname) AS referrer_name, 
+                         DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
+                         DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_agreed_terms_on, 
+                         IF(referrals.testimony IS NULL OR referrals.testimony = '', '0', '1') AS has_testimony", 
+            'joins' => "members ON members.email_addr = referrals.member, 
+                        jobs ON jobs.id = referrals.job, 
+                        employers ON employers.id = jobs.employer", 
+            //'match' => "referrals.referee = '". $this->member->getId(). "' AND 
+            //            referrals.employed_on IS NULL OR referrals.employed_on = ''", 
+            'match' => "referrals.referee = '". $this->member->getId(). "'",
+            'order' => "referrals.referred_on DESC"
+        );
+        
+        $referral = new Referral();
+        return $referral->find($criteria);
+    }
+    
     public function show() {
         $this->begin();
         $this->top('Member - '. htmlspecialchars_decode(stripslashes($this->member->getFullName())));
@@ -198,6 +252,10 @@ class EmployeeMemberPage extends Page {
                 'resumes' => array()
             );
         }
+        
+        $potential_referrers = $this->get_potential_referrers();
+        $potential_candidates = $this->get_potential_candidates();
+        $applications = $this->get_applications();
         
         ?>
         <!-- submenu -->
@@ -618,34 +676,173 @@ class EmployeeMemberPage extends Page {
         </div>
         
         <div id="member_applications">
+            <div id="applications">
+        <?php
+            if (empty($applications)) {
+        ?>
+                <div class="empty_results">No applications found.</div>
+        <?php
+            } else {
+                $applications_table = new HTMLTable('applications_table', 'applications');
+
+                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'employers.name');\">Employers</a>", '', 'header');
+                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header');
+                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'members.lastname');\">Referrer</a>", '', 'header');
+                $applications_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header');
+                $applications_table->set(0, 4, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.employer_agreed_terms_on');\">Employer Viewed On</a>", '', 'header');
+                $applications_table->set(0, 5, "Testimony", '', 'header');
+
+                foreach ($applications as $i=>$application) {
+                    $applications_table->set($i+1, 0, '<a href="employer.php?id='. $application['employer_id']. '">'. $application['employer']. '</a>', '', 'cell');
+                    $applications_table->set($i+1, 1, '<a class="no_link" onClick="show_job_desc('. $application['job_id']. ');">'. $application['job']. '</a>', '', 'cell');
+                    $applications_table->set($i+1, 2, '<a href="member.php?member_email_addr='. $application['referrer']. '">'. $application['referrer_name']. '</a>', '', 'cell');
+                    $applications_table->set($i+1, 3, $application['formatted_referred_on'], '', 'cell');
+                    
+                    $viewed_on = 'Not Viewed Yet';
+                    if (!is_null($application['formatted_employer_agreed_terms_on'])) {
+                        $viewed_on = $application['formatted_employer_agreed_terms_on'];
+                    }
+                    $applications_table->set($i+1, 4, $viewed_on, '', 'cell');
+                    
+                    $testimony = 'None Provided';
+                    if ($application['has_testimony'] == '1') {
+                        $testimony = '<a class="no_link" onClick="show_testimony('. $application['id']. ');">Show</a>';
+                    }
+                    $applications_table->set($i+1, 5, $testimony, '', 'cell testimony');
+                }
+
+                echo $applications_table->get_html();
+            }
+        ?>
+            </div>
         </div>
         
         <!-- popup windows goes here -->
-        <div id="upload_resume_window" class="popup_window">
-            <div class="popup_window_title">Upload Resume</div>
-            <form id="upload_resume_form" action="member_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_upload_resume_popup(true);">
-                <div class="upload_resume_form">
-                    <input type="hidden" id="resume_id" name="id" value="0" />
-                    <input type="hidden" name="member" value="<?php echo $this->member->getId(); ?>" />
-                    <input type="hidden" name="action" value="upload_resume" />
-                    <div id="upload_field" class="upload_field">
-                        <input id="my_file" name="my_file" type="file" />
-                        <div style="font-size: 9pt; margin-top: 15px;">
-                            <ol>
-                                <li>Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 1MB are allowed.</li>
-                                <li>You can upload as many resumes as you want and designate them for different job applications.</li>
-                                <li>You can update your resume by clicking &quot;Update&quot; then upload an updated version.</li>
-                            </ol>
-                        </div>
-                    </div>
+        <div id="add_referrers_window" class="popup_window">
+            <?php 
+                $has_no_potential_referrers = false;
+            ?>
+            <div class="popup_window_title">Add Referrers</div>
+            <form id="add_referrers_form" action="member_action.php" method="post">
+                <div class="add_referrers_form">
+                    <br/>
+                <?php
+                    if (empty($potential_referrers)) {
+                        $has_no_potential_referrers = true;
+                ?>
+                    No potential referrers can be found.
+                    <br/><br/>
+                <?php
+                    } else {
+                ?>
+                    Select multiple potential referrers from the following list.
+                    <br/><br/>
+                    <select id="referrers" class="potentials_list" multiple>
+                <?php
+                        foreach($potential_referrers as $referrer) {
+                ?>
+                        <option value="<?php echo $referrer['email_addr']; ?>">
+                            <?php echo $referrer['member_name']. ' ('. $referrer['email_addr']. ')'; ?>
+                        </option>
+                <?php
+                        }
+                ?>
+                    </select>
+                <?php
+                    }
+                ?>
                 </div>
                 <div class="popup_window_buttons_bar">
-                     <input type="submit" value="Upload" />
-                     <input type="button" value="Cancel" onClick="close_upload_resume_popup(false);" />
+                <?php 
+                    if ($has_no_potential_referrers) {
+                ?>
+                    <input type="button" value="Add Referrers" disabled />
+                <?php
+                    } else {
+                ?>
+                    <input type="button" value="Add Referrers" onClick="close_add_referrers_popup(true);" />
+                <?php
+                    }
+                ?>
+                    <input type="button" value="Cancel" onClick="close_add_referrers_popup(false);" />
                 </div>
             </form>
         </div>
         
+        <div id="add_candidates_window" class="popup_window">
+            <?php 
+                $has_no_potential_candidates = false;
+            ?>
+            <div class="popup_window_title">Add Candidate</div>
+            <form id="add_candidates_form" action="member_action.php" method="post">
+                <div class="add_candidates_form">
+                    <br/>
+                <?php
+                    if (empty($potential_candidates)) {
+                        $has_no_potential_candidate = true;
+                ?>
+                    No potential candidates can be found.
+                    <br/><br/>
+                <?php
+                    } else {
+                ?>
+                    Select multiple potential candidates from the following list.
+                    <br/><br/>
+                    <select id="candidates" class="potentials_list" multiple>
+                <?php
+                        foreach($potential_candidates as $candidate) {
+                ?>
+                        <option value="<?php echo $candidate['email_addr']; ?>">
+                            <?php echo $candidate['member_name']. ' ('. $candidate['email_addr']. ')'; ?>
+                        </option>
+                <?php
+                        }
+                ?>
+                    </select>
+                <?php
+                    }
+                ?>
+                </div>
+                <div class="popup_window_buttons_bar">
+                <?php 
+                    if ($has_no_potential_candidates) {
+                ?>
+                    <input type="button" value="Add Candidates" disabled />
+                <?php
+                    } else {
+                ?>
+                    <input type="button" value="Add Candidates" onClick="close_add_candidates_popup(true);" />
+                <?php
+                    }
+                ?>
+                    <input type="button" value="Cancel" onClick="close_add_candidates_popup(false);" />
+                </div>
+            </form>
+        </div>
+        
+        <div id="testimony_window" class="popup_window">
+            <div class="popup_window_title">Testimony</div>
+            <div class="testimony_form">
+                <br/>
+                <span id="testimony"></span>
+                <br/><br/>
+            </div>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Cancel" onClick="close_testimony();" />
+            </div>
+        </div>
+        
+        <div id="job_desc_window" class="popup_window">
+            <div class="popup_window_title">Job Description</div>
+            <div class="job_desc_form">
+                <br/>
+                <span id="job_desc"></span>
+                <br/><br/>
+            </div>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Cancel" onClick="close_job_desc();" />
+            </div>
+        </div>
         <?php
     }
 }

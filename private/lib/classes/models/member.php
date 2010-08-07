@@ -720,5 +720,21 @@ class Member implements Model {
                   member = '". $_referrer_email. "' AND referee = '". $this->id. "'";
         return $this->mysqli->execute($query);
     }
+    
+    public function addReferrer($_referrer_email) {
+        $_referrer_email = addslashes(stripslashes($_referrer_email));
+        $query = "INSERT INTO member_referees SET 
+                  member = '". $_referrer_email. "', 
+                  referee = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
+    public function addReferee($_referee_email) {
+        $_referee_email = addslashes(stripslashes($_referee_email));
+        $query = "INSERT INTO member_referees SET 
+                  member = '". $this->id. "', 
+                  referee = '". $_referee_email. "'";
+        return $this->mysqli->execute($query);
+    }
 }
 ?>

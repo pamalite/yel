@@ -236,6 +236,11 @@ if ($_POST['action'] == 'get_referees') {
     $member = new Member($_POST['id']);
     $result = $member->getReferees();
     
+    if (empty($result) || count($result) <= 0) {
+        echo '0';
+        exit();
+    }
+    
     foreach($result as $i=>$row) {
         foreach($row as $col=>$value) {
             $result[$i][$col] = stripslashes($value);
@@ -250,6 +255,11 @@ if ($_POST['action'] == 'get_referees') {
 if ($_POST['action'] == 'get_referrers') {
     $member = new Member($_POST['id']);
     $result = $member->getReferrers();
+    
+    if (empty($result) || count($result) <= 0) {
+        echo '0';
+        exit();
+    }
     
     foreach($result as $i=>$row) {
         foreach($row as $col=>$value) {
@@ -282,6 +292,95 @@ if ($_POST['action'] == 'remove_referrer') {
     }
     
     echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'add_referrer') {
+    $member = new Member($_POST['id']);
+    $referrers = explode(';', $_POST['referrers']);
+    foreach ($referrers as $referrer) {
+        $member->addReferrer(trim($referrer));
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'add_referee') {
+    $member = new Member($_POST['id']);
+    $referees = explode(';', $_POST['referees']);
+    foreach ($referees as $referee) {
+        $member->addReferee(trim($referee));
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'get_applications') {
+    $criteria = array(
+        'columns' => "referrals.id, referrals.member AS referrer, 
+                      jobs.title AS job, jobs.id AS job_id, 
+                      employers.name AS employer, employers.id AS employer_id, 
+                      CONCAT(members.lastname, ', ', members.firstname) AS referrer_name, 
+                      DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
+                      DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_agreed_terms_on, 
+                      IF(referrals.testimony IS NULL OR referrals.testimony = '', '0', '1') AS has_testimony", 
+        'joins' => "members ON members.email_addr = referrals.member, 
+                    jobs ON jobs.id = referrals.job, 
+                    employers ON employers.id = jobs.employer", 
+        //'match' => "referrals.referee = '". $this->member->getId(). "' AND 
+        //            referrals.employed_on IS NULL OR referrals.employed_on = ''", 
+        'match' => "referrals.referee = '". $_POST['id']. "'",
+        'order' => $_POST['order_by']
+    );
+    
+    $referral = new Referral();
+    $result = $referral->find($criteria);
+    
+    if (empty($result) || count($result) <= 0) {
+        echo '0';
+        exit();
+    }
+    
+    foreach($result as $i=>$row) {
+        foreach($row as $col=>$value) {
+            $result[$i][$col] = htmlspecialchars_decode(stripslashes($value));
+        }
+    }
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('applications' => array('application' => $result)));
+    exit();
+}
+
+if ($_POST['action'] == 'get_testimony') {
+    $criteria = array(
+        'columns' => "testimony", 
+        'match' => "id = ". $_POST['id'], 
+        'limit' => "1"
+    );
+    
+    $referral = new Referral();
+    $result = $referral->find($criteria);
+    $testimony = htmlspecialchars_decode(str_replace("\n", '<br/>', $result[0]['testimony']));
+    
+    echo $testimony;
+    exit();
+}
+
+if ($_POST['action'] == 'get_job_desc') {
+    $criteria = array(
+        'columns' => "description", 
+        'match' => "id = ". $_POST['id'], 
+        'limit' => "1"
+    );
+    
+    $job = new Job();
+    $result = $job->find($criteria);
+    $job_desc = htmlspecialchars_decode(str_replace("\n", '<br/>', $result[0]['description']));
+    
+    echo $job_desc;
     exit();
 }
 ?>
