@@ -318,6 +318,36 @@ if ($_POST['action'] == 'add_referee') {
 }
 
 if ($_POST['action'] == 'get_applications') {
+    $match = "referrals.referee = '". $_POST['id']. "'";
+    if (!empty($_POST['filter'])) {
+        $match .= "AND ";
+        switch ($_POST['filter']) {
+            case 'employed':
+                $match .= "(referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00') AND 
+                           (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 
+                           (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00')";
+                break;
+            case 'rejected':
+                $match .= "(referrals.employer_rejected_on IS NOT NULL AND referrals.employer_rejected_on <> '0000-00-00')";
+                break;
+            case 'removed':
+                $match .= "(referrals.employer_removed_on IS NOT NULL AND referrals.employer_removed_on <> '0000-00-00')";
+                break;
+            case 'viewed':
+                $match .= "(referrals.employer_agreed_terms_on IS NOT NULL AND referrals.employer_agreed_terms_on <> '0000-00-00') AND 
+                           (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00') AND 
+                           (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 
+                           (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00')";
+                break;
+            case 'not_viewed':
+                $match .= "(referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00') AND 
+                           (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00') AND 
+                           (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 
+                           (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00')";
+                break;
+        }
+    }
+    
     $criteria = array(
         'columns' => "referrals.id, referrals.member AS referrer, 
                       jobs.title AS job, jobs.id AS job_id, 
@@ -325,13 +355,15 @@ if ($_POST['action'] == 'get_applications') {
                       CONCAT(members.lastname, ', ', members.firstname) AS referrer_name, 
                       DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
                       DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_agreed_terms_on, 
-                      IF(referrals.testimony IS NULL OR referrals.testimony = '', '0', '1') AS has_testimony", 
+                      DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
+                      DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
+                      DATE_FORMAT(referrals.employer_removed_on, '%e %b, %Y') AS formatted_employer_removed_on, 
+                      IF(referrals.testimony IS NULL OR referrals.testimony = '', '0', '1') AS has_testimony, 
+                      IF(referrals.employer_remarks IS NULL OR referrals.employer_remarks = '', '0', '1') AS has_employer_remarks", 
         'joins' => "members ON members.email_addr = referrals.member, 
                     jobs ON jobs.id = referrals.job, 
                     employers ON employers.id = jobs.employer", 
-        //'match' => "referrals.referee = '". $this->member->getId(). "' AND 
-        //            referrals.employed_on IS NULL OR referrals.employed_on = ''", 
-        'match' => "referrals.referee = '". $_POST['id']. "'",
+        'match' => $match,
         'order' => $_POST['order_by']
     );
     

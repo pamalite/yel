@@ -270,7 +270,7 @@ table.notes_form td.title {
 }
 
 #applications_table td { 
-    vertical-align: baseline;
+    vertical-align: middle;
 }
 
 #applications_table td.testimony {
@@ -294,4 +294,28 @@ div.job_desc_form {
     height: 450px;
     margin: auto;
     overflow: auto;
+}
+
+span.not_viewed_yet {
+    font-style: italic;
+    color: #666666;
+}
+
+span.viewed {
+    font-weight: bold;
+    color: #0000FF;
+}
+
+span.employed {
+    font-weight: bold;
+    color: #0CA711;
+}
+
+span.rejected {
+    font-weight: bold;
+    color: #FF0000;
+}
+
+span.removed {
+    font-weight: bold;
 }

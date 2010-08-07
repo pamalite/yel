@@ -1,5 +1,6 @@
 var order = 'desc';
 var order_by = 'referrals.referred_on';
+var filter = '';
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -14,9 +15,14 @@ function sort_by(_table, _column) {
         case 'referrals':
             order_by = _column;
             ascending_or_descending();
-            update_applications();
+            update_applications(filter);
             break;
     }
+}
+
+function filter_applications() {
+    filter = $('filter').options[$('filter').selectedIndex].value;
+    update_applications(filter);
 }
 
 function reset_password() {
@@ -675,6 +681,7 @@ function update_applications() {
     var params = 'id=' + member_id;
     params = params + '&action=get_applications';
     params = params + '&order_by=' + order_by + ' ' + order;
+    params = params + '&filter=' + filter;
     
     var uri = root + "/employees/member_action.php";
     var request = new Request({
@@ -702,7 +709,11 @@ function update_applications() {
                 var referrers = xml.getElementsByTagName('referrer');
                 var referred_ons = xml.getElementsByTagName('formatted_referred_on');
                 var viewed_ons = xml.getElementsByTagName('formatted_employer_agreed_terms_on');
+                var employed_ons = xml.getElementsByTagName('formatted_employed_on');
+                var rejected_ons = xml.getElementsByTagName('formatted_employer_rejected_on');
+                var deleted_ons = xml.getElementsByTagName('formatted_employer_removed_on');
                 var has_testimonies = xml.getElementsByTagName('has_testimony');
+                var has_remarks = xml.getElementsByTagName('has_employer_remarks');
                 
                 var applications_table = new FlexTable('applications_table', 'applications');
                 var header = new Row('');
@@ -710,7 +721,7 @@ function update_applications() {
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header'));
                 header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'members.lastname');\">Referrer</a>", '', 'header'));
                 header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
-                header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.employer_agreed_terms_on');\">Employer Viewed On</a>", '', 'header'));
+                header.set(4, new Cell("Status", '', 'header'));
                 header.set(5, new Cell("Testimony", '', 'header'));
                 applications_table.set(0, header);
                 
@@ -721,11 +732,27 @@ function update_applications() {
                     row.set(2, new Cell('<a href="member.php?member_email_addr=' + add_slashes(referrers[i].childNodes[0].nodeValue) + '">' + referrer_names[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
                     row.set(3, new Cell(referred_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
-                    var viewed_on = 'Not Viewed Yet';
+                    var status = '<span class="not_viewed_yet">Not Viewed Yet</span>';
                     if (viewed_ons[i].childNodes.length > 0) {
-                        viewed_on = viewed_ons[i].childNodes[0].nodeValue;
+                        status = '<span class="viewed">Viewed On:</span> ' + viewed_ons[i].childNodes[0].nodeValue;
                     }
-                    row.set(4, new Cell(viewed_on, '', 'cell'));
+                    
+                    if (employed_ons[i].childNodes.length > 0) {
+                        status = '<span class="employed">Employed On:</span> ' + employed_ons[i].childNodes[0].nodeValue;
+                    }
+                    
+                    if (rejected_ons[i].childNodes.length > 0) {
+                        status = '<span class="rejected">Rejected On:</span> ' + viewed_ons[i].childNodes[0].nodeValue;
+                    }
+                    
+                    if (deleted_ons[i].childNodes.length > 0) {
+                        status = '<span class="deleted">Deleted On:</span> ' + viewed_ons[i].childNodes[0].nodeValue;
+                    }
+                    
+                    if (has_remarks[i].childNodes[0].nodeValue == '1') {
+                        status = status + '<br/><a class="no_link" onClick="show_employer_remarks(' + ids[i].childNodes[0].nodeValue + ');">Employer Remarks</a>';
+                    }
+                    row.set(4, new Cell(status, '', 'cell testimony'));
                     
                     var testimony = 'None Provided';
                     if (has_testimonies[i].childNodes[0].nodeValue == '1') {
