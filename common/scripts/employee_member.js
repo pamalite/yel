@@ -714,6 +714,8 @@ function update_applications() {
                 var deleted_ons = xml.getElementsByTagName('formatted_employer_removed_on');
                 var has_testimonies = xml.getElementsByTagName('has_testimony');
                 var has_remarks = xml.getElementsByTagName('has_employer_remarks');
+                var resume_ids = xml.getElementsByTagName('resume_id');
+                var resume_files = xml.getElementsByTagName('file_name');
                 
                 var applications_table = new FlexTable('applications_table', 'applications');
                 var header = new Row('');
@@ -723,6 +725,7 @@ function update_applications() {
                 header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
                 header.set(4, new Cell("Status", '', 'header'));
                 header.set(5, new Cell("Testimony", '', 'header'));
+                header.set(6, new Cell("Resume Submitted", '', 'header'));
                 applications_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
@@ -759,6 +762,8 @@ function update_applications() {
                         testimony = '<a class="no_link" onClick="show_testimony(' + ids[i].childNodes[0].nodeValue + ');">Show</a>';
                     }
                     row.set(5, new Cell(testimony, '', 'cell testimony'));
+                    
+                    row.set(6, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">' + resume_files[i].childNodes[0].nodeValue + '</a>', '', 'cell testimony'));
                     
                     applications_table.set((parseInt(i)+1), row);
                 }
@@ -834,6 +839,37 @@ function show_job_desc(_job_id) {
 
 function close_job_desc() {
     close_window('job_desc_window');
+}
+
+function show_employer_remarks(_referral_id) {
+    var params = 'id=' + _referral_id;
+    params = params + '&action=get_employer_remarks';
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (isEmpty(txt)) {
+                alert('Remarks not found!');
+                return;
+            }
+            
+            $('employer_remarks').set('html', txt);
+            set_status('');
+            show_window('employer_remarks_window');
+            window.scrollTo(0, 0);
+        },
+        onRequest: function(instance) {
+            set_status('Loading employer remarks...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_employer_remarks() {
+    close_window('employer_remarks_window');
 }
 
 function onDomReady() {

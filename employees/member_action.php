@@ -352,6 +352,7 @@ if ($_POST['action'] == 'get_applications') {
         'columns' => "referrals.id, referrals.member AS referrer, 
                       jobs.title AS job, jobs.id AS job_id, 
                       employers.name AS employer, employers.id AS employer_id, 
+                      referrals.resume AS resume_id, resumes.file_name, 
                       CONCAT(members.lastname, ', ', members.firstname) AS referrer_name, 
                       DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
                       DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_agreed_terms_on, 
@@ -362,7 +363,8 @@ if ($_POST['action'] == 'get_applications') {
                       IF(referrals.employer_remarks IS NULL OR referrals.employer_remarks = '', '0', '1') AS has_employer_remarks", 
         'joins' => "members ON members.email_addr = referrals.member, 
                     jobs ON jobs.id = referrals.job, 
-                    employers ON employers.id = jobs.employer", 
+                    employers ON employers.id = jobs.employer, 
+                    resumes ON resumes.id = referrals.resume", 
         'match' => $match,
         'order' => $_POST['order_by']
     );
@@ -413,6 +415,21 @@ if ($_POST['action'] == 'get_job_desc') {
     $job_desc = htmlspecialchars_decode(str_replace("\n", '<br/>', $result[0]['description']));
     
     echo $job_desc;
+    exit();
+}
+
+if ($_POST['action'] == 'get_employer_remarks') {
+    $criteria = array(
+        'columns' => "employer_remarks", 
+        'match' => "id = ". $_POST['id'], 
+        'limit' => "1"
+    );
+    
+    $referral = new Referral();
+    $result = $referral->find($criteria);
+    $remarks = str_replace("\n", '<br/>', stripslashes($result[0]['employer_remarks']));
+    
+    echo $remarks;
     exit();
 }
 ?>

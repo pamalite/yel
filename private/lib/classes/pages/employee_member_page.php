@@ -194,6 +194,7 @@ class EmployeeMemberPage extends Page {
             'columns' => "referrals.id, referrals.member AS referrer, 
                           jobs.title AS job, jobs.id AS job_id, 
                           employers.name AS employer, employers.id AS employer_id, 
+                          referrals.resume AS resume_id, resumes.file_name, 
                           CONCAT(members.lastname, ', ', members.firstname) AS referrer_name, 
                           DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
                           DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_agreed_terms_on, 
@@ -204,7 +205,8 @@ class EmployeeMemberPage extends Page {
                           IF(referrals.employer_remarks IS NULL OR referrals.employer_remarks = '', '0', '1') AS has_employer_remarks", 
             'joins' => "members ON members.email_addr = referrals.member, 
                         jobs ON jobs.id = referrals.job, 
-                        employers ON employers.id = jobs.employer", 
+                        employers ON employers.id = jobs.employer, 
+                        resumes ON resumes.id = referrals.resume", 
             'match' => "referrals.referee = '". $this->member->getId(). "'",
             'order' => "referrals.referred_on DESC"
         );
@@ -709,6 +711,7 @@ class EmployeeMemberPage extends Page {
                 $applications_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header');
                 $applications_table->set(0, 4, 'Status', '', 'header');
                 $applications_table->set(0, 5, "Testimony", '', 'header');
+                $applications_table->set(0, 6, "Resume Submitted", '', 'header');
 
                 foreach ($applications as $i=>$application) {
                     $applications_table->set($i+1, 0, '<a href="employer.php?id='. $application['employer_id']. '">'. $application['employer']. '</a>', '', 'cell');
@@ -743,6 +746,8 @@ class EmployeeMemberPage extends Page {
                         $testimony = '<a class="no_link" onClick="show_testimony('. $application['id']. ');">Show</a>';
                     }
                     $applications_table->set($i+1, 5, $testimony, '', 'cell testimony');
+                    
+                    $applications_table->set($i+1, 6, '<a href="resume.php?id='. $application['resume_id']. '">'. $application['file_name']. '</a>', '', 'cell testimony');
                 }
 
                 echo $applications_table->get_html();
@@ -875,6 +880,18 @@ class EmployeeMemberPage extends Page {
             </div>
             <div class="popup_window_buttons_bar">
                 <input type="button" value="Cancel" onClick="close_job_desc();" />
+            </div>
+        </div>
+        
+        <div id="employer_remarks_window" class="popup_window">
+            <div class="popup_window_title">Employer Remarks</div>
+            <div class="employer_remarks_form">
+                <br/>
+                <span id="employer_remarks"></span>
+                <br/><br/>
+            </div>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Cancel" onClick="close_employer_remarks();" />
             </div>
         </div>
         <?php

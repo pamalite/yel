@@ -1,0 +1,126 @@
+#div_filter {
+    width: 99%;
+    margin: auto;
+    text-align: right;
+    padding: 5px 5px 5px 5px;
+    background-color: #CCCCCC;
+}
+
+input.mini_field {
+    width: 35px;
+}
+
+div.pagination {
+    width: 99%;
+    margin: auto;
+    text-align: center;
+    padding: 5px 5px 5px 5px;
+}
+
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.action {
+    width: 20%;
+    text-align: center;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+.center {
+    text-align: center;
+}
+
+div.buttons_bar {
+    text-align: right;
+    background-color: #CCCCCC;
+    padding: 3px 3px 3px 3px;
+}
+
+table.buttons {
+    width: 100%;
+    margin: auto;
+    background-color: #CCCCCC;
+}
+
+table.buttons td.right {
+    text-align: right;
+}
+
+#applications_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#applications_table td { 
+    vertical-align: middle;
+}
+
+#applications_table td.testimony {
+    vertical-align: middle;
+    text-align: center;
+}
+
+#applications_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+#testimony_window,
+#job_desc_window, 
+#employer_remarks_window {
+    width: 450px;
+    display: none;
+}
+
+div.testimony_form, 
+div.job_desc_form, 
+div.employer_remarks_form {
+    width: 99%;
+    height: 450px;
+    margin: auto;
+    overflow: auto;
+}
+
+span.not_viewed_yet {
+    font-style: italic;
+    color: #666666;
+}
+
+span.viewed {
+    font-weight: bold;
+    color: #0000FF;
+}
+
+span.employed {
+    font-weight: bold;
+    color: #0CA711;
+}
+
+span.rejected {
+    font-weight: bold;
+    color: #FF0000;
+}
+
+span.removed {
+    font-weight: bold;
+}

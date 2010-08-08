@@ -283,13 +283,15 @@ table.notes_form td.title {
 }
 
 #testimony_window,
-#job_desc_window {
+#job_desc_window, 
+#employer_remarks_window {
     width: 450px;
     display: none;
 }
 
 div.testimony_form, 
-div.job_desc_form {
+div.job_desc_form, 
+div.employer_remarks_form {
     width: 99%;
     height: 450px;
     margin: auto;
