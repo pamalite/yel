@@ -113,6 +113,8 @@ function update_applications() {
                 var employer_ids = xml.getElementsByTagName('employer_id');
                 var referrer_names = xml.getElementsByTagName('referrer_name');
                 var referrers = xml.getElementsByTagName('referrer');
+                var candidate_names = xml.getElementsByTagName('candidate_name');
+                var candidates = xml.getElementsByTagName('candidate');
                 var referred_ons = xml.getElementsByTagName('formatted_referred_on');
                 var viewed_ons = xml.getElementsByTagName('formatted_employer_agreed_terms_on');
                 var employed_ons = xml.getElementsByTagName('formatted_employed_on');
@@ -127,11 +129,11 @@ function update_applications() {
                 var header = new Row('');
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'employers.name');\">Employers</a>", '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'members.lastname');\">Referrer</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
-                header.set(4, new Cell("Status", '', 'header'));
-                header.set(5, new Cell("Testimony", '', 'header'));
-                header.set(6, new Cell("Resume Submitted", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrers.lastname');\">Referrer</a>", '', 'header'));
+                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'candidates.lastname');\">Candidate</a>", '', 'header'));
+                header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
+                header.set(5, new Cell("Status", '', 'header'));
+                header.set(6, new Cell("Testimony", '', 'header'));
                 applications_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
@@ -139,7 +141,8 @@ function update_applications() {
                     row.set(0, new Cell('<a href="employer.php?id=' + employer_ids[i].childNodes[0].nodeValue + '">' + employers[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
                     row.set(1, new Cell('<a class="no_link" onClick="show_job_desc(' + job_ids[i].childNodes[0].nodeValue + ');">' + jobs[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
                     row.set(2, new Cell('<a href="member.php?member_email_addr=' + add_slashes(referrers[i].childNodes[0].nodeValue) + '">' + referrer_names[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
-                    row.set(3, new Cell(referred_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(3, new Cell('<a href="member.php?member_email_addr=' + add_slashes(candidates[i].childNodes[0].nodeValue) + '">' + candidate_names[i].childNodes[0].nodeValue + '</a><div class="resume"><span style="font-weight: bold;">Resume:</span> <a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">' + resume_files[i].childNodes[0].nodeValue + '</a></div>', '', 'cell'));
+                    row.set(4, new Cell(referred_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     var status = '<span class="not_viewed_yet">Not Viewed Yet</span>';
                     if (viewed_ons[i].childNodes.length > 0) {
@@ -161,15 +164,13 @@ function update_applications() {
                     if (has_remarks[i].childNodes[0].nodeValue == '1') {
                         status = status + '<br/><a class="no_link" onClick="show_employer_remarks(' + ids[i].childNodes[0].nodeValue + ');">Employer Remarks</a>';
                     }
-                    row.set(4, new Cell(status, '', 'cell testimony'));
+                    row.set(5, new Cell(status, '', 'cell testimony'));
                     
                     var testimony = 'None Provided';
                     if (has_testimonies[i].childNodes[0].nodeValue == '1') {
                         testimony = '<a class="no_link" onClick="show_testimony(' + ids[i].childNodes[0].nodeValue + ');">Show</a>';
                     }
-                    row.set(5, new Cell(testimony, '', 'cell testimony'));
-                    
-                    row.set(6, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">' + resume_files[i].childNodes[0].nodeValue + '</a>', '', 'cell testimony'));
+                    row.set(6, new Cell(testimony, '', 'cell testimony'));
                     
                     applications_table.set((parseInt(i)+1), row);
                 }

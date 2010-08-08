@@ -85,6 +85,10 @@ table.buttons td.right {
     background-color: #FFFF00;
 }
 
+div.resume {
+    font-size: 9pt;
+}
+
 #testimony_window,
 #job_desc_window, 
 #employer_remarks_window {

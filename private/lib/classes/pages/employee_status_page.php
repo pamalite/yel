@@ -47,11 +47,12 @@ class EmployeeStatusPage extends Page {
     
     private function get_applications() {
         $criteria = array(
-            'columns' => "referrals.id, referrals.member AS referrer, 
+            'columns' => "referrals.id, referrals.member AS referrer, referrals.referee AS candidate, 
                           jobs.title AS job, jobs.id AS job_id, 
                           employers.name AS employer, employers.id AS employer_id, 
                           referrals.resume AS resume_id, resumes.file_name, 
-                          CONCAT(members.lastname, ', ', members.firstname) AS referrer_name, 
+                          CONCAT(referrers.lastname, ', ', referrers.firstname) AS referrer_name, 
+                          CONCAT(candidates.lastname, ', ', candidates.firstname) AS candidate_name, 
                           DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
                           DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_agreed_terms_on, 
                           DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
@@ -59,7 +60,8 @@ class EmployeeStatusPage extends Page {
                           DATE_FORMAT(referrals.employer_removed_on, '%e %b, %Y') AS formatted_employer_removed_on, 
                           IF(referrals.testimony IS NULL OR referrals.testimony = '', '0', '1') AS has_testimony, 
                           IF(referrals.employer_remarks IS NULL OR referrals.employer_remarks = '', '0', '1') AS has_employer_remarks", 
-            'joins' => "members ON members.email_addr = referrals.member, 
+            'joins' => "members AS referrers ON referrers.email_addr = referrals.member, 
+                        members AS candidates ON candidates.email_addr = referrals.referee, 
                         jobs ON jobs.id = referrals.job, 
                         employers ON employers.id = jobs.employer, 
                         resumes ON resumes.id = referrals.resume", 
@@ -143,17 +145,19 @@ class EmployeeStatusPage extends Page {
 
                 $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'employers.name');\">Employers</a>", '', 'header');
                 $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header');
-                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'members.lastname');\">Referrer</a>", '', 'header');
-                $applications_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header');
-                $applications_table->set(0, 4, 'Status', '', 'header');
-                $applications_table->set(0, 5, "Testimony", '', 'header');
-                $applications_table->set(0, 6, "Resume Submitted", '', 'header');
+                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrers.lastname');\">Referrer</a>", '', 'header');
+                $applications_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'candidates.lastname');\">Candidate</a>", '', 'header');
+                $applications_table->set(0, 4, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header');
+                $applications_table->set(0, 5, 'Status', '', 'header');
+                $applications_table->set(0, 6, "Testimony", '', 'header');
+                //$applications_table->set(0, 7, "Resume Submitted", '', 'header');
 
                 foreach ($applications as $i=>$application) {
                     $applications_table->set($i+1, 0, '<a href="employer.php?id='. $application['employer_id']. '">'. $application['employer']. '</a>', '', 'cell');
                     $applications_table->set($i+1, 1, '<a class="no_link" onClick="show_job_desc('. $application['job_id']. ');">'. $application['job']. '</a>', '', 'cell');
                     $applications_table->set($i+1, 2, '<a href="member.php?member_email_addr='. $application['referrer']. '">'. $application['referrer_name']. '</a>', '', 'cell');
-                    $applications_table->set($i+1, 3, $application['formatted_referred_on'], '', 'cell');
+                    $applications_table->set($i+1, 3, '<a href="member.php?member_email_addr='. $application['candidate']. '">'. $application['candidate_name']. '</a><div class="resume"><span style="font-weight: bold;">Resume:</span> <a href="resume.php?id='. $application['resume_id']. '">'. $application['file_name']. '</a></div>', '', 'cell');
+                    $applications_table->set($i+1, 4, $application['formatted_referred_on'], '', 'cell');
                     
                     $status = '<span class="not_viewed_yet">Not Viewed Yet</a>';
                     if (!is_null($application['formatted_employer_agreed_terms_on'])) {
@@ -175,15 +179,13 @@ class EmployeeStatusPage extends Page {
                     if ($application['has_employer_remarks'] == '1') {
                         $status .= '<br/><a class="no_link" onClick="show_employer_remarks('. $application['id']. ');">Employer Remarks</a>';
                     }
-                    $applications_table->set($i+1, 4, $status, '', 'cell testimony');
+                    $applications_table->set($i+1, 5, $status, '', 'cell testimony');
                     
                     $testimony = 'None Provided';
                     if ($application['has_testimony'] == '1') {
                         $testimony = '<a class="no_link" onClick="show_testimony('. $application['id']. ');">Show</a>';
                     }
-                    $applications_table->set($i+1, 5, $testimony, '', 'cell testimony');
-                    
-                    $applications_table->set($i+1, 6, '<a href="resume.php?id='. $application['resume_id']. '">'. $application['file_name']. '</a>', '', 'cell testimony');
+                    $applications_table->set($i+1, 6, $testimony, '', 'cell testimony');
                 }
 
                 echo $applications_table->get_html();
