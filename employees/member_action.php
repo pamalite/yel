@@ -432,4 +432,34 @@ if ($_POST['action'] == 'get_employer_remarks') {
     echo $remarks;
     exit();
 }
+
+if ($_POST['action'] == 'get_filtered_jobs') {
+    $criteria = array(
+        'columns' => "jobs.id, jobs.title, industries.industry", 
+        'joins' => "industries ON industries.id = jobs.industry", 
+        //'match' => "jobs.employer = '". $_POST['id']. "' AND jobs.expire_on >= now()"
+        'match' => "jobs.employer = '". $_POST['id']. "'"
+    );
+    
+    $job = new Job();
+    $result = $job->find($criteria);
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('jobs' => array('job' => $result)));
+    exit(); 
+}
+
+if ($_POST['action'] == 'get_job_desc') {
+    $criteria = array(
+        'columns' => "description", 
+        'match' => "id = '". $_POST['id']. "'"
+    );
+    
+    $job = new Job();
+    $result = $job->find($criteria);
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('jobs' => array('job' => $result)));
+    exit(); 
+}
 ?>

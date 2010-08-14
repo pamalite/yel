@@ -45,6 +45,7 @@ class EmployeeMemberPage extends Page {
     public function insert_employee_member_css() {
         $this->insert_css();
         
+        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/list_box.css">'. "\n";
         echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_member.css">'. "\n";
     }
     
@@ -52,6 +53,7 @@ class EmployeeMemberPage extends Page {
         $this->insert_scripts();
         
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/list_box.js"></script>'. "\n";
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_member.js"></script>'. "\n";
     }
     
@@ -213,6 +215,17 @@ class EmployeeMemberPage extends Page {
         
         $referral = new Referral();
         return $referral->find($criteria);
+    }
+    
+    private function get_employers() {
+        $criteria = array(
+            'columns' => "employers.id, employers.name AS employer",
+            'joins' => "employers ON employers.id = jobs.employer", 
+            'match' => "jobs.expire_on >= now()"
+        );
+        
+        $job = new Job();
+        return $job->find($criteria);
     }
     
     public function show() {
@@ -498,7 +511,7 @@ class EmployeeMemberPage extends Page {
                     foreach ($profile['resumes'] as $i=>$resume) {
                         $resumes_table->set($i+1, 0, $resume['formatted_modified_on'], '', 'cell');
                         $resumes_table->set($i+1, 1, '<a href="resume.php?id='. $resume['id']. '">'. $resume['file_name']. '</a>', '', 'cell');
-                        $resumes_table->set($i+1, 2, '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>&nbsp;|&nbsp;<a class="no_link" onClick="apply_job_with('. $resume['id']. ');">Apply Job</a>', '', 'cell actions');
+                        $resumes_table->set($i+1, 2, '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>&nbsp;|&nbsp;<a class="no_link" onClick="show_apply_job_popup('. $resume['id']. ', \''. addslashes($resume['file_name']). '\');">Apply Job</a>', '', 'cell actions');
                     }
 
                     echo $resumes_table->get_html();
@@ -757,6 +770,83 @@ class EmployeeMemberPage extends Page {
         </div>
         
         <!-- popup windows goes here -->
+        <div id="upload_resume_window" class="popup_window">
+            <div class="popup_window_title">Upload Resume</div>
+            <form id="upload_resume_form" action="member_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_upload_resume_popup(true);">
+                <div class="upload_resume_form">
+                    <input type="hidden" id="resume_id" name="id" value="0" />
+                    <input type="hidden" name="member" value="<?php echo $this->member->getId(); ?>" />
+                    <input type="hidden" name="action" value="upload_resume" />
+                    <div id="upload_field" class="upload_field">
+                        <input id="my_file" name="my_file" type="file" />
+                        <div style="font-size: 9pt; margin-top: 15px;">
+                            <ol>
+                                <li>Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 1MB are allowed.</li>
+                                <li>You can upload as many resumes as you want and designate them for different job applications.</li>
+                                <li>You can update your resume by clicking &quot;Update&quot; then upload an updated version.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup_window_buttons_bar">
+                     <input type="submit" value="Upload" />
+                     <input type="button" value="Cancel" onClick="close_upload_resume_popup(false);" />
+                </div>
+            </form>
+        </div>
+                
+        <div id="apply_job_window" class="popup_window">
+            <div class="popup_window_title">Apply Job</div>
+            <div class="resume_info">
+                <span style="font-weight: bold;">Resume selected:</span>
+                <span id="resume_file_name"></span>
+            </div>
+            <form id="apply_job_form" onSubmit="return false;">
+                <input type="hidden" id="resume_id" name="resume_id" value="0" />
+                <div class="apply_job_form">
+                    <table class="jobs_selection">
+                        <tr>
+                            <td class="jobs_list">
+                            <?php
+                                $employers = $this->get_employers();
+                                if (!empty($employers) && $employers !== false) {
+                            ?>
+                                <select id="employers" onClick="filter_jobs();">
+                            <?php
+                                    foreach($employers as $employer) {
+                            ?>
+                                    <option value="<?php echo $employer['id']; ?>"><?php echo $employer['employer']; ?></option>
+                            <?php
+                                    }
+                            ?>
+                                </select>
+                            <?php
+                                } else {
+                            ?>
+                                <span class="no_employers">[No employers with opened jobs found.]</span>
+                            <?php
+                                }
+                            ?>
+                                <div id="jobs_selector">
+                                    Select an employer in the dropdown list above.
+                                </div>
+                            </td>
+                            <td class="separator"></td>
+                            <td>
+                                <div id="job_description">
+                                    Select a job in the jobs list.
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="popup_window_buttons_bar">
+                    <input type="button" value="Apply" onClick="close_apply_job_popup(true);" />
+                    <input type="button" value="Cancel" onClick="close_apply_job_popup(false);" />
+                </div>
+            </form>
+        </div>
+        
         <div id="add_referrers_window" class="popup_window">
             <?php 
                 $has_no_potential_referrers = false;

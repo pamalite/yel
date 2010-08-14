@@ -1,6 +1,7 @@
 var order = 'desc';
 var order_by = 'referrals.referred_on';
 var filter = '';
+var jobs_list = new ListBox('jobs_selector', 'jobs_list', true);
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -870,6 +871,64 @@ function show_employer_remarks(_referral_id) {
 
 function close_employer_remarks() {
     close_window('employer_remarks_window');
+}
+
+function show_apply_job_popup(_resume_id, _resume_file_name) {
+    $('resume_id').value = _resume_id;
+    $('resume_file_name').set('html', _resume_file_name);
+    filter_jobs();
+    show_window('apply_job_window');
+    window.scrollTo(0, 0);
+}
+
+function close_apply_job_popup(_is_apply_job) {
+    if (_is_apply_job) {
+        
+    } else {
+        close_window('apply_job_window');
+    }
+}
+
+function filter_jobs() {
+    if ($('employers') == null) {
+        $('jobs_selected').set('html', '<span class="no_employers">No opened jobs found.</span>');
+        $('job_description').set('html', '');
+        return;
+    }
+    
+    var employer = $('employers').options[$('employers').selectedIndex].value;
+    var params = 'id=' + employer + '&action=get_filtered_jobs';
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error occured while retrieving jobs.');
+                return;
+            }
+            
+            if (txt == '0') {
+                $('jobs_selected').set('html', '<span class="no_employers">No opened jobs found.</span>');
+                $('job_description').set('html', '');
+                return;
+            }
+            
+            jobs_list.clear();
+            var ids = xml.getElementsByTagName('id');
+            var titles = xml.getElementsByTagName('title');
+            var industries = xml.getElementsByTagName('industry');
+            
+            for (var i=0; i < ids.length; i++) {
+                var item = '<span class="job_item">' + titles[i].childNodes[0].nodeValue + '</span><br/><span class="job_industry_item">' + industries[i].childNodes[0].nodeValue + '</span>';
+                jobs_list.add_item(item, ids[i].childNodes[0].nodeValue);
+            }
+            
+            jobs_list.show();
+        }
+    });
+    
+    request.send(params);
 }
 
 function onDomReady() {
