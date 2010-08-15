@@ -435,7 +435,8 @@ if ($_POST['action'] == 'get_employer_remarks') {
 
 if ($_POST['action'] == 'get_filtered_jobs') {
     $criteria = array(
-        'columns' => "jobs.id, jobs.title, industries.industry", 
+        'columns' => "jobs.id, jobs.title, industries.industry, 
+                     DATE_FORMAT(jobs.expire_on, '%e %b, %Y') AS formatted_expire_on", 
         'joins' => "industries ON industries.id = jobs.industry", 
         //'match' => "jobs.employer = '". $_POST['id']. "' AND jobs.expire_on >= now()"
         'match' => "jobs.employer = '". $_POST['id']. "'"
@@ -449,17 +450,29 @@ if ($_POST['action'] == 'get_filtered_jobs') {
     exit(); 
 }
 
-if ($_POST['action'] == 'get_job_desc') {
-    $criteria = array(
-        'columns' => "description", 
-        'match' => "id = '". $_POST['id']. "'"
-    );
+if ($_POST['action'] == 'apply_job') {
+    $referral = new Referral();
     
-    $job = new Job();
-    $result = $job->find($criteria);
+    $member = $_POST['referrer'];
+    $referee = $_POST['id'];
+    $resume = $_POST['resume'];
+    $testimony = sanitize($_POST['testimony']);
+    $job_ids = explode(',', $_POST['jobs']);
     
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array(array('jobs' => array('job' => $result)));
-    exit(); 
+    $timestamp = date('Y-m-d h:i:s');
+    foreach($job_ids as $job) {
+        $data = array();
+        $data['member'] = $member;
+        $data['referee'] = $referee;
+        $data['resume'] = $resume;
+        $data['testimony'] = $testimony;
+        $data['job'] = $job;
+        $data['referred_on'] = $timestamp;
+        
+        $referral->create($data);
+    }
+    
+    echo 'ok';
+    exit();
 }
 ?>

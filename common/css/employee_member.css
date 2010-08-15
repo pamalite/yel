@@ -1,3 +1,7 @@
+label.overTxtLabel {
+    color: #666666;
+}
+
 .empty_results {
     text-align: center;
     color: #666666;
@@ -346,15 +350,23 @@ span.removed {
 }
 
 #apply_job_window {
-    width: 650px;
+    width: 750px;
     display: none;
 }
 
-div.apply_job_form {
+div.apply_job_form, 
+div.apply_job_testimony_form {
     width: 99%;
     height: 450px;
     margin: auto;
     overflow: auto;
+    padding-bottom: 3px;
+    padding-top: 3px;
+}
+
+textarea.apply_job_testimony {
+    width: 99%;
+    height: 93%;
 }
 
 div.resume_info {
@@ -390,7 +402,11 @@ table.jobs_selection td.separator {
     margin: auto;
     padding: 5px 5px 5px 5px;
     overflow: auto;
-    height: 93%;
+    height: 90%;
+}
+
+#selected_job_counter {
+    color: #666666;
 }
 
 #job_description {
@@ -412,4 +428,16 @@ table.jobs_selection td.separator {
 .job_industry_item {
     font-style: italic;
     font-size: 9pt;
+}
+
+.job_expiry_item {
+    font-size: 7pt;
+}
+
+#back_btn {
+    display: none;
+}
+
+#div_apply_job_testimony_form {
+    display: none;
 }

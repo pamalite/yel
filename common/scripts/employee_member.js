@@ -2,6 +2,7 @@ var order = 'desc';
 var order_by = 'referrals.referred_on';
 var filter = '';
 var jobs_list = new ListBox('jobs_selector', 'jobs_list', true);
+var is_selected_resume_and_job = false;
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -874,28 +875,111 @@ function close_employer_remarks() {
 }
 
 function show_apply_job_popup(_resume_id, _resume_file_name) {
+    is_selected_resume_and_job = false;
     $('resume_id').value = _resume_id;
     $('resume_file_name').set('html', _resume_file_name);
-    filter_jobs();
     show_window('apply_job_window');
     window.scrollTo(0, 0);
+    filter_jobs();
+    show_apply_job_form();
 }
 
 function close_apply_job_popup(_is_apply_job) {
     if (_is_apply_job) {
+        var selected_jobs = jobs_list.get_selected_values();
         
+        if (!is_selected_resume_and_job) {
+            if (selected_jobs.length > 0) {
+                is_selected_resume_and_job = true;
+                show_testimony_form();
+            } else {
+                alert('Please select at least one job.');
+            }
+            return;
+        }
+        
+        if (isEmpty($('apply_job_testimony').value)) {
+            var is_confirm_leave_blank = confirm('Are you sure to leave the testimony blank?');
+            if (!is_confirm_leave_blank) {
+                return;
+            }
+        }
+        
+        var params = 'id=' + member_id;
+        params = params + '&action=apply_job';
+        params = params + '&employee=' + user_id;
+        params = params + '&resume=' + $('resume_id').value;
+        
+        var selected_job_str = '';
+        for (var i=0; i < selected_jobs.length; i++) {
+            var item_value = selected_jobs[i].split('|');
+            selected_job_str = selected_job_str + item_value[item_value.length-1];
+            
+            if (i < selected_jobs.length-1) {
+                selected_job_str = selected_job_str + ',';
+            }
+        }
+        params = params + '&jobs=' + selected_job_str;
+        
+        var referrer = '';
+        if ($('apply_job_referrer').options != null) {
+            referrer = $('apply_job_referrer').options[$('apply_job_referrer').selectedIndex].value;
+        } else {
+            referrer = $('apply_job_referrer').value;
+        }
+        params = params + '&referrer=' + referrer;
+        params = params + '&testimony=' + $('apply_job_testimony').value;
+        
+        var uri = root + "/employees/member_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('An error occured while applying job.');
+                    return;
+                }
+
+                set_status('');
+                close_window('apply_job_window');
+            },
+            onRequest: function(instance) {
+                set_status('Applying job...');
+            }
+        });
+
+        request.send(params);
     } else {
         close_window('apply_job_window');
     }
 }
 
+function show_testimony_form() {
+    $('div_resume_info').setStyle('display', 'none');
+    $('back_btn').setStyle('display', 'inline');
+    $('div_apply_job_form').setStyle('display', 'none');
+    $('div_apply_job_testimony_form').setStyle('display', 'block');
+    
+    new OverText($('apply_job_testimony'));
+}
+
+function show_apply_job_form() {
+    is_selected_resume_and_job = false;
+    $('div_resume_info').setStyle('display', 'block');
+    $('back_btn').setStyle('display', 'none');
+    $('div_apply_job_form').setStyle('display', 'block');
+    $('div_apply_job_testimony_form').setStyle('display', 'none');
+}
+
 function filter_jobs() {
     if ($('employers') == null) {
-        $('jobs_selected').set('html', '<span class="no_employers">No opened jobs found.</span>');
+        $('jobs_selector').set('html', '<span class="no_employers">No opened jobs found.</span>');
         $('job_description').set('html', '');
+        $('apply_btn').disabled = true;
         return;
     }
     
+    $('apply_btn').disabled = false;
     var employer = $('employers').options[$('employers').selectedIndex].value;
     var params = 'id=' + employer + '&action=get_filtered_jobs';
     var uri = root + "/employees/member_action.php";
@@ -909,7 +993,7 @@ function filter_jobs() {
             }
             
             if (txt == '0') {
-                $('jobs_selected').set('html', '<span class="no_employers">No opened jobs found.</span>');
+                $('jobs_selector').set('html', '<span class="no_employers">No opened jobs found.</span>');
                 $('job_description').set('html', '');
                 return;
             }
@@ -918,13 +1002,48 @@ function filter_jobs() {
             var ids = xml.getElementsByTagName('id');
             var titles = xml.getElementsByTagName('title');
             var industries = xml.getElementsByTagName('industry');
+            var expirys = xml.getElementsByTagName('formatted_expire_on');
             
             for (var i=0; i < ids.length; i++) {
-                var item = '<span class="job_item">' + titles[i].childNodes[0].nodeValue + '</span><br/><span class="job_industry_item">' + industries[i].childNodes[0].nodeValue + '</span>';
+                var item = '<span class="job_item">' + titles[i].childNodes[0].nodeValue + '</span><br/><span class="job_industry_item">' + industries[i].childNodes[0].nodeValue + '</span><br/><span class="job_expiry_item">Expire On: ' + expirys[i].childNodes[0].nodeValue + '</span>';
                 jobs_list.add_item(item, ids[i].childNodes[0].nodeValue);
             }
             
             jobs_list.show();
+        }
+    });
+    
+    request.send(params);
+}
+
+function get_job_description() {
+    var counter = parseInt($('counter_lbl').get('html'));
+    if (jobs_list.items.length <= 0 || isEmpty(jobs_list.selected_value)) {
+        counter = counter - 1;
+        $('counter_lbl').set('html', counter);
+        return;
+    }
+    
+    counter = counter + 1;
+    $('counter_lbl').set('html', counter);
+    var params = 'id=' + jobs_list.selected_value + '&action=get_job_desc';
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error occured while retrieving job description.');
+                return;
+            }
+            
+            if (txt == '0') {
+                $('jobs_selector').set('html', '<span class="no_employers">No opened jobs found.</span>');
+                $('job_description').set('html', '');
+                return;
+            }
+            
+            $('job_description').set('html', txt);
         }
     });
     
@@ -948,6 +1067,8 @@ function onDomReady() {
             show_profile();
             break;
     }
+    
+    $('jobs_selector').addEvent('click', get_job_description);
 }
 
 window.addEvent('domready', onDomReady);

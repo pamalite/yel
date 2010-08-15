@@ -191,6 +191,18 @@ class EmployeeMemberPage extends Page {
         return $this->member->find($criteria);
     }
     
+    private function get_referrers() {
+        $criteria = array(
+            'columns' => "member_referees.member AS id, 
+                          CONCAT(members.lastname, ', ', members.firstname) AS member_name", 
+            'joins' => "member_referees ON members.email_addr = member_referees.member", 
+            'match' => "member_referees.referee = '". $this->member->getId(). "'",
+            'order' => "member_name"
+        );
+        
+        return $this->member->find($criteria);
+    }
+    
     private function get_applications() {
         $criteria = array(
             'columns' => "referrals.id, referrals.member AS referrer, 
@@ -219,9 +231,9 @@ class EmployeeMemberPage extends Page {
     
     private function get_employers() {
         $criteria = array(
-            'columns' => "employers.id, employers.name AS employer",
-            'joins' => "employers ON employers.id = jobs.employer", 
-            'match' => "jobs.expire_on >= now()"
+            'columns' => "DISTINCT employers.id, employers.name AS employer",
+            'joins' => "employers ON employers.id = jobs.employer" 
+            //'match' => "jobs.expire_on >= now()"
         );
         
         $job = new Job();
@@ -797,13 +809,13 @@ class EmployeeMemberPage extends Page {
                 
         <div id="apply_job_window" class="popup_window">
             <div class="popup_window_title">Apply Job</div>
-            <div class="resume_info">
+            <div id="div_resume_info" class="resume_info">
                 <span style="font-weight: bold;">Resume selected:</span>
                 <span id="resume_file_name"></span>
             </div>
             <form id="apply_job_form" onSubmit="return false;">
                 <input type="hidden" id="resume_id" name="resume_id" value="0" />
-                <div class="apply_job_form">
+                <div id="div_apply_job_form" class="apply_job_form">
                     <table class="jobs_selection">
                         <tr>
                             <td class="jobs_list">
@@ -830,6 +842,9 @@ class EmployeeMemberPage extends Page {
                                 <div id="jobs_selector">
                                     Select an employer in the dropdown list above.
                                 </div>
+                                <div id="selected_job_counter">
+                                    <span id="counter_lbl">0</span> jobs selected.
+                                </div>
                             </td>
                             <td class="separator"></td>
                             <td>
@@ -840,8 +855,37 @@ class EmployeeMemberPage extends Page {
                         </tr>
                     </table>
                 </div>
+                <div id="div_apply_job_testimony_form" class="apply_job_testimony_form">
+                    <textarea id="apply_job_testimony" class="apply_job_testimony" alt="Type your testimony here, if available."></textarea>
+                    <br/>
+                    <span style="font-weight: bold;">Referrer: </span>
+                <?php
+                    $referrers = $this->get_referrers();
+                    if (empty($referrers) || $referrers === false) {
+                ?>
+                    [No referrers.]
+                    <input type="hidden" id="apply_job_referrer" value="<?php echo 'team.'. strtolower($branch[0]['country']); ?>@yellowelevator.com" />
+                <?php
+                    } else {
+                ?>
+                    <select id="apply_job_referrer">
+                        <option value="">Select a Referrer</opion>
+                        <option value="" disabled>&nbsp;</opion>
+                <?php
+                        foreach ($referrers as $referrer) {
+                ?>
+                        <option value="<?php echo $referrer['id']; ?>"><?php echo htmlspecialchars_decode(stripslashes($referrer['member_name'])). ' ('. $referrer['id']. ')'; ?></option>
+                <?php
+                        }
+                ?>
+                    </select>
+                <?php
+                    }
+                ?>
+                </div>
                 <div class="popup_window_buttons_bar">
-                    <input type="button" value="Apply" onClick="close_apply_job_popup(true);" />
+                    <input type="button" id="back_btn" value="< Back" onClick="show_apply_job_form();" />
+                    <input type="button" id="apply_btn" value="Apply" onClick="close_apply_job_popup(true);" />
                     <input type="button" value="Cancel" onClick="close_apply_job_popup(false);" />
                 </div>
             </form>
