@@ -460,17 +460,39 @@ if ($_POST['action'] == 'apply_job') {
     $job_ids = explode(',', $_POST['jobs']);
     
     $timestamp = date('Y-m-d h:i:s');
+    $failed_jobs = array();
+    $data = array();
+    $data['member'] = $member;
+    $data['referee'] = $referee;
+    $data['resume'] = $resume;
+    $data['testimony'] = $testimony;
+    $data['referred_on'] = $timestamp;
+    $data['job'] = 0;
     foreach($job_ids as $job) {
-        $data = array();
-        $data['member'] = $member;
-        $data['referee'] = $referee;
-        $data['resume'] = $resume;
-        $data['testimony'] = $testimony;
         $data['job'] = $job;
-        $data['referred_on'] = $timestamp;
-        
-        $referral->create($data);
+        if ($referral->create($data) === false) {
+            $failed_jobs[] = $job;
+        }
     }
+    
+    if (!empty($failed_jobs) && count($failed_jobs) > 0) {
+        $criteria = array(
+            "columns" => "jobs.id, jobs.title, employers.id, employers.name AS employer, 
+                          jobs.expire_on", 
+            "joins" => "employers ON employers.id = jobs.id", 
+            "match" => "jobs.id IN (". implode(',', $failed_jobs). ")"
+        );
+        
+        $job = new Job();
+        $result = $job->find($criteria);
+        
+        header('Content-type: text/xml');
+        echo $xml_dom->get_xml_from_array(array('failed_jobs' => array('job' => $result)));
+        exit();
+    }
+    
+    // send email to employers and CC to team.XX@yellowelevator.com
+    
     
     echo 'ok';
     exit();
