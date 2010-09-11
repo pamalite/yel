@@ -123,6 +123,7 @@ if ($_POST['action'] == 'upload_resume') {
     $data['private'] = 'N';
     
     if ($_POST['id'] == '0') {
+        $data['is_yel_uploaded'] = '1';
         $resume = new Resume($member->getId());
         if (!$resume->create($data)) {
             redirect_to('member.php?member_email_addr='. $member->getId(). '&page=resumes&error=1');
@@ -451,31 +452,55 @@ if ($_POST['action'] == 'get_filtered_jobs') {
 }
 
 if ($_POST['action'] == 'apply_job') {
-    $referral = new Referral();
+    $employee = new Employee($_POST['employee']);
+    $branch = $employee->getBranch();
+    $yel_email = 'team.'. strtolower($branch['country']). '@yellowelevator.com';
     
-    $member = $_POST['referrer'];
+    $member = $yel_email;
+    if (!empty($_POST['referrer'])) {
+        $member = $_POST['referrer'];
+    }
     $referee = $_POST['id'];
     $resume = $_POST['resume'];
-    $testimony = sanitize($_POST['testimony']);
     $job_ids = explode(',', $_POST['jobs']);
     
+    $referral = new Referral();
     $timestamp = date('Y-m-d h:i:s');
     $failed_jobs = array();
     $data = array();
     $data['member'] = $member;
     $data['referee'] = $referee;
     $data['resume'] = $resume;
-    $data['testimony'] = $testimony;
     $data['referred_on'] = $timestamp;
+    $data['referee_acknowledged_on'] = $timestamp;
+    $data['member_confirmed_on'] = $timestamp;
+    $data['member_read_resume_on'] = $timestamp;
     $data['job'] = 0;
     foreach($job_ids as $job) {
         $data['job'] = $job;
         if ($referral->create($data) === false) {
-            $failed_jobs[] = $job;
+            $criteria = array(
+                "columns" => "id", 
+                "match" => "member = '". $member. "' AND 
+                            referee = '". $referee. "' AND 
+                            job = ". $job. " LIMIT 1"
+            );
+            $result = $referral->find($criteria);
+            
+            if (is_null($result) || count($result) <= 0 || $result === false) {
+                $failed_jobs[] = $job;
+                continue;
+            } 
+
+            $data_1 = $data;
+            $data_1['id'] = $result[0]['id'];
+            if ($referral->update($data_1) === false) {
+                $failed_jobs[] = $job;
+            }
         }
     }
     
-    if (!empty($failed_jobs) && count($failed_jobs) > 0) {
+    if (!empty($failed_jobs) && count($failed_jobs) > 0) {        
         $criteria = array(
             "columns" => "jobs.id, jobs.title, employers.id, employers.name AS employer, 
                           jobs.expire_on", 
@@ -491,8 +516,89 @@ if ($_POST['action'] == 'apply_job') {
         exit();
     }
     
-    // send email to employers and CC to team.XX@yellowelevator.com
+    // send email to employer and CC to team.XX@yellowelevator.com
+    // 1. setup the mail message contents
+    $jobs = array();
+    if (empty($failed_jobs)) {
+        $jobs = $job_ids;
+    } else {
+        foreach ($job_ids as $job) {
+            if (!in_array($job, $job_ids)) {
+                $job[] = $job;
+            }
+        }
+    }
     
+    $criteria = array(
+        "columns" => "jobs.title, employers.id AS employer_id" 
+        "joins" => "employers ON employers.id = jobs.id", 
+        "match" => "jobs.id IN (". implode(',', $jobs). ")"
+    );
+    $job = new Job();
+    $result = $job->find($criteria);
+    
+    $employer = new Employer($result[0]['employer_id']);
+    
+    $mail_lines = file('../private/mail/employee_new_job_application.txt');
+    $message = '';
+    foreach ($mail_lines as $line) {
+        $message .= $line;
+    }
+    
+    $job_list = '';
+    $i = 0;
+    foreach ($result as $row) {
+        $job_list .= '- '. htmlspecialchars_decode(stripslashes($row[$i]['title'])). "\n";
+        $i++;
+    }
+    
+    $message = str_replace('%company%', htmlspecialchars_decode(stripslashes($employer->getName())), $message);
+    $message = str_replace('%jobs%', $job_list, $message);
+    $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+    $message = str_replace('%root%', $GLOBALS['root'], $message);
+    
+    // 2. get the selected resume file
+    $criteria = array(
+        "columns" => "file_name, file_hash, file_size, file_type", 
+        "match" => "id = ". $resume. " LIMIT 1"
+    );
+    $member_resume = new Resume();
+    $result = $member_resume->find($criteria);
+    $original_filename = explode('.', $result[0]['file_name']);
+    $extension = $original_filename[1];
+    $resume_file_raw = $resume. '.'. $result[0]['file_hash'];
+    $attached_filename = $resume. '.'. $extension;
+    $filetype = $result[0]['file_type'];
+    $attachment = chunk_split(base64_encode(file_get_contents($GLOBALS['resume_dir']. '/'. $attached_filename)));
+    
+    // 3. make mail with attachment
+    $subject = 'New Applicant from YellowElevator';
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    $headers .= 'Cc: '. $yel_email. "\n";
+    $headers .= 'MIME-Version: 1.0'. "\n";
+    $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $attached_filename. '";'. "\n\n";
+    
+    $body = '--yel_mail_sep_'. $attached_filename. "\n";
+    $body .= 'Content-Type: multipart/alternative; boundary="yel_mail_sep_alt_'. $attached_filename. '"'. "\n";
+    $body .= '--yel_mail_sep_alt_'. $attached_filename. "\n";
+    $body .= 'Content-Type: text/plain; charset="iso-8859-1"'. "\n";
+    $body .= 'Content-Transfer-Encoding: 7bit"'. "\n";
+    
+    $body .= $message. "\n";
+    $body .= '--yel_mail_sep_alt_'. $attached_filename. "--\n\n";
+    $body .= '--yel_mail_sep_'. $attached_filename. "\n";
+    $body .= 'Content-Type: '. $filetype. '; name="'. $attached_filename. '"'. "\n";
+    $body .= 'Content-Transfer-Encoding: base64'. "\n";
+    $body .= 'Content-Disposition: attachment'. "\n";
+    $body .= $attachment. "\n";
+    $body .= '--yel_mail_sep_'. $attached_filename. "--\n\n";
+    // mail($employer->getEmailAddress(), $subject, $body, $headers);
+    mail('ken.sng.wong@yellowelevator.com', $subject, $body, $headers);
+    
+    $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $body);
+    fclose($handle);
     
     echo 'ok';
     exit();

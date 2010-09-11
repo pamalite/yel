@@ -53,12 +53,15 @@ if ($has_photo) {
     <?php
 } else {
     if (file_exists($file)) {
+        $filename_items = explode('.', $resume_file['file_name']);
+        $ext = $filename_items[1];
+        
         header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Pragma: public');
         header('Expires: -1');
         header('Content-Description: File Transfer');
         header('Content-Length: ' . $resume_file['file_size']);
-        header('Content-Disposition: attachment; filename="' . $resume_file['file_name'].'"');
+        header('Content-Disposition: attachment; filename="' . $_GET['id']. '.'. $ext. '"');
         header('Content-type: '. $resume_file['file_type']);
         ob_clean();
         flush();

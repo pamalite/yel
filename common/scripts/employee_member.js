@@ -2,7 +2,6 @@ var order = 'desc';
 var order_by = 'referrals.referred_on';
 var filter = '';
 var jobs_list = new ListBox('jobs_selector', 'jobs_list', true);
-var is_selected_resume_and_job = false;
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -875,34 +874,24 @@ function close_employer_remarks() {
 }
 
 function show_apply_job_popup(_resume_id, _resume_file_name) {
-    is_selected_resume_and_job = false;
     $('resume_id').value = _resume_id;
     $('resume_file_name').set('html', _resume_file_name);
     show_window('apply_job_window');
     window.scrollTo(0, 0);
     filter_jobs();
-    show_apply_job_form();
 }
 
 function close_apply_job_popup(_is_apply_job) {
     if (_is_apply_job) {
         var selected_jobs = jobs_list.get_selected_values();
         
-        if (!is_selected_resume_and_job) {
-            if (selected_jobs.length > 0) {
-                is_selected_resume_and_job = true;
-                show_testimony_form();
-            } else {
-                alert('Please select at least one job.');
-            }
+        if (selected_jobs.length <= 0) {
+            alert('Please select at least one job.');
             return;
         }
         
-        if (isEmpty($('apply_job_testimony').value)) {
-            var is_confirm_leave_blank = confirm('Are you sure to leave the testimony blank?');
-            if (!is_confirm_leave_blank) {
-                return;
-            }
+        if (!confirm('Confirm to apply the selected jobs for candidate?')) {
+            return;
         }
         
         var params = 'id=' + member_id;
@@ -928,7 +917,6 @@ function close_apply_job_popup(_is_apply_job) {
             referrer = $('apply_job_referrer').value;
         }
         params = params + '&referrer=' + referrer;
-        params = params + '&testimony=' + $('apply_job_testimony').value;
         
         var uri = root + "/employees/member_action.php";
         var request = new Request({
@@ -939,7 +927,21 @@ function close_apply_job_popup(_is_apply_job) {
                     alert('An error occured while applying job.');
                     return;
                 }
-
+                
+                if (xml) {
+                    var job_titles = xml.getElementsByTagName('title');
+                    var employers = xml.getElementsByTagName('employer');
+                    var expire_ons = xml.getElementsByTagName('expire_on');
+                    
+                    var error_msg = 'The following jobs failed to apply:' + "\n\n";
+                    for (var i=0; i < job_titles.length; i++) {
+                        error_msg = error_msg + '- ' + job_titles[i].childNodes[0].nodeValue + ' (' + employers[i].childNodes[0].nodeValue + ') [exp: ' + expire_ons[i].childNodes[0].nodeValue + ']' + "\n";
+                    }
+                    
+                    alert(error_msg);
+                    return;
+                }
+                
                 set_status('');
                 close_window('apply_job_window');
             },
@@ -952,23 +954,6 @@ function close_apply_job_popup(_is_apply_job) {
     } else {
         close_window('apply_job_window');
     }
-}
-
-function show_testimony_form() {
-    $('div_resume_info').setStyle('display', 'none');
-    $('back_btn').setStyle('display', 'inline');
-    $('div_apply_job_form').setStyle('display', 'none');
-    $('div_apply_job_testimony_form').setStyle('display', 'block');
-    
-    new OverText($('apply_job_testimony'));
-}
-
-function show_apply_job_form() {
-    is_selected_resume_and_job = false;
-    $('div_resume_info').setStyle('display', 'block');
-    $('back_btn').setStyle('display', 'none');
-    $('div_apply_job_form').setStyle('display', 'block');
-    $('div_apply_job_testimony_form').setStyle('display', 'none');
 }
 
 function filter_jobs() {
@@ -999,6 +984,7 @@ function filter_jobs() {
             }
             
             jobs_list.clear();
+            $('counter_lbl').set('html', '0');
             var ids = xml.getElementsByTagName('id');
             var titles = xml.getElementsByTagName('title');
             var industries = xml.getElementsByTagName('industry');

@@ -72,10 +72,12 @@ class Referral implements Model {
         }
         
         if (($this->id = $this->mysqli->execute($query, true)) > 0) {
-            $query = "INSERT INTO `referral_index` SET 
-                      `referral` = ". $this->id. ", 
-                      `testimony` = '". $simplified_testimony. "'";
-            $this->mysqli->execute($query);
+            if (!empty($simplified_testimony)) {
+                $query = "INSERT INTO `referral_index` SET 
+                          `referral` = ". $this->id. ", 
+                          `testimony` = '". $simplified_testimony. "'";
+                $this->mysqli->execute($query);
+            }
             return $this->id;
         }
         
@@ -126,10 +128,14 @@ class Referral implements Model {
         $query .= "WHERE id = '". $this->id. "'";
         
         if ($this->mysqli->execute($query)) {
-            $query = "UPDATE `referral_index` SET 
-                      `testimony` = '". $simplified_testimony. "' 
-                      WHERE referral = ". $this->id;
-            return $this->mysqli->execute($query);
+            if (!empty($simplified_testimony)) {
+                $query = "UPDATE `referral_index` SET 
+                          `testimony` = '". $simplified_testimony. "' 
+                          WHERE referral = ". $this->id;
+                return $this->mysqli->execute($query);
+            } else {
+                return true;
+            }
         }
         
         return false;

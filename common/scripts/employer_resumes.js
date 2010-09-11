@@ -137,7 +137,8 @@ function show_resumes_of(_job_id, _job_title) {
                 
                 var header = new Row('');
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'candidate');\">Candidate</a>", '', 'header'));
+                // header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'candidate');\">Candidate</a>", '', 'header'));
+                header.set(1, new Cell("Resume Number", '', 'header'));
                 header.set(2, new Cell("Resume", '', 'header'));
                 header.set(3, new Cell("Remarks", '', 'header'));
                 header.set(4, new Cell('&nbsp;', '', 'header'));
@@ -169,14 +170,16 @@ function show_resumes_of(_job_id, _job_title) {
                     var row = new Row('');
                     row.set(0, new Cell(referred_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
-                    var candidate_details = '';
-                    if (is_agreed_terms) {
-                        candidate_details = candidates[i].name;
-                        candidate_details = candidate_details + '<div class="mini_contacts">Tel: ' + candidates[i].phone_num + '<br/>Email: <a href="mailto: ' + candidates[i].email_addr + '">' + candidates[i].email_addr + '</a></div></div>';
-                    } else {
-                        candidate_details = '<div id="candidate_' + i + '">' + candidates[i].name + '</div>';
-                    }
-                    row.set(1, new Cell(candidate_details, '', 'cell'));
+                    //var candidate_details = '';
+                    // if (is_agreed_terms) {
+                    //     candidate_details = candidates[i].name;
+                    //     candidate_details = candidate_details + '<div class="mini_contacts">Tel: ' + candidates[i].phone_num + '<br/>Email: <a href="mailto: ' + candidates[i].email_addr + '">' + candidates[i].email_addr + '</a></div></div>';
+                    // } else {
+                    //     candidate_details = '<div id="candidate_' + i + '">' + candidates[i].name + '</div>';
+                    // }
+                    //row.set(1, new Cell(candidate_details, '', 'cell'));
+                    
+                    row.set(1, new Cell(resume_ids[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     var agreed_terms = 'false';
                     if (is_agreed_terms) {
@@ -211,7 +214,7 @@ function show_resumes_of(_job_id, _job_title) {
                         actions = actions + get_display_stars_for(referral_ids[i].childNodes[0].nodeValue, stars);
                         actions = actions + '</span>';
                         actions = actions + '<br/>';
-                        actions = actions + '<a class="no_link" onClick="show_employment_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Hired</a>';
+                        actions = actions + '<a class="no_link" onClick="show_employment_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Employed</a>';
                         actions = actions + '&nbsp;|&nbsp;';
                         actions = actions + '<a class="no_link" onClick="show_notify_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Notify</a>';
                     }

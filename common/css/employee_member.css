@@ -357,7 +357,7 @@ span.removed {
 div.apply_job_form, 
 div.apply_job_testimony_form {
     width: 99%;
-    height: 450px;
+    height: 500px;
     margin: auto;
     overflow: auto;
     padding-bottom: 3px;
@@ -435,9 +435,5 @@ table.jobs_selection td.separator {
 }
 
 #back_btn {
-    display: none;
-}
-
-#div_apply_job_testimony_form {
     display: none;
 }

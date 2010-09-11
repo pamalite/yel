@@ -151,7 +151,8 @@ class EmployeeMemberPage extends Page {
         $resume = new Resume();
         
         $criteria = array(
-            'columns' => "id, file_name, DATE_FORMAT(modified_on, '%e %b, %Y') AS formatted_modified_on", 
+            'columns' => "id, file_name, is_yel_uploaded, 
+                          DATE_FORMAT(modified_on, '%e %b, %Y') AS formatted_modified_on", 
             'match' => "member = '". $this->member->getId(). "' AND deleted = 'N'", 
             'order' => "modified_on DESC"
         );
@@ -522,8 +523,13 @@ class EmployeeMemberPage extends Page {
 
                     foreach ($profile['resumes'] as $i=>$resume) {
                         $resumes_table->set($i+1, 0, $resume['formatted_modified_on'], '', 'cell');
-                        $resumes_table->set($i+1, 1, '<a href="resume.php?id='. $resume['id']. '">'. $resume['file_name']. '</a>', '', 'cell');
-                        $resumes_table->set($i+1, 2, '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>&nbsp;|&nbsp;<a class="no_link" onClick="show_apply_job_popup('. $resume['id']. ', \''. addslashes($resume['file_name']). '\');">Apply Job</a>', '', 'cell actions');
+                        $resumes_table->set($i+1, 1, '<a href="resume_download.php?id='. $resume['id']. '">'. $resume['file_name']. '</a>', '', 'cell');
+                        
+                        $resume_action = '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>';
+                        if ($resume['is_yel_uploaded'] == '1') {
+                            $resume_action .= '&nbsp;|&nbsp;<a class="no_link" onClick="show_apply_job_popup('. $resume['id']. ', \''. addslashes($resume['file_name']). '\');">Apply Job</a>';
+                        }
+                        $resumes_table->set($i+1, 2, $resume_action, '', 'cell actions');
                     }
 
                     echo $resumes_table->get_html();
@@ -811,7 +817,31 @@ class EmployeeMemberPage extends Page {
             <div class="popup_window_title">Apply Job</div>
             <div id="div_resume_info" class="resume_info">
                 <span style="font-weight: bold;">Resume selected:</span>
-                <span id="resume_file_name"></span>
+                <span id="resume_file_name"></span><br/>
+                <span style="font-weight: bold;">Referrer: </span>
+                <?php
+                    $referrers = $this->get_referrers();
+                    if (empty($referrers) || $referrers === false) {
+                ?>
+                    [No referrers.]
+                    <input type="hidden" id="apply_job_referrer" value="<?php echo 'team.'. strtolower($branch[0]['country']); ?>@yellowelevator.com" />
+                <?php
+                    } else {
+                ?>
+                    <select id="apply_job_referrer">
+                        <option value="">Select a Referrer</option>
+                        <option value="" disabled>&nbsp;</option>
+                <?php
+                        foreach ($referrers as $referrer) {
+                ?>
+                        <option value="<?php echo $referrer['id']; ?>"><?php echo htmlspecialchars_decode(stripslashes($referrer['member_name'])). ' ('. $referrer['id']. ')'; ?></option>
+                <?php
+                        }
+                ?>
+                    </select>
+                <?php
+                    }
+                ?>
             </div>
             <form id="apply_job_form" onSubmit="return false;">
                 <input type="hidden" id="resume_id" name="resume_id" value="0" />
@@ -823,7 +853,7 @@ class EmployeeMemberPage extends Page {
                                 $employers = $this->get_employers();
                                 if (!empty($employers) && $employers !== false) {
                             ?>
-                                <select id="employers" onClick="filter_jobs();">
+                                <select id="employers" onChange="filter_jobs();">
                             <?php
                                     foreach($employers as $employer) {
                             ?>
@@ -855,36 +885,7 @@ class EmployeeMemberPage extends Page {
                         </tr>
                     </table>
                 </div>
-                <div id="div_apply_job_testimony_form" class="apply_job_testimony_form">
-                    <textarea id="apply_job_testimony" class="apply_job_testimony" alt="Type your testimony here, if available."></textarea>
-                    <br/>
-                    <span style="font-weight: bold;">Referrer: </span>
-                <?php
-                    $referrers = $this->get_referrers();
-                    if (empty($referrers) || $referrers === false) {
-                ?>
-                    [No referrers.]
-                    <input type="hidden" id="apply_job_referrer" value="<?php echo 'team.'. strtolower($branch[0]['country']); ?>@yellowelevator.com" />
-                <?php
-                    } else {
-                ?>
-                    <select id="apply_job_referrer">
-                        <option value="">Select a Referrer</opion>
-                        <option value="" disabled>&nbsp;</opion>
-                <?php
-                        foreach ($referrers as $referrer) {
-                ?>
-                        <option value="<?php echo $referrer['id']; ?>"><?php echo htmlspecialchars_decode(stripslashes($referrer['member_name'])). ' ('. $referrer['id']. ')'; ?></option>
-                <?php
-                        }
-                ?>
-                    </select>
-                <?php
-                    }
-                ?>
-                </div>
                 <div class="popup_window_buttons_bar">
-                    <input type="button" id="back_btn" value="< Back" onClick="show_apply_job_form();" />
                     <input type="button" id="apply_btn" value="Apply" onClick="close_apply_job_popup(true);" />
                     <input type="button" value="Cancel" onClick="close_apply_job_popup(false);" />
                 </div>
