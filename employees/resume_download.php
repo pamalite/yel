@@ -43,26 +43,20 @@ if (isset($_SESSION['yel']['employee']['dev'])) {
 }
 
 $resume = new Resume(0, $_GET['id']);
-$cover = $resume->get();
-
-if (!is_null($cover[0]['file_name'])) {
-    $file = $resume->getFile();
-    $filename_items = explode('.', $file['name']);
-    $ext = $filename_items[1];
+$file = $resume->getFile();
+$filename_items = explode('.', $file['name']);
+$ext = $filename_items[1];
     
-    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-    header('Pragma: public');
-    header('Expires: -1');
-    header('Content-Description: File Transfer');
-    header('Content-Length: ' . $file['size']);
-    header('Content-Disposition: attachment; filename="' . $_GET['id']. '.'. $ext. '"');
-    header('Content-type: '. $file['type']);
-    ob_clean();
-    flush();
-    readfile($GLOBALS['resume_dir']. "/". $_GET['id']. ".". $file['hash']);
-} else {
-    redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?id='. $_GET['id']);
-}
+header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+header('Pragma: public');
+header('Expires: -1');
+header('Content-Description: File Transfer');
+header('Content-Length: ' . $file['size']);
+header('Content-Disposition: attachment; filename="' . $_GET['id']. '.'. $ext. '"');
+header('Content-type: '. $file['type']);
+ob_clean();
+flush();
+readfile($GLOBALS['resume_dir']. "/". $_GET['id']. ".". $file['hash']);
 
 exit();
 ?>

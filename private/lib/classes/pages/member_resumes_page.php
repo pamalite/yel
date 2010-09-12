@@ -59,7 +59,9 @@ class MemberResumesPage extends Page {
         
         $criteria = array(
             'columns' => "id, file_name, DATE_FORMAT(modified_on, '%e %b, %Y') AS formatted_modified_on", 
-            'match' => "member = '". $this->member->getId(). "' AND deleted = 'N'", 
+            'match' => "member = '". $this->member->getId(). "' AND 
+                        deleted = 'N' AND 
+                        is_yel_uploaded = FALSE", 
             'order' => "modified_on DESC"
         );
         

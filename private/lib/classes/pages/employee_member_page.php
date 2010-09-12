@@ -778,7 +778,7 @@ class EmployeeMemberPage extends Page {
                     }
                     $applications_table->set($i+1, 5, $testimony, '', 'cell testimony');
                     
-                    $applications_table->set($i+1, 6, '<a href="resume.php?id='. $application['resume_id']. '">'. $application['file_name']. '</a>', '', 'cell testimony');
+                    $applications_table->set($i+1, 6, '<a href="resume_download.php?id='. $application['resume_id']. '">'. $application['file_name']. '</a>', '', 'cell testimony');
                 }
 
                 echo $applications_table->get_html();

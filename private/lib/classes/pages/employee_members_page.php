@@ -150,9 +150,9 @@ class EmployeeMembersPage extends Page {
                     $applications_table->set($i+1, 2, $candidate_short_details, '', 'cell');
                     
                     if ($application['has_notes'] == '1') {
-                        $applications_table->set($i+1, 3, '<a class="no_link" onClick="show_notes_window(\''. $application['id']. '\');">Update</a>', '', 'cell');
+                        $applications_table->set($i+1, 3, '<a class="no_link" onClick="show_notes_popup(\''. $application['id']. '\');">Update</a>', '', 'cell');
                     } else {
-                        $applications_table->set($i+1, 3, '<a  class="no_link" onClick="show_notes_window(\''. $application['id']. '\');">Add</a>', '', 'cell');
+                        $applications_table->set($i+1, 3, '<a  class="no_link" onClick="show_notes_popup(\''. $application['id']. '\');">Add</a>', '', 'cell');
                     }
                     
                     if (!is_null($application['existing_resume_id']) && 
@@ -211,7 +211,7 @@ class EmployeeMembersPage extends Page {
                     if ($member['active'] == 'Y') {
                         $actions = '<input type="button" id="activate_button_'. $i. '" value="De-activate" onClick="activate_member(\''. $member['email_addr']. '\', \''. $i. '\');" />';
                         $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" />';
-                        $actions .= '<input type="button" value="Refer Job" onClick="show_refer_form(\''. $member['email_addr']. '\');" />';
+                        $actions .= '<input type="button" value="Pick a Resume to Refer" onClick="show_resumes_page(\''. $member['email_addr']. '\');" />';
                     } else {
                         $actions = '<input type="button" id="activate_button_'. $i. '" value="Activate" onClick="activate_member(\''. $member['email_addr']. '\', \''. $i. '\');" />';
                         // $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" disabled />';
@@ -237,6 +237,21 @@ class EmployeeMembersPage extends Page {
         </div>
         
         <div id="member_search">
+        </div>
+        
+        <!-- popup windows goes here -->
+        <div id="notes_window" class="popup_window">
+            <div class="popup_window_title">Notes</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="app_id" value="" />
+                <div class="notes_form">
+                    <textarea id="notes" class="notes"></textarea>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Cancel" onClick="close_notes_popup(false);" />
+                <input type="button" value="Save" onClick="close_notes_popup(true);" />
+            </div>
         </div>
         <?php
     }

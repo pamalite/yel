@@ -113,7 +113,7 @@ function show_members() {
                     if (is_actives[i].childNodes[0].nodeValue == 'Y') {
                         actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
                         actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
-                        actions = actions + '<input type="button" value="Refer Job" onClick="show_refer_form(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
+                        actions = actions + '<input type="button" value="Pick a Resume to Refer" onClick="show_resumes_page(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
                     } else {
                         actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
                     }
@@ -382,6 +382,93 @@ function show_search_members() {
     $('item_members').setStyle('background-color', '');
     $('item_search').setStyle('background-color', '#CCCCCC');
     
+}
+
+function show_resumes_page(_member_id) {
+    location.replace('member.php?member_email_addr=' + _member_id + '&page=resumes');
+}
+
+function delete_application(_app_id) {
+    if (!confirm('You sure to delete the selected application?')) {
+        return;
+    }
+    
+    var params = 'id=' + _app_id;
+    params = params + '&action=delete_application';
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('Cannot delete the application.');
+            }
+            
+            set_status('');
+            show_applications();
+        },
+        onRequest: function(instance) {
+            set_status('Deleting application...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function show_notes_popup(_app_id) {
+    $('app_id').value = _app_id;
+    
+    var params = 'id=' + _app_id;
+    params = params + '&action=get_notes';
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            txt = txt.replace('&lt;br/&gt;' , '<br/>');
+            txt = txt.replace(/<br\/>/g, "\n");
+            $('notes').value = txt;
+            set_status('');
+            show_window('notes_window');
+            window.scrollTo(0, 0);
+            $('notes').focus();
+        },
+        onRequest: function(instance) {
+            set_status('Loading notes...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_notes_popup(_is_save) {
+    if (_is_save) {
+        var params = 'id=' + $('app_id').value;
+        params = params + '&action=update_notes';
+        
+        var notes = $('notes').value.replace("\n", '<br/>');
+        params = params + '&notes=' + notes;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                close_window('notes_window');
+                set_status('');
+                show_applications();
+            },
+            onRequest: function(instance) {
+                set_status('Saving notes...');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('notes_window');
+    }
 }
 
 function onDomReady() {

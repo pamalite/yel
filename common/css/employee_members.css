@@ -91,3 +91,21 @@ a.menu {
 .member_form {
     display: none;
 }
+
+#notes_window {
+    width: 650px;
+    display: none;
+}
+
+div.notes_form {
+    padding-bottom: 10px;
+    width: 100%;
+    height: 550px;
+    text-align: center;
+}
+
+textarea.notes {
+    width: 98%;
+    height: 550px;
+    font-size: 12pt;
+}

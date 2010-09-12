@@ -944,6 +944,7 @@ function close_apply_job_popup(_is_apply_job) {
                 
                 set_status('');
                 close_window('apply_job_window');
+                location.replace('member.php?member_email_addr=' + member_id + '&page=applications');
             },
             onRequest: function(instance) {
                 set_status('Applying job...');

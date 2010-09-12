@@ -193,4 +193,35 @@ if ($_POST['action'] == 'reset_password') {
     echo 'ok';
     exit();
 }
+
+if ($_POST['action'] == 'get_notes') {
+    $referral_buffer = new ReferralBuffer($_POST['id']);
+    $record = $referral_buffer->get();
+    echo htmlspecialchars_decode(stripslashes($record[0]['notes']));
+    exit();
+}
+
+if ($_POST['action'] == 'update_notes') {
+    $data['notes'] = sanitize(stripslashes($_POST['notes']));
+
+    $referral_buffer = new ReferralBuffer($_POST['id']);
+    if ($referral_buffer->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'delete_application') {
+    $referral_buffer = new ReferralBuffer($_POST['id']);
+    if ($referral_buffer->delete() === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
 ?>
