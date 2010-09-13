@@ -108,7 +108,7 @@ class ReferralBuffer implements Model {
     }
     
     public function delete() {
-        $query = "SELECT resume_file_hash, existing_resume_id AS `resume` 
+        $query = "SELECT resume_file_hash, existing_resume_id 
                   FROM referral_buffers 
                   WHERE id = ". $this->id. " LIMIT 1";
         $result = $this->mysqli->query($query);
@@ -116,16 +116,9 @@ class ReferralBuffer implements Model {
         if (!is_null($result[0]['resume_file_hash'])) {
             $file = $GLOBALS['buffered_resume_dir']. '/'. $this->id. '.'. $result[0]['resume_file_hash'];
             @unlink($file);
-        } elseif (!is_null($result[0]['resume'])) {
-            $query = "UPDATE resumes SET deleted = 'Y' WHERE id = ". $result[0]['resume'];
-            $this->mysqli->execute($query);
-            
-            $query = "SELECT COUNT(id) AS is_used FROM referrals WHERE `resume` = ". $result[0]['resume'];
-            $result = $this->mysqli->query($query);
-            if ($result[0]['is_used'] <= 0) {
-                $query = "DELETE FROM resumes WHERE id = ". $result[0]['resume'];
-                $this->mysqli->execute($query);
-            }
+        } elseif (!is_null($result[0]['existing_resume_id'])) {
+            $resume = new Resume($result[0]['existing_resume_id']);
+            $resume->delete();
         }
         
         $query = "DELETE FROM referral_buffers WHERE id = ". $this->id;

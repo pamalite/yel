@@ -164,7 +164,6 @@ class EmployeeMembersPage extends Page {
                     
                     $actions = '<input type="button" value="Delete" onClick="delete_application(\''. $application['id']. '\');" />';
                     $actions .= '<input type="button" value="Sign Up" onClick="make_member_from(\''. $application['id']. '\');" />';
-                    $actions .= '<input type="button" value="Refer Job" onClick="show_refer_form(\''. $application['id']. '\');" />';
                     $applications_table->set($i+1, 5, $actions, '', 'cell action');
                 }
 
@@ -253,6 +252,54 @@ class EmployeeMembersPage extends Page {
                 <input type="button" value="Save" onClick="close_notes_popup(true);" />
             </div>
         </div>
+        
+        <div id="conflicts_window" class="popup_window">
+            <div class="popup_window_title">Member Contact Conflicts Resolution</div>
+            <div class="resolution_instructions">
+                Choose which of the following details are the latest contacts.
+            </div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="conflict_app_id" value="" />
+                <div class="conflicts_form">
+                    <table class="conflicts">
+                        <tr>
+                            <td class="buffered" colspan="2">Buffered</td>
+                            <td class="existing" colspan="2">Existing</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Name:</td>
+                            <td><span id="buffered_name"></span></td>
+                            <td class="label">Name:</td>
+                            <td><span id="existing_name"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Telephone:</td>
+                            <td><span id="buffered_phone"></span></td>
+                            <td class="label">Telephone:</td>
+                            <td><span id="existing_phone"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Requested On:</td>
+                            <td><span id="buffered_created_on"></span></td>
+                            <td class="label">Joined On:</td>
+                            <td><span id="existing_created_on"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="resolution_button" colspan="2">
+                                <input type="button" value="Use Buffered" onClick="close_conflict_popup(0);" />
+                            </td>
+                            <td class="resolution_button" colspan="2">
+                                <input type="button" value="Use Existing" onClick="close_conflict_popup(1);" />
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Cancel" onClick="close_conflict_popup();" />
+            </div>
+        </div>
+        
         <?php
     }
 }

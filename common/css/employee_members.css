@@ -109,3 +109,42 @@ textarea.notes {
     height: 550px;
     font-size: 12pt;
 }
+
+#conflicts_window {
+    width: 650px;
+    display: none;
+}
+
+div.resolution_instructions {
+    text-align: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+table.conflicts {
+    border: none;
+    width: 100%;
+    margin: auto;
+}
+
+table.conflicts td {
+    padding: 3px 3px 3px 3px;
+}
+
+table.conflicts td.buffered, 
+table.conflicts td.existing {
+    text-align: center;
+    font-weight: bold;
+    background-color: #CCCCCC;
+    width: 50%;
+}
+
+table.conflicts td.label {
+    width: 15%;
+    font-weight: bold;
+    background-color: #CCCCCC;
+}
+
+table.conflicts td.resolution_button {
+    text-align: center;
+}

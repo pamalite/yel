@@ -3,6 +3,55 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 
 session_start();
 
+function create_member_from($_email_addr, $_fullname, $_phone) {
+    if (empty($_email_addr) || empty($_fullname) || empty($_phone)) {
+        return false;
+    }
+    
+    $password = generate_random_string_of(6);
+    $timestamp = now();
+    $data = array();
+    $data['phone_num'] = $_phone;
+    $data['firstname'] = $_fullname;
+    $data['lastname'] = $data['firstname'];
+    $data['password'] = md5($password);
+    $data['forget_password_question'] = '1';
+    $data['forget_password_answer'] = '(System Generated)';
+    $data['joined_on'] = $timestamp;
+    $data['active'] = 'Y';
+    $data['like_newsletter'] = 'N';
+    
+    $member = new Member($_email_addr);
+    $member->setAdmin(true);
+    if ($member->create($data) === false) {
+        return false;
+    }
+    
+    // send email out
+    $mail_lines = file('../private/mail/member_sign_up_with_password.txt');
+    $message = '';
+    foreach ($mail_lines as $line) {
+        $message .= $line;
+    }
+    
+    $message = str_replace('%password%', $password, $message);
+    $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+    $message = str_replace('%root%', $GLOBALS['root'], $message);
+    
+    $subject = 'New Membership from Yellow Elevator';
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    
+    mail($_email_addr, $subject, $message, $headers);
+    
+    // $handle = fopen('/tmp/email_to_'. $_email_addr. '.txt', 'w');
+    // fwrite($handle, 'Header: '. $headers. "\n\n");
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
+    
+    return true;
+}
+
 if (!isset($_POST['id'])) {
     redirect_to('members.php');
 }
@@ -222,6 +271,135 @@ if ($_POST['action'] == 'delete_application') {
     }
     
     echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'sign_up') {
+    // 1. get the buffer record
+    $buffer = new ReferralBuffer($_POST['id']);
+    $buffer_result = $buffer->get();
+    
+    // 2. check whether a referrer is needed
+    $referrer_successfully_created = false;
+    $needs_to_be_connected = false;
+    $referrer_email = explode('@', $buffer_result[0]['referrer_email']);
+    if ($referrer_email[1] != 'yellowelevator.com') {
+        $needs_to_be_connected = true;
+        
+        // referrer is already a member?
+        $member = new Member($buffer_result[0]['referrer_email']);
+        $result = $member->get();
+        if (is_null($result) || count($result) <= 0) {
+            if (create_member_from($buffer_result[0]['referrer_email'], 
+                                   $buffer_result[0]['referrer_name'], 
+                                   $buffer_result[0]['referrer_phone']) === false) {
+                $needs_to_be_connected = false;
+                $referrer_successfully_created = false;
+            } else {
+                $referrer_successfully_created = true;
+            }
+        } else {
+            $referrer_successfully_created = true;
+        }
+    }
+    
+    $referrer = new Member($buffer_result[0]['referrer_email']);
+    
+    // 3. create member account
+    // member already exists?
+    $member = new Member($buffer_result[0]['candidate_email']);
+    if (isset($_POST['resolution'])) {
+        if ($_POST['resolution'] == 'buffered') {
+            if (create_member_from($buffer_result[0]['candidate_email'], 
+                                   $buffer_result[0]['candidate_name'], 
+                                   $buffer_result[0]['candidate_phone']) === false) {
+                echo 'ko:member';
+                exit();
+            }
+        }
+    } else {
+        if (create_member_from($buffer_result[0]['candidate_email'], 
+                               $buffer_result[0]['candidate_name'], 
+                               $buffer_result[0]['candidate_phone']) === false) {
+            echo 'ko:member';
+            exit();
+        }
+    }
+    
+    $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
+    $member->saveNotes($existing_notes. "\n\n". $buffer_result[0]['notes']);
+    
+    // 4. create connection
+    $connection_is_success = true;
+    if ($needs_to_be_connected && $referrer_successfully_created) {
+        $connection_is_success = $referrer->addReferee($buffer_result[0]['candidate_email']);
+    }
+    
+    // 5. move resume
+    $resume_successfully_moved = false;
+    if (!is_null($buffer_result[0]['existing_resume_id'])) {
+        $resume_successfully_moved = true;
+    } else {
+        $resume = new Resume($buffer_result[0]['candidate_email']);
+        $new_hash = generate_random_string_of(6);
+        $data = array();
+        $data['private'] = 'N';
+        $data['modified_on'] = $buffer_result[0]['requested_on'];
+        $data['name'] = $buffer_result[0]['resume_file_name'];
+        $data['file_name'] = $data['name'];
+        $data['file_size'] = $buffer_result[0]['resume_file_size'];
+        $data['file_type'] = $buffer_result[0]['resume_file_type'];
+        $data['file_hash'] = $new_hash;
+        
+        if ($resume->create($data) === false) {
+            echo 'ko:resume';
+            exit();
+        }
+        
+        $original_file = $GLOBALS['buffered_resume_dir']. '/'. $_POST['id']. '.'. $buffer_result[0]['resume_file_hash'];
+        if ($resume->copyFrom($original_file, $buffer_result[0]['resume_file_text']) === false) {
+            echo 'ko:resume_copy';
+            exit();
+        }
+        
+        $resume_successfully_moved = true;
+    }
+    
+    // 6. delete referralbuffer
+    $buffer->delete();
+    
+    echo $buffer_result[0]['candidate_email'];
+    exit();
+}
+
+if ($_POST['action'] == 'check_member') {
+    $buffer = new ReferralBuffer($_POST['id']);
+    $buffer_result = $buffer->get();
+    
+    $member = new Member($buffer_result[0]['candidate_email']);
+    $result = $member->get();
+    if (is_null($result) || count($result) <= 0) {
+        echo '0';
+        exit();
+    }
+    
+    // there is a conflict
+    $conflicts = array(
+        'buffered' => array(
+            'name' => htmlspecialchars_decode(stripslashes($buffer_result[0]['candidate_name'])),
+            'phone' => $buffer_result[0]['candidate_phone'],
+            'created_on' => $buffer_result[0]['requested_on']
+        ),
+        'existing' => array(
+            'name' => htmlspecialchars_decode(stripslashes($result[0]['firstname']. ', '. $result[0]['lastname'])),
+            'phone' => $result[0]['phone_num'],
+            'created_on' => $result[0]['joined_on']
+        )
+    );
+    
+    $response = array('conflicts' => $conflicts);
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
     exit();
 }
 ?>

@@ -296,7 +296,7 @@ function show_applications() {
                 header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header'));
                 header.set(3, new Cell('Notes', '', 'header'));
                 header.set(4, new Cell('Resume', '', 'header'));
-                header.set(5, new Cell('Quick Action', '', 'header action'));
+                header.set(5, new Cell('Quick Actions', '', 'header action'));
                 applications_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
@@ -345,7 +345,7 @@ function show_applications() {
                     if (has_notes[i].childNodes[0].nodeValue == '1') {
                         add_update_notes = 'Update';
                     }
-                    row.set(3, new Cell('<a class="no_link" onClick="show_notes_window(\'' + ids[i].childNodes[0].nodeValue +  '\');">' + add_update_notes + '</a>', '', 'cell'));
+                    row.set(3, new Cell('<a class="no_link" onClick="show_notes_popup(\'' + ids[i].childNodes[0].nodeValue +  '\');">' + add_update_notes + '</a>', '', 'cell'));
                     
                     if (resume_ids[i].childNodes.length > 0) {
                         row.set(4, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
@@ -356,7 +356,6 @@ function show_applications() {
                     var actions = '';
                     actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
                     actions = actions + '<input type="button" value="Sign Up" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
-                    actions = actions + '<input type="button" value="Refer Job" onClick="show_refer_form(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
                     row.set(5, new Cell(actions, '', 'cell action'));
                     applications_table.set((parseInt(i)+1), row);
                 }
@@ -410,6 +409,105 @@ function delete_application(_app_id) {
         },
         onRequest: function(instance) {
             set_status('Deleting application...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function check_member_from(_app_id) {
+    var params = 'id=' + _app_id;
+    params = params + '&action=check_member';
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        async: false,
+        onSuccess: function(txt, xml) {
+            set_status('');
+            
+            if (txt == '0') {
+                return 'ok';
+            }
+            
+            var names = xml.getElementsByTagName('name');
+            var phones = xml.getElementsByTagName('phone');
+            var created_ons = xml.getElementsByTagName('created_on');
+            
+            $('conflict_app_id').value = _app_id;
+            $('buffered_name').set('html', names[0].childNodes[0].nodeValue);
+            $('existing_name').set('html', names[1].childNodes[0].nodeValue);
+            $('buffered_phone').set('html', phones[0].childNodes[0].nodeValue);
+            $('existing_phone').set('html', phones[1].childNodes[0].nodeValue);
+            $('buffered_created_on').set('html', created_ons[0].childNodes[0].nodeValue);
+            $('existing_created_on').set('html', created_ons[1].childNodes[0].nodeValue);
+            
+            return '-1';
+        },
+        onRequest: function(instance) {
+            set_status('Checking application...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_conflict_popup() {
+    close_window('conflicts_window');
+    
+    if (arguments.length > 0) {
+        if (arguments[0] == 0) {
+            make_member_from($('conflict_app_id').value, 'buffered');
+        } else {
+            make_member_from($('conflict_app_id').value, 'existing');
+        }
+    }
+}
+
+function make_member_from(_app_id) {
+    var resolute_using = '';
+    
+    if (arguments.length <= 1) {
+        if (!confirm('You sure to sign up selected application?')) {
+            return;
+        }
+        
+        if (check_member_from(_app_id) != 'ok') {
+            show_window('conflicts_window');
+            return;
+        }
+    } else {
+        resolute_using = arguments[1];
+    }
+    
+    var params = 'id=' + _app_id;
+    params = params + '&action=sign_up';
+    params = params + '&resolution=' + resolute_using;
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            var err_msg = 'Cannot sign up the selected application.' + "\n\n";
+            switch(txt) {
+                case 'ko:member':
+                    alert(err_msg + 'The candidate cannot be signed up as a member.');
+                    break;
+                case 'ko:resume':
+                    alert(err_msg + 'Resume data error has occurred.');
+                    break;
+                case 'ko:resume_copy':
+                    alert(err_msg + 'Resume file copy/move error occurred.');
+                    break;
+            }
+            
+            set_status('');
+            location.replace('member.php?member_email_addr=' + txt);
+        },
+        onRequest: function(instance) {
+            set_status('Signing up application...');
         }
     });
     

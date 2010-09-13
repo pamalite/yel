@@ -166,20 +166,29 @@ class Resume implements Model{
             return false;
         }
         
-        $query = "SELECT file_name FROM resumes WHERE id = ". $this->id. " LIMIT 1";
-        if ($result = $this->mysqli->query($query)) {
-            if (!empty($result[0]['file_name']) && !is_null($result[0]['file_name'])) {
-                if (!$this->deleteFile()) {
-                    return false;
+        $query = "SELECT COUNT(id) AS is_used FROM referrals 
+                  WHERE `resume` = ". $this->id;
+        $result = $this->mysqli->query($query);
+        if ($result[0]['is_used'] > 0) {
+            $query = "UPDATE resumes SET deleted = TRUE WHERE id = ". $this->id;
+            $this->id = 0;
+            return $this->mysqli->execute($query);
+        } else {
+            $query = "SELECT file_name FROM resumes WHERE id = ". $this->id. " LIMIT 1";
+            if ($result = $this->mysqli->query($query)) {
+                if (!empty($result[0]['file_name']) && !is_null($result[0]['file_name'])) {
+                    if (!$this->deleteFile()) {
+                        return false;
+                    }
                 }
             }
-        }
-        
-        $query = "DELETE FROM resume_index WHERE resume = ". $this->id. ";
-                  DELETE FROM resumes WHERE id = ". $this->id;
-        if ($this->mysqli->transact($query)) {
-            $this->id = 0;
-            return true;
+
+            $query = "DELETE FROM resume_index WHERE resume = ". $this->id. ";
+                      DELETE FROM resumes WHERE id = ". $this->id;
+            if ($this->mysqli->transact($query)) {
+                $this->id = 0;
+                return true;
+            }
         }
         
         return false;
@@ -405,6 +414,35 @@ class Resume implements Model{
         }
         
         return false;
+    }
+    
+    public function copyFrom($_original_file, $_file_text) {
+        $query = "SELECT COUNT(*) AS is_exists FROM resume_index 
+                  WHERE resume = ". $this->id. " AND member = '". $this->member_id. "'";
+        $result = $this->mysqli->query($query);
+        if ($result[0]['is_exists'] == '0') {
+            $query = "INSERT INTO resume_index SET 
+                      resume = ". $this->id. ", 
+                      member = '". $this->member_id. "', 
+                      file_text = '". $_file_text. "'";
+        } else {
+            $query = "UPDATE resume_index SET file_text = '". $_file_text. "' 
+                      WHERE resume = ". $this->id. " AND 
+                      member = '". $this->member_id. "'";
+        }
+        
+        if ($this->mysqli->execute($query) === false) {
+            return false;
+        }
+        
+        $query = "SELECT file_hash FROM resumes WHERE id = ". $this->id;
+        $result = $this->mysqli->query($query);
+        $new_hash = $result[0]['file_hash'];
+        $new_file = $GLOBALS['resume_dir']. '/'. $this->id. '.'. $new_hash;
+        
+        @copy($_original_file, $new_file);
+        
+        return true;
     }
     
     public function deleteFile() {
