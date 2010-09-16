@@ -1,0 +1,109 @@
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+a.menu {
+    cursor: pointer;
+}
+
+#receipts {
+    display: none;
+}
+
+#invoices_table, #receipts_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#invoices_table td, 
+#receipts_table td { 
+    vertical-align: baseline;
+}
+
+#invoices_table td.action, 
+#receipts_table td.payment {
+    vertical-align: middle;
+}
+
+#invoices_table tr:hover, 
+#receipts_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+#invoices_table td.expiry_status {
+    text-align: center;
+    width: 20px;
+}
+
+img.warning {
+    vertical-align: middle;    
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.action, .payment {
+    width: 20%;
+    text-align: center;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+.buttons_bar {
+    background-color: #CCCCCC;
+    text-align: right;
+    padding: 3px 3px 3px 3px;
+}
+
+div.contacts {
+    padding-top: 5px;
+    font-size: 9pt;
+}
+
+span.contact_label {
+    font-weight: bold;
+}
+
+#paid_window {
+    width: 450px;
+    display: none;
+}
+
+div.paid_form {
+    font-size: 12pt;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+table.paid_form {
+    width: 100%;
+    margin: auto;
+}
+
+table.paid_form td.label {
+    width: 25%;
+}
+
+#paid_window input.field {
+    width: 98%;
+}
+
+#paid_window input.year {
+    width: 50px;
+}

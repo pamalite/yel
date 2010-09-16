@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__)."/../private/lib/utilities.php";
-require_once dirname(__FILE__)."/../private/lib/classes/pages/employee_invoices_page.php";
+require_once dirname(__FILE__)."/../private/lib/classes/pages/employee_payments_page.php";
 
 session_start();
 
@@ -39,11 +39,11 @@ if (isset($_SESSION['yel']['employee']['dev'])) {
     }
 }
 
-$home = new EmployeeInvoicesPage($_SESSION['yel']['employee']);
+$home = new EmployeePaymentsPage($_SESSION['yel']['employee']);
 $home->header(array('root_dir' => '../', 
-                    'title' => 'Invoices &amp; Receipts'));
-$home->insert_employee_invoices_css();
-$home->insert_employee_invoices_scripts();
+                    'title' => 'Payments'));
+$home->insert_employee_payments_css();
+$home->insert_employee_payments_scripts();
 $home->insert_inline_scripts();
 $home->show();
 $home->footer();

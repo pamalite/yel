@@ -350,7 +350,7 @@ class Page {
                 <li <?php echo ($_page == 'home') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/home.php">Home</a></li>
                 <li <?php echo ($_page == 'employers') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/employers.php">Employers</a></li>
                 <li <?php echo ($_page == 'members') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/members.php">Members</a></li>
-                <li <?php echo ($_page == 'invoices') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/invoices.php">Invoices &amp; Receipts</a></li>
+                <li <?php echo ($_page == 'payments') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/payments.php">Payments</a></li>
                 <li <?php echo ($_page == 'rewards') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/rewards.php">Rewards</a></li>
                 <li <?php echo ($_page == 'status') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/status.php">Status</a></li>
                 <li><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/employees/logout.php">Logout</a></li>

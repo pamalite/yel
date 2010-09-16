@@ -40,14 +40,8 @@ if (isset($_SESSION['yel']['employee']['dev'])) {
     }
 }
 
-$clearances = $_SESSION['yel']['employee']['security_clearances'];
-if (!Employee::has_clearance_for('invoices_view', $clearances)) {
-    echo 'No permisison to view invoice.';
-    exit();
-}
-
 $invoice = Invoice::get($_GET['id']);
-$items = Invoice::get_items_of($_GET['id']);
+$items = Invoice::getItems($_GET['id']);
 
 if (!$invoice) {
     echo "Invoice not found.";
@@ -55,7 +49,7 @@ if (!$invoice) {
 }
 
 $employer = new Employer($invoice[0]['employer']);
-$branch = $employer->get_branch();
+$branch = $employer->getAssociatedBranch();
 $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
 $branch['address_lines'] = explode("\n", $branch[0]['address']);
 $currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
@@ -135,7 +129,7 @@ class InvoicePdf extends FPDF   {
             }
             $this->Cell(5, 3, $line, 0, 2);
         }
-        $this->Cell(5, 3, $this->branch[0]['zip']. " ". $this->branch[0]['state']. ", ". $this->branch[0]['country_name']. ". ", 0, 2);
+        $this->Cell(5, 3, $this->branch[0]['zip']. " ". $this->branch[0]['state']. ", ". $this->branch[0]['mailing_country_name']. ". ", 0, 2);
         
         $this->SetFont('Arial','',12);
         //Line break
@@ -242,7 +236,7 @@ $pdf->Ln(6);
 $pdf->SetTextColor(0, 0, 0);
 $pdf->Cell(60, 5, $invoice[0]['employer'],1,0,'C');
 $pdf->Cell(1);
-$pdf->Cell(0, 5, $employer->get_name(),1,0,'C');
+$pdf->Cell(0, 5, $employer->getName(),1,0,'C');
 $pdf->Ln(10);
 
 $table_header = array("No.", "Item", "Amount (". $currency. ")");
