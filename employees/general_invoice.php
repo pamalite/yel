@@ -1,11 +1,16 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/classes/fpdf.php";
 
-class CreditNote extends FPDF {
-    private $refund_amount = 0;
-    private $description = '';
-    private $currency = '???';
-    private $branch = '';
+class GeneralInvoice extends FPDF   {
+    private $invoiceType;
+    private $invoice_or_receipt;
+    private $currency;
+    private $branch;
+    
+    function SetInvoiceType($type, $_invoice_or_receipt) {
+        $this->invoiceType = $type;
+        $this->invoice_or_receipt = $_invoice_or_receipt;
+    }
     
     function SetCurrency($_currency) {
         $this->currency = $_currency;
@@ -15,14 +20,7 @@ class CreditNote extends FPDF {
         $this->branch = $_branch;
     }
     
-    function SetDescription($_description) {
-        $this->description = $_description;
-    }
-    
-    function SetRefundAmount($_refund_amount) {
-        $this->refund_amount = number_format($_refund_amount, 2, '.', ', ');
-    }
-    
+    //Page header
     function Header()   {
         //Logo
         $this->Image(dirname(__FILE__). '/../common/images/logos/top_letterhead_pdf.png', 10, 8);
@@ -31,7 +29,20 @@ class CreditNote extends FPDF {
         //Move to the right
         $this->Cell(80);
         //Title
-        $this->Cell(30, 20, "Credit Note", 0, 0,'C');
+        switch ($this->invoiceType) {
+            case 'J':
+                $this->Cell(30, 20, "Subscription ". $this->invoice_or_receipt, 0, 0, 'C');
+                break;
+            case 'P':
+                $this->Cell(30, 20, "Job Postings ". $this->invoice_or_receipt, 0, 0, 'C');
+                break;
+            case 'R':
+                $this->Cell(30, 20, "Service Fee ". $this->invoice_or_receipt, 0, 0, 'C');
+                break;
+            default:
+                $this->Cell(30, 20, "Miscellaneous ". $this->invoice_or_receipt, 0, 0,'C');
+                break;
+        }
         
         $this->Cell(30);
         $this->SetFont('Arial', '', 5);
@@ -58,7 +69,7 @@ class CreditNote extends FPDF {
             }
             $this->Cell(5, 3, $line, 0, 2);
         }
-        $this->Cell(5, 3, $this->branch[0]['zip']. " ". $this->branch[0]['state']. ", ". $this->branch[0]['country_name']. ". ", 0, 2);
+        $this->Cell(5, 3, $this->branch[0]['zip']. " ". $this->branch[0]['state']. ", ". $this->branch[0]['mailing_country_name']. ". ", 0, 2);
         
         $this->SetFont('Arial','',12);
         //Line break
@@ -73,7 +84,7 @@ class CreditNote extends FPDF {
         $this->Cell(0,10,'Page '.$this->PageNo(). ' of {nb}',0,0,'C');
     }
 
-    function FancyTable($header) {
+    function FancyTable($header, $data, $_amount_payable) {
         //Colors, line width and bold font
         $this->SetFillColor(54, 54, 54);
         $this->SetTextColor(255);
@@ -93,22 +104,26 @@ class CreditNote extends FPDF {
         $this->SetFont('');
         //Data
         $fill=0;
-        $this->Cell($w[0], 5, "1", 'L', 0, 'L', $fill);
-        $this->Cell($w[1], 5, stripslashes(htmlspecialchars_decode($this->description)), 'L', 0, 'L', $fill);
-        $this->Cell($w[2], 5, $this->refund_amount, 'L', 0,'R', $fill);
-        $this->Ln();
+        $count = 1;
+        foreach($data as $row) {
+            $this->Cell($w[0], 5, $count, 'L', 0, 'L', $fill);
+            $this->Cell($w[1], 5, stripslashes(htmlspecialchars_decode($row['itemdesc'])), 'L', 0, 'L', $fill);
+            $this->Cell($w[2], 5, $row['amount'], 'L', 0,'R', $fill);
+            $this->Ln();
+            $fill = !$fill;
+            $count++;
+        }
         $this->Cell(array_sum($w),0,'','T');
         $this->Ln();
         $this->SetFillColor(54, 54, 54);
         $this->SetDrawColor(54, 54, 54);
         $this->SetTextColor(255);
-        $this->Cell($w[0]+$w[1], 5, "Total Amount Creditable (". $this->currency. ") ", 1, 0, 'R', 1);
+        $this->Cell($w[0]+$w[1], 5, "Total Amount Payable (". $this->currency. ") ", 1, 0, 'R', 1);
         $this->SetTextColor(0);
         $this->SetFont('', 'B');
         $this->SetDrawColor(0, 0, 0);
-        $this->Cell($w[2], 5, $this->refund_amount, 1, 0, 'R', 0);
+        $this->Cell($w[2], 5, $_amount_payable, 1, 0, 'R', 0);
         $this->SetFont('Arial', '', 10);
     }
 }
-
 ?>
