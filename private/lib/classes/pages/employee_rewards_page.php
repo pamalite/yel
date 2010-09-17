@@ -40,7 +40,8 @@ class EmployeeRewardsPage extends Page {
                           referrals.member AS member_id, referrals.employed_on, 
                           employers.name AS employer, members.phone_num, 
                           CONCAT(members.lastname, ', ', members.firstname) AS member, 
-                          DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on", 
+                          DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
+                          (SUM(referral_rewards.reward) / 3) AS paid_reward", 
             'joins' => "invoice_items ON invoice_items.item = referrals.id, 
                         invoices ON invoices.id = invoice_items.invoice, 
                         referral_rewards ON referral_rewards.referral = referrals.id, 
@@ -54,37 +55,17 @@ class EmployeeRewardsPage extends Page {
                         (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
                         (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
                         (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
-                        (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL)", 
+                        (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL)                        ", 
             'group' => "referrals.id", 
-            'order' => "referrals.employed_on"
+            'order' => "referrals.employed_on",
+            'having' => "(paid_reward < referrals.total_reward OR paid_reward IN NULL)"
         );
         
         if ($_is_paid) {
-            $criteria = array(
-                'columns' => "invoices.id AS invoice, referrals.id AS referral, currencies.symbol AS currency, 
-                              referrals.total_reward, jobs.title, employers.name AS employer, 
-                              referrals.member AS member_id, referrals.employed_on, 
-                              MAX(referral_rewards.paid_on) AS fully_paid_on, 
-                              CONCAT(members.lastname, ', ', members.firstname) AS member, 
-                              DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
-                              DATE_FORMAT(MAX(referral_rewards.paid_on), '%e %b, %Y') AS formatted_fully_paid_on", 
-                'joins' => "invoice_items ON invoice_items.item = referrals.id, 
-                            invoices ON invoices.id = invoice_items.invoice, 
-                            referral_rewards ON referral_rewards.referral = referrals.id, 
-                            jobs ON jobs.id = referrals.job, 
-                            members ON members.email_addr = referrals.member, 
-                            employers ON employers.id = jobs.employer, 
-                            currencies ON currencies.country_code = employers.country",
-                'match' => "invoices.type = 'R' AND 
-                            (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
-                            (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
-                            (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
-                            (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
-                            (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
-                            (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL)", 
-                'group' => "referrals.id", 
-                'order' => "fully_paid_on"
-            );
+            $criteria['columns'] .= ", referral_rewards.reward_equivalent";
+            $criteria['having'] = "(paid_reward >= referrals.total_reward OR referral_rewards.reward_equivalent IS NOT NULL)";
+        } else {
+            $criteria['match'] .= "AND (referral_rewards.reward_equivalent IS NULL OR referral_rewards.reward_equivalent = '')";
         }
         
         $referral = new Referral();
@@ -98,26 +79,23 @@ class EmployeeRewardsPage extends Page {
         
         $new_rewards = $this->get_rewards();
         foreach ($new_rewards as $i=>$row) {
-            $paid = ReferralReward::getSumPaidOfReferral($row['referral']);
-            if ($paid[0]['amount'] <= 0 || is_null($paid)) {
-                $new_rewards[$i]['member'] = htmlspecialchars_decode(stripslashes($row['member']));
-                $new_rewards[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
-                $new_rewards[$i]['title'] = htmlspecialchars_decode(stripslashes($row['title']));
-                $new_rewards[$i]['padded_invoice'] = pad($row['invoice'], 11, '0');
-                $new_rewards[$i]['total_reward'] = number_format($row['total_reward'], 2, '.', ', ');
-            }
+            $new_rewards[$i]['member'] = htmlspecialchars_decode(stripslashes($row['member']));
+            $new_rewards[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
+            $new_rewards[$i]['title'] = htmlspecialchars_decode(stripslashes($row['title']));
+            $new_rewards[$i]['padded_invoice'] = pad($row['invoice'], 11, '0');
+            $new_rewards[$i]['total_reward'] = number_format($row['total_reward'], 2, '.', ', ');
+            $new_rewards[$i]['paid_reward'] = number_format($row['paid_reward'], 2, '.', ', ');
         }
         
         $paid_rewards = $this->get_rewards(true);
         foreach ($paid_rewards as $i=>$row) {
-            $paid = ReferralReward::getSumPaidOfReferral($row['referral']);
-            if ($paid[0]['amount'] >= $row['total_reward']) {
-                $paid_rewards[$i]['member'] = htmlspecialchars_decode(stripslashes($row['member']));
-                $paid_rewards[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
-                $paid_rewards[$i]['title'] = htmlspecialchars_decode(stripslashes($row['title']));
-                $paid_rewards[$i]['padded_invoice'] = pad($row['invoice'], 11, '0');
-                $paid_rewards[$i]['paid'] = number_format($paid[0]['amount'], 2, '.', ', ');
-            }
+            $paid_rewards[$i]['member'] = htmlspecialchars_decode(stripslashes($row['member']));
+            $paid_rewards[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
+            $paid_rewards[$i]['title'] = htmlspecialchars_decode(stripslashes($row['title']));
+            $paid_rewards[$i]['padded_invoice'] = pad($row['invoice'], 11, '0');
+            $paid_rewards[$i]['total_reward'] = number_format($row['total_reward'], 2, '.', ', ');
+            $paid_rewards[$i]['paid_reward'] = number_format($row['paid_reward'], 2, '.', ', ');
+            $paid_rewards[$i]['reward_equivalent'] = htmlspecialchars_decode(stripslashes($row['reward_equivalent']));
         }
         
         ?>
