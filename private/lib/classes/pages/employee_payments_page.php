@@ -178,7 +178,7 @@ class EmployeePaymentsPage extends Page {
                     $amount = $invoice['currency']. '$&nbsp;'. $invoice['amount_payable'];
                     $invoices_table->set($i+1, 5, $amount, '', 'cell');
                     
-                    $actions = '<input type="button" value="Paid" onClick="show_payment_popup('. $invoice['id']. ', \''. $invoice['padded_id']. '\');" />';
+                    $actions = '<input type="button" value="Paid" onClick="show_payment_popup('. $invoice['id']. ', \''. $invoice['padded_id']. '\');" /><input type="button" value="Resend" onClick="show_resend_popup('. $invoice['id']. ', \''. $invoice['padded_id']. '\');" />';
                     $invoices_table->set($i+1, 6, $actions, '', 'cell action');
                 }
 
@@ -295,6 +295,27 @@ class EmployeePaymentsPage extends Page {
             </div>
         </div>
         
+        <div id="resend_window" class="popup_window">
+            <div class="popup_window_title">Resend Invoice <span id="lbl_resend_invoice"></span></div>
+            <div class="employer_details">
+                <span style="font-weight: bold;">Employer: </span>
+                <span id="employer_name"></span>
+                <br/>
+                <span style="font-weight: bold;">Contact Person: </span>
+                <span id="contact_person"></span>
+            </div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="resend_invoice_id" value="" />
+                <div class="resend_form">
+                    <span style="font-weight: bold;">Recipients: </span>(separated by commas)<br/>
+                    <textarea id="recipients" class="recipients"></textarea>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Cancel" onClick="close_resend_popup(false);" />
+                <input type="button" value="Resend" onClick="close_resend_popup(true);" />
+            </div>
+        </div>
         <?php
     }
 }

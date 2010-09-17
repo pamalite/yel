@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
+require_once dirname(__FILE__). "/general_invoice.php";
 
 session_start();
 
@@ -16,7 +17,7 @@ function get_payments($_is_invoice = true, $_order = "invoices.issued_on",
     $criteria = array(
         "columns" => "invoices.id, invoices.type, invoices.payable_by,
                       employers.name AS employer, employers.contact_person, employers.email_addr, 
-                      employers.fax_num, employers.phone_num,
+                      employers.fax_num, employers.phone_num, 
                       SUM(invoice_items.amount) AS amount_payable, currencies.symbol AS currency, 
                       DATE_FORMAT(invoices.issued_on, '%e %b, %Y') AS formatted_issued_on, 
                       DATE_FORMAT(invoices.payable_by, '%e %b, %Y') AS formatted_payable_by,
@@ -117,6 +118,116 @@ if ($_POST['action'] == 'confirm_payment') {
         exit();
     }
     
+    $invoice = Invoice::get($_POST['id']);
+    $invoice[0]['items'] = Invoice::getItems($_POST['id']);
+    $employer = new Employer($invoice[0]['employer']);
+    $branch = $employer->getAssociatedBranch();
+    $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
+    $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
+    $branch['address_lines'] = explode("\n", $branch[0]['address']);
+    $currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
+    $amount_payable = 0.00;
+    foreach($invoice[0]['items'] as $i=>$item) {
+        $amount_payable += $item['amount'];
+        $items[$i]['amount'] = number_format($item['amount'], 2, '.', ', ');
+    }
+    $amount_payable = number_format($amount_payable, 2, '.', ', ');
+    
+    // generate pdf
+    $pdf = new GeneralInvoice();
+    $pdf->AliasNbPages();
+    $pdf->SetAuthor('Yellow Elevator. This receipt was automatically generated. Signature is not required.');
+    $pdf->SetTitle($GLOBALS['COMPANYNAME']. ' - Receipt '. pad($invoice[0]['id'], 11, '0'));
+    $pdf->SetInvoiceType($invoice[0]['type'], 'Receipt');
+    $pdf->SetCurrency($currency);
+    $pdf->SetBranch($branch);
+    $pdf->AddPage();
+    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetTextColor(255, 255, 255);
+    $pdf->SetFillColor(54, 54, 54);
+    $pdf->Cell(60, 5, "Invoice Number",1,0,'C',1);
+    $pdf->Cell(1);
+    $pdf->Cell(33, 5, "Issuance Date",1,0,'C',1);
+    $pdf->Cell(1);
+    $pdf->Cell(33, 5, "Paid On",1,0,'C',1);
+    $pdf->Cell(1);
+    $pdf->Cell(0, 5, "Amount Paid (". $currency. ")",1,0,'C',1);
+    $pdf->Ln(6);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell(60, 5, pad($invoice[0]['id'], 11, '0'),1,0,'C');
+    $pdf->Cell(1);
+    $pdf->Cell(33, 5, sql_date_format($invoice[0]['issued_on']),1,0,'C');
+    $pdf->Cell(1);
+    $pdf->Cell(33, 5, sql_date_format($invoice[0]['paid_on']),1,0,'C');
+    $pdf->Cell(1);
+    $pdf->Cell(0, 5, $amount_payable,1,0,'C');
+    $pdf->Ln(6);
+    $pdf->SetTextColor(255, 255, 255);
+    $pdf->Cell(60, 5, "User ID",1,0,'C',1);
+    $pdf->Cell(1);
+    $pdf->Cell(0, 5, "Employer Name",1,0,'C',1);
+    $pdf->Ln(6);
+    $pdf->SetTextColor(0, 0, 0);
+    $pdf->Cell(60, 5, $invoice[0]['employer'],1,0,'C');
+    $pdf->Cell(1);
+    $pdf->Cell(0, 5, $employer->getName(),1,0,'C');
+    $pdf->Ln(10);
+
+    $table_header = array("No.", "Item", "Amount (". $currency. ")");
+    $pdf->FancyTable($table_header, $items, $amount_payable);
+
+    $pdf->Ln(13);
+    $pdf->SetFont('','I');
+    $pdf->Cell(0, 0, "This receipt was automatically generated. Signature is not required.", 0, 0, 'C');
+    $pdf->Ln(6);
+    $pdf->Close();
+    $pdf->Output($GLOBALS['data_path']. '/general_invoices/r_'. $invoice[0]['id']. '.pdf', 'F');
+    
+    // generate email and attach it
+    $attachment = chunk_split(base64_encode(file_get_contents($GLOBALS['data_path']. '/general_invoices/r_'. $invoice[0]['id']. '.pdf')));
+    
+    $subject = "YellowElevator: Receipt ". pad($invoice[0]['id'], 11, '0');
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    $headers .= 'Bcc: '. $sales. "\n";
+    $headers .= 'MIME-Version: 1.0'. "\n";
+    $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $invoice[0]['id']. '";'. "\n\n";
+    
+    $body = '--yel_mail_sep_'. $invoice[0]['id']. "\n";
+    $body .= 'Content-Type: multipart/alternative; boundary="yel_mail_sep_alt_'. $invoice[0]['id']. '"'. "\n";
+    $body .= '--yel_mail_sep_alt_'. $invoice[0]['id']. "\n";
+    $body .= 'Content-Type: text/plain; charset="iso-8859-1"'. "\n";
+    $body .= 'Content-Transfer-Encoding: 7bit"'. "\n";
+    
+    $mail_lines = file('../private/mail/employer_general_receipt.txt');
+    $message = '';
+    foreach ($mail_lines as $line) {
+        $message .= $line;
+    }
+
+    $message = str_replace('%employer%', $employer->getName(), $message);
+    $message = str_replace('%invoice%', pad($invoice[0]['id'], 11, '0'), $message);
+    $message = str_replace('%currency%', $currency, $message);
+    $message = str_replace('%amount%', $amount_payable, $message);
+    $message = str_replace('%issued_on%', sql_date_format($invoice[0]['issued_on']), $message);
+    $message = str_replace('%paid_on%', sql_date_format($invoice[0]['paid_on']), $message);
+    
+    $body .= $message. "\n";
+    $body .= '--yel_mail_sep_alt_'. $invoice[0]['id']. "--\n\n";
+    $body .= '--yel_mail_sep_'. $invoice[0]['id']. "\n";
+    $body .= 'Content-Type: application/pdf; name="yel_receipt_'. pad($invoice[0]['id'], 11, '0'). '.pdf"'. "\n";
+    $body .= 'Content-Transfer-Encoding: base64'. "\n";
+    $body .= 'Content-Disposition: attachment'. "\n";
+    $body .= $attachment. "\n";
+    $body .= '--yel_mail_sep_'. $invoice[0]['id']. "--\n\n";
+    mail($employer->getEmailAddress(), $subject, $body, $headers);
+
+    /*$handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $body);
+    fclose($handle);*/
+
+    @unlink($GLOBALS['data_path']. '/general_invoices/r_'. $invoice[0]['id']. '.pdf');
+    
     echo 'ok';
     exit();
 }
@@ -145,6 +256,14 @@ if ($_POST['action'] == 'resend') {
     $invoice = Invoice::get($_POST['id']);
     $invoice[0]['items'] = Invoice::getItems($_POST['id']);
     $employer = new Employer($invoice[0]['employer']);
+    
+    $recipients = $employer->getEmailAddress();
+    if (isset($_POST['recipients'])) {
+        if (!empty($_POST['recipients'])) {
+            $recipients = str_replace(';', ',', $_POST['recipients']);
+        }
+    }
+    
     $branch = $employer->getAssociatedBranch();
     $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
     $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
@@ -173,13 +292,7 @@ if ($_POST['action'] == 'resend') {
     $pdf->Cell(1);
     $pdf->Cell(33, 5, "Issuance Date",1,0,'C',1);
     $pdf->Cell(1);
-    
-    if (is_null($invoice[0]['paid_on']) || empty($invoice[0]['paid_on'])) {
-        $pdf->Cell(33, 5, "Payable By",1,0,'C',1);
-    } else {
-        $pdf->Cell(33, 5, "Paid On",1,0,'C',1);
-    }
-
+    $pdf->Cell(33, 5, "Payable By",1,0,'C',1);
     $pdf->Cell(1);
     $pdf->Cell(0, 5, "Amount Payable (". $currency. ")",1,0,'C',1);
     $pdf->Ln(6);
@@ -257,14 +370,14 @@ if ($_POST['action'] == 'resend') {
     $body .= 'Content-Disposition: attachment'. "\n";
     $body .= $attachment. "\n";
     $body .= '--yel_mail_sep_'. $invoice[0]['id']. "--\n\n";
-    //mail($_employer->getEmailAddress(), $subject, $body, $headers);
+    mail($recipients, $subject, $body, $headers);
 
-    $handle = fopen('/tmp/email_to_'. $_employer->getEmailAddress(). '.txt', 'w');
+    /*$handle = fopen('/tmp/email_to_'. $recipients. '.txt', 'w');
     fwrite($handle, 'Subject: '. $subject. "\n\n");
     fwrite($handle, $body);
-    fclose($handle);
+    fclose($handle);*/
 
-    @unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice[0]['id']. '.pdf');
+    @unlink($GLOBALS['data_path']. '/general_invoices/'. $invoice[0]['id']. '.pdf');
     
     echo 'ok';
     exit();

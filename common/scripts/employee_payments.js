@@ -132,7 +132,7 @@ function update_invoices_list() {
                     row.set(5, new Cell(amount, '', 'cell'));
                     
                     var actions = '';
-                    actions = '<input type="button" value="Paid" onClick="show_payment_popup(' + ids[i].childNodes[0].nodeValue + ', \'' + padded_ids[i].childNodes[0].nodeValue + '\');" />';                    
+                    actions = '<input type="button" value="Paid" onClick="show_payment_popup(' + ids[i].childNodes[0].nodeValue + ', \'' + padded_ids[i].childNodes[0].nodeValue + '\');" /><input type="button" value="Resend" onClick="show_resend_popup(' + ids[i].childNodes[0].nodeValue + ', \'' + padded_ids[i].childNodes[0].nodeValue + '\');" />';                    
                     row.set(6, new Cell(actions, '', 'cell action'));
                     
                     invoices_table.set((parseInt(i)+1), row);
@@ -303,6 +303,83 @@ function close_payment_popup(_is_confirmed) {
     }
     
     close_window('paid_window');
+}
+
+function show_resend_popup(_invoice_id, _padded_id) {
+    $('lbl_resend_invoice').set('html', _padded_id);
+    $('resend_invoice_id').value = _invoice_id;
+    
+    var params = 'id=' + _invoice_id + '&action=get_employer_info';
+    var uri = root + "/employees/payments_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            //set_status(txt);
+            //return;
+            if (txt == 'ko') {
+                alert('An error occured while getting employer details.');
+                return false;
+            }
+            
+            var employer_name = xml.getElementsByTagName('name');
+            var contact_person = xml.getElementsByTagName('contact_person');
+            var email_addr = xml.getElementsByTagName('email_addr');
+            
+            $('employer_name').set('html', employer_name[0].childNodes[0].nodeValue);
+            $('contact_person').set('html', contact_person[0].childNodes[0].nodeValue);
+            $('recipients').value = email_addr[0].childNodes[0].nodeValue;
+            
+            set_status('');
+            show_window('resend_window');
+        },
+        onRequest: function(instance) {
+            set_status('Getting employer details...');
+        }
+    });
+    
+    request.send(params);
+    window.scrollTo(0, 0);
+}
+
+function close_resend_popup(_is_resend) {
+    if (_is_resend) {
+        var recipients = $('recipients').value;
+        
+        if (isEmpty(recipients)) {
+            var proceed = confirm('You have not entered an email to be send to.\n\nIf you proceed, the default email address will be used.');
+            if (!proceed) {
+                return;
+            }
+        }
+        
+        var params = 'id=' + $('resend_invoice_id').value;
+        params = params + '&action=resend';
+        params = params + '&recipients=' + recipients;
+        alert(params);
+        var uri = root + "/employees/payments_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('An error occured while resending invoice.');
+                    return false;
+                }
+
+                set_status('');
+                close_window('resend_window');
+            },
+            onRequest: function(instance) {
+                set_status('Resending invoice...');
+            }
+        });
+        
+        request.send(params);
+        return;
+    }
+    
+    close_window('resend_window');
 }
 
 function onDomReady() {

@@ -295,12 +295,12 @@ function send_invoice(&$_employer, $_paid_postings, $_subscription_period) {
         $body .= 'Content-Disposition: attachment'. "\n";
         $body .= $attachment. "\n";
         $body .= '--yel_mail_sep_'. $invoice. "--\n\n";
-        //mail($_employer->getEmailAddress(), $subject, $body, $headers);
+        mail($_employer->getEmailAddress(), $subject, $body, $headers);
     
-        $handle = fopen('/tmp/email_to_'. $_employer->getEmailAddress(). '.txt', 'w');
+        /*$handle = fopen('/tmp/email_to_'. $_employer->getEmailAddress(). '.txt', 'w');
         fwrite($handle, 'Subject: '. $subject. "\n\n");
         fwrite($handle, $body);
-        fclose($handle);
+        fclose($handle);*/
     
         unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
     }
