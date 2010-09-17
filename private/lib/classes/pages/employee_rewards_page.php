@@ -1,13 +1,12 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
+require_once dirname(__FILE__). "/../htmltable.php";
 
 class EmployeeRewardsPage extends Page {
     private $employee = NULL;
-    private $clearances = array();
     
     function __construct($_session) {
         $this->employee = new Employee($_session['id'], $_session['sid']);
-        $this->clearances = $_session['security_clearances'];
     }
     
     public function insert_inline_css() {
@@ -23,54 +22,120 @@ class EmployeeRewardsPage extends Page {
     public function insert_employee_rewards_scripts() {
         $this->insert_scripts();
         
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_rewards.js"></script>'. "\n";
     }
     
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employee->id(). '";'. "\n";
-        echo 'var user_id = "'. $this->employee->get_user_id(). '";'. "\n";
+        echo 'var id = "'. $this->employee->getId(). '";'. "\n";
+        echo 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
         echo '</script>'. "\n";
     }
     
-    private function generate_year_list() {
-        $year = date('Y');
-        echo '<select class="field_year" id="year" name="year">'. "\n";
-        echo '<option value="'. ($year-1). '">'. ($year-1). '</option>'. "\n";
-        echo '<option value="'. $year. '" selected>'. $year. '</option>'. "\n";
-        echo '</select>'. "\n";
+    private function get_rewards($_is_paid = false) {
+        $criteria = array(
+            'columns' => "invoices.id AS invoice, referrals.id AS referral, referrals.total_reward,
+                          referrals.job AS job_id, currencies.symbol AS currency, jobs.title, 
+                          referrals.member AS member_id, referrals.employed_on, 
+                          employers.name AS employer, members.phone_num, 
+                          CONCAT(members.lastname, ', ', members.firstname) AS member, 
+                          DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on", 
+            'joins' => "invoice_items ON invoice_items.item = referrals.id, 
+                        invoices ON invoices.id = invoice_items.invoice, 
+                        referral_rewards ON referral_rewards.referral = referrals.id, 
+                        jobs ON jobs.id = referrals.job, 
+                        members ON members.email_addr = referrals.member, 
+                        employers ON employers.id = jobs.employer, 
+                        currencies ON currencies.country_code = employers.country",
+            'match' => "invoices.type = 'R' AND 
+                        (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
+                        (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
+                        (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
+                        (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
+                        (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
+                        (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL)", 
+            'group' => "referrals.id", 
+            'order' => "referrals.employed_on"
+        );
+        
+        if ($_is_paid) {
+            $criteria = array(
+                'columns' => "invoices.id AS invoice, referrals.id AS referral, currencies.symbol AS currency, 
+                              referrals.total_reward, jobs.title, employers.name AS employer, 
+                              referrals.member AS member_id, referrals.employed_on, 
+                              MAX(referral_rewards.paid_on) AS fully_paid_on, 
+                              CONCAT(members.lastname, ', ', members.firstname) AS member, 
+                              DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
+                              DATE_FORMAT(MAX(referral_rewards.paid_on), '%e %b, %Y') AS formatted_fully_paid_on", 
+                'joins' => "invoice_items ON invoice_items.item = referrals.id, 
+                            invoices ON invoices.id = invoice_items.invoice, 
+                            referral_rewards ON referral_rewards.referral = referrals.id, 
+                            jobs ON jobs.id = referrals.job, 
+                            members ON members.email_addr = referrals.member, 
+                            employers ON employers.id = jobs.employer, 
+                            currencies ON currencies.country_code = employers.country",
+                'match' => "invoices.type = 'R' AND 
+                            (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
+                            (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
+                            (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
+                            (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
+                            (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
+                            (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL)", 
+                'group' => "referrals.id", 
+                'order' => "fully_paid_on"
+            );
+        }
+        
+        $referral = new Referral();
+        return $referral->find($criteria);
     }
     
     public function show() {
         $this->begin();
-        $this->top_employee($this->employee->get_name(). " - Rewards");
-        $this->menu_employee($this->clearances, 'rewards');
+        $this->top('Rewards');
+        $this->menu_employee('rewards');
         
-        $query = "SELECT currencies.symbol 
-                  FROM employees 
-                  LEFT JOIN branches ON branches.id = employees.branch 
-                  LEFT JOIN currencies ON currencies.country_code = branches.country 
-                  WHERE employees.id = ". $this->employee->id(). " LIMIT 1";
-        $mysqli = Database::connect();
-        $result = $mysqli->query($query);
-        $currency = '??? $';
-        if ($result !== false) {
-            $currency = $result[0]['symbol'];
+        $new_rewards = $this->get_rewards();
+        foreach ($new_rewards as $i=>$row) {
+            $paid = ReferralReward::getSumPaidOfReferral($row['referral']);
+            if ($paid[0]['amount'] <= 0 || is_null($paid)) {
+                $new_rewards[$i]['member'] = htmlspecialchars_decode(stripslashes($row['member']));
+                $new_rewards[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
+                $new_rewards[$i]['title'] = htmlspecialchars_decode(stripslashes($row['title']));
+                $new_rewards[$i]['padded_invoice'] = pad($row['invoice'], 11, '0');
+                $new_rewards[$i]['total_reward'] = number_format($row['total_reward'], 2, '.', ', ');
+            }
+        }
+        
+        $paid_rewards = $this->get_rewards(true);
+        foreach ($paid_rewards as $i=>$row) {
+            $paid = ReferralReward::getSumPaidOfReferral($row['referral']);
+            if ($paid[0]['amount'] >= $row['total_reward']) {
+                $paid_rewards[$i]['member'] = htmlspecialchars_decode(stripslashes($row['member']));
+                $paid_rewards[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
+                $paid_rewards[$i]['title'] = htmlspecialchars_decode(stripslashes($row['title']));
+                $paid_rewards[$i]['padded_invoice'] = pad($row['invoice'], 11, '0');
+                $paid_rewards[$i]['paid'] = number_format($paid[0]['amount'], 2, '.', ', ');
+            }
         }
         
         ?>
-        <div class="banner">
-            An administration fee of <?php echo $currency ?> 2.00 will be charged to the referrers for every transfer of rewards into their bank accounts. <br/><br/>Always remember to ensure that the <?php echo $currency ?> 2.00 administration fee is taken into considration when making an online bank transaction.
+        <!-- submenu -->
+        <div class="menu">
+            <ul class="menu">
+                <li id="item_new_rewards" style="background-color: #CCCCCC;"><a class="menu" onClick="show_new_rewards();">New</a></li>
+                <li id="item_paid_rewards"><a class="menu" onClick="show_paid_rewards();">Paid</a></li>
+            </ul>
         </div>
+        <!-- end submenu -->
+        
+        <!-- div class="banner">
+            An administration fee of <?php //echo $currency ?> 2.00 will be charged to the referrers for every transfer of rewards into their bank accounts. <br/><br/>Always remember to ensure that the <?php // echo $currency ?> 2.00 administration fee is taken into considration when making an online bank transaction.
+        </div -->
+        
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
-        </div>
-        <div id="div_tabs">
-            <ul>
-                <li id="li_new">New</li>
-                <li id="li_partially_paid">Partially Paid</li>
-                <li id="li_fully_paid">Fully Paid</li>
-            </ul>
         </div>
         
         <div id="div_new_rewards">
