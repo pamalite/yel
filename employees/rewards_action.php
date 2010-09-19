@@ -166,15 +166,23 @@ if ($_POST['action'] == 'get_banks') {
     exit();
 }
 
-if ($_POST['action'] == 'confirm_payment') {
+if ($_POST['action'] == 'award') {
     $data = array();
     $data['referral'] = $_POST['id'];
-    $data['reward'] = $_POST['amount'];
     $data['paid_on'] = now();
-    $data['paid_through'] = $_POST['payment_mode'];
-    $data['bank'] = ($_POST['bank'] == '0' || empty($_POST['bank'])) ? 'NULL' : $_POST['bank'];
-    $data['cheque'] = $_POST['cheque'];
-    $data['receipt'] = $_POST['receipt'];
+    
+    if ($_POST['award_mode'] == 'gift') {
+        $data['reward'] = '0.00';
+        $data['bank'] = 'NULL';
+        $data['paid_through'] = 'NULL';
+        $data['gift'] = sanitize($_POST['gift']);
+    } else {
+        $data['reward'] = $_POST['amount'];
+        $data['paid_through'] = $_POST['payment_mode'];
+        $data['bank'] = ($_POST['bank'] == '0' || empty($_POST['bank'])) ? 'NULL' : $_POST['bank'];
+        $data['receipt'] = $_POST['receipt'];
+        $data['gift'] = 'NULL';
+    }
     
     if (!ReferralReward::create($data)) {
         echo 'ko';
@@ -185,63 +193,4 @@ if ($_POST['action'] == 'confirm_payment') {
     exit();
 }
 
-if ($_POST['action'] == 'get_payment_history') {
-    $order_by = 'referral_rewards.paid_on ASC';
-    
-    if (isset($_POST['order_by'])) {
-        $order_by = $_POST['order_by'];
-    }
-    
-    $query = "SELECT referral_rewards.id, referral_rewards.reward, referral_rewards.paid_through, 
-              referral_rewards.cheque, referral_rewards.receipt, 
-              DATE_FORMAT(referral_rewards.paid_on, '%e %b, %Y') AS formatted_paid_on,  
-              CONCAT(member_banks.bank, ' (', member_banks.account, ')') AS bank 
-              FROM referral_rewards 
-              LEFT JOIN member_banks ON member_banks.id = referral_rewards.bank 
-              WHERE referral_rewards.referral = ". $_POST['id']. " 
-              ORDER BY ". $order_by;
-    $mysqli = Database::connect();
-    $result = $mysqli->query($query);
-    if (count($result) <= 0 || is_null($result)) {
-        echo '0';
-        exit();
-    }
-    
-    if (!$result) {
-        echo 'ko';
-        exit();
-    }
-    
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array(array('payments' => array('payment' => $result)));
-    exit();
-}
-
-if ($_POST['action'] == 'get_payment_plan') {
-    $months = 6;
-    $total_reward = str_replace(array(',', ', '), '', $_POST['total_reward']);
-    $monthly_amount = round(($total_reward / $months), 2);
-    $new_total_reward = ($monthly_amount * $months);
-    $remainder = ($total_reward - $new_total_reward);
-    $final_monthly_amount = ($monthly_amount + $remainder);
-    
-    $employed_on = $_POST['employed_on'];
-    $plans = array();
-    $due_days = 30;
-    for($i=0; $i < $months; $i++) {
-        $plans[$i]['due_day'] = $due_days;
-        $plans[$i]['due_on'] = sql_date_format(sql_date_add($employed_on, $due_days, 'day'));
-        if ($i == ($months-1)) {
-            $plans[$i]['amount'] = $final_monthly_amount;
-        } else {
-            $plans[$i]['amount'] = $monthly_amount;
-        }
-        
-        $due_days += 30;
-    }
-    
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array(array('plans' => array('plan' => $plans)));
-    exit();
-}
 ?>

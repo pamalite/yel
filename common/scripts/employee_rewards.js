@@ -22,20 +22,21 @@ function get_banks(_member_id) {
         method: 'post',
         onSuccess: function(txt, xml) {
             if (txt == '0') {
-                return 0;
+                $('banks_list').set('html', 'No bank account stored.');
+                return;
             }
             
             var ids = xml.getElementsByTagName('id');
             var banks = xml.getElementsByTagName('bank');
-            var accounts = xml.getElementsByTagName('accounts');
+            var accounts = xml.getElementsByTagName('account');
             
+            var html = '<select class="field" id="bank_account">';
             for (var i=0; i < ids.length; i++) {
-                var a_bank = new Bank(ids[i].childNodes[0].nodeValue, 
-                                      banks[i].childNodes[0].nodeValue,
-                                      accounts[i].childNodes[0].nodeValue);
-                banks[banks.length] = a_bank;
+                html = html + '<option value="' + ids[i].childNodes[0].nodeValue + '">' + banks[i].childNodes[0].nodeValue + ' (' + accounts[i].childNodes[0].nodeValue + ')</option>';
             }
-            
+            html = html + '</select>';
+            $('banks_list').set('html', html);
+            set_status('');
             return true;
         },
         onRequest: function(instance) {
@@ -204,7 +205,7 @@ function update_paid_rewards_list() {
                 var paid_rewards_table = new FlexTable('paid_rewards_table', 'paid_rewards');
 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'referral_rewards.paid_on');\">Employed On</a>", '', 'header'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'referral_rewards.paid_on');\">Awarded On</a>", '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'jobs.title');\">Job</a>", '', 'header'));
                 header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'members.lastname');\">Referrer</a>", '', 'header'));
                 header.set(3, new Cell('Receipt', '', 'header'));
@@ -274,7 +275,7 @@ function show_paid_rewards() {
 }
 
 function show_award_popup(_referral_id) {
-    $('referrer_id').value = _invoice_id;
+    $('referral_id').value = _referral_id;
     
     var params = 'id=' + _referral_id + '&action=get_reward_details';
     
@@ -293,17 +294,13 @@ function show_award_popup(_referral_id) {
             var referrers = xml.getElementsByTagName('member');
             var referrer_ids = xml.getElementsByTagName('member_id');
             var total_rewards = xml.getElementsByTagName('total_reward');
-            var currencies = xml.getElementsByTagName('currencies');
+            var currencies = xml.getElementsByTagName('currency');
             
-            if (get_banks(referrer_ids)) {
-                // populate drop down
-            } else {
-                $('banks_list').set('html', 'No bank accounts stored.');
-            }
+            get_banks(referrer_ids[0].childNodes[0].nodeValue);
             
             $('lbl_referrer').set('html', referrers[0].childNodes[0].nodeValue);
             
-            var amount = currencies[0].childNodes[0].nodeValue + '$ ' + total_rewards[0].nodeValue;
+            var amount = currencies[0].childNodes[0].nodeValue + '$ ' + total_rewards[0].childNodes[0].nodeValue;
             $('lbl_reward').set('html', amount);
             
             show_window('award_window');
@@ -319,205 +316,53 @@ function show_award_popup(_referral_id) {
 
 function close_award_popup(_is_award) {
     if (_is_award) {
+        var params = 'id=' + $('referral_id').value + '&action=award';
         
-    }
-    
-    close_window('award_window');
-}
-
-function show_payments_with(_referral, _reward, _member_id, _job_title, _employer_name, _currency) {
-    payments_referral = _referral;
-    payments_reward = _reward;
-    payments_member_id = _member_id;
-    payments_job_title = _job_title;
-    payments_employer_name = _employer_name;
-    payments_currency = _currency;
-    
-    show_payments();
-}
-
-function show_payments() {
-    display_member_name_in('member_name', payments_member_id);
-    //$('member_name').set('html', _member);
-    $('total_reward').set('html', payments_currency + ' ' + payments_reward);
-    $('job_title').set('html', payments_job_title);
-    $('job_employer').set('html', payments_employer_name);
-    $('payment_info.currency').set('html', payments_currency);
-    $('payment_info.total_paid.currency').set('html', payments_currency);
-    $('total_amount').set('html', '0.00');
-    
-    selected_tab = 'div_payments';
-    $('div_partially_paid_rewards').setStyle('display', 'none');
-    $('div_fully_paid_rewards').setStyle('display', 'none');
-    $('div_new_rewards').setStyle('display', 'none');
-    $('div_payments').setStyle('display', 'block');
-    
-    var params = 'id=' + payments_referral + '&action=get_payment_history';
-    params = params + '&order_by=' + payments_order_by + ' ' + payments_order;
-    
-    var uri = root + "/employees/rewards_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading payment history.');
-                return false;
-            }
-            
-            var html = '<table id="list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no payments made yet.</div>';
-            } else {
-                var ids = xml.getElementsByTagName('id');
-                var rewards = xml.getElementsByTagName('reward');
-                var paid_ons = xml.getElementsByTagName('formatted_paid_on');
-                var payment_modes = xml.getElementsByTagName('paid_through');
-                var banks = xml.getElementsByTagName('bank');
-                var cheques = xml.getElementsByTagName('cheque');
-                var receipts = xml.getElementsByTagName('receipt');
-                var total_reward = 0.00;
-                
-                for (var i=0; i < ids.length; i++) {
-                    var id = ids[i].childNodes[0].nodeValue;
-                    
-                    html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="date">' + paid_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    
-                    var payment_mode = 'Not Applicable';
-                    switch (payment_modes[i].childNodes[0].nodeValue) {
-                        case 'CSH':
-                            payment_mode = 'Cash';
-                            break;
-                        case 'CHQ':
-                            payment_mode = 'Cheque';
-                            break;
-                        case 'CDB':
-                            payment_mode = 'Bank on-behalf';
-                            break;
-                        case 'IBT':
-                            payment_mode = 'Bank Transfer';
-                            break;
-                    }
-                    
-                    html = html + '<td class="mode">' + payment_mode + '</td>' + "\n";
-                    
-                    var bank = 'Not Applicable';
-                    if (banks[i].childNodes.length > 0) {
-                        bank = banks[i].childNodes[0].nodeValue;
-                    }
-                    html = html + '<td class="bank">' + bank + '</td>' + "\n";
-                    
-                    var cheque = 'Not Applicable';
-                    if (cheques[i].childNodes.length > 0) {
-                        cheque = cheques[i].childNodes[0].nodeValue;
-                    }
-                    html = html + '<td class="cheque">' + cheque + '</td>' + "\n";
-                    
-                    var receipt = 'Not Applicable';
-                    if (receipts[i].childNodes.length > 0) {
-                        receipt = receipts[i].childNodes[0].nodeValue;
-                    }
-                    html = html + '<td class="receipt">' + receipt + '</td>' + "\n";
-                    html = html + '<td class="reward">' + rewards[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                    
-                    total_reward = parseFloat(total_reward) + parseFloat(rewards[i].childNodes[0].nodeValue);
+        if ($('award_as_gift').checked) {
+            params = params + '&award_mode=gift';
+            params = params + '&gift=' + $('gift').value;
+        } else {
+            params = params + '&award_mode=money';
+            params = params + '&bank=' + $('bank_account').options[$('bank_account').selectedIndex].value;
+            params = params + '&payment_mode=' + $('payment_mode').options[$('payment_mode').selectedIndex].value;
+            params = params + '&receipt=' + $('receipt').value;
+            params = params + '&amount=' + $('lbl_reward').get('html').substr(5);
+        }
+        
+        var uri = root + "/employees/rewards_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                //set_status('<pre>' + txt + '</pre>');
+                //return;
+                if (txt == 'ko') {
+                    alert('An error occured while awarding reward.');
+                    return false;
                 }
-                html = html + '</table>';
                 
-                total_reward = (Math.round(total_reward * 100) / 100);
-                $('total_amount').set('html', total_reward);
+                
+                
+                if ($('div_paid_rewards') == null) {
+                    location.replace('rewards.php');
+                } else {
+                    update_new_rewards_list();
+                    update_paid_rewards_list();
+                }
+                
+                close_window('award_window');
+                set_status('');
+            },
+            onRequest: function(instance) {
+                set_status('Loading paid rewards...');
             }
-            
-            
-            var button = '<input type="button" value="Confirm New Payment" onClick="show_payment_form(\'' + payments_referral + '\', \'' + (Math.round((payments_reward - total_reward) * 100) / 100) + '\', \'' + payments_member_id + '\', \'' + payments_currency + '\')" />';
-            if (parseFloat(total_reward) >= parseFloat(payments_reward)) {
-                button = '<input type="button" value="Confirm New Payment" disabled />';
-            }
-            
-            $('payments_button').set('html', button);
-            $('payments_button_1').set('html', button);
-            $('div_payments_list').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading payment history...');
-        }
-    });
-    
-    request.send(params);
-}
+        });
 
-function close_payment_plan() {
-    $('div_payment_plan').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
-}
-
-function show_payment_plan(_reward, _employed_on, _formatted_employed_on, _currency) {
-    $('div_blanket').setStyle('display', 'block');
-    $('payment_plan.currency').set('html', _currency);
-    
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_payment_plan').getStyle('height'));
-    var div_width = parseInt($('div_payment_plan').getStyle('width'));
-    
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
+        request.send(params);
+        
     } else {
-        window_height = document.documentElement.clientHeight;
+        close_window('award_window');
     }
-    
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
-    }
-    
-    $('div_payment_plan').setStyle('top', ((window_height - div_height) / 2));
-    $('div_payment_plan').setStyle('left', ((window_width - div_width) / 2));
-    
-    var params = 'id=0&action=get_payment_plan';
-    params = params + '&total_reward=' + _reward + '&employed_on=' + _employed_on;
-    
-    var uri = root + "/employees/rewards_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading payment plan.');
-                return false;
-            }
-            
-            $('plan_reward').set('html', _currency + ' ' + _reward);
-            $('plan_employed_on').set('html', _formatted_employed_on);
-            
-            var due_days = xml.getElementsByTagName('due_day');
-            var due_ons = xml.getElementsByTagName('due_on');
-            var amounts = xml.getElementsByTagName('amount');
-            
-            var html = '<table id="list" class="list">';
-            for (var i=0; i < due_days.length; i++) {
-                html = html + '<tr id="'+ i + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                html = html + '<td class="days">' + due_days[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '<td class="date">' + due_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '<td class="amount">' + amounts[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '</tr>' + "\n";
-            }
-            html = html + '</table>';
-            
-            $('payment_plan_list').set('html', html);
-            $('div_payment_plan').setStyle('display', 'block');
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading payment plan...');
-        }
-    });
-    
-    request.send(params);
 }
 
 function onDomReady() {

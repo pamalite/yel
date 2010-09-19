@@ -81,7 +81,30 @@ span.contact_label {
     font-weight: bold;
 }
 
+#award_window {
+    width: 450px;
+    display: none;
+}
 
+div.award_form {
+    font-size: 12pt;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+table.award_form {
+    width: 100%;
+    margin: auto;
+}
+
+table.award_form td {
+    vertical-align: top;
+}
+
+table.award_form td.label {
+    font-weight: bold;
+    width: 30%;
+}
 
 /* old */
 #div_new_rewards, #div_partially_paid_rewards, 

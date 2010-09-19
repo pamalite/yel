@@ -209,7 +209,7 @@ class EmployeeRewardsPage extends Page {
                     $paid_rewards_table->set($i+1, 4, $paid_reward['currency']. '$ '. $paid_reward['total_reward'], '', 'cell');
                     
                     $rewarded = $paid_reward['currency']. '$ '. $paid_reward['paid_reward'];
-                    if ($rewarded <= 0 && !is_null($paid_reward['gift'])) {
+                    if ($paid_reward['paid_reward'] <= 0 && !is_null($paid_reward['gift'])) {
                         $rewarded = $paid_reward['gift'];
                     }
                     $paid_rewards_table->set($i+1, 5, $rewarded, '', 'cell');
@@ -224,44 +224,55 @@ class EmployeeRewardsPage extends Page {
         </div>
         
         <!-- popup windows goes here -->
-        
-        <!-- div id="div_blanket"></div>
-        <div id="div_payment_form">
-            <form method="post" onSubmit="return false;">
-                <input type="hidden" id="referral_id" name="referral_id" value="0" />
-                <p class="instructions">Please enter the following fields to confirm payment of <span id="reward" style="font-weight: bold;"></span> to <span id="member" style="font-weight: bold;"></span>.</p>
-                <table id="payment_form" class="payment_form">
-                    <tr>
-                        <td class="label"><label for="amount">Amount (<span id="payment_form.currency"></span>):</label></td>
-                        <td class="field"><input class="field" type="text" id="amount" name="amount" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="payment_mode">Payment mode:</label></td>
-                        <td class="field">
-                            <select id="payment_mode" name="payment_mode">
-                                <option value="IBT" selected>Bank Transfer</option>
-                                <option value="CSH">Cash</option>
-                                <option value="CHQ">Cheque</option>
-                                <option value="CDB">Bank on-behalf</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="accounts_dropdown">Account:</label></td>
-                        <td class="field"><span id="accounts_list"></span></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="cheque">Cheque:</label></td>
-                        <td class="field"><input class="field" type="text" id="cheque" name="cheque" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="receipt">Receipt:</label></td>
-                        <td class="field"><input class="field" type="text" id="receipt" name="receipt" /></td>
-                    </tr>
-                </table>
-                <p class="button"><input class="button" type="button" value="Cancel" onClick="close_payment_form();" />&nbsp;<input class="button" type="button" id="save_bank" name="save_bank" value="Confirm Payment" onClick="confirm_payment();" /></p>
+        <div id="award_window" class="popup_window">
+            <div class="popup_window_title">Award</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="referral_id" value="" />
+                <div class="award_form">
+                    <table class="award_form">
+                        <tr>
+                            <td class="label">Referrer:</td>
+                            <td class="field"><span id="lbl_referrer"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Total Reward:</td>
+                            <td class="field">
+                                <span id="lbl_reward"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Award as:</td>
+                            <td class="field">
+                                <div class="award_field">
+                                    <input type="radio" name="award_as" id="award_as_money" checked />Monetary Incentive<br/>
+                                    Payment Mode:
+                                    <select id="payment_mode" name="payment_mode">
+                                        <option value="IBT" selected>Bank Transfer</option>
+                                        <option value="CSH">Cash</option>
+                                        <option value="CHQ">Cheque</option>
+                                        <option value="CDB">Bank on-behalf</option>
+                                    </select><br/>
+                                    Bank Account:
+                                    <span id="banks_list"></span><br/>
+                                    Receipt #:
+                                    <input type="text" id="receipt" value="" />
+                                </div>
+                                <br/>
+                                <div class="award_field">
+                                    <input type="radio" name="award_as" id="award_as_gift" />Gift: 
+                                    <input type="text" id="gift" value="" />
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </form>
-        </div -->
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Cancel" onClick="close_award_popup(false);" />
+                <input type="button" value="Confirm" onClick="close_award_popup(true);" />
+            </div>
+        </div>
+        
         <?php
     }
 }

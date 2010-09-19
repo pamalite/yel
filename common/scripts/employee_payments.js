@@ -290,8 +290,13 @@ function close_payment_popup(_is_confirmed) {
 
                 set_status('');
                 close_window('paid_window');
-                update_invoices_list();
-                update_receipts_list();
+                
+                if ($('div_receipts') == null) {
+                    location.replace('payments.php');
+                } else {
+                    update_invoices_list();
+                    update_receipts_list();
+                }
             },
             onRequest: function(instance) {
                 set_status('Confirming payment...');

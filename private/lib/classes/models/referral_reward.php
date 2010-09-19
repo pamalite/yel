@@ -12,7 +12,7 @@ class ReferralReward {
         }
         
         $data = sanitize($_data);
-        if ($data['reward'] <= 0) {
+        if ($data['reward'] <= 0 && $data['gift'] == 'NULL') {
             return false;
         }
         
