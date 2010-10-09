@@ -382,4 +382,24 @@ if ($_POST['action'] == 'resend') {
     echo 'ok';
     exit();
 }
+
+if ($_POST['action'] == 'get_employers') {
+    $criteria = array(
+        'columns' => "DISTINCT employers.id, employers.name", 
+        'joins' => "employers ON employers.id = invoices.employer"
+    );
+
+    if ($_POST['for'] == 'invoice') {
+        $criteria['match'] = "invoices.paid_on IS NULL";
+    } else {
+        $criteria['match'] = "invoices.paid_on IS NOT NULL";
+    }
+
+    $result = Invoice::find($criteria);
+    
+    $response = array('employers' => array('employer' => $result));
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
 ?>

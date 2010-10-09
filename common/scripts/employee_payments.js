@@ -34,6 +34,43 @@ function sort_by(_table, _column) {
     }
 }
 
+function update_employers_list(_for_invoice) {
+    var params = 'id=0&action=get_employers';
+    
+    if (_for_invoice) {
+        params = params + '&for=invoice';
+    } else {
+        params = params + '&for=receipt';
+    }
+    
+    var uri = root + "/employees/payments_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            //set_status('<pre>' + txt + '</pre>');
+            //return;
+            var ids = xml.getElementsByTagName('id');
+            var names = xml.getElementsByTagName('name');
+            
+            var filter = $('invoices_filter');
+            if (!_for_invoice) {
+                filter = $('receipts_filter');
+            }
+            
+            filter.options.length = 0;
+            filter.add(new Option('All', '', true, true));
+            filter.add(new Option('', ''));
+            
+            for (var i=0; i < ids.length; i++) {
+                filter.add(new Option(names[i].childNodes[0].nodeValue, ids[i].childNodes[0].nodeValue));
+            }
+        }
+    });
+    
+    request.send(params);
+}
+
 function filter_invoices() {
     update_invoices_list();
 }
@@ -296,6 +333,8 @@ function close_payment_popup(_is_confirmed) {
                 } else {
                     update_invoices_list();
                     update_receipts_list();
+                    update_employers_list(true);
+                    update_employers_list(false);
                 }
             },
             onRequest: function(instance) {
