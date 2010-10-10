@@ -110,7 +110,8 @@ textarea.notes {
     font-size: 12pt;
 }
 
-#conflicts_window {
+#conflicts_window, 
+#new_application_window {
     width: 650px;
     display: none;
 }
@@ -121,30 +122,55 @@ div.resolution_instructions {
     padding-bottom: 15px;
 }
 
-table.conflicts {
+table.conflicts, 
+table.new_application {
     border: none;
     width: 100%;
     margin: auto;
 }
 
-table.conflicts td {
+table.conflicts td, 
+table.new_application td {
     padding: 3px 3px 3px 3px;
 }
 
 table.conflicts td.buffered, 
-table.conflicts td.existing {
+table.conflicts td.existing, 
+table.new_application td.referrer, 
+table.new_application td.candidate {
     text-align: center;
     font-weight: bold;
-    background-color: #CCCCCC;
+    background-color: #DDDDDD;
     width: 50%;
 }
 
-table.conflicts td.label {
+table.conflicts td.label, 
+table.new_application td.label {
     width: 15%;
     font-weight: bold;
-    background-color: #CCCCCC;
+    background-color: #DDDDDD;
 }
 
 table.conflicts td.resolution_button {
     text-align: center;
+}
+
+table.new_application td.auto_fill {
+    text-align: center;
+}
+
+input.field {
+    font-size: 10pt;
+    width: 98%;
+}
+
+textarea.quick_notes {
+    width: 98%;
+    height: 100px;
+}
+
+.small_contact_edit {
+    font-style: normal;
+    font-size: 9pt;
+    font-weight: bold;
 }

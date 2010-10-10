@@ -83,6 +83,7 @@ class EmployeeMembersPage extends Page {
         $this->menu_employee('members');
         
         $branch = $this->employee->getBranch();
+        $sales_email_addr = 'team.'. strtolower($branch[0]['country']). '@yellowelevator.com';
         $members = $this->get_members($branch[0]['id']);
         $applications = $this->get_applications();
         
@@ -118,6 +119,8 @@ class EmployeeMembersPage extends Page {
                     <option value="self_applied">Self Applied</option>
                     <option value="referred">Referred</option>
                 </select>
+                &nbsp;
+                <input class="button" type="button" value="Add New Application" onClick="show_new_application_popup();" />
             </div>
             <div id="div_applications">
             <?php
@@ -131,6 +134,8 @@ class EmployeeMembersPage extends Page {
                 $applications_table->set(0, 5, 'Quick Actions', '', 'header action');
 
                 foreach ($applications as $i=>$application) {
+                    $is_cannot_signup = false;
+                    
                     $applications_table->set($i+1, 0, $application['formatted_requested_on'], '', 'cell');
                     
                     $referrer_short_details = '';
@@ -139,14 +144,40 @@ class EmployeeMembersPage extends Page {
                         $referrer_short_details = 'Self Applied';
                     } else {
                         $referrer_short_details = '<span style="font-weight: bold;">'. htmlspecialchars_decode(desanitize($application['referrer_name'])). '</span>'. "\n";
-                        $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['referrer_phone']. '</div>'. "\n";
-                        $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['referrer_email']. '">'. $application['referrer_email']. '</a></div>'. "\n";
+                        
+                        if (empty($application['referrer_phone']) || 
+                            is_null($application['referrer_phone'])) {
+                            $is_cannot_signup = true;
+                            $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> <a class="no_link small_contact_edit" onClick="edit_referrer_phone('. $application['id']. ');">Add Phone Number</a></div>'. "\n";
+                        } else {
+                            $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['referrer_phone']. '</div>'. "\n";
+                        }
+                        
+                        if (empty($application['referrer_email']) || 
+                            is_null($application['referrer_email'])) {
+                            $is_cannot_signup = true;
+                            $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span> <a class="no_link small_contact_edit" onClick="edit_referrer_email('. $application['id']. ');">Add Email</a></div>'. "\n";
+                        } else {
+                            $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['referrer_email']. '">'. $application['referrer_email']. '</a></div>'. "\n";
+                        }
                     }
                     $applications_table->set($i+1, 1, $referrer_short_details, '', 'cell');
                     
                     $candidate_short_details = '<span style="font-weight: bold;">'. htmlspecialchars_decode(desanitize($application['candidate_name'])). '</span>'. "\n";
-                    $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['candidate_phone']. '</div>'. "\n";
-                    $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['candidate_email']. '">'. $application['candidate_email']. '</a></div>'. "\n";
+                    
+                    if (empty($application['candidate_phone']) || is_null($application['candidate_phone'])) {
+                        $is_cannot_signup = true;
+                        $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> <a class="no_link small_contact_edit" onClick="edit_candidate_phone('. $application['id']. ');">Add Phone Number</a></div>'. "\n";
+                    } else {
+                        $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['candidate_phone']. ' <a class="no_link small_contact_edit" onClick="edit_candidate_phone('. $application['id']. ');">edit</a></div>'. "\n";
+                    }
+                    
+                    if (empty($application['candidate_email']) || is_null($application['candidate_email'])) {
+                        $is_cannot_signup = true;
+                        $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span> <a class="no_link small_contact_edit" onClick="edit_candidate_email('. $application['id']. ');">Add Email</a></div>'. "\n";
+                    } else {
+                        $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['candidate_email']. '">'. $application['candidate_email']. '</a> <a class="no_link small_contact_edit" onClick="edit_candidate_email('. $application['id']. ');">edit</a></div>'. "\n";
+                    }
                     $applications_table->set($i+1, 2, $candidate_short_details, '', 'cell');
                     
                     if ($application['has_notes'] == '1') {
@@ -158,12 +189,21 @@ class EmployeeMembersPage extends Page {
                     if (!is_null($application['existing_resume_id']) && 
                         !empty($application['existing_resume_id'])) {
                         $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['existing_resume_id']. '">View Resume</a>', '', 'cell');
-                    } else {
+                    } elseif (!is_null($application['resume_file_hash']) && 
+                              !empty($application['resume_file_hash'])) {
                         $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['id']. '&hash='. $application['resume_file_hash']. '">View Resume</a>', '', 'cell');
+                    } else {
+                        $applications_table->set($i+1, 4, 'Sign Up to Upload', '', 'cell');
                     }
                     
                     $actions = '<input type="button" value="Delete" onClick="delete_application(\''. $application['id']. '\');" />';
-                    $actions .= '<input type="button" value="Sign Up" onClick="make_member_from(\''. $application['id']. '\');" />';
+                    
+                    if ($is_cannot_signup) {
+                        $actions .= '<input type="button" value="Sign Up" disabled />';
+                    } else {
+                        $actions .= '<input type="button" value="Sign Up" onClick="make_member_from(\''. $application['id']. '\');" />';
+                    }
+                    
                     $applications_table->set($i+1, 5, $actions, '', 'cell action');
                 }
 
@@ -250,6 +290,57 @@ class EmployeeMembersPage extends Page {
             <div class="popup_window_buttons_bar">
                 <input type="button" value="Cancel" onClick="close_notes_popup(false);" />
                 <input type="button" value="Save" onClick="close_notes_popup(true);" />
+            </div>
+        </div>
+        
+        <div id="new_application_window" class="popup_window">
+            <div class="popup_window_title">New Application</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="sales_email_addr" value="<?php echo $sales_email_addr; ?>" />
+                <div class="new_application_form">
+                    <table class="new_application">
+                        <tr>
+                            <td class="referrer" colspan="2">Referrer</td>
+                            <td class="candidate" colspan="2">Candidate</td>
+                        </tr>
+                        <tr>
+                            <td class="auto_fill" colspan="2">
+                                <input type="checkbox" id="auto_fill_checkbox" onClick="auto_fill_referrer();" />
+                                <label for="auto_fill_checkbox">Referrer is YellowElevator.com</label>
+                            </td>
+                            <td colspan="2">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Name:</td>
+                            <td><input type="text" class="field" id="referrer_name" /></td>
+                            <td class="label">Name:</td>
+                            <td><input type="text" class="field" id="candidate_name" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Telephone:</td>
+                            <td><input type="text" class="field" id="referrer_phone" /></td>
+                            <td class="label">Telephone:</td>
+                            <td><input type="text" class="field" id="candidate_phone" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label">E-mail:</td>
+                            <td><input type="text" class="field" id="referrer_email_addr" /></td>
+                            <td class="label">E-mail:</td>
+                            <td><input type="text" class="field" id="candidate_email_addr" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td class="label">Notes:</td>
+                            <td>
+                                <textarea class="quick_notes" id="quick_notes"></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Add New Application" onClick="close_new_application_popup(1);" />
+                <input type="button" value="Cancel" onClick="close_new_application_popup(0);" />
             </div>
         </div>
         

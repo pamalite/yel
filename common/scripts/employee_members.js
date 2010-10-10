@@ -300,6 +300,7 @@ function show_applications() {
                 applications_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
+                    var is_cannot_signup = false;
                     var row = new Row('');
                     
                     row.set(0, new Cell(requested_ons[i].childNodes[0].nodeValue, '', 'cell'));
@@ -309,8 +310,8 @@ function show_applications() {
                         referrer_emails[i].childNodes[0].nodeValue.substr(7) == '@yellowelevator.com') {
                         row.set(1, new Cell('Self Applied', '', 'cell'));
                     } else {
-                        var referrer_phone_num = 'Not Provided';
-                        var referrer_email = 'Not Provided';
+                        var referrer_phone_num = '';
+                        var referrer_email = '';
                         if (referrer_phones[i].childNodes.length > 0) {
                             referrer_phone_num = referrer_phones[i].childNodes[0].nodeValue;
                         }
@@ -320,14 +321,26 @@ function show_applications() {
                         }
 
                         var short_desc = '<span style="font-weight: bold;">' + referrer_names[i].childNodes[0].nodeValue + '</span>' + "\n";
-                        short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + referrer_phone_num + '</div>' + "\n";
-                        short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + referrer_email + '"> ' + referrer_email + '</a></div>' + "\n";
+                        
+                        if (isEmpty(referrer_phone_num)) {
+                            is_cannot_signup = true;
+                            short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> <a class="no_link small_contact_edit" onClick="edit_referrer_phone(' + ids[i].childNodes[0].nodeValue + ');">Add Phone Number</a></div>' + "\n";
+                        } else {
+                            short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + referrer_phone_num + '</div>' + "\n";
+                        }
+                        
+                        if (isEmpty(referrer_email)) {
+                            is_cannot_signup = true;
+                            short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a class="no_link small_contact_edit" onClick="edit_referrer_email(' + ids[i].childNodes[0].nodeValue + ');">Add Email</a></div>' + "\n";
+                        } else {
+                            short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + referrer_email + '"> ' + referrer_email + '</a></div>' + "\n";
+                        }
                         row.set(1, new Cell(short_desc, '', 'cell'));
                     }
                     
                     // candidate column
-                    var candidate_phone_num = 'Not Provided';
-                    var candidate_email = 'Not Provided';
+                    var candidate_phone_num = '';
+                    var candidate_email = '';
                     if (candidate_phones[i].childNodes.length > 0) {
                         candidate_phone_num = candidate_phones[i].childNodes[0].nodeValue;
                     }
@@ -337,8 +350,21 @@ function show_applications() {
                     }
                     
                     short_desc = '<span style="font-weight: bold;">' + candidate_names[i].childNodes[0].nodeValue + '</span>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + candidate_phone_num + '</div>' + "\n";
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + candidate_email + '"> ' + candidate_email + '</a></div>' + "\n";
+                    
+                    if (isEmpty(candidate_phone_num)) {
+                        is_cannot_signup = true;
+                        short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> <a class="no_link small_contact_edit" onClick="edit_candidate_phone(' + ids[i].childNodes[0].nodeValue + ');">Add Phone Number</a></div>' + "\n";
+                    } else {
+                        short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + candidate_phone_num + ' <a class="no_link small_contact_edit" onClick="edit_candidate_phone(' + ids[i].childNodes[0].nodeValue + ');">edit</a></div>' + "\n";
+                    }
+                    
+                    if (isEmpty(candidate_email)) {
+                        is_cannot_signup = true;
+                        short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a class="no_link small_contact_edit" onClick="edit_candidate_email(' + ids[i].childNodes[0].nodeValue + ');">Add Email</a></div>' + "\n";
+                    } else {
+                        short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + candidate_email + '"> ' + candidate_email + '</a> <a class="no_link small_contact_edit" onClick="edit_candidate_email(' + ids[i].childNodes[0].nodeValue + ');">edit</a></div>' + "\n";
+                    }
+                    
                     row.set(2, new Cell(short_desc, '', 'cell'));
                     
                     var add_update_notes = 'Add';
@@ -349,13 +375,20 @@ function show_applications() {
                     
                     if (resume_ids[i].childNodes.length > 0) {
                         row.set(4, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
-                    } else {
+                    } else if (resume_file_hashes[i].childNodes.length > 0) {
                         row.set(4, new Cell('<a href="resume.php?id=' + ids[i].childNodes[0].nodeValue + '&hash=' + resume_file_hashes[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
+                    } else {
+                        row.set(4, new Cell('Sign Up to Upload', '', 'cell'));
                     }
                     
                     var actions = '';
                     actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
-                    actions = actions + '<input type="button" value="Sign Up" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                    
+                    if (is_cannot_signup) {
+                        actions = actions + '<input type="button" value="Sign Up" disabled />';
+                    } else {
+                        actions = actions + '<input type="button" value="Sign Up" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                    }
                     row.set(5, new Cell(actions, '', 'cell action'));
                     applications_table.set((parseInt(i)+1), row);
                 }
@@ -566,6 +599,220 @@ function close_notes_popup(_is_save) {
         request.send(params);
     } else {
         close_window('notes_window');
+    }
+}
+
+function edit_candidate_phone(_id) {
+    var phone = prompt('Enter the candidate\'s phone number.');
+    if (!isEmpty(phone)) {
+        var params = 'id=' + _id + '&action=edit_candidate_phone&phone=' + phone;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error while saving candidate\'s phone number.');
+                    return;
+                }
+                
+                show_applications();
+            },
+            onRequest: function(instance) {
+                set_status('Saving phone number...');
+            }
+        });
+
+        request.send(params);
+    } 
+}
+
+function edit_candidate_email(_id) {
+    var email = prompt('Enter the candidate\'s email address.');
+    if (isEmail(email)) {
+        var params = 'id=' + _id + '&action=edit_candidate_email&email=' + email;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error while saving candidate\'s email address.');
+                    return;
+                }
+                
+                show_applications();
+            },
+            onRequest: function(instance) {
+                set_status('Saving email address...');
+            }
+        });
+
+        request.send(params);
+    }
+}
+
+function edit_referrer_phone(_id) {
+    var phone = prompt('Enter the referrer\'s phone number.');
+    if (!isEmpty(phone)) {
+        var params = 'id=' + _id + '&action=edit_referrer_phone&phone=' + phone;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error while saving referrer\'s phone number.');
+                    return;
+                }
+                
+                show_applications();
+            },
+            onRequest: function(instance) {
+                set_status('Saving phone number...');
+            }
+        });
+
+        request.send(params);
+    } 
+}
+
+function edit_referrer_email(_id) {
+    var email = prompt('Enter the referrer\'s email address.');
+    if (isEmail(email)) {
+        var params = 'id=' + _id + '&action=edit_referrer_email&email=' + email;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error while saving referrer\'s email address.');
+                    return;
+                }
+                
+                show_applications();
+            },
+            onRequest: function(instance) {
+                set_status('Saving email address...');
+            }
+        });
+
+        request.send(params);
+    }
+}
+
+function auto_fill_referrer() {
+    if ($('auto_fill_checkbox').checked) {
+        $('referrer_name').value = 'YellowElevator.com';
+        $('referrer_phone').value = '-';
+        $('referrer_email_addr').value = $('sales_email_addr').value;
+        $('referrer_name').disabled = true;
+        $('referrer_phone').disabled = true;
+        $('referrer_email_addr').disabled = true;
+    } else {
+        $('referrer_name').value = '';
+        $('referrer_phone').value = '';
+        $('referrer_email_addr').value = '';
+        $('referrer_name').disabled = false;
+        $('referrer_phone').disabled = false;
+        $('referrer_email_addr').disabled = false;
+    }
+}
+
+function show_new_application_popup() {
+    show_window('new_application_window');
+    window.scrollTo(0, 0);
+}
+
+function close_new_application_popup(_is_save) {
+    if (_is_save) {
+        if (isEmpty($('candidate_name').value) && 
+            isEmpty($('candidate_phone').value) && 
+            isEmpty($('candidate_email_addr').value)) {
+            alert('At least ONE field of Candidate must NOT be empty.');
+            return;
+        }
+        
+        if (!isEmpty($('candidate_email_addr').value) && 
+            !isEmail($('candidate_email_addr').value)) {
+            alert('Candidate email is invalid.');
+            return;
+        }
+        
+        var referrer_is_yel = 0;
+        if ($('auto_fill_checkbox').checked) {
+            referrer_is_yel = 1;
+        }
+        
+        if (!referrer_is_yel && 
+            isEmpty($('referrer_name').value) && 
+            isEmpty($('referrer_phone').value) && 
+            isEmpty($('referrer_email_addr').value)) {
+            
+            if (confirm('Without stating the referrer, the system will default it to YellowElevator.' + "\n\n" + 'Are you sure to continue?')) {
+                referrer_is_yel = 1;
+            }
+        } else if (!referrer_is_yel && 
+                   !isEmpty($('referrer_email_addr').value) &&
+                   !isEmail($('referrer_email_addr').value)) {
+            alert('Referrer email is invalid.');
+            return;
+        }
+        
+        var params = 'id=' + user_id;
+        params = params + '&action=add_new_application';
+        params = params + '&referrer_is_yel=' + referrer_is_yel;
+        params = params + '&candidate_name=' + $('candidate_name').value;
+        params = params + '&candidate_phone=' + $('candidate_phone').value;
+        params = params + '&candidate_email=' + $('candidate_email_addr').value;
+        
+        if (!referrer_is_yel) {
+            params = params + '&referrer_name=' + $('referrer_name').value;
+            params = params + '&referrer_phone=' + $('referrer_phone').value;
+            params = params + '&referrer_email=' + $('referrer_email_addr').value;
+        } else {
+            params = params + '&referrer_email=' + $('sales_email_addr').value;
+        }
+        
+        var notes = $('quick_notes').value.replace("\n", '<br/>');
+        params = params + '&notes=' + notes;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                close_window('new_application_window');
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error while adding new application.');
+                    return;
+                }
+                
+                show_applications();
+            },
+            onRequest: function(instance) {
+                set_status('Saving new application...');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('new_application_window');
     }
 }
 

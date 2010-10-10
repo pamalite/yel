@@ -29,11 +29,11 @@ class ReferralBuffer implements Model {
             return false;
         }
         
-        if (!array_key_exists('referrer_email', $_data) || 
-            !array_key_exists('candidate_email', $_data) || 
-            !array_key_exists('job', $_data)) {
-            return false;
-        }
+        // if (!array_key_exists('referrer_email', $_data) || 
+        //     !array_key_exists('candidate_email', $_data) || 
+        //     !array_key_exists('job', $_data)) {
+        //     return false;
+        // }
         
         $data = sanitize($_data);
         $query = "INSERT INTO referral_buffers SET ";                

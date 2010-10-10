@@ -195,7 +195,7 @@ function isEmail(aString) {
             }
         }
     }
-
+    
     return true;
 }
 

@@ -243,7 +243,11 @@ class EmployeeMemberPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top('Member - '. htmlspecialchars_decode(stripslashes($this->member->getFullName())));
+        if ($this->is_new) {
+            $this->top('Member - New Member');
+        } else {
+            $this->top('Member - '. htmlspecialchars_decode(stripslashes($this->member->getFullName())));
+        }
         $this->menu_employee('members');
         
         $branch = $this->employee->getBranch();

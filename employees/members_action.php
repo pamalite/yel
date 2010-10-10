@@ -402,4 +402,84 @@ if ($_POST['action'] == 'check_member') {
     echo $xml_dom->get_xml_from_array($response);
     exit();
 }
+
+if ($_POST['action'] == 'add_new_application') {
+    $data = array();
+    $data['requested_on'] = now();
+    $data['referrer_email'] = $_POST['referrer_email'];
+    if ($_POST['referrer_is_yel'] == '0') {
+        $data['referrer_name'] = (empty($_POST['referrer_name']) ? "NULL" : $_POST['referrer_name']);
+        $data['referrer_phone'] = (empty($_POST['referrer_phone']) ? "NULL" : $_POST['referrer_phone']);;
+    }
+    
+    $data['candidate_email'] = (empty($_POST['candidate_email']) ? "NULL" : $_POST['candidate_email']);;
+    $data['candidate_name'] = (empty($_POST['candidate_name']) ? "NULL" : $_POST['candidate_name']);;
+    $data['candidate_phone'] = (empty($_POST['candidate_phone']) ? "NULL" : $_POST['candidate_phone']);;
+    $data['notes'] = (empty($_POST['notes']) ? "NULL" : $_POST['notes']);;
+    
+    $buffer = new ReferralBuffer();
+    if ($buffer->create($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'edit_candidate_phone') {
+    $data = array();
+    $data['candidate_phone'] = $_POST['phone'];
+    
+    $buffer = new ReferralBuffer($_POST['id']);
+    if ($buffer->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'edit_candidate_email') {
+    $data = array();
+    $data['candidate_email'] = $_POST['email'];
+    
+    $buffer = new ReferralBuffer($_POST['id']);
+    if ($buffer->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'edit_referrer_phone') {
+    $data = array();
+    $data['referrer_phone'] = $_POST['phone'];
+    
+    $buffer = new ReferralBuffer($_POST['id']);
+    if ($buffer->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'edit_referrer_email') {
+    $data = array();
+    $data['referrer_email'] = $_POST['email'];
+    
+    $buffer = new ReferralBuffer($_POST['id']);
+    if ($buffer->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
 ?>
