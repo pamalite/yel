@@ -340,8 +340,11 @@ class Resume implements Model{
                                   file_name = '". basename($name)."', 
                                   file_hash = '". $hash."', 
                                   file_size = '". $size."',
-                                  file_type = '". $type."' 
-                                  WHERE id = ". $this->id;
+                                  file_type = '". $type."'";
+                        if ($type == 'application/msword') {
+                            $query .= ", needs_indexing = TRUE";
+                        }
+                        $query .= " WHERE id = ". $this->id;
                         if ($this->mysqli->execute($query)) {
                             //return true;
                             $resume_text = '';
@@ -365,12 +368,13 @@ class Resume implements Model{
                                     }
                                     break;
                                 case 'application/msword':
-                                    $tmp = Resume::getTextFromMsword($GLOBALS['resume_dir']. "/". $new_name);
-                                    if (empty($tmp)) {
-                                        $tmp = Resume::getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
-                                    }
-                                    $resume_text = sanitize($tmp);
-                                    break;
+                                    // $tmp = Resume::getTextFromMsword($GLOBALS['resume_dir']. "/". $new_name);
+                                    // if (empty($tmp)) {
+                                    //     $tmp = Resume::getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
+                                    // }
+                                    // $resume_text = sanitize($tmp);
+                                    // break;
+                                    return true;
                                 case 'application/rtf':
                                     $tmp = Resume::getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
                                     if (empty($tmp)) {

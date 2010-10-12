@@ -306,7 +306,8 @@ function show_applications() {
                     row.set(0, new Cell(requested_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     // referrer column
-                    if (referrer_emails[i].childNodes[0].nodeValue.substr(0, 5) == 'team.' &&
+                    if (referrer_emails[i].childNodes.length > 0 && 
+                        referrer_emails[i].childNodes[0].nodeValue.substr(0, 5) == 'team.' &&
                         referrer_emails[i].childNodes[0].nodeValue.substr(7) == '@yellowelevator.com') {
                         row.set(1, new Cell('Self Applied', '', 'cell'));
                     } else {

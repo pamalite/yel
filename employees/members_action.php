@@ -139,16 +139,16 @@ if ($_POST['action'] == 'get_applications') {
         'match' => $filter_by, 
         'order' => $order_by
     );
-
+    
     $referral_buffer = new ReferralBuffer();
     $result = $referral_buffer->find($criteria);
-
+    
     if (count($result) <= 0 || is_null($result)) {
         echo '0';
         exit();
     }
 
-    if (!$result) {
+    if ($result === false) {
         echo 'ko';
         exit();
     }

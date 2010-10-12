@@ -136,7 +136,11 @@ class EmployeeEmployerPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top('Employer - '. htmlspecialchars_decode(stripslashes($this->employer->getName())));
+        if ($this->is_new) {
+            $this->top('Employer - New Employer');
+        } else {
+            $this->top('Employer - '. htmlspecialchars_decode(stripslashes($this->employer->getName())));
+        }
         $this->menu_employee('employers');
         
         $subscriptions_rates = $GLOBALS['subscriptions_rates'];

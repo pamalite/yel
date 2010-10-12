@@ -1,0 +1,24 @@
+Hi %employee%,
+
+%employer% would like to consult you about the application of the 
+%job% position:
+
+=== Message Begin ===
+
+Request:
+%request%
+
+Message:
+%message%
+
+=== Message End ===
+
+Application Details:
+
+Job: %job%
+Candidate: %candidate%
+Resume: %resume%
+Applied On: %referred_on%
+
+Yellow Elevator
+Refer a job

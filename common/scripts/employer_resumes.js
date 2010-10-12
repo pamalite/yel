@@ -216,7 +216,7 @@ function show_resumes_of(_job_id, _job_title) {
                         actions = actions + '<br/>';
                         actions = actions + '<a class="no_link" onClick="show_employment_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Employed</a>';
                         actions = actions + '&nbsp;|&nbsp;';
-                        actions = actions + '<a class="no_link" onClick="show_notify_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Notify</a>';
+                        actions = actions + '<a class="no_link" onClick="show_notify_popup(' + referral_ids[i].childNodes[0].nodeValue + ');">Consult</a>';
                     }
                     row.set(4, new Cell(actions, '', 'cell actions_column'));
                     resumes_table.set((parseInt(i)+1), row);
@@ -483,18 +483,14 @@ function close_notify_popup(_needs_sending) {
             }
         }
         
-        var is_good = '1';
-        if ($('bad').checked) {
-            is_good = '0';
+        var is_full_resume = '1';
+        if ($('others').checked) {
+            is_full_resume = '0';
         }
         
-        var params = 'id=' + $('notify_referral_id').value + '&action=notify_candidate';
+        var params = 'id=' + $('notify_referral_id').value + '&action=notify_consultant';
         params = params + '&reply_to=' + $('reply_to').value;
-        params = params + '&is_good=' + is_good;
-        params = params + '&job=' + current_job_title;
-        params = params + '&job_id=' + current_job_id;
-        params = params + '&candidate_email_addr=' + candidates[$('notify_candidate_idx').value].email_addr;
-        params = params + '&candidate_name=' + candidates[$('notify_candidate_idx').value].name;
+        params = params + '&is_full_resume=' + is_full_resume;
         params = params + '&message=' + encodeURIComponent($('txt_message').value);
 
         var uri = root + "/employers/resumes_action.php";
@@ -502,7 +498,7 @@ function close_notify_popup(_needs_sending) {
             url: uri,
             method: 'post',
             onSuccess: function(txt, xml) {
-                alert('Notification send.');
+                alert('Consultation send.');
             }
         });
 
@@ -512,10 +508,11 @@ function close_notify_popup(_needs_sending) {
     close_window('notify_window');
 }
 
-function show_notify_popup(_referral_id, _candidate_idx) {
+function show_notify_popup(_referral_id) {
     $('notify_referral_id').value = _referral_id;
-    $('notify_candidate_idx').value = _candidate_idx;
-    $('window_notify_candidate').set('html', 'A message to ' + candidates[_candidate_idx].name + ' about ' + current_job_title);
+    $('employee_name').set('html', employee_name);
+    $('employee_email').set('html', employee_email);
+    $('window_notify_consultant').set('html', 'Consult ' + employee_name + ' about ' + current_job_title);
     show_window('notify_window');
 }
 

@@ -29,6 +29,17 @@ class EmployerResumesPage extends Page {
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
         echo 'var id = "'. $this->employer->getId(). '";'. "\n";
+        
+        $criteria = array(
+            'columns' => "CONCAT(employees.firstname, ', ', employees.lastname) AS employee_name,
+                          employees.email_addr", 
+            'joins' => "employees ON employees.id = employers.registered_by",
+            'match' => "employers.id = '". $this->employer->getId(). "'"
+        );
+        $result = $this->employer->find($criteria);
+        
+        echo 'var employee_name = "'. htmlspecialchars_decode($result[0]['employee_name']). '";'. "\n";
+        echo 'var employee_email = "'. $result[0]['email_addr']. '";'. "\n";
         echo '</script>'. "\n";
     }
     
@@ -208,20 +219,24 @@ class EmployerResumesPage extends Page {
         </div>
         
         <div id="notify_window" class="popup_window">
-            <div id="window_notify_candidate" class="popup_window_title"></div>
+            <div id="window_notify_consultant" class="popup_window_title"></div>
             <div class="message_options">
-                Choose a message to send, and enter any further communications below.<br/><br/>
-                <input type="radio" name="message" id="good" checked /><label for="good">&quot;You have been shortlisted.&quot;&nbsp;
-                <input type="radio" name="message" id="bad" /><label for="bad">&quot;You have been KIVed.&quot;
+                Choose a request to send, and enter any further communications below.<br/><br/>
+                <input type="radio" name="message" id="full_resume" checked /><label for="full_resume">Need full resume.&nbsp;
+                <input type="radio" name="message" id="others" /><label for="others">Others.
                 <br/><br/>
             </div>
             <textarea id="txt_message" class="txt_message"></textarea>
             <table class="reply_to_area">
                 <tr>
+                    <td style="width: 25%;">Send To Consultant:</td>
+                    <td><span id="employee_name"></span>&nbsp;(<span id="employee_email"></span>)</td>
+                </tr>
+                <tr>
                     <td style="width: 25%;">Reply To Email:</td>
                     <td>
                         <input type="text" class="field" id="reply_to" value="" /><br/>
-                        <span style="font-size: 7pt; color: #666666;">Tip: If this is left empty, the default email will be used for the candidate to reply to.</span>
+                        <span style="font-size: 7pt; color: #666666;">Tip: If this is left empty, the default email will be used for your consultant to reply to.</span>
                     </td>
                 </tr>
             </table>

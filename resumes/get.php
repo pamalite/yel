@@ -1,13 +1,12 @@
 <?php
 require_once dirname(__FILE__)."/../private/lib/utilities.php";
 
-if ($GLOBALS['protocol'] == 'https') {
-    if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') {
-        redirect_to('https://'. $GLOBALS['root']. '/resumes/get.php');
-        exit();
-    } 
-}
-
+// if ($GLOBALS['protocol'] == 'https') {
+//     if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') {
+//         redirect_to('https://'. $GLOBALS['root']. '/resumes/get.php');
+//         exit();
+//     } 
+// }
 
 $xml_dom = new XMLDOM();
 $mysqli = Database::connect();
@@ -32,9 +31,10 @@ if (count($result) <= 0 || is_null($result)) {
 // 2. put them into array for XML parsing
 $response = array();
 foreach ($result as $i=>$row) {
-    $resume = array();
-    $resume['id'] = $row['id'];
-    $resume['hash'] = $row['file_hash'];
+    $resume = array(
+        'id' => $row['id'],
+        'hash' => $row['file_hash']
+    );
     
     $response['resume'][] = $resume;
 }

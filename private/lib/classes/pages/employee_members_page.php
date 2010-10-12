@@ -127,7 +127,7 @@ class EmployeeMembersPage extends Page {
                 $applications_table = new HTMLTable('applications_table', 'applications');
 
                 $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Requested On</a>", '', 'header');
-                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.referral_name');\">Referrer</a>", '', 'header');
+                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.referrer_name');\">Referrer</a>", '', 'header');
                 $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header');
                 $applications_table->set(0, 3, "Notes", '', 'header');
                 $applications_table->set(0, 4, "Resume", '', 'header');

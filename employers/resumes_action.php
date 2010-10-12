@@ -261,49 +261,76 @@ if ($_POST['action'] == 'save_remarks') {
     exit();
 }
 
-if ($_POST['action'] == 'notify_candidate') {
-    $job = new Job();
+if ($_POST['action'] == 'notify_consultant') {
+    $referral = new Referral();
     $criteria = array(
-        'columns' => 'employers.name AS employer, email_addr', 
-        'joins' => 'employers ON employers.id = jobs.employer',
-        'match' => 'jobs.id = '. $_POST['job_id'], 
-        'limit' => '1'
+        'columns' => "CONCAT(employees.firstname, ', ', employees.lastname) AS employee_name,
+                      employees.email_addr, employers.name AS employer_name, employers.id AS employer_id, 
+                      jobs.title AS job_title, employers.email_addr AS employer_email_addr, 
+                      CONCAT(members.firstname, ', ', members.lastname) AS member_name, 
+                      resumes.name AS `resume`, referrals.job AS job_id, 
+                      DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on", 
+        'joins' => "members ON members.email_addr = referrals.referee,
+                    resumes ON resumes.id = referrals.resume,
+                    jobs ON jobs.id = referrals.job,
+                    employers ON employers.id = jobs.employer,
+                    employees ON employees.id = employers.registered_by", 
+        'match' => "referrals.id = ". $_POST['id'],
+        'limit' => "1"    
     );
-    $result = $job->find($criteria);
-    $employer = $result[0]['employer'];
-    $email_addr = $result[0]['email_addr'];
+    
+    $result = $referral->find($criteria);
+    
+    $employer = htmlspecialchars_decode(stripslashes($result[0]['employer_name']));
+    $employer_id = $result[0]['employer_id'];
+    $email_addr = $result[0]['employer_email_addr'];
+    $candidate = htmlspecialchars_decode(stripslashes($result[0]['member_name']));
+    $job = $result[0]['job_title'];
+    $job_id = $result[0]['job_id'];
+    $referred_on = $result[0]['formatted_referred_on'];
+    $resume = $result[0]['resume'];
+    $employee_email_addr = $result[0]['email_addr'];
+    $employee_name = htmlspecialchars_decode(stripslashes($result[0]['employee_name']));
     
     $reply_to = $email_addr;
     if (!empty($_POST['reply_to'])) {
         $reply_to = $_POST['reply_to'];
     }
     
-    $news = 'Congratulations! Your application has been shortlisted. We will contact you for further arrangements.';
-    if ($_POST['is_good'] == '0') {
-        $news = 'We are sorry that your application did not meet our requirements, and your resume has been kept for future use.';
+    $request = 'Request for full resume file for further viewing.';
+    if ($_POST['is_full_resume'] == '0') {
+        $request = 'Need your consult on other related matters.';
     }
     
-    $lines = file(dirname(__FILE__). '/../private/mail/employer_notify_candidate.txt');
+    $lines = file(dirname(__FILE__). '/../private/mail/employer_notify_consultant.txt');
     $message = '';
     foreach($lines as $line) {
        $message .= $line;
     }
     
-    $message = str_replace('%candidate%', htmlspecialchars_decode(desanitize($_POST['candidate_name'])), $message);
-    $message = str_replace('%employer%', desanitize($employer), $message);
-    $message = str_replace('%job%', desanitize($_POST['job']), $message);
-    $message = str_replace('%news%', $news, $message);
-    $message = str_replace('%message%', desanitize($_POST['message']), $message);
-    $subject = "A message from ". desanitize($employer);
+    $personalized_message = desanitize($_POST['message']);
+    if (empty($personalized_message)) {
+        $personalized_message = '(No message entered.)';
+    }
+    
+    $message = str_replace('%employee%', $employee_name, $message);
+    $message = str_replace('%candidate%', htmlspecialchars_decode($candidate), $message);
+    $message = str_replace('%employer%', $employer, $message);
+    $message = str_replace('%job%', $job. ' ['. $job_id. ']', $message);
+    $message = str_replace('%request%', $request, $message);
+    $message = str_replace('%message%', $personalized_message, $message);
+    $message = str_replace('%resume%', $resume, $message);
+    $message = str_replace('%referred_on%', $referred_on, $message);
+    $subject = "A consultation request from ". $employer;
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     $headers .= 'Reply-To: '. $reply_to. "\n";
-    mail($_POST['candidate_email_addr'], $subject, $message, $headers);
+    //mail($employee_email_addr, $subject, $message, $headers);
     
-    /*$handle = fopen('/tmp/email_to_'. $_POST['candidate_email_addr']. '.txt', 'w');
+    $handle = fopen('/tmp/email_to_'. $employee_email_addr. '.txt', 'w');
     fwrite($handle, 'Subject: '. $subject. "\n\n");
     fwrite($handle, 'Headers: '. $headers. "\n\n");
     fwrite($handle, $message);
-    fclose($handle);*/
+    fclose($handle);
     
     exit();
 }
