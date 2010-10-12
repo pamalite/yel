@@ -324,13 +324,14 @@ if ($_POST['action'] == 'notify_consultant') {
     $subject = "A consultation request from ". $employer;
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     $headers .= 'Reply-To: '. $reply_to. "\n";
-    //mail($employee_email_addr, $subject, $message, $headers);
+    $headers .= 'Bcc: sui.cheng.wong@yellowelevator.com'. "\n";
+    mail($employee_email_addr, $subject, $message, $headers);
     
-    $handle = fopen('/tmp/email_to_'. $employee_email_addr. '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, 'Headers: '. $headers. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);
+    // $handle = fopen('/tmp/email_to_'. $employee_email_addr. '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, 'Headers: '. $headers. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     exit();
 }
