@@ -64,6 +64,16 @@ if (!empty($_FILES['apply_resume']['name'])) {
                     $data['resume_file_size'] = $size;
                     
                     if ($referral_buffer->update($data)) {
+                        if ($type == 'application/msword') {
+                            $data['needs_indexing'] = '1';
+                            if ($referral_buffer->update($data) === true) {
+                                $has_resume = 'YES';
+                            } else {
+                                @unlink($file_path);
+                            }
+                            break;
+                        } 
+                        
                         switch ($type) {
                             case 'text/plain':
                                 $tmp = file_get_contents($file_path);
@@ -84,11 +94,11 @@ if (!empty($_FILES['apply_resume']['name'])) {
                                 }
                                 break;
                             case 'application/msword':
-                                $tmp = Resume::getTextFromMsword($file_path);
-                                if (empty($tmp)) {
-                                    $tmp = Resume::getTextFromRTF($file_path);
-                                }
-                                $resume_text = sanitize($tmp);
+                                // $tmp = Resume::getTextFromMsword($file_path);
+                                // if (empty($tmp)) {
+                                //     $tmp = Resume::getTextFromRTF($file_path);
+                                // }
+                                // $resume_text = sanitize($tmp);
                                 break;
                             case 'application/rtf':
                                 $tmp = Resume::getTextFromRTF($file_path);

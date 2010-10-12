@@ -1,6 +1,6 @@
 var order_by = 'members.joined_on';
 var order = 'desc';
-var applications_order_by = 'requested_on';
+var applications_order_by = 'referral_buffers.requested_on';
 var applications_order = 'desc';
 var applications_filter = '';
 
@@ -819,6 +819,15 @@ function close_new_application_popup(_is_save) {
 
 function onDomReady() {
     initialize_page();
+    
+    switch (current_page) {
+       case 'members':
+           show_members()
+           break;
+       default:
+           show_applications();
+           break;
+   }
 }
 
 window.addEvent('domready', onDomReady);

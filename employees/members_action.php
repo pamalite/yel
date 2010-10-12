@@ -112,8 +112,8 @@ if ($_POST['action'] == 'get_members') {
 }
 
 if ($_POST['action'] == 'get_applications') {
-    $order_by = 'requested_on desc';
-    $filter_by = "referrer_email LIKE '%'";
+    $order_by = 'referral_buffers.requested_on desc';
+    $filter_by = "referral_buffers.referrer_email LIKE '%'";
     
     //$employee = new Employee($_POST['id']);
     //$branch = $employee->getBranch();
@@ -124,18 +124,22 @@ if ($_POST['action'] == 'get_applications') {
     
     if (isset($_POST['filter'])) {
         if ($_POST['filter'] == 'self_applied') {
-            $filter_by = "referrer_email LIKE 'team%@yellowelevator.com'";
+            $filter_by = "referral_buffers.referrer_email LIKE 'team%@yellowelevator.com'";
         } else if ($_POST['filter'] == 'referred') {
-            $filter_by = "referrer_email NOT LIKE 'team%@yellowelevator.com'";
+            $filter_by = "referral_buffers.referrer_email NOT LIKE 'team%@yellowelevator.com'";
         } 
     }
     
     $criteria = array(
-        'columns' => "id, candidate_email, candidate_phone, candidate_name, 
-                      referrer_email, referrer_phone, referrer_name, 
-                      existing_resume_id, resume_file_hash, 
-                      IF(notes IS NULL OR notes = '', 0, 1) AS has_notes,
-                      DATE_FORMAT(requested_on, '%e %b, %Y') AS formatted_requested_on", 
+        'columns' => "referral_buffers.id, referral_buffers.candidate_email, 
+                      referral_buffers.candidate_phone, referral_buffers.candidate_name, 
+                      referral_buffers.referrer_email, referral_buffers.referrer_phone, 
+                      referral_buffers.referrer_name, 
+                      referral_buffers.existing_resume_id, referral_buffers.resume_file_hash, 
+                      IF(referral_buffers.notes IS NULL OR referral_buffers.notes = '', 0, 1) AS has_notes,
+                      IF(members.email_addr IS NULL, 0, 1) AS is_member,
+                      DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on", 
+        'joins' => "members ON members.email_addr = referral_buffers.candidate_email",
         'match' => $filter_by, 
         'order' => $order_by
     );

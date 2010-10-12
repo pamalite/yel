@@ -35,6 +35,7 @@ class EmployeeMembersPage extends Page {
         echo '<script type="text/javascript">'. "\n";
         echo 'var id = "'. $this->employee->getId(). '";'. "\n";
         echo 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
+        echo 'var current_page = "'. $this->current_page. '";'. "\n";
         echo '</script>'. "\n";
     }
     
@@ -64,12 +65,16 @@ class EmployeeMembersPage extends Page {
     private function get_applications() {
         $results = array();
         $criteria = array(
-            'columns' => "id, candidate_email, candidate_phone, candidate_name, 
-                          referrer_email, referrer_phone, referrer_name, 
-                          existing_resume_id, resume_file_hash, 
-                          IF(notes IS NULL OR notes = '', 0, 1) AS has_notes,
-                          DATE_FORMAT(requested_on, '%e %b, %Y') AS formatted_requested_on", 
-            'order' => "requested_on DESC"
+            'columns' => "referral_buffers.id, referral_buffers.candidate_email, 
+                          referral_buffers.candidate_phone, referral_buffers.candidate_name, 
+                          referral_buffers.referrer_email, referral_buffers.referrer_phone, 
+                          referral_buffers.referrer_name, 
+                          referral_buffers.existing_resume_id, referral_buffers.resume_file_hash, 
+                          IF(referral_buffers.notes IS NULL OR referral_buffers.notes = '', 0, 1) AS has_notes,
+                          IF(members.email_addr IS NULL, 0, 1) AS is_member,
+                          DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on", 
+            'joins' => "members ON members.email_addr = referral_buffers.candidate_email",
+            'order' => "referral_buffers.requested_on DESC"
         );
 
         $referral_buffer = new ReferralBuffer();
@@ -126,7 +131,7 @@ class EmployeeMembersPage extends Page {
             <?php
                 $applications_table = new HTMLTable('applications_table', 'applications');
 
-                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Requested On</a>", '', 'header');
+                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Requested/Added On</a>", '', 'header');
                 $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.referrer_name');\">Referrer</a>", '', 'header');
                 $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header');
                 $applications_table->set(0, 3, "Notes", '', 'header');

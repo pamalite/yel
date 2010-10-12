@@ -13,12 +13,16 @@ Message:
 
 === Message End ===
 
-Application Details:
+REMINDER: Remember to REMOVE the details below when replying!
+
+=== Application Details begin ===
 
 Job: %job%
 Candidate: %candidate%
 Resume: %resume%
 Applied On: %referred_on%
+
+=== Application Details end ===
 
 Yellow Elevator
 Refer a job

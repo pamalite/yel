@@ -26,6 +26,10 @@ function filter_applications() {
     update_applications(filter);
 }
 
+function go_back() {
+    location.replace('members.php?page=members');
+}
+
 function reset_password() {
     var proceed = confirm('Are you sure to reset the password?');
     if (!proceed) {
