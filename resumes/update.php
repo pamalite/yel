@@ -26,6 +26,10 @@ $query = "UPDATE resume_index SET
           file_text = '". addslashes($extracted_text). "' 
           WHERE resume = ". $_POST['id'];
 if ($mysqli->execute($query) === false) {
+    $handle = fopen('/var/log/yellowel_resumes_update.log', 'a');
+    fwrite($handle, date('Y-m-d h:i:s'). ' resume '. $_POST['id']. ' failed to update'. "\n");
+    fclose($handle);
+    
     echo 'ko';
     exit();
 }

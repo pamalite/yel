@@ -14,7 +14,7 @@ $mysqli = Database::connect();
 // 1. get all the resume IDs which are needs re-indexing
 $query = "SELECT id, resume_file_hash FROM referral_buffers 
           WHERE needs_indexing = TRUE AND 
-          file_type = 'application/msword'";
+          resume_file_type = 'application/msword'";
 
 $result = $mysqli->query($query);
 if ($result === false) {
@@ -32,7 +32,7 @@ $response = array();
 foreach ($result as $i=>$row) {
     $resume = array(
         'id' => $row['id'],
-        'hash' => $row['file_hash']
+        'hash' => $row['resume_file_hash']
     );
     
     $response['resume'][] = $resume;
