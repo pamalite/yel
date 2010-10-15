@@ -39,6 +39,17 @@ class EmployeeMembersPage extends Page {
         echo '</script>'. "\n";
     }
     
+    private function get_employers() {
+        $criteria = array(
+            'columns' => "DISTINCT employers.name AS employer, employers.id", 
+            'joins' => "employers ON employers.id = jobs.employer", 
+            'order' => "employers.name"
+        );
+        
+        $job = new Job();
+        return $job->find($criteria);
+    }
+    
     private function get_members($_employee_branch_id) {
         $results = array();
         $criteria = array(
@@ -91,6 +102,7 @@ class EmployeeMembersPage extends Page {
         $sales_email_addr = 'team.'. strtolower($branch[0]['country']). '@yellowelevator.com';
         $members = $this->get_members($branch[0]['id']);
         $applications = $this->get_applications();
+        $employers = $this->get_employers();
         
         ?>
         <!-- submenu -->
@@ -108,6 +120,61 @@ class EmployeeMembersPage extends Page {
             <span id="span_status" class="status"></span>
         </div>
         
+        <!-- main filter -->
+        <div class="main_filter_toggle">
+            <a class="no_link" onClick="toggle_main_filter();">
+                <span id="hide_show_lbl">Hide</span>
+            </a>
+        </div>
+        <div id="div_main_filter" class="main_filter">
+            <table id="main_filter_table">
+                <tr>
+                    <td class="employers_list">
+                    <?php
+                        if ($employers === false || empty($employers) || is_null($employers)) {
+                    ?>
+                        <div class="main_filter_warning">There are no employers to list.</div>
+                    <?php
+                        } else {
+                    ?>
+                        <select id="employers" class="employers" multiple>
+                    <?php
+                            foreach ($employers as $an_employer) {
+                    ?>
+                            <option value="<?php echo $an_employer['id']; ?>"><?php echo htmlspecialchars_decode(stripslashes($an_employer['employer'])); ?></option>
+                    <?php
+                            }
+                    ?>
+                        </select>
+                    <?php
+                        }
+                    ?>
+                    </td>
+                    <td class="filter_jobs_button">
+                        <input type="button" value="&gt;&gt;" onClick="populate_jobs_list();" />
+                    </td>
+                    <td id="jobs_list" class="jobs_list">
+                        <div id="jobs_list_message_box">&lt;--- Select the employers to list jobs.</div>
+                        <div id="jobs_list_placeholder">
+                            <select id="jobs" class="jobs" onClick="toggle_add_button();" multiple>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="filter_buttons">
+                        <input type="button" class="main_filter_button" value="Filter" onClick="filter_applicants();" />
+                        <br/>
+                        <input type="button" class="main_filter_button" id="add_new_btn" value="Add New" onClick="show_new_applicantion_popup();" disabled />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="hide_show">
+                        <div class="main_filter_tip">* Hold down the CTRL (Windows) or Command (Mac) key to select multiple items.</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <!-- end main filter -->
+        
         <div id="applications">
         <?php
         if (is_null($applications) || count($applications) <= 0 || $applications === false) {
@@ -117,15 +184,25 @@ class EmployeeMembersPage extends Page {
         } else {
         ?>
             <div class="buttons_bar">
-                Filter: 
-                <select id="applications_filter" onChange="filter_applications();">
-                    <option value="" selected>All</option>
-                    <option value="" disabled>&nbsp;</option>
-                    <option value="self_applied">Self Applied</option>
-                    <option value="referred">Referred</option>
-                </select>
-                &nbsp;
-                <input class="button" type="button" value="Add New Application" onClick="show_new_application_popup();" />
+                <div class="pagination">
+                    Page
+                    <select id="pages">
+                        <option value="1" selected>1</option>
+                    <?php
+                        // generate pages
+                    ?>
+                    </select>
+                    of <span id="total_page"></span>
+                </div>
+                <div class="sub_filter">
+                    Show 
+                    <select id="applications_filter" onChange="filter_applications();">
+                        <option value="" selected>All</option>
+                        <option value="" disabled>&nbsp;</option>
+                        <option value="self_applied">Self Applied</option>
+                        <option value="referred">Referred</option>
+                    </select>
+                </div>
             </div>
             <div id="div_applications">
             <?php

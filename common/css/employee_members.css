@@ -174,3 +174,86 @@ textarea.quick_notes {
     font-size: 9pt;
     font-weight: bold;
 }
+
+div.main_filter {
+    width: 100%;
+    height: 375px;
+    padding-top: 5px;
+    background-color: #DDDDDD;
+    border-collapse: collapse;
+}
+
+#main_filter_table {
+    margin: auto;
+    width: 100%;
+}
+
+#main_filter_table td.filter_jobs_button {
+    width: 50px;
+    text-align: center;
+}
+
+#main_filter_table td.employers_list, 
+#main_filter_table td.jobs_list {
+    width: 40%;
+}
+
+#main_filter_table td.jobs_list {
+    border: 1px dashed #888888;
+}
+#main_filter_table td.filter_buttons {
+    vertical-align: top;
+    text-align: center;
+}
+
+input.main_filter_button {
+    width: 85%;
+}
+
+select.employers, 
+select.jobs {
+    font-size: 11pt;
+    width: 100%;
+    height: 345px;
+}
+
+div.main_filter_warning {
+    text-align: center;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+#jobs_list_message_box {
+    text-align: center;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+#jobs_list_placeholder {
+    display: none;
+}
+
+div.main_filter_tip {
+    font-size: 9pt;
+    text-align: left;
+    font-style: italic;
+    color: #888888;
+    float: left;
+}
+
+div.main_filter_toggle {
+    margin-top: 5px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    text-align: right;
+    background-color: #CCCCCC;
+}
+
+div.sub_filter {
+    text-align: right;
+}
+
+div.pagination {
+    float: left;
+}

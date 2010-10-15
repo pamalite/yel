@@ -4,6 +4,8 @@ var applications_order_by = 'referral_buffers.requested_on';
 var applications_order = 'desc';
 var applications_filter = '';
 
+var sliding_filter_fx = '';
+
 function ascending_or_descending() {
     if (order == 'desc') {
         order = 'asc';
@@ -32,6 +34,91 @@ function sort_by(_table, _column) {
             applications_ascending_or_descending();
             show_applications();
             break;
+    }
+}
+
+function toggle_main_filter() {
+    if ($('div_main_filter').getStyle('display') != 'none') {
+        sliding_filter_fx.toggle();
+        $('hide_show_lbl').set('html', 'Show');
+    } else {
+        sliding_filter_fx.toggle();
+        $('hide_show_lbl').set('html', 'Hide');
+    }
+}
+
+function populate_jobs_list() {
+    var ids = '';
+    for (var i=0; i < $('employers').options.length; i++) {
+        if ($('employers').options[i].selected) {
+            ids = ids + $('employers').options[i].value + ',';
+        }
+    }
+    
+    if (isEmpty(ids)) {
+        alert('You must at least select an employer.');
+        return;
+    }
+    
+    ids = ids.substr(0, ids.length-1);
+    
+    var params = 'id=0&employer_ids=' + ids;
+    params = params + '&action=get_jobs';
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            if (txt == 'ko') {
+                alert('An error occured while getting jobs.');
+                return false;
+            }
+            
+            if (txt == '0') {
+                $('jobs_list_message_box').set('html', 'Please select another employer. There are no jobs published.');
+                $('jobs_list').setStyle('border', '1px dashed #888888');
+                $('jobs_list_message_box').setStyle('display', 'block');
+                $('jobs_list_placeholder').setStyle('display', 'none');
+            } else {
+                var titles = xml.getElementsByTagName('job_title');
+                var ids = xml.getElementsByTagName('id');
+                
+                $('jobs').length = 0;
+                for (var i=0; i < ids.length; i++) {
+                    var option = new Option(titles[i].childNodes[0].nodeValue, ids[i].childNodes[0].nodeValue );
+                    $('jobs').options[$('jobs').options.length] = option;
+                }
+                
+                $('jobs_list').setStyle('border', 'none');
+                $('jobs_list_message_box').setStyle('display', 'none');
+                $('jobs_list_placeholder').setStyle('display', 'block');
+                set_status('');
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Loading jobs...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function toggle_add_button() {
+    var has_selected = false;
+    for (var i=0; i < $('jobs').options.length; i++) {
+        if ($('jobs').options[i].selected) {
+            has_selected = true;
+            break;
+        }
+    }
+    
+    if (has_selected) {
+        $('add_new_btn').disabled = false;
+    } else {
+        $('add_new_btn').disabled = true;
     }
 }
 
@@ -828,6 +915,10 @@ function onDomReady() {
            show_applications();
            break;
    }
+   
+   sliding_filter_fx = new Fx.Slide('div_main_filter', {
+       mode: 'vertical'
+   });
 }
 
 window.addEvent('domready', onDomReady);

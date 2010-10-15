@@ -3,6 +3,26 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 
 session_start();
 
+// SELECT referral_buffers.id, 
+// referral_buffers.candidate_email, 
+// referral_buffers.candidate_phone, referral_buffers.candidate_name, 
+// referral_buffers.referrer_email, referral_buffers.referrer_phone, 
+// referral_buffers.referrer_name, referral_buffers.existing_resume_id, 
+// referral_buffers.resume_file_hash, 
+// IF(referral_buffers.notes IS NULL OR referral_buffers.notes = '', 0, 1) AS has_notes,
+// IF(members.email_addr IS NULL, 0, 1) AS is_member,
+// DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on, 
+// jobs.title AS job, jobs.id AS job_id
+// FROM referral_buffers
+// LEFT JOIN members ON members.email_addr = referral_buffers.candidate_email
+// LEFT JOIN referral_buffer_jobs ON referral_buffer_jobs.referral_buffer = referral_buffers.id 
+// LEFT JOIN jobs ON jobs.id = referral_buffer_jobs.job
+// WHERE referral_buffers.referrer_email LIKE '%' 
+// -- AND jobs.employer IN ('acme123', 'ajax124') 
+// -- AND referral_buffer_jobs.job IN (123, 138) 
+// ORDER BY referral_buffers.requested_on DESC
+// , referral_buffers.candidate_email;
+
 function create_member_from($_email_addr, $_fullname, $_phone) {
     if (empty($_email_addr) || empty($_fullname) || empty($_phone)) {
         return false;
@@ -61,6 +81,62 @@ if (!isset($_POST['action'])) {
 }
 
 $xml_dom = new XMLDOM();
+
+if ($_POST['action'] == 'get_jobs') {
+    $employer_ids = explode(',', $_POST['employer_ids']);
+    
+    if (count($employer_ids) > 0) {
+        foreach ($employer_ids as $i=>$id) {
+            $employer_ids[$i] = trim($id);
+        }
+    } else {
+        echo '0';
+        exit();
+    }
+    
+    $employers = '';
+    $j = 0;
+    foreach ($employer_ids as $i=>$id) {
+        $employers .= "'". $id. "'";
+        if ($j < count($employer_ids)-1) {
+            $employers .= ', ';
+        }
+        $j++;
+    }
+    
+    if (empty($employers)) {
+        echo '0';
+        exit();
+    }
+    
+    $criteria = array(
+        'columns' => "title AS job_title, id", 
+        'match' => "employer IN (". $employers. ")",
+        'order' => "title"
+    );
+    
+    $job = new Job();
+    $result = $job->find($criteria);
+    
+    if ($result === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    if (is_null($result) || empty($result)) {
+        echo '0';
+        exit();
+    }
+    
+    foreach($result as $i=>$row) {
+        $result[$i]['job_title'] = htmlspecialchars_decode(stripslashes($row['job_title']));
+    }
+    
+    $response = array('jobs' => array('job' => $result));
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
 
 if ($_POST['action'] == 'get_members') {
     $order_by = 'members.joined_on desc';
