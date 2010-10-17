@@ -5,7 +5,9 @@ require_once dirname(__FILE__). "/../htmltable.php";
 class EmployeeMembersPage extends Page {
     private $employee = NULL;
     private $current_page = 'applications';
-
+    private $total_applicantions = 0;
+    private $total_members = 0;
+    
     function __construct($_session) {
         $this->employee = new Employee($_session['id'], $_session['sid']);
     }
@@ -74,23 +76,26 @@ class EmployeeMembersPage extends Page {
     }
     
     private function get_applications() {
-        $results = array();
         $criteria = array(
             'columns' => "referral_buffers.id, referral_buffers.candidate_email, 
                           referral_buffers.candidate_phone, referral_buffers.candidate_name, 
-                          referral_buffers.referrer_email, referral_buffers.referrer_phone, 
-                          referral_buffers.referrer_name, 
+                          referral_buffers.referrer_email, referral_buffers.referrer_name, 
+                          referral_buffers.referrer_phone, 
                           referral_buffers.existing_resume_id, referral_buffers.resume_file_hash, 
                           IF(referral_buffers.notes IS NULL OR referral_buffers.notes = '', 0, 1) AS has_notes,
-                          IF(members.email_addr IS NULL, 0, 1) AS is_member,
+                          IF(members.email_addr IS NULL, 0, 1) AS is_member, 
+                          jobs.title AS job, employers.id AS employer, 
                           DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on", 
-            'joins' => "members ON members.email_addr = referral_buffers.candidate_email",
+            'joins' => "members ON members.email_addr = referral_buffers.candidate_email, 
+                        jobs ON jobs.id = referral_buffers.job, 
+                        employers ON employers.id = jobs.employer",
             'order' => "referral_buffers.requested_on DESC"
         );
-
+        
         $referral_buffer = new ReferralBuffer();
-        $results = $referral_buffer->find($criteria);
-        return $results;
+        $this->total_applications = count($referral_buffer->find($criteria));
+        $criteria['limit']= $GLOBALS['default_results_per_page'];
+        return $referral_buffer->find($criteria);
     }
     
     public function show() {
@@ -109,7 +114,7 @@ class EmployeeMembersPage extends Page {
         <div class="menu">
             <?php $style = 'background-color: #CCCCCC;'; ?>
             <ul class="menu">
-                <li id="item_applications" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_applications();">Applications</a></li>
+                <li id="item_applications" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_applications();">Applicants</a></li>
                 <li id="item_members" style="<?php echo ($this->current_page == 'members') ? $style : ''; ?>"><a class="menu" onClick="show_members(false);">Members</a></li>
                 <li id="item_search" style="<?php echo ($this->current_page == 'search') ? $style : ''; ?>"><a class="menu" onClick="show_search_members();">Search</a></li>
             </ul>
@@ -123,7 +128,7 @@ class EmployeeMembersPage extends Page {
         <!-- main filter -->
         <div class="main_filter_toggle">
             <a class="no_link" onClick="toggle_main_filter();">
-                <span id="hide_show_lbl">Hide</span>
+                <span id="hide_show_lbl">Hide Filter</span>
             </a>
         </div>
         <div id="div_main_filter" class="main_filter">
@@ -141,7 +146,9 @@ class EmployeeMembersPage extends Page {
                     <?php
                             foreach ($employers as $an_employer) {
                     ?>
-                            <option value="<?php echo $an_employer['id']; ?>"><?php echo htmlspecialchars_decode(stripslashes($an_employer['employer'])); ?></option>
+                            <option value="<?php echo $an_employer['id']; ?>">
+                                <?php echo '['.  $an_employer['id']. '] '. htmlspecialchars_decode(stripslashes($an_employer['employer'])); ?>
+                            </option>
                     <?php
                             }
                     ?>
@@ -161,14 +168,17 @@ class EmployeeMembersPage extends Page {
                         </div>
                     </td>
                     <td class="filter_buttons">
-                        <input type="button" class="main_filter_button" value="Filter" onClick="filter_applicants();" />
+                        <input type="button" class="main_filter_button" value="Filter Candidates" onClick="filter_applications();" />
                         <br/>
-                        <input type="button" class="main_filter_button" id="add_new_btn" value="Add New" onClick="show_new_applicantion_popup();" disabled />
+                        <input type="button" class="main_filter_button" value="Reset" onClick="show_all_applications();" />
+                        <input type="button" class="main_filter_button" value="Show Non-attached" onClick="show_non_attached();" />
+                        <hr />
+                        <input type="button" class="main_filter_button" id="add_new_btn" value="Add New Applicant" onClick="show_new_application_popup();" disabled />
                     </td>
                 </tr>
                 <tr>
                     <td colspan="4" class="hide_show">
-                        <div class="main_filter_tip">* Hold down the CTRL (Windows) or Command (Mac) key to select multiple items.</div>
+                        <div class="main_filter_tip">Hold down the CTRL (Windows), or Command (Mac), key to select multiple items.</div>
                     </td>
                 </tr>
             </table>
@@ -180,19 +190,26 @@ class EmployeeMembersPage extends Page {
         if (is_null($applications) || count($applications) <= 0 || $applications === false) {
         ?>
             <div class="empty_results">No applications at this moment.</div>
+            <input type="hidden" id="total_applications" value="0" />
         <?php
         } else {
         ?>
+            <input type="hidden" id="total_applications" value="<?php echo $this->total_applications; ?>" />
             <div class="buttons_bar">
                 <div class="pagination">
                     Page
-                    <select id="pages">
+                    <select id="pages" onChange="show_applications();">
                         <option value="1" selected>1</option>
                     <?php
-                        // generate pages
+                        $total_pages = ceil($this->total_applications / $GLOBALS['default_results_per_page']);
+                        for ($i=1; $i < $total_pages; $i++) {
+                    ?>
+                        <option value="<?php echo ($i+1); ?>"><?php echo ($i+1); ?></option>
+                    <?php
+                        }
                     ?>
                     </select>
-                    of <span id="total_page"></span>
+                    of <span id="total_pages"><?php echo $total_pages; ?></span>
                 </div>
                 <div class="sub_filter">
                     Show 
@@ -207,88 +224,99 @@ class EmployeeMembersPage extends Page {
             <div id="div_applications">
             <?php
                 $applications_table = new HTMLTable('applications_table', 'applications');
-
-                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Requested/Added On</a>", '', 'header');
-                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.referrer_name');\">Referrer</a>", '', 'header');
-                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header');
-                $applications_table->set(0, 3, "Notes", '', 'header');
+                
+                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Created On</a>", '', 'header');
+                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header');
+                $applications_table->set(0, 2, "Notes", '', 'header');
+                $applications_table->set(0, 3, "Job", '', 'header');
                 $applications_table->set(0, 4, "Resume", '', 'header');
                 $applications_table->set(0, 5, 'Quick Actions', '', 'header action');
-
+                
                 foreach ($applications as $i=>$application) {
                     $is_cannot_signup = false;
-                    
+                                    
                     $applications_table->set($i+1, 0, $application['formatted_requested_on'], '', 'cell');
                     
-                    $referrer_short_details = '';
-                    if (substr($application['referrer_email'], 0, 5) == 'team.' && 
-                        substr($application['referrer_email'], 7) == '@yellowelevator.com') {
-                        $referrer_short_details = 'Self Applied';
-                    } else {
-                        $referrer_short_details = '<span style="font-weight: bold;">'. htmlspecialchars_decode(desanitize($application['referrer_name'])). '</span>'. "\n";
-                        
-                        if (empty($application['referrer_phone']) || 
-                            is_null($application['referrer_phone'])) {
-                            $is_cannot_signup = true;
-                            $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> <a class="no_link small_contact_edit" onClick="edit_referrer_phone('. $application['id']. ');">Add Phone Number</a></div>'. "\n";
-                        } else {
-                            $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['referrer_phone']. '</div>'. "\n";
-                        }
-                        
-                        if (empty($application['referrer_email']) || 
-                            is_null($application['referrer_email'])) {
-                            $is_cannot_signup = true;
-                            $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span> <a class="no_link small_contact_edit" onClick="edit_referrer_email('. $application['id']. ');">Add Email</a></div>'. "\n";
-                        } else {
-                            $referrer_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['referrer_email']. '">'. $application['referrer_email']. '</a></div>'. "\n";
-                        }
-                    }
-                    $applications_table->set($i+1, 1, $referrer_short_details, '', 'cell');
-                    
-                    $candidate_short_details = '<span style="font-weight: bold;">'. htmlspecialchars_decode(desanitize($application['candidate_name'])). '</span>'. "\n";
-                    
-                    if (empty($application['candidate_phone']) || is_null($application['candidate_phone'])) {
+                    $candidate_short_details = '<span style="font-weight: bold;">'. htmlspecialchars_decode(stripslashes($application['candidate_name'])). '</span>'. "\n";
+                    if (empty($application['candidate_phone']) || 
+                        is_null($application['candidate_phone'])) {
                         $is_cannot_signup = true;
                         $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> <a class="no_link small_contact_edit" onClick="edit_candidate_phone('. $application['id']. ');">Add Phone Number</a></div>'. "\n";
                     } else {
                         $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['candidate_phone']. ' <a class="no_link small_contact_edit" onClick="edit_candidate_phone('. $application['id']. ');">edit</a></div>'. "\n";
                     }
-                    
+
                     if (empty($application['candidate_email']) || is_null($application['candidate_email'])) {
                         $is_cannot_signup = true;
                         $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span> <a class="no_link small_contact_edit" onClick="edit_candidate_email('. $application['id']. ');">Add Email</a></div>'. "\n";
                     } else {
                         $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['candidate_email']. '">'. $application['candidate_email']. '</a> <a class="no_link small_contact_edit" onClick="edit_candidate_email('. $application['id']. ');">edit</a></div>'. "\n";
                     }
-                    $applications_table->set($i+1, 2, $candidate_short_details, '', 'cell');
+
+                    $referrer_short_details = '<div class="tiny_contact">Ref: ';
+                    if (substr($application['referrer_email'], 0, 5) == 'team.' && 
+                        substr($application['referrer_email'], 7) == '@yellowelevator.com') {
+                        $referrer_short_details .= 'Self Applied';
+                    } else {
+                        $referrer_short_details .= '<a class="no_link" onClick="show_referrer_popup('. $application['id']. ');">';
+                        $referrer_short_details .= htmlspecialchars_decode(stripslashes($application['referrer_name']));
+                        if (empty($application['referrer_phone']) || 
+                            is_null($application['referrer_phone']) || 
+                            empty($application['referrer_email']) || 
+                            is_null($application['referrer_email'])) {
+                            $is_cannot_signup = true;
+                            $referrer_short_details .= '&nbsp;(Incomplete!)'. "\n";
+                        }
+
+                        $referrer_short_details .= '</a>';
+                    }
+                    $referrer_short_details .= '</div>';
+                    $candidate_short_details .= '<br/>'. $referrer_short_details;
+                    $applications_table->set($i+1, 1, $candidate_short_details, '', 'cell');
                     
                     if ($application['has_notes'] == '1') {
-                        $applications_table->set($i+1, 3, '<a class="no_link" onClick="show_notes_popup(\''. $application['id']. '\');">Update</a>', '', 'cell');
+                        $applications_table->set($i+1, 2, '<a class="no_link" onClick="show_notes_popup(\''. $application['id']. '\');">Update</a>', '', 'cell');
                     } else {
-                        $applications_table->set($i+1, 3, '<a  class="no_link" onClick="show_notes_popup(\''. $application['id']. '\');">Add</a>', '', 'cell');
+                        $applications_table->set($i+1, 2, '<a  class="no_link" onClick="show_notes_popup(\''. $application['id']. '\');">Add</a>', '', 'cell');
                     }
+                    
+                    $job = '['. $application['employer']. '] '. $application['job'];
+                    if ($job == '[] ') {
+                        $job = 'N/A';
+                    }
+                    $applications_table->set($i+1, 3, $job, '', 'cell');
                     
                     if (!is_null($application['existing_resume_id']) && 
                         !empty($application['existing_resume_id'])) {
-                        $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['existing_resume_id']. '">View Resume</a>', '', 'cell');
+                        $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['existing_resume_id']. '">View</a>', '', 'cell');
                     } elseif (!is_null($application['resume_file_hash']) && 
                               !empty($application['resume_file_hash'])) {
-                        $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['id']. '&hash='. $application['resume_file_hash']. '">View Resume</a>', '', 'cell');
+                        $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['id']. '&hash='. $application['resume_file_hash']. '">View</a>', '', 'cell');
                     } else {
-                        $applications_table->set($i+1, 4, 'Sign Up to Upload', '', 'cell');
+                        $applications_table->set($i+1, 4, 'N/A', '', 'cell');
                     }
                     
                     $actions = '<input type="button" value="Delete" onClick="delete_application(\''. $application['id']. '\');" />';
                     
+                    if (is_null($application['candidate_email']) || 
+                        empty($application['candidate_email'])) {
+                        $actions .= '<input type="button" value="Jobs" onClick="show_jobs_popup(false, \''. $application['candidate_name']. '\');" />';
+                    } else {
+                        $actions .= '<input type="button" value="Jobs" onClick="show_jobs_popup(true, \''. $application['candidate_email']. '\');" />';
+                    }
+                    
                     if ($is_cannot_signup) {
                         $actions .= '<input type="button" value="Sign Up" disabled />';
                     } else {
-                        $actions .= '<input type="button" value="Sign Up" onClick="make_member_from(\''. $application['id']. '\');" />';
+                        if ($application['is_member'] == '1') {
+                            $actions .= '<input type="button" value="Transfer" onClick="transfer_to_member(\''. $application['id']. '\');" />';
+                        } else {
+                            $actions .= '<input type="button" value="Sign Up" onClick="make_member_from(\''. $application['id']. '\');" />';
+                        }
                     }
-                    
                     $applications_table->set($i+1, 5, $actions, '', 'cell action');
                 }
-
+                
                 echo $applications_table->get_html();
             ?>
             </div>
@@ -301,7 +329,7 @@ class EmployeeMembersPage extends Page {
         <?php
         if (is_null($members) || count($members) <= 0 || $members === false) {
         ?>
-            <div class="empty_results">No requests at this moment.</div>
+            <div class="empty_results">No members at this moment.</div>
         <?php
         } else {
         ?>
@@ -370,8 +398,35 @@ class EmployeeMembersPage extends Page {
                 </div>
             </form>
             <div class="popup_window_buttons_bar">
-                <input type="button" value="Cancel" onClick="close_notes_popup(false);" />
                 <input type="button" value="Save" onClick="close_notes_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_notes_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="referrer_window" class="popup_window">
+            <div class="popup_window_title">Referrer to <span id="ref_candidate_name">[Unknown]</span></div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="referral_buffer_id" value="" />
+                <div class="referrer_form">
+                    <table class="referrer_form">
+                        <tr>
+                            <td class="label">Name:</td>
+                            <td><input type="text" class="field" id="ref_referrer_name" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Telephone:</td>
+                            <td><input type="text" class="field" id="ref_referrer_phone" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label">E-mail:</td>
+                            <td><input type="text" class="field" id="ref_referrer_email" /></td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_referrer_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_referrer_popup(false);" />
             </div>
         </div>
         
@@ -379,97 +434,63 @@ class EmployeeMembersPage extends Page {
             <div class="popup_window_title">New Application</div>
             <form onSubmit="return false;">
                 <input type="hidden" id="sales_email_addr" value="<?php echo $sales_email_addr; ?>" />
+                <input type="hidden" id="new_applicant_jobs" value="" />
                 <div class="new_application_form">
                     <table class="new_application">
                         <tr>
-                            <td class="referrer" colspan="2">Referrer</td>
-                            <td class="candidate" colspan="2">Candidate</td>
+                            <td class="title" colspan="2">Referrer</td>
+                            <td class="title">Notes</td>
                         </tr>
                         <tr>
                             <td class="auto_fill" colspan="2">
                                 <input type="checkbox" id="auto_fill_checkbox" onClick="auto_fill_referrer();" />
                                 <label for="auto_fill_checkbox">Referrer is YellowElevator.com</label>
                             </td>
-                            <td colspan="2">&nbsp;</td>
+                            <td rowspan="8">
+                                <textarea class="quick_notes" id="quick_notes"></textarea>
+                            </td>
                         </tr>
                         <tr>
                             <td class="label">Name:</td>
                             <td><input type="text" class="field" id="referrer_name" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Telephone:</td>
+                            <td><input type="text" class="field" id="referrer_phone" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label">E-mail:</td>
+                            <td><input type="text" class="field" id="referrer_email_addr" /></td>
+                        </tr>
+                        <tr>
+                            <td class="title" colspan="2">Candidate</td>
+                        </tr>
+                        <tr>
                             <td class="label">Name:</td>
                             <td><input type="text" class="field" id="candidate_name" /></td>
                         </tr>
                         <tr>
                             <td class="label">Telephone:</td>
-                            <td><input type="text" class="field" id="referrer_phone" /></td>
-                            <td class="label">Telephone:</td>
                             <td><input type="text" class="field" id="candidate_phone" /></td>
                         </tr>
                         <tr>
                             <td class="label">E-mail:</td>
-                            <td><input type="text" class="field" id="referrer_email_addr" /></td>
-                            <td class="label">E-mail:</td>
                             <td><input type="text" class="field" id="candidate_email_addr" /></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2"></td>
-                            <td class="label">Notes:</td>
-                            <td>
-                                <textarea class="quick_notes" id="quick_notes"></textarea>
-                            </td>
                         </tr>
                     </table>
                 </div>
             </form>
             <div class="popup_window_buttons_bar">
-                <input type="button" value="Add New Application" onClick="close_new_application_popup(1);" />
+                <input type="button" value="Add New Applicant" onClick="close_new_application_popup(1);" />
                 <input type="button" value="Cancel" onClick="close_new_application_popup(0);" />
             </div>
         </div>
         
-        <div id="conflicts_window" class="popup_window">
-            <div class="popup_window_title">Member Contact Conflicts Resolution</div>
-            <div class="resolution_instructions">
-                Choose which of the following details are the latest contacts.
-            </div>
-            <form onSubmit="return false;">
-                <input type="hidden" id="conflict_app_id" value="" />
-                <div class="conflicts_form">
-                    <table class="conflicts">
-                        <tr>
-                            <td class="buffered" colspan="2">Buffered</td>
-                            <td class="existing" colspan="2">Existing</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Name:</td>
-                            <td><span id="buffered_name"></span></td>
-                            <td class="label">Name:</td>
-                            <td><span id="existing_name"></span></td>
-                        </tr>
-                        <tr>
-                            <td class="label">Telephone:</td>
-                            <td><span id="buffered_phone"></span></td>
-                            <td class="label">Telephone:</td>
-                            <td><span id="existing_phone"></span></td>
-                        </tr>
-                        <tr>
-                            <td class="label">Requested On:</td>
-                            <td><span id="buffered_created_on"></span></td>
-                            <td class="label">Joined On:</td>
-                            <td><span id="existing_created_on"></span></td>
-                        </tr>
-                        <tr>
-                            <td class="resolution_button" colspan="2">
-                                <input type="button" value="Use Buffered" onClick="close_conflict_popup(0);" />
-                            </td>
-                            <td class="resolution_button" colspan="2">
-                                <input type="button" value="Use Existing" onClick="close_conflict_popup(1);" />
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </form>
+        <div id="other_jobs_window" class="popup_window">
+            <div class="popup_window_title">Other Applied Jobs</div>
+            <div id="div_other_jobs" class="other_jobs"></div>
             <div class="popup_window_buttons_bar">
-                <input type="button" value="Cancel" onClick="close_conflict_popup();" />
+                <input type="button" value="Close" onClick="close_jobs_popup();" />
             </div>
         </div>
         

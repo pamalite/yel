@@ -5,6 +5,10 @@ class HTMLTable {
     private $css_class = '';
     private $items = array();
     
+    function get_items() {
+        return $this->items;
+    }
+    
     function __construct($_id = '', $_css_class = '') {
         if (!empty($_id)) {
             $this->id = $_id;
@@ -34,8 +38,16 @@ class HTMLTable {
             for ($i=0; $i < strlen($item); $i++) {
                 if (substr($item, $i, 1) == '>') {
                     $back = substr($item, $i);
+                    break;
                 } else {
                     $front .= substr($item, $i, 1);
+                }
+            }
+            
+            for ($i=0; $i < strlen($front); $i++) {
+                if (substr($front, $i, 8) == 'colspan=') {
+                    $front = substr($front, 0, $i-1);
+                    break;
                 }
             }
             
@@ -51,8 +63,16 @@ class HTMLTable {
             for ($i=0; $i < strlen($item); $i++) {
                 if (substr($item, $i, 1) == '>') {
                     $back = substr($item, $i);
+                    break;
                 } else {
                     $front .= substr($item, $i, 1);
+                }
+            }
+            
+            for ($i=0; $i < strlen($front); $i++) {
+                if (substr($front, $i, 8) == 'rowspan=') {
+                    $front = substr($front, 0, $i-1);
+                    break;
                 }
             }
             

@@ -3,26 +3,6 @@ require_once dirname(__FILE__). "/../private/lib/utilities.php";
 
 session_start();
 
-// SELECT referral_buffers.id, 
-// referral_buffers.candidate_email, 
-// referral_buffers.candidate_phone, referral_buffers.candidate_name, 
-// referral_buffers.referrer_email, referral_buffers.referrer_phone, 
-// referral_buffers.referrer_name, referral_buffers.existing_resume_id, 
-// referral_buffers.resume_file_hash, 
-// IF(referral_buffers.notes IS NULL OR referral_buffers.notes = '', 0, 1) AS has_notes,
-// IF(members.email_addr IS NULL, 0, 1) AS is_member,
-// DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on, 
-// jobs.title AS job, jobs.id AS job_id
-// FROM referral_buffers
-// LEFT JOIN members ON members.email_addr = referral_buffers.candidate_email
-// LEFT JOIN referral_buffer_jobs ON referral_buffer_jobs.referral_buffer = referral_buffers.id 
-// LEFT JOIN jobs ON jobs.id = referral_buffer_jobs.job
-// WHERE referral_buffers.referrer_email LIKE '%' 
-// -- AND jobs.employer IN ('acme123', 'ajax124') 
-// -- AND referral_buffer_jobs.job IN (123, 138) 
-// ORDER BY referral_buffers.requested_on DESC
-// , referral_buffers.candidate_email;
-
 function create_member_from($_email_addr, $_fullname, $_phone) {
     if (empty($_email_addr) || empty($_fullname) || empty($_phone)) {
         return false;
@@ -61,13 +41,17 @@ function create_member_from($_email_addr, $_fullname, $_phone) {
     $subject = 'New Membership from Yellow Elevator';
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     
-    mail($_email_addr, $subject, $message, $headers);
+    // mail($_email_addr, $subject, $message, $headers);
     
-    // $handle = fopen('/tmp/email_to_'. $_email_addr. '.txt', 'w');
-    // fwrite($handle, 'Header: '. $headers. "\n\n");
-    // fwrite($handle, 'Subject: '. $subject. "\n\n");
-    // fwrite($handle, $message);
-    // fclose($handle);
+    $file_name = '/tmp/email_to_'. $_email_addr. '.txt';
+    if (file_exists($file_name)) {
+        $file_name .= '.'. generate_random_string_of(6). '.txt';
+    }
+    $handle = fopen($file_name, 'w');
+    fwrite($handle, 'Header: '. $headers. "\n\n");
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);
     
     return true;
 }
@@ -110,7 +94,7 @@ if ($_POST['action'] == 'get_jobs') {
     }
     
     $criteria = array(
-        'columns' => "title AS job_title, id", 
+        'columns' => "title AS job_title, jobs.id, employer",
         'match' => "employer IN (". $employers. ")",
         'order' => "title"
     );
@@ -188,35 +172,60 @@ if ($_POST['action'] == 'get_members') {
 }
 
 if ($_POST['action'] == 'get_applications') {
-    $order_by = 'referral_buffers.requested_on desc';
-    $filter_by = "referral_buffers.referrer_email LIKE '%'";
+    $order_by = "referral_buffers.requested_on desc";
+    $show_only = "referral_buffers.referrer_email LIKE '%'";
+    $filter_by = "";
+    $page = 1;
     
-    //$employee = new Employee($_POST['id']);
-    //$branch = $employee->getBranch();
-
     if (isset($_POST['order_by'])) {
         $order_by = $_POST['order_by'];
     }
     
-    if (isset($_POST['filter'])) {
-        if ($_POST['filter'] == 'self_applied') {
-            $filter_by = "referral_buffers.referrer_email LIKE 'team%@yellowelevator.com'";
-        } else if ($_POST['filter'] == 'referred') {
-            $filter_by = "referral_buffers.referrer_email NOT LIKE 'team%@yellowelevator.com'";
+    if (isset($_POST['show_only'])) {
+        if ($_POST['show_only'] == 'self_applied') {
+            $show_only = "referral_buffers.referrer_email LIKE 'team%@yellowelevator.com'";
+        } else if ($_POST['show_only'] == 'referred') {
+            $show_only = "referral_buffers.referrer_email NOT LIKE 'team%@yellowelevator.com'";
         } 
     }
     
+    $match = $show_only;
+    
+    if (isset($_POST['non_attached'])) {
+        $match .= " AND referral_buffers.job IS NULL OR referral_buffers.job <= 0";
+    } else {
+        $employers_str = "";
+        $jobs_str = "";
+        if (isset($_POST['jobs'])) {
+            $match .= " AND referral_buffers.job IN (". trim($_POST['jobs']). ")";
+        } elseif (isset($_POST['employers'])) {
+            $employers = explode(',', $_POST['employers']);
+            foreach ($employers as $i=>$id) {
+                $employers[$i] = "'". trim($id). "'";
+            }
+            $employers_str = implode(',', $employers);
+            $match .= " AND jobs.employer IN (". $employers_str. ")";
+        }
+    }
+    
+    if (isset($_POST['page'])) {
+        $page = $_POST['page'];
+    }
+     
     $criteria = array(
         'columns' => "referral_buffers.id, referral_buffers.candidate_email, 
                       referral_buffers.candidate_phone, referral_buffers.candidate_name, 
-                      referral_buffers.referrer_email, referral_buffers.referrer_phone, 
-                      referral_buffers.referrer_name, 
+                      referral_buffers.referrer_email, referral_buffers.referrer_name, 
+                      referral_buffers.referrer_phone, 
                       referral_buffers.existing_resume_id, referral_buffers.resume_file_hash, 
                       IF(referral_buffers.notes IS NULL OR referral_buffers.notes = '', 0, 1) AS has_notes,
                       IF(members.email_addr IS NULL, 0, 1) AS is_member,
+                      jobs.title AS job, jobs.employer,  
                       DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on", 
-        'joins' => "members ON members.email_addr = referral_buffers.candidate_email",
-        'match' => $filter_by, 
+        'joins' => "members ON members.email_addr = referral_buffers.candidate_email, 
+                    jobs ON jobs.id = referral_buffers.job, 
+                    employers ON employers.id = jobs.employer",
+        'match' => $match, 
         'order' => $order_by
     );
     
@@ -232,13 +241,31 @@ if ($_POST['action'] == 'get_applications') {
         echo 'ko';
         exit();
     }
-
+    
+    $total_pages = ceil(count($result) / $GLOBALS['default_results_per_page']);
+    if ($page > $total_pages) {
+        $page = $total_pages;
+    }
+    
+    $offset = 0;
+    if ($page > 1) {
+        $offset = ($page-1) * $GLOBALS['default_results_per_page'];
+        $offset = ($offset < 0) ? 0 : $offset;
+    }
+    
+    $criteria['limit'] = $offset. ", ". $GLOBALS['default_results_per_page'];
+    $result = $referral_buffer->find($criteria);
     foreach($result as $i=>$row) {
         $result[$i]['referrer_name'] = htmlspecialchars_decode(stripslashes($row['referrer_name']));
         $result[$i]['candidate_name'] = htmlspecialchars_decode(stripslashes($row['candidate_name']));
     }
-
-    $response = array('applications' => array('application' => $result));
+    
+    $response = array(
+        'applications' => array(
+            'total_pages' => $total_pages,
+            'application' => $result
+        )
+    );
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
     exit();
@@ -355,41 +382,53 @@ if ($_POST['action'] == 'delete_application') {
 }
 
 if ($_POST['action'] == 'sign_up') {
-    // 1. get the buffer record
-    $buffer = new ReferralBuffer($_POST['id']);
-    $buffer_result = $buffer->get();
+    // 0. get all related buffer records
+    $referral_buffer = new ReferralBuffer($_POST['id']);
+    $result = $referral_buffer->get();
+    $candidate_email = $result[0]['candidate_email'];
     
-    // 2. check whether a referrer is needed
-    $referrer_successfully_created = false;
-    $needs_to_be_connected = false;
-    $referrer_email = explode('@', $buffer_result[0]['referrer_email']);
-    if ($referrer_email[1] != 'yellowelevator.com') {
-        $needs_to_be_connected = true;
+    $criteria = array(
+        'columns' => "*", 
+        'match' => "candidate_email = '". $result[0]['candidate_email']. "'"
+    );
+    $buffers = $referral_buffer->find($criteria);
+    
+    foreach ($buffers as $a_buffer) {
+        // 1. get the buffer record
+        $buffer = new ReferralBuffer($a_buffer['id']);
+        $buffer_result = $buffer->get();
         
-        // referrer is already a member?
-        $member = new Member($buffer_result[0]['referrer_email']);
-        $result = $member->get();
-        if (is_null($result) || count($result) <= 0) {
-            if (create_member_from($buffer_result[0]['referrer_email'], 
-                                   $buffer_result[0]['referrer_name'], 
-                                   $buffer_result[0]['referrer_phone']) === false) {
-                $needs_to_be_connected = false;
-                $referrer_successfully_created = false;
+        // 2. check whether a referrer is needed
+        $referrer_successfully_created = false;
+        $needs_to_be_connected = false;
+        $referrer_email = explode('@', $buffer_result[0]['referrer_email']);
+        if ($referrer_email[1] != 'yellowelevator.com') {
+            $needs_to_be_connected = true;
+
+            // referrer is already a member?
+            $member = new Member($buffer_result[0]['referrer_email']);
+            $result = $member->get();
+            if (is_null($result) || count($result) <= 0) {
+                if (create_member_from($buffer_result[0]['referrer_email'], 
+                                       $buffer_result[0]['referrer_name'], 
+                                       $buffer_result[0]['referrer_phone']) === false) {
+                    $needs_to_be_connected = false;
+                    $referrer_successfully_created = false;
+                } else {
+                    $referrer_successfully_created = true;
+                }
             } else {
                 $referrer_successfully_created = true;
             }
-        } else {
-            $referrer_successfully_created = true;
         }
-    }
-    
-    $referrer = new Member($buffer_result[0]['referrer_email']);
-    
-    // 3. create member account
-    // member already exists?
-    $member = new Member($buffer_result[0]['candidate_email']);
-    if (isset($_POST['resolution'])) {
-        if ($_POST['resolution'] == 'buffered') {
+
+        $referrer = new Member($buffer_result[0]['referrer_email']);
+
+        // 3. create member account
+        // member already exists?
+        $member = new Member($buffer_result[0]['candidate_email']);
+        $result = $member->get();
+        if (is_null($result) || count($result) <= 0) {
             if (create_member_from($buffer_result[0]['candidate_email'], 
                                    $buffer_result[0]['candidate_name'], 
                                    $buffer_result[0]['candidate_phone']) === false) {
@@ -397,59 +436,76 @@ if ($_POST['action'] == 'sign_up') {
                 exit();
             }
         }
-    } else {
-        if (create_member_from($buffer_result[0]['candidate_email'], 
-                               $buffer_result[0]['candidate_name'], 
-                               $buffer_result[0]['candidate_phone']) === false) {
-            echo 'ko:member';
-            exit();
-        }
-    }
-    
-    $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
-    $member->saveNotes($existing_notes. "\n\n". $buffer_result[0]['notes']);
-    
-    // 4. create connection
-    $connection_is_success = true;
-    if ($needs_to_be_connected && $referrer_successfully_created) {
-        $connection_is_success = $referrer->addReferee($buffer_result[0]['candidate_email']);
-    }
-    
-    // 5. move resume
-    $resume_successfully_moved = false;
-    if (!is_null($buffer_result[0]['existing_resume_id'])) {
-        $resume_successfully_moved = true;
-    } else {
-        $resume = new Resume($buffer_result[0]['candidate_email']);
-        $new_hash = generate_random_string_of(6);
-        $data = array();
-        $data['private'] = 'N';
-        $data['modified_on'] = $buffer_result[0]['requested_on'];
-        $data['name'] = $buffer_result[0]['resume_file_name'];
-        $data['file_name'] = $data['name'];
-        $data['file_size'] = $buffer_result[0]['resume_file_size'];
-        $data['file_type'] = $buffer_result[0]['resume_file_type'];
-        $data['file_hash'] = $new_hash;
         
-        if ($resume->create($data) === false) {
-            echo 'ko:resume';
-            exit();
+        $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
+        $member->saveNotes($existing_notes. "\n\n". $buffer_result[0]['notes']);
+
+        // 4. create connection
+        $connection_is_success = true;
+        if ($needs_to_be_connected && $referrer_successfully_created) {
+            $connection_is_success = $referrer->addReferee($buffer_result[0]['candidate_email']);
         }
+
+        // 5. move resume
+        $resume = null;
+        $resume_successfully_moved = false;
+        if (!is_null($buffer_result[0]['existing_resume_id']) || 
+            is_null($buffer_result[0]['resume_file_hash'])) {
+            // either the resume is already exists or no resume provided
+            $resume_successfully_moved = true;
+        } else {
+            $resume = new Resume($buffer_result[0]['candidate_email']);
+            $new_hash = generate_random_string_of(6);
+            $data = array();
+            $data['private'] = 'N';
+            $data['modified_on'] = $buffer_result[0]['requested_on'];
+            $data['name'] = $buffer_result[0]['resume_file_name'];
+            $data['file_name'] = $data['name'];
+            $data['file_size'] = $buffer_result[0]['resume_file_size'];
+            $data['file_type'] = $buffer_result[0]['resume_file_type'];
+            $data['file_hash'] = $new_hash;
         
-        $original_file = $GLOBALS['buffered_resume_dir']. '/'. $_POST['id']. '.'. $buffer_result[0]['resume_file_hash'];
-        if ($resume->copyFrom($original_file, $buffer_result[0]['resume_file_text']) === false) {
-            echo 'ko:resume_copy';
-            exit();
+            if ($resume->create($data) === false) {
+                echo 'ko:resume';
+                exit();
+            }
+        
+            $original_file = $GLOBALS['buffered_resume_dir']. '/'. $a_buffer['id']. '.'. $buffer_result[0]['resume_file_hash'];
+            if ($resume->copyFrom($original_file, $buffer_result[0]['resume_file_text']) === false) {
+                echo 'ko:resume_copy';
+                exit();
+            }
+            
+            $resume_successfully_moved = true;
         }
         
-        $resume_successfully_moved = true;
+        // 6. store the jobs applied
+        if (!is_null($buffer_result[0]['job'])) {
+            $data = array();
+            $data['applied_on'] = $buffer_result[0]['requested_on'];
+            $data['job'] = $buffer_result[0]['job'];
+            
+            if ($referrer_email[1] != 'yellowelevator.com') {
+                $data['referrer'] = $referrer->getId();
+            }
+            
+            if (!is_null($resume)) {
+                $data['resume'] = $resume->getId();
+            }
+            
+            $member->addJobApplied($data);
+        }
+        
+        // 7. delete referralbuffer
+        $buffer->delete();
     }
     
-    // 6. delete referralbuffer
-    $buffer->delete();
-    
-    echo $buffer_result[0]['candidate_email'];
+    echo $candidate_email;
     exit();
+}
+
+if ($_POST['action'] == 'transfer') {
+    
 }
 
 if ($_POST['action'] == 'check_member') {
@@ -484,6 +540,8 @@ if ($_POST['action'] == 'check_member') {
 }
 
 if ($_POST['action'] == 'add_new_application') {
+    $is_success = true;
+    
     $data = array();
     $data['requested_on'] = now();
     $data['referrer_email'] = $_POST['referrer_email'];
@@ -497,8 +555,17 @@ if ($_POST['action'] == 'add_new_application') {
     $data['candidate_phone'] = (empty($_POST['candidate_phone']) ? "NULL" : $_POST['candidate_phone']);;
     $data['notes'] = (empty($_POST['notes']) ? "NULL" : $_POST['notes']);;
     
+    $jobs = explode(',', $_POST['jobs']);
+    
     $buffer = new ReferralBuffer();
-    if ($buffer->create($data) === false) {
+    foreach ($jobs as $job) {
+        $data['job'] = $job;
+        if ($buffer->create($data) === false) {
+            $is_success = false;
+        }
+    }
+    
+    if (!$is_success) {
         echo 'ko';
         exit();
     }
@@ -535,12 +602,37 @@ if ($_POST['action'] == 'edit_candidate_email') {
     exit();
 }
 
-if ($_POST['action'] == 'edit_referrer_phone') {
-    $data = array();
-    $data['referrer_phone'] = $_POST['phone'];
+if ($_POST['action'] == 'get_referrer') {
+    $criteria = array(
+        'columns' => "candidate_name, referrer_name, referrer_email, referrer_phone", 
+        'match' => "id = ". $_POST['id'],
+        'limit' => "1"
+    );
     
-    $buffer = new ReferralBuffer($_POST['id']);
-    if ($buffer->update($data) === false) {
+    $referral_buffer = new ReferralBuffer();
+    $result = $referral_buffer->find($criteria);
+    
+    if (is_null($result) || empty($result) || $result === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    $result[0]['candidate_name'] = htmlspecialchars_decode(stripslashes($result[0]['candidate_name']));
+    $result[0]['referrer_name'] = htmlspecialchars_decode(stripslashes($result[0]['referrer_name']));
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('referrer' => $result));
+    exit();
+}
+
+if ($_POST['action'] == 'save_referrer') {
+    $data = array();
+    $data['referrer_name'] = $_POST['referrer_name'];
+    $data['referrer_email'] = $_POST['referrer_email'];
+    $data['referrer_phone'] = $_POST['referrer_phone'];
+    
+    $referral_buffer = new ReferralBuffer($_POST['id']);
+    if ($referral_buffer->update($data) === false) {
         echo 'ko';
         exit();
     }
@@ -549,17 +641,33 @@ if ($_POST['action'] == 'edit_referrer_phone') {
     exit();
 }
 
-if ($_POST['action'] == 'edit_referrer_email') {
-    $data = array();
-    $data['referrer_email'] = $_POST['email'];
+if ($_POST['action'] == 'get_other_jobs') {
+    $match = "referral_buffers.job IS NOT NULL";
+    if (isset($_POST['candidate_email'])) {
+        $match .= " AND referral_buffers.candidate_email = '". $_POST['candidate_email']. "'";
+    } else if (isset($_POST['candidate_name'])) {
+        $match .= " AND referral_buffers.candidate_name LIKE '". $_POST['candidate_name']. "'";
+    }
     
-    $buffer = new ReferralBuffer($_POST['id']);
-    if ($buffer->update($data) === false) {
+    $criteria = array(
+        'columns' => "jobs.title AS job, employers.name AS employer,
+                      DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on", 
+        'joins' => "jobs ON jobs.id = referral_buffers.job, 
+                    employers ON employers.id = jobs.employer", 
+        'match' => $match, 
+        'order' => "referral_buffers.requested_on DESC, jobs.title"
+    );
+    
+    $referral_buffer = new ReferralBuffer();
+    $result = $referral_buffer->find($criteria);
+    
+    if ($result === false || is_null($result)  || empty($result)) {
         echo 'ko';
         exit();
     }
     
-    echo 'ok';
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('applications' => array('application' => $result)));
     exit();
 }
 ?>

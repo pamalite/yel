@@ -736,5 +736,48 @@ class Member implements Model {
                   referee = '". $_referee_email. "'";
         return $this->mysqli->execute($query);
     }
+    
+    public function addJobApplied($_data) {
+        if (!$this->hasData($_data)) {
+            return false;
+        }
+        
+        $data = sanitize($_data);
+        $query = "INSERT INTO member_jobs SET ";
+        $i = 0;
+        foreach ($data as $key => $value) {
+            if (strtoupper($key) != "ID") {
+                if (is_string($value)) {
+                    if (strtoupper($value) == "NULL") {
+                        $query .= "`". $key. "` = NULL";
+                    } else {
+                        $query .= "`". $key. "` = '". $value. "'";
+                    }
+                } else if (is_null($value) || empty($value)) {
+                    $query .= "`". $key. "` = ''";
+                } else {
+                    $query .= "`". $key. "` = ". $value;
+                }
+
+                if ($i < count($data) - 1) {
+                    $query .= ", ";
+                }
+            }
+            
+            $i++;
+        }
+        
+        if ($i == 0) {
+            $query .= "`member` = '". $this->id. "'";
+        } else {
+            $query .= ", `member` = '". $this->id. "'";
+        }
+        
+        if ($this->mysqli->execute($query)) {
+            return true;
+        }
+        
+        return false;
+    }
 }
 ?>

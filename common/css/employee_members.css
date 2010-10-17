@@ -30,7 +30,7 @@ a.menu {
 }
 
 #applications_table td { 
-    vertical-align: baseline;
+    /*vertical-align: middle;*/
 }
 
 #members_table td.action {
@@ -75,6 +75,16 @@ a.menu {
     font-size: 9pt;
     font-style: italic;
     color: #666666;
+}
+
+.tiny_contact {
+    font-size: 9pt;
+    font-style: italic;
+    font-weight: bold;
+}
+
+td.vtop {
+    vertical-align: top;
 }
 
 .member_link {
@@ -123,21 +133,22 @@ div.resolution_instructions {
 }
 
 table.conflicts, 
-table.new_application {
+table.new_application, 
+table.referrer_form {
     border: none;
     width: 100%;
     margin: auto;
 }
 
 table.conflicts td, 
-table.new_application td {
+table.new_application td, 
+table.referrer_form td {
     padding: 3px 3px 3px 3px;
 }
 
 table.conflicts td.buffered, 
 table.conflicts td.existing, 
-table.new_application td.referrer, 
-table.new_application td.candidate {
+table.new_application td.title {
     text-align: center;
     font-weight: bold;
     background-color: #DDDDDD;
@@ -145,7 +156,8 @@ table.new_application td.candidate {
 }
 
 table.conflicts td.label, 
-table.new_application td.label {
+table.new_application td.label, 
+table.referrer_form td.label {
     width: 15%;
     font-weight: bold;
     background-color: #DDDDDD;
@@ -166,13 +178,37 @@ input.field {
 
 textarea.quick_notes {
     width: 98%;
-    height: 100px;
+    height: 100%;
 }
 
 .small_contact_edit {
     font-style: normal;
     font-size: 9pt;
     font-weight: bold;
+}
+
+#referrer_window {
+    width: 350px;
+    display: none;
+}
+
+div.referrer_form {
+    padding-bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+#other_jobs_window {
+    width: 650px;
+    display: none;
+}
+
+div.other_jobs {
+    padding-bottom: 10px;
+    width: 100%;
+    height: 350px;
+    overflow: auto;
+    text-align: center;
 }
 
 div.main_filter {
@@ -201,6 +237,7 @@ div.main_filter {
 #main_filter_table td.jobs_list {
     border: 1px dashed #888888;
 }
+
 #main_filter_table td.filter_buttons {
     vertical-align: top;
     text-align: center;
@@ -212,7 +249,7 @@ input.main_filter_button {
 
 select.employers, 
 select.jobs {
-    font-size: 11pt;
+    font-size: 10pt;
     width: 100%;
     height: 345px;
 }
@@ -256,4 +293,14 @@ div.sub_filter {
 
 div.pagination {
     float: left;
+}
+
+#other_jobs_table {
+    margin: auto;
+    width: 98%;
+    border-collapse: collapse;
+}
+
+#other_jobs_table tr:hover  {
+    background-color: #FFFF00;
 }

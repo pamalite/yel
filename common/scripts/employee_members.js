@@ -3,7 +3,10 @@ var order = 'desc';
 var applications_order_by = 'referral_buffers.requested_on';
 var applications_order = 'desc';
 var applications_filter = '';
-
+var candidates_filter = '';
+var filter_by_employer_only = true;
+var filter_only_non_attached = false;
+var applicants_page = 1;
 var sliding_filter_fx = '';
 
 function ascending_or_descending() {
@@ -38,12 +41,11 @@ function sort_by(_table, _column) {
 }
 
 function toggle_main_filter() {
-    if ($('div_main_filter').getStyle('display') != 'none') {
-        sliding_filter_fx.toggle();
-        $('hide_show_lbl').set('html', 'Show');
+    sliding_filter_fx.toggle();
+    if ($('hide_show_lbl').get('html') == 'Hide Filter') {
+        $('hide_show_lbl').set('html', 'Show Filter');
     } else {
-        sliding_filter_fx.toggle();
-        $('hide_show_lbl').set('html', 'Hide');
+        $('hide_show_lbl').set('html', 'Hide Filter');
     }
 }
 
@@ -85,10 +87,12 @@ function populate_jobs_list() {
             } else {
                 var titles = xml.getElementsByTagName('job_title');
                 var ids = xml.getElementsByTagName('id');
+                var employer_ids = xml.getElementsByTagName('employer');
                 
                 $('jobs').length = 0;
                 for (var i=0; i < ids.length; i++) {
-                    var option = new Option(titles[i].childNodes[0].nodeValue, ids[i].childNodes[0].nodeValue );
+                    var title = '[' + employer_ids[i].childNodes[0].nodeValue + '][' + ids[i].childNodes[0].nodeValue + '] ' + titles[i].childNodes[0].nodeValue;
+                    var option = new Option(title, ids[i].childNodes[0].nodeValue );
                     $('jobs').options[$('jobs').options.length] = option;
                 }
                 
@@ -325,8 +329,49 @@ function add_new_member() {
     $('member_page_form').submit();
 }
 
+function show_all_applications() {
+    location.reload();
+}
+
+function show_non_attached() {
+    applications_filter = '';
+    candidates_filter = '';
+    filter_only_non_attached = true;
+    show_applications();
+}
+
 function filter_applications() {
+    filter_only_non_attached = false;
     applications_filter = $('applications_filter').options[$('applications_filter').selectedIndex].value;
+    
+    filter_by_employer_only = true;
+    if ($('jobs') != null) {
+        for (var i=0; i < $('jobs').options.length; i++) {
+            if ($('jobs').options[i].selected) {
+                filter_by_employer_only = false;
+                break;
+            }
+        }
+    }
+    
+    candidates_filter = '';
+    if (filter_by_employer_only) {
+        for (var i=0; i < $('employers').options.length; i++) {
+            if ($('employers').options[i].selected) {
+                candidates_filter = candidates_filter + $('employers').options[i].value + ',';
+            }
+        }
+    } else {
+        for (var i=0; i < $('jobs').options.length; i++) {
+            if ($('jobs').options[i].selected) {
+                candidates_filter = candidates_filter + $('jobs').options[i].value + ',';
+            }
+        }
+    }
+    
+    if (!isEmpty(candidates_filter)) {
+        candidates_filter = candidates_filter.substr(0, candidates_filter.length-1);
+    }
     show_applications();
 }
 
@@ -346,23 +391,60 @@ function show_applications() {
     
     var params = 'id=' + user_id + '&order_by=' + applications_order_by + ' ' + applications_order;
     params = params + '&action=get_applications';
-    params = params + '&filter=' + applications_filter;
+    params = params + '&show_only=' + applications_filter;
+    params = params + '&page=' + $('pages').options[$('pages').selectedIndex].value;
+    
+    if (filter_only_non_attached) {
+        params = params + '&non_attached=1';
+    }
+    
+    if (!isEmpty(candidates_filter)) {
+        if (filter_by_employer_only) {
+            params = params + '&employers=' + candidates_filter;
+        } else {
+            params = params + '&jobs=' + candidates_filter;
+        }
+    }
     
     var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            // set_status('<pre>' + txt + '</pre>');
-            // return;
+            //set_status('<pre>' + txt + '</pre>');
+            //return;
             if (txt == 'ko') {
                 alert('An error occured while loading applications.');
                 return false;
             }
             
             if (txt == '0') {
+                set_status('');
                 $('div_applications').set('html', '<div class="empty_results">No applications at this moment.</div>');
             } else {
+                if ($('hide_show_lbl').get('html') == 'Hide Filter') {
+                    toggle_main_filter();
+                }
+                
+                var total_pages = xml.getElementsByTagName('total_pages');
+                
+                $('total_pages').set('html', total_pages[0].childNodes[0].nodeValue);
+                var selected_page_index = $('pages').selectedIndex;
+                if (selected_page_index >= parseInt(total_pages[0].childNodes[0].nodeValue)) {
+                    selected_page_index = parseInt(total_pages[0].childNodes[0].nodeValue)-1;
+                }
+                
+                $('pages').length = 0;
+                for (var i=0; i < parseInt(total_pages[0].childNodes[0].nodeValue); i++) {
+                    var an_option = '';
+                    if (i == selected_page_index) {
+                        an_option = new Option((i+1), (i+1), true, true);
+                    } else {
+                        an_option = new Option((i+1), (i+1));
+                    }
+                    $('pages').options[$('pages').length] = an_option;
+                }
+                
                 var ids = xml.getElementsByTagName('id');
                 var referrer_emails = xml.getElementsByTagName('referrer_email');
                 var referrer_names = xml.getElementsByTagName('referrer_name');
@@ -374,14 +456,16 @@ function show_applications() {
                 var resume_file_hashes = xml.getElementsByTagName('resume_file_hash');
                 var requested_ons = xml.getElementsByTagName('formatted_requested_on');
                 var has_notes = xml.getElementsByTagName('has_notes');
+                var jobs = xml.getElementsByTagName('job');
+                var employers = xml.getElementsByTagName('employer');
                 
                 var applications_table = new FlexTable('applications_table', 'applications');
 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Requested On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.referrer_name');\">Referrer</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header'));
-                header.set(3, new Cell('Notes', '', 'header'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Created On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header'));
+                header.set(2, new Cell('Notes', '', 'header'));
+                header.set(3, new Cell('Job', '', 'header'));
                 header.set(4, new Cell('Resume', '', 'header'));
                 header.set(5, new Cell('Quick Actions', '', 'header action'));
                 applications_table.set(0, header);
@@ -392,11 +476,12 @@ function show_applications() {
                     
                     row.set(0, new Cell(requested_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
-                    // referrer column
+                    // referrer link
+                    var referrer_short_details = '';
                     if (referrer_emails[i].childNodes.length > 0 && 
                         referrer_emails[i].childNodes[0].nodeValue.substr(0, 5) == 'team.' &&
                         referrer_emails[i].childNodes[0].nodeValue.substr(7) == '@yellowelevator.com') {
-                        row.set(1, new Cell('Self Applied', '', 'cell'));
+                        referrer_short_details = '<div class="tiny_contact">Self Applied</div>' + "\n";
                     } else {
                         var referrer_phone_num = '';
                         var referrer_email = '';
@@ -408,25 +493,15 @@ function show_applications() {
                             referrer_email = referrer_emails[i].childNodes[0].nodeValue;
                         }
 
-                        var short_desc = '<span style="font-weight: bold;">' + referrer_names[i].childNodes[0].nodeValue + '</span>' + "\n";
-                        
-                        if (isEmpty(referrer_phone_num)) {
+                        if (isEmpty(referrer_phone_num) || isEmpty(referrer_email)) {
                             is_cannot_signup = true;
-                            short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> <a class="no_link small_contact_edit" onClick="edit_referrer_phone(' + ids[i].childNodes[0].nodeValue + ');">Add Phone Number</a></div>' + "\n";
+                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + ' (Incomplete!)</a></div>' + "\n";
                         } else {
-                            short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + referrer_phone_num + '</div>' + "\n";
+                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + '</a></div>' + "\n";
                         }
-                        
-                        if (isEmpty(referrer_email)) {
-                            is_cannot_signup = true;
-                            short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a class="no_link small_contact_edit" onClick="edit_referrer_email(' + ids[i].childNodes[0].nodeValue + ');">Add Email</a></div>' + "\n";
-                        } else {
-                            short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + referrer_email + '"> ' + referrer_email + '</a></div>' + "\n";
-                        }
-                        row.set(1, new Cell(short_desc, '', 'cell'));
                     }
                     
-                    // candidate column
+                    // candidate details
                     var candidate_phone_num = '';
                     var candidate_email = '';
                     if (candidate_phones[i].childNodes.length > 0) {
@@ -437,7 +512,7 @@ function show_applications() {
                         candidate_email = candidate_emails[i].childNodes[0].nodeValue;
                     }
                     
-                    short_desc = '<span style="font-weight: bold;">' + candidate_names[i].childNodes[0].nodeValue + '</span>' + "\n";
+                    var short_desc = '<span style="font-weight: bold;">' + candidate_names[i].childNodes[0].nodeValue + '</span>' + "\n";
                     
                     if (isEmpty(candidate_phone_num)) {
                         is_cannot_signup = true;
@@ -453,24 +528,38 @@ function show_applications() {
                         short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + candidate_email + '"> ' + candidate_email + '</a> <a class="no_link small_contact_edit" onClick="edit_candidate_email(' + ids[i].childNodes[0].nodeValue + ');">edit</a></div>' + "\n";
                     }
                     
-                    row.set(2, new Cell(short_desc, '', 'cell'));
+                    var candidate_details = short_desc + '<br />' + referrer_short_details;
+                    row.set(1, new Cell(candidate_details, '', 'cell'));
                     
                     var add_update_notes = 'Add';
                     if (has_notes[i].childNodes[0].nodeValue == '1') {
                         add_update_notes = 'Update';
                     }
-                    row.set(3, new Cell('<a class="no_link" onClick="show_notes_popup(\'' + ids[i].childNodes[0].nodeValue +  '\');">' + add_update_notes + '</a>', '', 'cell'));
+                    row.set(2, new Cell('<a class="no_link" onClick="show_notes_popup(\'' + ids[i].childNodes[0].nodeValue +  '\');">' + add_update_notes + '</a>', '', 'cell'));
+                    
+                    
+                    var job_desc = 'N/A';
+                    if (jobs[i].childNodes.length > 0) {
+                        job_desc = '[' + employers[i].childNodes[0].nodeValue + '] ' + jobs[i].childNodes[0].nodeValue;
+                    }
+                    row.set(3, new Cell(job_desc, '', 'cell'));
                     
                     if (resume_ids[i].childNodes.length > 0) {
                         row.set(4, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
                     } else if (resume_file_hashes[i].childNodes.length > 0) {
                         row.set(4, new Cell('<a href="resume.php?id=' + ids[i].childNodes[0].nodeValue + '&hash=' + resume_file_hashes[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
                     } else {
-                        row.set(4, new Cell('Sign Up to Upload', '', 'cell'));
+                        row.set(4, new Cell('N/A', '', 'cell'));
                     }
                     
                     var actions = '';
                     actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                    
+                    if (candidate_emails[i].childNodes.length <= 0) {
+                        actions = actions + '<input type="button" value="Jobs" onClick="show_jobs_popup(false, \'' + candidate_names[i].childNodes[0].nodeValue + '\');" />';
+                    } else {
+                        actions = actions + '<input type="button" value="Jobs" onClick="show_jobs_popup(true, \'' + candidate_emails[i].childNodes[0].nodeValue + '\');" />';
+                    }
                     
                     if (is_cannot_signup) {
                         actions = actions + '<input type="button" value="Sign Up" disabled />';
@@ -536,85 +625,61 @@ function delete_application(_app_id) {
     request.send(params);
 }
 
-function check_member_from(_app_id) {
+function make_member_from(_app_id) {
+    if (!confirm('Confirm to sign up the selected applicant?' + "\n\n" + 'All other application made to/for this candidate will be moved to Members section as well.' +"\n")) {
+        return;
+    }
+    
     var params = 'id=' + _app_id;
-    params = params + '&action=check_member';
+    params = params + '&action=sign_up';
     
     var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
-        async: false,
         onSuccess: function(txt, xml) {
-            set_status('');
-            
-            if (txt == '0') {
-                return 'ok';
+            var err_msg = 'Cannot sign up the selected applicant.' + "\n\n";
+            switch(txt) {
+                case 'ko:member':
+                    alert(err_msg + 'The candidate cannot be signed up as a member.');
+                    break;
+                case 'ko:resume':
+                    alert(err_msg + 'Resume data error has occurred.');
+                    break;
+                case 'ko:resume_copy':
+                    alert(err_msg + 'Resume file copy/move error occurred.');
+                    break;
             }
             
-            var names = xml.getElementsByTagName('name');
-            var phones = xml.getElementsByTagName('phone');
-            var created_ons = xml.getElementsByTagName('created_on');
-            
-            $('conflict_app_id').value = _app_id;
-            $('buffered_name').set('html', names[0].childNodes[0].nodeValue);
-            $('existing_name').set('html', names[1].childNodes[0].nodeValue);
-            $('buffered_phone').set('html', phones[0].childNodes[0].nodeValue);
-            $('existing_phone').set('html', phones[1].childNodes[0].nodeValue);
-            $('buffered_created_on').set('html', created_ons[0].childNodes[0].nodeValue);
-            $('existing_created_on').set('html', created_ons[1].childNodes[0].nodeValue);
-            
-            return '-1';
+            //set_status('<pre>' + txt + '</pre>');
+            set_status('');
+            location.replace('member.php?member_email_addr=' + txt);
         },
         onRequest: function(instance) {
-            set_status('Checking application...');
+            set_status('Signing up applicant...');
         }
     });
     
     request.send(params);
 }
 
-function close_conflict_popup() {
-    close_window('conflicts_window');
-    
-    if (arguments.length > 0) {
-        if (arguments[0] == 0) {
-            make_member_from($('conflict_app_id').value, 'buffered');
-        } else {
-            make_member_from($('conflict_app_id').value, 'existing');
-        }
-    }
-}
-
-function make_member_from(_app_id) {
-    var resolute_using = '';
-    
-    if (arguments.length <= 1) {
-        if (!confirm('You sure to sign up selected application?')) {
-            return;
-        }
-        
-        if (check_member_from(_app_id) != 'ok') {
-            show_window('conflicts_window');
-            return;
-        }
-    } else {
-        resolute_using = arguments[1];
+function transfer_to_member(_app_id) {
+    if (!confirm('Confirm to transfer the selected applicant?' + "\n\n" + 'All other application made to/for this candidate will be moved to Members section as well.' +"\n")) {
+        return;
     }
     
     var params = 'id=' + _app_id;
-    params = params + '&action=sign_up';
-    params = params + '&resolution=' + resolute_using;
+    params = params + '&action=transfer';
     
     var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            var err_msg = 'Cannot sign up the selected application.' + "\n\n";
+            var err_msg = 'Cannot transfer the selected applicant.' + "\n\n";
             switch(txt) {
                 case 'ko:member':
-                    alert(err_msg + 'The candidate cannot be signed up as a member.');
+                    alert(err_msg + 'The candidate seems like not to be a member.');
                     break;
                 case 'ko:resume':
                     alert(err_msg + 'Resume data error has occurred.');
@@ -628,7 +693,7 @@ function make_member_from(_app_id) {
             location.replace('member.php?member_email_addr=' + txt);
         },
         onRequest: function(instance) {
-            set_status('Signing up application...');
+            set_status('Signing up applicant...');
         }
     });
     
@@ -821,6 +886,18 @@ function auto_fill_referrer() {
 }
 
 function show_new_application_popup() {
+    $('new_applicant_jobs').value = '';
+    
+    var jobs = '';
+    for (var i=0; i < $('jobs').options.length; i++) {
+        if ($('jobs').options[i].selected) {
+            jobs = jobs + $('jobs').options[i].value + ',';
+        }
+    }
+    jobs = jobs.substr(0, jobs.length-1);
+    
+    $('new_applicant_jobs').value = jobs;
+    
     show_window('new_application_window');
     window.scrollTo(0, 0);
 }
@@ -866,6 +943,7 @@ function close_new_application_popup(_is_save) {
         params = params + '&candidate_name=' + $('candidate_name').value;
         params = params + '&candidate_phone=' + $('candidate_phone').value;
         params = params + '&candidate_email=' + $('candidate_email_addr').value;
+        params = params + '&jobs=' + $('new_applicant_jobs').value;
         
         if (!referrer_is_yel) {
             params = params + '&referrer_name=' + $('referrer_name').value;
@@ -904,15 +982,152 @@ function close_new_application_popup(_is_save) {
     }
 }
 
+function show_referrer_popup(_id) {
+    $('referral_buffer_id').value = _id;
+    
+    var params = 'id=' + _id + '&action=get_referrer';
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error while retrieving referrer contacts.');
+                return;
+            }
+            
+            var candidate_name = xml.getElementsByTagName('candidate_name');
+            var referrer_name = xml.getElementsByTagName('referrer_name');
+            var referrer_email = xml.getElementsByTagName('referrer_email');
+            var referrer_phone = xml.getElementsByTagName('referrer_phone');
+            
+            $('ref_candidate_name').set('html', candidate_name[0].childNodes[0].nodeValue);
+            $('ref_referrer_name').value = referrer_name[0].childNodes[0].nodeValue;
+            if (referrer_email[0].childNodes.length > 0) {
+                $('ref_referrer_email').value = referrer_email[0].childNodes[0].nodeValue;
+            } else {
+                $('ref_referrer_email').value = '';
+            }
+            
+            if (referrer_phone[0].childNodes.length > 0) {
+                $('ref_referrer_phone').value = referrer_phone[0].childNodes[0].nodeValue;
+            } else {
+                $('ref_referrer_phone').value = '';
+            }
+            
+            show_window('referrer_window');
+            window.scrollTo(0, 0);
+        }
+    });
+
+    request.send(params);
+}
+
+function close_referrer_popup(_is_save) {
+    if (_is_save) {
+        if (isEmpty($('ref_referrer_name').value)) {
+            alert('You need at least a name to identify the referrer.');
+            return;
+        }
+        
+        if (isEmpty($('ref_referrer_phone').value) || !isEmail($('ref_referrer_email').value)) {
+            if (!confirm('You will NOT be able to proceed to Sign Up or Transfer without a valid phone number and email address.' + "\n\n" + 'Are you sure to proceed?')) {
+                return;
+            }
+        }
+        
+        var params = 'id=' + $('referral_buffer_id').value + '&action=save_referrer';
+        params = params + '&referrer_name=' + encodeURIComponent($('ref_referrer_name').value);
+        params = params + '&referrer_email=' + $('ref_referrer_email').value;
+        params = params + '&referrer_phone=' + $('ref_referrer_phone').value;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('An error while saving referrer contacts.');
+                    return;
+                }
+                
+                close_window('referrer_window');
+                show_applications();
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('referrer_window');
+    }
+}
+
+function show_jobs_popup(_use_email, _match) {
+    var params = 'id=0&action=get_other_jobs';
+    if (_use_email) {
+        params = params + '&candidate_email=' + _match;
+    } else {
+        params = params + '&candidate_name=' + _match;
+    }
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            if (txt == 'ko') {
+                alert('An error while retrieving other applied jobs.' + "\n\n" + 'Perhaps this candidate is not attached to any job.');
+                return;
+            }
+            
+            var titles = xml.getElementsByTagName('job');
+            var employers = xml.getElementsByTagName('employer');
+            var requested_ons = xml.getElementsByTagName('formatted_requested_on');
+            
+            var jobs_table = new FlexTable('other_jobs_table', 'other_jobs');
+
+            var header = new Row('');
+            header.set(0, new Cell('Applied On', '', 'header'));
+            header.set(1, new Cell('Job', '', 'header'));
+            header.set(2, new Cell('Employer', '', 'header'));
+            jobs_table.set(0, header);
+            
+            for (var i=0; i < titles.length; i++) {
+                var row = new Row('');
+                
+                row.set(0, new Cell(requested_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                row.set(1, new Cell(titles[i].childNodes[0].nodeValue, '', 'cell'));
+                row.set(2, new Cell(employers[i].childNodes[0].nodeValue, '', 'cell'));
+                
+                jobs_table.set((parseInt(i)+1), row);
+            }
+            
+            $('div_other_jobs').set('html', jobs_table.get_html());
+            
+            show_window('other_jobs_window');
+            window.scrollTo(0, 0);
+        }
+    });
+
+    request.send(params);
+}
+
+function close_jobs_popup() {
+    close_window('other_jobs_window');
+}
+
 function onDomReady() {
     initialize_page();
     
     switch (current_page) {
        case 'members':
-           show_members()
+           show_members(false);
            break;
        default:
-           show_applications();
+           show_applications(false);
            break;
    }
    
