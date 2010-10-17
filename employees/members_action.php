@@ -398,6 +398,14 @@ if ($_POST['action'] == 'sign_up') {
         $buffer = new ReferralBuffer($a_buffer['id']);
         $buffer_result = $buffer->get();
         
+        $criteria = array(
+            'columns' => "jobs.title AS job_title", 
+            'joins' => "jobs ON jobs.id = referral_buffers.job", 
+            'match' => "referral_buffers.id = ". $a_buffer['id'],
+            'limit' => "1"
+        );
+        $job_result = $buffer->find($criteria);
+        
         // 2. check whether a referrer is needed
         $referrer_successfully_created = false;
         $needs_to_be_connected = false;
@@ -437,8 +445,9 @@ if ($_POST['action'] == 'sign_up') {
             }
         }
         
+        // 3.5 save the notes by appending them
         $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
-        $member->saveNotes($existing_notes. "\n\n". $buffer_result[0]['notes']);
+        $member->saveNotes($existing_notes. "\n\n[(". $buffer_result[0]['job']. ") ". $job_result[0]['job_title']. "] ". $buffer_result[0]['notes']);
 
         // 4. create connection
         $connection_is_success = true;
@@ -502,10 +511,6 @@ if ($_POST['action'] == 'sign_up') {
     
     echo $candidate_email;
     exit();
-}
-
-if ($_POST['action'] == 'transfer') {
-    
 }
 
 if ($_POST['action'] == 'check_member') {

@@ -638,21 +638,24 @@ function make_member_from(_app_id) {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            var err_msg = 'Cannot sign up the selected applicant.' + "\n\n";
-            switch(txt) {
-                case 'ko:member':
-                    alert(err_msg + 'The candidate cannot be signed up as a member.');
-                    break;
-                case 'ko:resume':
-                    alert(err_msg + 'Resume data error has occurred.');
-                    break;
-                case 'ko:resume_copy':
-                    alert(err_msg + 'Resume file copy/move error occurred.');
-                    break;
+            set_status('');
+            
+            if (!isEmail(txt)) {
+                var err_msg = 'Cannot sign up the selected applicant.' + "\n\n";
+                switch(txt) {
+                    case 'ko:member':
+                        alert(err_msg + 'The candidate cannot be signed up as a member.');
+                        break;
+                    case 'ko:resume':
+                        alert(err_msg + 'Resume data error has occurred.');
+                        break;
+                    case 'ko:resume_copy':
+                        alert(err_msg + 'Resume file copy/move error occurred.');
+                        break;
+                }
+                return;
             }
             
-            //set_status('<pre>' + txt + '</pre>');
-            set_status('');
             location.replace('member.php?member_email_addr=' + txt);
         },
         onRequest: function(instance) {
@@ -668,32 +671,38 @@ function transfer_to_member(_app_id) {
         return;
     }
     
+    // this function is similar with sign up, but functions a little differently.
+    // separting them is to manage them more easily
     var params = 'id=' + _app_id;
-    params = params + '&action=transfer';
+    params = params + '&action=sign_up';
     
     var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            var err_msg = 'Cannot transfer the selected applicant.' + "\n\n";
-            switch(txt) {
-                case 'ko:member':
-                    alert(err_msg + 'The candidate seems like not to be a member.');
-                    break;
-                case 'ko:resume':
-                    alert(err_msg + 'Resume data error has occurred.');
-                    break;
-                case 'ko:resume_copy':
-                    alert(err_msg + 'Resume file copy/move error occurred.');
-                    break;
+            set_status('');
+            
+            if (!isEmail(txt)) {
+                var err_msg = 'Cannot transfer the selected applicant.' + "\n\n";
+                switch(txt) {
+                    case 'ko:member':
+                        alert(err_msg + 'The candidate is not a member, and the system failed to create an account too.');
+                        break;
+                    case 'ko:resume':
+                        alert(err_msg + 'Resume data error has occurred.');
+                        break;
+                    case 'ko:resume_copy':
+                        alert(err_msg + 'Resume file copy/move error occurred.');
+                        break;
+                }
+                return;
             }
             
-            set_status('');
             location.replace('member.php?member_email_addr=' + txt);
         },
         onRequest: function(instance) {
-            set_status('Signing up applicant...');
+            set_status('Transferring applicant...');
         }
     });
     
