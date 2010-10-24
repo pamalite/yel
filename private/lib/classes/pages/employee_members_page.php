@@ -55,22 +55,26 @@ class EmployeeMembersPage extends Page {
     private function get_members($_employee_branch_id) {
         $results = array();
         $criteria = array(
-            'columns' => "members.email_addr, members.phone_num, members.active, members.phone_num,
-                          members.address, members.state, members.zip, countries.country, 
+            'columns' => "members.email_addr, members.phone_num, members.progress_notes, members.active,
+                          IF(member_index.notes IS NULL OR member_index.notes = '', 0, 1) AS has_notes,  
+                          CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
                           DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
-                          DATE_FORMAT(member_sessions.last_login, '%e %b, %Y') AS formatted_last_login, 
-                          CONCAT(members.lastname, ', ', members.firstname) AS member, 
-                          CONCAT(employees.lastname, ', ', employees.firstname) AS employee",
-            'joins' => "member_sessions ON member_sessions.member = members.email_addr, 
-                        employees ON employees.id = members.added_by, 
-                        countries ON countries.country_code = members.country", 
-            'match' => "employees.branch = ". $_employee_branch_id ." AND 
-                        members.email_addr <> 'initial@yellowelevator.com' AND 
-                        members.email_addr NOT LIKE 'team%@yellowelevator.com'", 
+                          COUNT(DISTINCT resumes.id) AS num_yel_resumes, 
+                          COUNT(DISTINCT resumes_1.id) AS num_self_resumes",
+            'joins' => "resumes AS resumes ON resumes.member = members.email_addr AND 
+                            resumes.is_yel_uploaded = TRUE,
+                        resumes AS resumes_1 ON resumes_1.member = members.email_addr AND
+                            resumes_1.is_yel_uploaded = FALSE, 
+                        member_index ON member_index.member = members.email_addr",
+            'match' => "members.email_addr <> 'initial@yellowelevator.com' AND 
+                        members.email_addr NOT LIKE 'team%@yellowelevator.com'",
+            'group' => "members.email_addr", 
             'order' => "members.joined_on DESC"
         );
-
+        
         $member = new Member();
+        $this->total_members = count($member->find($criteria));
+        $criteria['limit']= $GLOBALS['default_results_per_page'];
         $results = $member->find($criteria);
         return $results;
     }
@@ -115,7 +119,7 @@ class EmployeeMembersPage extends Page {
             <?php $style = 'background-color: #CCCCCC;'; ?>
             <ul class="menu">
                 <li id="item_applications" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_applications();">Applicants</a></li>
-                <li id="item_members" style="<?php echo ($this->current_page == 'members') ? $style : ''; ?>"><a class="menu" onClick="show_members(false);">Members</a></li>
+                <li id="item_members" style="<?php echo ($this->current_page == 'members') ? $style : ''; ?>"><a class="menu" onClick="show_members();">Members</a></li>
                 <li id="item_search" style="<?php echo ($this->current_page == 'search') ? $style : ''; ?>"><a class="menu" onClick="show_search_members();">Search</a></li>
             </ul>
         </div>
@@ -168,9 +172,9 @@ class EmployeeMembersPage extends Page {
                         </div>
                     </td>
                     <td class="filter_buttons">
-                        <input type="button" class="main_filter_button" value="Filter Candidates" onClick="filter_applications();" />
+                        <input type="button" class="main_filter_button" value="Apply Filter" onClick="do_filter();" />
                         <br/>
-                        <input type="button" class="main_filter_button" value="Reset" onClick="show_all_applications();" />
+                        <input type="button" class="main_filter_button" value="Reset" onClick="show_all();" />
                         <input type="button" class="main_filter_button" value="Show Non-attached" onClick="show_non_attached();" />
                         <hr />
                         <input type="button" class="main_filter_button" id="add_new_btn" value="Add New Applicant" onClick="show_new_application_popup();" disabled />
@@ -329,11 +333,26 @@ class EmployeeMembersPage extends Page {
         <?php
         if (is_null($members) || count($members) <= 0 || $members === false) {
         ?>
-            <div class="empty_results">No members at this moment.</div>
+            <div class="empty_results">No members found.</div>
         <?php
         } else {
         ?>
             <div class="buttons_bar">
+                <div class="pagination">
+                    Page
+                    <select id="member_pages" onChange="show_members();">
+                        <option value="1" selected>1</option>
+                    <?php
+                        $total_member_pages = ceil($this->total_members / $GLOBALS['default_results_per_page']);
+                        for ($i=1; $i < $total_member_pages; $i++) {
+                    ?>
+                        <option value="<?php echo ($i+1); ?>"><?php echo ($i+1); ?></option>
+                    <?php
+                        }
+                    ?>
+                    </select>
+                    of <span id="total_member_pages"><?php echo $total_member_pages; ?></span>
+                </div>
                 <input class="button" type="button" id="add_new_member" name="add_new_member" value="Add New Member" onClick="add_new_member();" />
             </div>
             <div id="div_members">
@@ -342,20 +361,41 @@ class EmployeeMembersPage extends Page {
 
                 $members_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('members', 'members.joined_on');\">Joined On</a>", '', 'header');
                 $members_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('members', 'members.lastname');\">Member</a>", '', 'header');
-                $members_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('members', 'employees.lastname');\">Added By</a>", '', 'header');
-                $members_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('members', 'member_sessions.first_login');\">Last Login</a>", '', 'header');
-                $members_table->set(0, 4, 'Quick Actions', '', 'header action');
+                $members_table->set(0, 2, "Notes", '', 'header');
+                $members_table->set(0, 3, "Resumes", '', 'header');
+                $members_table->set(0, 4, "Jobs", '', 'header');
+                $members_table->set(0, 5, "Progress", '', 'header');
+                $members_table->set(0, 6, 'Quick Actions', '', 'header action');
 
                 foreach ($members as $i=>$member) {
                     $members_table->set($i+1, 0, $member['formatted_joined_on'], '', 'cell');
 
-                    $member_short_details = '<a class="member_link" href="member.php?member_email_addr='. $member['email_addr']. '">'. desanitize($member['member']). '</a>'. "\n";
+                    $member_short_details = '<a class="member_link" href="member.php?member_email_addr='. $member['email_addr']. '">'. desanitize($member['member_name']). '</a>'. "\n";
                     $member_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $member['phone_num']. '</div>'. "\n";
                     $member_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $member['email_addr']. '">'. $member['email_addr']. '</a></div>'. "\n";
+                    $member_short_details .= '<br/><a href="member.php?member_email_addr='. $member['email_addr']. '&page=referrers">View Referrers</a>'. "\n";
                     $members_table->set($i+1, 1, $member_short_details, '', 'cell');
-                    $members_table->set($i+1, 2, $member['employee'], '', 'cell');
-                    $members_table->set($i+1, 3, $member['formatted_last_login'], '', 'cell');
-
+                    
+                    if ($members['has_notes'] == '1') {
+                        $members_table->set($i+1, 2, '<a class="no_link" onClick="show_notes_popup(\''. $member['email_addr']. '\');">Update</a>', '', 'cell');
+                    } else {
+                        $members_table->set($i+1, 2, '<a class="no_link" onClick="show_notes_popup(\''. $member['email_addr']. '\');">Add</a>', '', 'cell');
+                    }
+                    
+                    $resume_details = '<a href="member.php?member_email_addr='. $member['email_addr']. '&page=resumes">View</a><br/><br/>'. "\n";
+                    $resume_details .= '<span style="color: #666666;">YEL: '. $member['num_yel_resumes']. "</span><br/>\n";
+                    $resume_details .= '<span style="color: #666666;">Self: '. $member['num_self_resumes']. "</span><br/>\n";
+                    $members_table->set($i+1, 3, $resume_details, '', 'cell');
+                    
+                    $members_table->set($i+1, 4, '<a class="no_link" onClick="show_jobs_popup(false, \''. $member['email_addr']. '\', true);">View</a>', '', 'cell');
+                    
+                    $progress_note = '<a class="no_link" onClick="show_progress_popup(\''. $member['email_addr']. '\');">Add</a>';
+                    if (!is_null($member['progress_notes'])) {
+                        $progress_note = $member['progress_notes']. '<br/><br/>';
+                        $progress_note .= '<a class="no_link" onClick="show_progress_popup(\''. $member['email_addr']. '\');">Update</a>';
+                    }
+                    $members_table->set($i+1, 5, $progress_note, '', 'cell');
+                    
                     $actions = '';
                     if ($member['active'] == 'Y') {
                         $actions = '<input type="button" id="activate_button_'. $i. '" value="De-activate" onClick="activate_member(\''. $member['email_addr']. '\', \''. $i. '\');" />';
@@ -366,7 +406,7 @@ class EmployeeMembersPage extends Page {
                         // $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" disabled />';
                     }
                     
-                    $members_table->set($i+1, 4, $actions, '', 'cell action');
+                    $members_table->set($i+1, 6, $actions, '', 'cell action');
                 }
 
                 echo $members_table->get_html();

@@ -123,34 +123,59 @@ if ($_POST['action'] == 'get_jobs') {
 }
 
 if ($_POST['action'] == 'get_members') {
-    $order_by = 'members.joined_on desc';
-
-    $employee = new Employee($_POST['id']);
-    $branch = $employee->getBranch();
-
+    $order_by = "members.joined_on desc";
+    $filter_by = "";
+    $page = 1;
+    
     if (isset($_POST['order_by'])) {
         $order_by = $_POST['order_by'];
     }
-
+    
+    $match = "members.email_addr <> 'initial@yellowelevator.com' AND 
+              members.email_addr NOT LIKE 'team%@yellowelevator.com'";
+    if (isset($_POST['non_attached'])) {
+        $order_by .= " HAVING num_attached_jobs <= 0";
+    } else {
+        $employers_str = "";
+        $jobs_str = "";
+        if (isset($_POST['jobs'])) {
+            $match = " AND member_jobs.job IN (". trim($_POST['jobs']). ")";
+        } elseif (isset($_POST['employers'])) {
+            $employers = explode(',', $_POST['employers']);
+            foreach ($employers as $i=>$id) {
+                $employers[$i] = "'". trim($id). "'";
+            }
+            $employers_str = implode(',', $employers);
+            $match = " AND jobs.employer IN (". $employers_str. ")";
+        }
+    }
+    
+    if (isset($_POST['page'])) {
+        $page = $_POST['page'];
+    }
+    
     $criteria = array(
-        'columns' => "members.email_addr, members.phone_num, members.active, members.phone_num,
-                      members.address, members.state, members.zip, countries.country, 
+        'columns' => "members.email_addr, members.phone_num, members.progress_notes,
+                      IF(member_index.notes IS NULL OR member_index.notes = '', 0, 1) AS has_notes,  
+                      CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
                       DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
-                      DATE_FORMAT(member_sessions.last_login, '%e %b, %Y') AS formatted_last_login, 
-                      CONCAT(members.lastname, ', ', members.firstname) AS member, 
-                      CONCAT(employees.lastname, ', ', employees.firstname) AS employee",
-        'joins' => "member_sessions ON member_sessions.member = members.email_addr, 
-                    employees ON employees.id = members.added_by, 
-                    countries ON countries.country_code = members.country", 
-        'match' => "employees.branch = ". $branch[0]['id'] ." AND 
-                    members.email_addr <> 'initial@yellowelevator.com' AND 
-                    members.email_addr NOT LIKE 'team%@yellowelevator.com'",
+                      COUNT(DISTINCT resumes.id) AS num_yel_resumes, 
+                      COUNT(DISTINCT resumes_1.id) AS num_self_resumes,
+                      COUNT(DISTINCT member_jobs.id) AS num_attached_jobs",
+        'joins' => "resumes AS resumes ON resumes.member = members.email_addr AND resumes.is_yel_uploaded = TRUE, 
+                    resumes AS resumes_1 ON resumes_1.member = members.email_addr AND resumes_1.is_yel_uploaded = FALSE, 
+                    member_index ON member_index.member = members.email_addr,
+                    member_jobs ON member_jobs.member = members.email_addr,
+                    jobs ON jobs.id = member_jobs.job,
+                    employers ON employers.id = jobs.employer", 
+        'match' => $match,
+        'group' => "members.email_addr",
         'order' => $order_by
     );
-
+    
     $member = new Member();
     $result = $member->find($criteria);
-
+    
     if (count($result) <= 0 || is_null($result)) {
         echo '0';
         exit();
@@ -160,9 +185,24 @@ if ($_POST['action'] == 'get_members') {
         echo 'ko';
         exit();
     }
-
+    
+    $total_pages = ceil(count($result) / $GLOBALS['default_results_per_page']);
+    if ($page > $total_pages) {
+        $page = $total_pages;
+    }
+    
+    $offset = 0;
+    if ($page > 1) {
+        $offset = ($page-1) * $GLOBALS['default_results_per_page'];
+        $offset = ($offset < 0) ? 0 : $offset;
+    }
+    
+    $criteria['limit'] = $offset. ", ". $GLOBALS['default_results_per_page'];
+    $result = $member->find($criteria);
+    
     foreach($result as $i=>$row) {
-        $result[$i]['member'] = htmlspecialchars_decode($row['member']);
+        $result[$i]['member_name'] = htmlspecialchars_decode(stripslashes($row['member_name']));
+        $result[$i]['progress_notes'] = htmlspecialchars_decode(stripslashes($row['progress_notes']));
     }
 
     $response = array('members' => array('a_member' => $result));

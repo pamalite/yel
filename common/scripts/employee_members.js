@@ -1,5 +1,7 @@
+var current_section = 'applicants';
 var order_by = 'members.joined_on';
 var order = 'desc';
+var members_filter = '';
 var applications_order_by = 'referral_buffers.requested_on';
 var applications_order = 'desc';
 var applications_filter = '';
@@ -7,6 +9,7 @@ var candidates_filter = '';
 var filter_by_employer_only = true;
 var filter_only_non_attached = false;
 var applicants_page = 1;
+var members_pahe = 1;
 var sliding_filter_fx = '';
 
 function ascending_or_descending() {
@@ -126,7 +129,64 @@ function toggle_add_button() {
     }
 }
 
+function do_filter() {
+    if (current_section == 'applicants') {
+        filter_applications();
+    } else if (current_section == 'members') {
+        filter_members();
+    }
+}
+
+function show_all() {
+    if (current_section == 'applicants') {
+        show_all_applications();
+    } else {
+        show_all_members();
+    }
+}
+
+function show_all_members() {
+    window.location = 'members.php?page=members';
+}
+
+function filter_members() {
+    filter_only_non_attached = false;
+    filter_by_employer_only = true;
+    if ($('jobs') != null) {
+        for (var i=0; i < $('jobs').options.length; i++) {
+            if ($('jobs').options[i].selected) {
+                filter_by_employer_only = false;
+                break;
+            }
+        }
+    }
+    
+    members_filter = '';
+    if (filter_by_employer_only) {
+        for (var i=0; i < $('employers').options.length; i++) {
+            if ($('employers').options[i].selected) {
+                members_filter = members_filter + $('employers').options[i].value + ',';
+            }
+        }
+    } else {
+        for (var i=0; i < $('jobs').options.length; i++) {
+            if ($('jobs').options[i].selected) {
+                members_filter = members_filter + $('jobs').options[i].value + ',';
+            }
+        }
+    }
+    
+    if (!isEmpty(members_filter)) {
+        members_filter = members_filter.substr(0, members_filter.length-1);
+    }
+    
+    show_members();
+}
+
 function show_members() {
+    current_section = 'members';
+    $('add_new_btn').setStyle('visibility', 'hidden');
+    
     $('applications').setStyle('display', 'none');
     $('members').setStyle('display', 'block');
     $('member_search').setStyle('display', 'none');
@@ -142,14 +202,27 @@ function show_members() {
     
     var params = 'id=' + user_id + '&order_by=' + order_by + ' ' + order;
     params = params + '&action=get_members';
+    params = params + '&page=' + $('member_pages').options[$('member_pages').selectedIndex].value;
+    
+    if (filter_only_non_attached) {
+        params = params + '&non_attached=1';
+    }
+    
+    if (!isEmpty(members_filter)) {
+        if (filter_by_employer_only) {
+            params = params + '&employers=' + members_filter;
+        } else {
+            params = params + '&jobs=' + members_filter;
+        }
+    }
     
     var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            //set_status('<pre>' + txt + '</pre>');
-            //return;
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
             if (txt == 'ko') {
                 alert('An error occured while loading members.');
                 return false;
@@ -330,14 +403,20 @@ function add_new_member() {
 }
 
 function show_all_applications() {
-    location.reload();
+    window.location = 'members.php';
 }
 
 function show_non_attached() {
     applications_filter = '';
     candidates_filter = '';
+    members_filter = '';
     filter_only_non_attached = true;
-    show_applications();
+    
+    if (current_page == 'applicants') {
+        show_applications();
+    } else {
+        show_members();
+    }
 }
 
 function filter_applications() {
@@ -376,6 +455,9 @@ function filter_applications() {
 }
 
 function show_applications() {
+    current_section = 'members';
+    $('add_new_btn').setStyle('visibility', 'visible');
+    
     $('applications').setStyle('display', 'block');
     $('members').setStyle('display', 'none');
     $('member_search').setStyle('display', 'none');

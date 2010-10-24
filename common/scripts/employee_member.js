@@ -1054,6 +1054,9 @@ function onDomReady() {
         case 'applications':
             show_applications();
             break;
+        case 'referrers':
+            show_connections();
+            break;
         default:
             show_profile();
             break;
