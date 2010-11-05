@@ -133,20 +133,21 @@ if ($_POST['action'] == 'get_members') {
     
     $match = "members.email_addr <> 'initial@yellowelevator.com' AND 
               members.email_addr NOT LIKE 'team%@yellowelevator.com'";
+    $having = '';
     if (isset($_POST['non_attached'])) {
-        $order_by .= " HAVING num_attached_jobs <= 0";
+        $having = " HAVING num_attached_jobs <= 0";
     } else {
         $employers_str = "";
         $jobs_str = "";
         if (isset($_POST['jobs'])) {
-            $match = " AND member_jobs.job IN (". trim($_POST['jobs']). ")";
+            $match .= " AND member_jobs.job IN (". trim($_POST['jobs']). ")";
         } elseif (isset($_POST['employers'])) {
             $employers = explode(',', $_POST['employers']);
             foreach ($employers as $i=>$id) {
                 $employers[$i] = "'". trim($id). "'";
             }
             $employers_str = implode(',', $employers);
-            $match = " AND jobs.employer IN (". $employers_str. ")";
+            $match .= " AND jobs.employer IN (". $employers_str. ")";
         }
     }
     
@@ -155,21 +156,23 @@ if ($_POST['action'] == 'get_members') {
     }
     
     $criteria = array(
-        'columns' => "members.email_addr, members.phone_num, members.progress_notes,
+        'columns' => "members.email_addr, members.phone_num, members.progress_notes, members.active, 
                       IF(member_index.notes IS NULL OR member_index.notes = '', 0, 1) AS has_notes,  
                       CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
                       DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
                       COUNT(DISTINCT resumes.id) AS num_yel_resumes, 
-                      COUNT(DISTINCT resumes_1.id) AS num_self_resumes,
+                      COUNT(DISTINCT resumes_1.id) AS num_self_resumes, 
                       COUNT(DISTINCT member_jobs.id) AS num_attached_jobs",
-        'joins' => "resumes AS resumes ON resumes.member = members.email_addr AND resumes.is_yel_uploaded = TRUE, 
-                    resumes AS resumes_1 ON resumes_1.member = members.email_addr AND resumes_1.is_yel_uploaded = FALSE, 
+        'joins' => "resumes AS resumes ON resumes.member = members.email_addr AND 
+                        resumes.is_yel_uploaded = TRUE, 
+                    resumes AS resumes_1 ON resumes_1.member = members.email_addr AND 
+                        resumes_1.is_yel_uploaded = FALSE, 
                     member_index ON member_index.member = members.email_addr,
                     member_jobs ON member_jobs.member = members.email_addr,
                     jobs ON jobs.id = member_jobs.job,
                     employers ON employers.id = jobs.employer", 
         'match' => $match,
-        'group' => "members.email_addr",
+        'group' => "members.email_addr". $having,
         'order' => $order_by
     );
     
@@ -205,7 +208,12 @@ if ($_POST['action'] == 'get_members') {
         $result[$i]['progress_notes'] = htmlspecialchars_decode(stripslashes($row['progress_notes']));
     }
 
-    $response = array('members' => array('a_member' => $result));
+    $response = array(
+        'members' => array(
+            'total_pages' => $total_pages,
+            'a_member' => $result
+        )
+    );
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
     exit();

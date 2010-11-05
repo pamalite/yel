@@ -8,8 +8,9 @@ var applications_filter = '';
 var candidates_filter = '';
 var filter_by_employer_only = true;
 var filter_only_non_attached = false;
+var filter_is_dirty = false;
 var applicants_page = 1;
-var members_pahe = 1;
+var members_page = 1;
 var sliding_filter_fx = '';
 
 function ascending_or_descending() {
@@ -33,23 +34,18 @@ function sort_by(_table, _column) {
         case 'members':
             order_by = _column;
             ascending_or_descending();
-            show_members();
+            update_members();
             break;
         case 'applications':
             applications_order_by = _column;
             applications_ascending_or_descending();
-            show_applications();
+            update_applications();
             break;
     }
 }
 
 function toggle_main_filter() {
     sliding_filter_fx.toggle();
-    if ($('hide_show_lbl').get('html') == 'Hide Filter') {
-        $('hide_show_lbl').set('html', 'Show Filter');
-    } else {
-        $('hide_show_lbl').set('html', 'Hide Filter');
-    }
 }
 
 function populate_jobs_list() {
@@ -130,6 +126,8 @@ function toggle_add_button() {
 }
 
 function do_filter() {
+    filter_is_dirty = true;
+    
     if (current_section == 'applicants') {
         filter_applications();
     } else if (current_section == 'members') {
@@ -180,7 +178,7 @@ function filter_members() {
         members_filter = members_filter.substr(0, members_filter.length-1);
     }
     
-    show_members();
+    update_members();
 }
 
 function show_members() {
@@ -195,14 +193,22 @@ function show_members() {
     $('item_members').setStyle('background-color', '#CCCCCC');
     $('item_search').setStyle('background-color', '');
     
-    if (arguments.length > 0) {
-        // do not load from db unless is being sorted
-        return;
+    if (filter_is_dirty) {
+        filter_is_dirty = false;
+        filter_members();
+    }
+}
+
+function update_members() {
+    var selected_page = 1;
+    var selected_page_index = $('member_pages').selectedIndex;
+    if ($('member_pages').options.length > 0) {
+        selected_page = $('member_pages').options[selected_page_index].value;
     }
     
     var params = 'id=' + user_id + '&order_by=' + order_by + ' ' + order;
     params = params + '&action=get_members';
-    params = params + '&page=' + $('member_pages').options[$('member_pages').selectedIndex].value;
+    params = params + '&page=' + selected_page;
     
     if (filter_only_non_attached) {
         params = params + '&non_attached=1';
@@ -228,15 +234,42 @@ function show_members() {
                 return false;
             }
             
+            $('member_pages').length = 0;
+            $('total_member_pages').set('html', '0');
+            
             if (txt == '0') {
+                set_status('');
                 $('div_members').set('html', '<div class="empty_results">No members at this moment.</div>');
             } else {
+                if ($('hide_show_lbl').get('html') == 'Hide Filter') {
+                    toggle_main_filter();
+                }
+                
+                var total_pages = xml.getElementsByTagName('total_pages');
+                
+                $('total_member_pages').set('html', total_pages[0].childNodes[0].nodeValue);
+                if (selected_page_index >= parseInt(total_pages[0].childNodes[0].nodeValue)) {
+                    selected_page_index = parseInt(total_pages[0].childNodes[0].nodeValue)-1;
+                }
+                
+                for (var i=0; i < parseInt(total_pages[0].childNodes[0].nodeValue); i++) {
+                    var an_option = '';
+                    if (i == selected_page_index) {
+                        an_option = new Option((i+1), (i+1), true, true);
+                    } else {
+                        an_option = new Option((i+1), (i+1));
+                    }
+                    $('member_pages').options[$('member_pages').length] = an_option;
+                }
+                
                 var emails = xml.getElementsByTagName('email_addr');
-                var members = xml.getElementsByTagName('member');
+                var members = xml.getElementsByTagName('member_name');
                 var phone_nums = xml.getElementsByTagName('phone_num');
-                var employees = xml.getElementsByTagName('employee');
+                var has_notes = xml.getElementsByTagName('has_notes');
+                var progress_notes = xml.getElementsByTagName('progress_notes');
                 var joined_ons = xml.getElementsByTagName('formatted_joined_on');
-                var last_logins = xml.getElementsByTagName('formatted_last_login');
+                var yel_resumes = xml.getElementsByTagName('num_yel_resumes');
+                var self_resumes = xml.getElementsByTagName('num_self_resumes');
                 var is_actives = xml.getElementsByTagName('active');
                 
                 var members_table = new FlexTable('members_table', 'members');
@@ -244,9 +277,11 @@ function show_members() {
                 var header = new Row('');
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.joined_on');\">Joined On</a>", '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.lastname');\">Member</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'employees.lastname');\">Added By</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'member_sessions.last_login');\">First Login</a>", '', 'header'));
-                header.set(4, new Cell('&nbsp;', '', 'header action'));
+                header.set(2, new Cell('Notes', '', 'header'));
+                header.set(3, new Cell('Resumes', '', 'header'));
+                header.set(4, new Cell('Jobs', '', 'header'));
+                header.set(5, new Cell('Progress', '', 'header'));
+                header.set(6, new Cell('Quick Actions', '', 'header action'));
                 members_table.set(0, header);
                 
                 for (var i=0; i < emails.length; i++) {
@@ -262,27 +297,39 @@ function show_members() {
                     }
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + phone_num + '</div>' + "\n";
                     
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
+                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a href="mailto:' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
+                    short_desc = short_desc + '<br/><a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=referrers">View Referrers</a>' + "\n";
                     row.set(1, new Cell(short_desc, '', 'cell'));
                     
-                    row.set(2, new Cell(employees[i].childNodes[0].nodeValue, '', 'cell'));
-                    
-                    var last_login = '';
-                    if (last_logins[i].childNodes.length > 0) {
-                        last_login = last_logins[i].childNodes[0].nodeValue;
+                    if (has_notes[i].childNodes[0].nodeValue == '1') {
+                        row.set(2, new Cell('<a class="no_link" onClick="show_notes_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Update</a>', '', 'cell'));
+                    } else {
+                        row.set(2, new Cell('<a class="no_link" onClick="show_notes_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Add</a>', '', 'cell'));
                     }
-                    row.set(3, new Cell(last_login, '', 'cell'));
+                    
+                    var resume_details = '<a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=resumes">View/Refer</a><br/><br/>';
+                    resume_details = resume_details + '<span style="color: #666666;">YEL: ' + yel_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
+                    resume_details = resume_details + '<span style="color: #666666;">Self: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
+                    row.set(3, new Cell(resume_details, '', 'cell'));
+                    
+                    row.set(4, new Cell('<a class="no_link" onClick="show_jobs_popup(false, \'' + emails[i].childNodes[0].nodeValue + '\', true);">View</a>', '', 'cell'));
+                    
+                    var progress = '<a class="no_link" onClick="show_progress_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Add</a>';
+                    if (progress_notes[i].length > 0) {
+                        progress = progress_notes[i].childNodes[0].nodeValue + '<br/><br/>';
+                        progress = progress + '<a class="no_link" onClick="show_progress_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Update</a>';
+                    }
+                    row.set(5, new Cell(progress, '', 'cell'));
                     
                     var actions = '';
                     if (is_actives[i].childNodes[0].nodeValue == 'Y') {
                         actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
                         actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
-                        actions = actions + '<input type="button" value="Pick a Resume to Refer" onClick="show_resumes_page(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
                     } else {
                         actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
                     }
                     
-                    row.set(4, new Cell(actions, '', 'cell action'));
+                    row.set(6, new Cell(actions, '', 'cell action'));
                     members_table.set((parseInt(i)+1), row);
                 }
                 
@@ -412,10 +459,10 @@ function show_non_attached() {
     members_filter = '';
     filter_only_non_attached = true;
     
-    if (current_page == 'applicants') {
-        show_applications();
+    if (current_section == 'applicants') {
+        update_applications();
     } else {
-        show_members();
+        update_members();
     }
 }
 
@@ -451,11 +498,12 @@ function filter_applications() {
     if (!isEmpty(candidates_filter)) {
         candidates_filter = candidates_filter.substr(0, candidates_filter.length-1);
     }
-    show_applications();
+    
+    update_applications();
 }
 
 function show_applications() {
-    current_section = 'members';
+    current_section = 'applicants';
     $('add_new_btn').setStyle('visibility', 'visible');
     
     $('applications').setStyle('display', 'block');
@@ -466,15 +514,23 @@ function show_applications() {
     $('item_members').setStyle('background-color', '');
     $('item_search').setStyle('background-color', '');
     
-    if (arguments.length > 0) {
-        // do not load from db unless is being sorted
-        return;
+    if (filter_is_dirty) {
+        filter_is_dirty = false;
+        filter_applications();
+    }
+}
+
+function update_applications() {
+    var selected_page = 1;
+    var selected_page_index = $('pages').selectedIndex;
+    if ($('pages').options.length > 0) {
+        selected_page = $('pages').options[selected_page_index].value;
     }
     
     var params = 'id=' + user_id + '&order_by=' + applications_order_by + ' ' + applications_order;
     params = params + '&action=get_applications';
     params = params + '&show_only=' + applications_filter;
-    params = params + '&page=' + $('pages').options[$('pages').selectedIndex].value;
+    params = params + '&page=' + selected_page;
     
     if (filter_only_non_attached) {
         params = params + '&non_attached=1';
@@ -500,6 +556,9 @@ function show_applications() {
                 return false;
             }
             
+            $('pages').length = 0;
+            $('total_pages').set('html', '0');
+            
             if (txt == '0') {
                 set_status('');
                 $('div_applications').set('html', '<div class="empty_results">No applications at this moment.</div>');
@@ -511,12 +570,10 @@ function show_applications() {
                 var total_pages = xml.getElementsByTagName('total_pages');
                 
                 $('total_pages').set('html', total_pages[0].childNodes[0].nodeValue);
-                var selected_page_index = $('pages').selectedIndex;
                 if (selected_page_index >= parseInt(total_pages[0].childNodes[0].nodeValue)) {
                     selected_page_index = parseInt(total_pages[0].childNodes[0].nodeValue)-1;
                 }
                 
-                $('pages').length = 0;
                 for (var i=0; i < parseInt(total_pages[0].childNodes[0].nodeValue); i++) {
                     var an_option = '';
                     if (i == selected_page_index) {
@@ -1215,10 +1272,10 @@ function onDomReady() {
     
     switch (current_page) {
        case 'members':
-           show_members(false);
+           show_members();
            break;
        default:
-           show_applications(false);
+           show_applications();
            break;
    }
    

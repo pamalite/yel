@@ -132,7 +132,7 @@ class EmployeeMembersPage extends Page {
         <!-- main filter -->
         <div class="main_filter_toggle">
             <a class="no_link" onClick="toggle_main_filter();">
-                <span id="hide_show_lbl">Hide Filter</span>
+                <span id="hide_show_lbl">Toggle Filter</span>
             </a>
         </div>
         <div id="div_main_filter" class="main_filter">
@@ -172,7 +172,7 @@ class EmployeeMembersPage extends Page {
                         </div>
                     </td>
                     <td class="filter_buttons">
-                        <input type="button" class="main_filter_button" value="Apply Filter" onClick="do_filter();" />
+                        <input type="button" class="main_filter_button" value="Refresh" onClick="do_filter();" />
                         <br/>
                         <input type="button" class="main_filter_button" value="Reset" onClick="show_all();" />
                         <input type="button" class="main_filter_button" value="Show Non-attached" onClick="show_non_attached();" />
@@ -182,7 +182,7 @@ class EmployeeMembersPage extends Page {
                 </tr>
                 <tr>
                     <td colspan="4" class="hide_show">
-                        <div class="main_filter_tip">Hold down the CTRL (Windows), or Command (Mac), key to select multiple items.</div>
+                        <div class="main_filter_tip">Hold down the CTRL (Windows), or Command (Mac), key to select/un-select multiple items.</div>
                     </td>
                 </tr>
             </table>
@@ -202,7 +202,7 @@ class EmployeeMembersPage extends Page {
             <div class="buttons_bar">
                 <div class="pagination">
                     Page
-                    <select id="pages" onChange="show_applications();">
+                    <select id="pages" onChange="update_applications();">
                         <option value="1" selected>1</option>
                     <?php
                         $total_pages = ceil($this->total_applications / $GLOBALS['default_results_per_page']);
@@ -340,7 +340,7 @@ class EmployeeMembersPage extends Page {
             <div class="buttons_bar">
                 <div class="pagination">
                     Page
-                    <select id="member_pages" onChange="show_members();">
+                    <select id="member_pages" onChange="update_members();">
                         <option value="1" selected>1</option>
                     <?php
                         $total_member_pages = ceil($this->total_members / $GLOBALS['default_results_per_page']);
@@ -376,13 +376,13 @@ class EmployeeMembersPage extends Page {
                     $member_short_details .= '<br/><a href="member.php?member_email_addr='. $member['email_addr']. '&page=referrers">View Referrers</a>'. "\n";
                     $members_table->set($i+1, 1, $member_short_details, '', 'cell');
                     
-                    if ($members['has_notes'] == '1') {
+                    if ($member['has_notes'] == '1') {
                         $members_table->set($i+1, 2, '<a class="no_link" onClick="show_notes_popup(\''. $member['email_addr']. '\');">Update</a>', '', 'cell');
                     } else {
                         $members_table->set($i+1, 2, '<a class="no_link" onClick="show_notes_popup(\''. $member['email_addr']. '\');">Add</a>', '', 'cell');
                     }
                     
-                    $resume_details = '<a href="member.php?member_email_addr='. $member['email_addr']. '&page=resumes">View</a><br/><br/>'. "\n";
+                    $resume_details = '<a href="member.php?member_email_addr='. $member['email_addr']. '&page=resumes">View/Refer</a><br/><br/>'. "\n";
                     $resume_details .= '<span style="color: #666666;">YEL: '. $member['num_yel_resumes']. "</span><br/>\n";
                     $resume_details .= '<span style="color: #666666;">Self: '. $member['num_self_resumes']. "</span><br/>\n";
                     $members_table->set($i+1, 3, $resume_details, '', 'cell');
@@ -400,7 +400,6 @@ class EmployeeMembersPage extends Page {
                     if ($member['active'] == 'Y') {
                         $actions = '<input type="button" id="activate_button_'. $i. '" value="De-activate" onClick="activate_member(\''. $member['email_addr']. '\', \''. $i. '\');" />';
                         $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" />';
-                        $actions .= '<input type="button" value="Pick a Resume to Refer" onClick="show_resumes_page(\''. $member['email_addr']. '\');" />';
                     } else {
                         $actions = '<input type="button" id="activate_button_'. $i. '" value="Activate" onClick="activate_member(\''. $member['email_addr']. '\', \''. $i. '\');" />';
                         // $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" disabled />';
