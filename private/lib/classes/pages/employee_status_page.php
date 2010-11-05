@@ -7,6 +7,7 @@ class EmployeeStatusPage extends Page {
     private $referrals = NULL;
     private $period = NULL;
     private $initial_total_pages = NULL;
+    private $found_employers = array();
     
     function __construct($_session, $_member_id = '') {
         $this->employee = new Employee($_session['id'], $_session['sid']);
@@ -58,6 +59,7 @@ class EmployeeStatusPage extends Page {
                           DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
                           DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
                           DATE_FORMAT(referrals.employer_removed_on, '%e %b, %Y') AS formatted_employer_removed_on, 
+                          DATE_FORMAT(referrals.referee_confirmed_hired_on, '%e %b, %Y') AS formatted_referee_confirmed_hired_on, 
                           IF(referrals.testimony IS NULL OR referrals.testimony = '', '0', '1') AS has_testimony, 
                           IF(referrals.employer_remarks IS NULL OR referrals.employer_remarks = '', '0', '1') AS has_employer_remarks", 
             'joins' => "members AS referrers ON referrers.email_addr = referrals.member, 
@@ -70,6 +72,14 @@ class EmployeeStatusPage extends Page {
         );
         
         $result = $this->referrals->find($criteria);
+        
+        $this->found_employers = array();
+        if (count($result) > 0 && !is_null($result)) {
+            foreach ($result as $app) {
+                $this->found_employers[$app['employer_id']] = $app['employer'];
+            }
+        }
+        
         $this->initial_total_pages = ceil(count($result) / 20);
         $criteria['limit'] = "0, 20";
         return $this->referrals->find($criteria);
@@ -82,6 +92,14 @@ class EmployeeStatusPage extends Page {
         
         $branch = $this->employee->getBranch();
         $applications = $this->get_applications();
+        
+        $employers_filter = '<select id="employers_filter" onChange="update_applications();">';
+        $employers_filter .= '<option value="" selected>All Employers</option>';
+        $employers_filter .= '<option value="" disabled>&nbsp;</option>';
+        foreach ($this->found_employers as $key=>$value) {
+            $employers_filter .= '<option value="'. $key. '">'. $value. '</option>';
+        }
+        $employers_filter .= '</select>';
         
         ?>
         <div id="div_status" class="status">
@@ -118,11 +136,12 @@ class EmployeeStatusPage extends Page {
             <select id="filter">
                 <option value="" selected>All</option>
                 <option value="" disabled>&nbsp;</option>
-                <option value="not_viewed">Not Viewed</option>
+                <option value="not_viewed">Not Viewed &amp; applied</option>
                 <option value="viewed">Viewed</option>
                 <option value="employed">Employed</option>
                 <option value="rejected">Rejected</option>
                 <option value="removed">Deleted</option>
+                <option value="confirmed">Confirmed &amp; applied</option>
             </select>
             between
             <input type="text" class="mini_field" id="from_year" maxlength="4" value="<?php echo $from_date[0]; ?>" />
@@ -142,22 +161,30 @@ class EmployeeStatusPage extends Page {
         <?php
             } else {
                 $applications_table = new HTMLTable('applications_table', 'applications');
-
-                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'employers.name');\">Employers</a>", '', 'header');
-                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header');
-                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrers.lastname');\">Referrer</a>", '', 'header');
-                $applications_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'candidates.lastname');\">Candidate</a>", '', 'header');
-                $applications_table->set(0, 4, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header');
-                $applications_table->set(0, 5, 'Status', '', 'header');
-                $applications_table->set(0, 6, "Testimony", '', 'header');
-                //$applications_table->set(0, 7, "Resume Submitted", '', 'header');
+                
+                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header');
+                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'candidates.lastname');\">Candidate</a>", '', 'header');
+                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a> from ". $employers_filter, '', 'header');
+                $applications_table->set(0, 3, 'Status', '', 'header');
 
                 foreach ($applications as $i=>$application) {
-                    $applications_table->set($i+1, 0, '<a href="employer.php?id='. $application['employer_id']. '">'. $application['employer']. '</a>', '', 'cell');
-                    $applications_table->set($i+1, 1, '<a class="no_link" onClick="show_job_desc('. $application['job_id']. ');">'. $application['job']. '</a>', '', 'cell');
-                    $applications_table->set($i+1, 2, '<a href="member.php?member_email_addr='. $application['referrer']. '">'. $application['referrer_name']. '</a>', '', 'cell');
-                    $applications_table->set($i+1, 3, '<a href="member.php?member_email_addr='. $application['candidate']. '">'. $application['candidate_name']. '</a><div class="resume"><span style="font-weight: bold;">Resume:</span> <a href="resume.php?id='. $application['resume_id']. '">'. $application['file_name']. '</a></div>', '', 'cell');
-                    $applications_table->set($i+1, 4, $application['formatted_referred_on'], '', 'cell');
+                    $applications_table->set($i+1, 0, $application['formatted_referred_on'], '', 'cell');
+                    
+                    $candidate_details = '<a href="member.php?member_email_addr='. $application['candidate']. '">'. $application['candidate_name']. '</a>';
+                    $candidate_details .= '<div class="resume"><span style="font-weight: bold;">Resume:</span> <a href="resume.php?id='. $application['resume_id']. '">'. $application['file_name']. '</a></div>';
+                    
+                    $ref_email = explode('@', $application['referrer']);
+                    $ref_email_front = explode('.', $ref_email[0]);
+                    if ($ref_email_front[0] == 'team' && $ref_email[1] == 'yellowelevator.com') {
+                        $candidate_details .= '<br/><div class="referrer">Self Applied</div>';
+                    } else {
+                        $candidate_details .= '<br/><div class="referrer"><a href="member.php?member_email_addr='. $application['referrer']. '">'. $application['referrer_name']. '</a></div>';
+                    }
+                    $applications_table->set($i+1, 1, $candidate_details, '', 'cell');
+                    
+                    $job_details = '<a class="no_link" onClick="show_job_desc('. $application['job_id']. ');">'. $application['job']. '</a>';
+                    $job_details .= '<br/><br/><div class="employer"><a href="employer.php?id='. $application['employer_id']. '">'. $application['employer']. '</a></div>';
+                    $applications_table->set($i+1, 2, $job_details, '', 'cell');
                     
                     $status = '<span class="not_viewed_yet">Not Viewed Yet</a>';
                     if (!is_null($application['formatted_employer_agreed_terms_on'])) {
@@ -173,19 +200,23 @@ class EmployeeStatusPage extends Page {
                     }
                     
                     if (!is_null($application['formatted_employer_removed_on'])) {
-                        $status = '<span class="removed">Deleted on:</span> '. $application['formatted_employer_deleted_on'];
+                        $status = '<span class="removed">Deleted on:</span> '. $application['formatted_employer_removed_on'];
                     }
                     
                     if ($application['has_employer_remarks'] == '1') {
                         $status .= '<br/><a class="no_link" onClick="show_employer_remarks('. $application['id']. ');">Employer Remarks</a>';
                     }
-                    $applications_table->set($i+1, 5, $status, '', 'cell testimony');
                     
-                    $testimony = 'None Provided';
-                    if ($application['has_testimony'] == '1') {
-                        $testimony = '<a class="no_link" onClick="show_testimony('. $application['id']. ');">Show</a>';
+                    if (!is_null($application['formatted_referee_confirmed_hired_on'])) {
+                        $status .= '<br/><span class="confirmed">Confirmed on: </span>'. $application['formatted_referee_confirmed_hired_on'];
                     }
-                    $applications_table->set($i+1, 6, $testimony, '', 'cell testimony');
+                    $applications_table->set($i+1, 3, $status, '', 'cell testimony');
+                    
+                    // $testimony = 'None Provided';
+                    // if ($application['has_testimony'] == '1') {
+                    //     $testimony = '<a class="no_link" onClick="show_testimony('. $application['id']. ');">Show</a>';
+                    // }
+                    // $applications_table->set($i+1, 6, $testimony, '', 'cell testimony');
                 }
 
                 echo $applications_table->get_html();

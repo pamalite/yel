@@ -45,14 +45,12 @@ if ($_POST['action'] == 'get_applications') {
                            (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00') AND 
                            (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 
                            (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00')";
+           case 'confirmed':
+               $match .= "AND (referrals.referee_confirmed_hired_on IS NOT NULL AND referrals.referee_confirmed_hired_on <> '0000-00-00') AND 
+                          (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 
+                          (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00')";
                 break;
         }
-    }
-    
-    $limit = "0, 20";
-    if (!empty($_POST['page']) || $_POST['page'] > 0) {
-        $offset = ($_POST['page'] + 20) - 1;
-        $limit = $offset. ", 20";
     }
     
     $criteria = array(
@@ -67,6 +65,7 @@ if ($_POST['action'] == 'get_applications') {
                       DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
                       DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
                       DATE_FORMAT(referrals.employer_removed_on, '%e %b, %Y') AS formatted_employer_removed_on, 
+                      DATE_FORMAT(referrals.referee_confirmed_hired_on, '%e %b, %Y') AS formatted_referee_confirmed_hired_on, 
                       IF(referrals.testimony IS NULL OR referrals.testimony = '', '0', '1') AS has_testimony, 
                       IF(referrals.employer_remarks IS NULL OR referrals.employer_remarks = '', '0', '1') AS has_employer_remarks", 
         'joins' => "members AS referrers ON referrers.email_addr = referrals.member, 
@@ -74,8 +73,7 @@ if ($_POST['action'] == 'get_applications') {
                     jobs ON jobs.id = referrals.job, 
                     employers ON employers.id = jobs.employer, 
                     resumes ON resumes.id = referrals.resume",
-        'match' => $match,
-        'order' => $_POST['order_by']
+        'match' => $match
     );
     
     $referral = new Referral();
@@ -84,6 +82,30 @@ if ($_POST['action'] == 'get_applications') {
     if (empty($result) || count($result) <= 0) {
         echo '0';
         exit();
+    }
+    
+    $found_employers = array();
+    if (count($result) > 0 && !is_null($result)) {
+        foreach ($result as $app) {
+            $found_employer['emp_id'] = $app['employer_id'];
+            $found_employer['emp_name'] = htmlspecialchars_decode(stripslashes($app['employer']));
+            $found_employer['emp_selected'] = ($app['employer_id'] == $_POST['employer']) ? '1' : '0';
+            if (!in_array($found_employer, $found_employers)) {
+                $found_employers[] = $found_employer;
+            }
+        }
+    }
+    
+    $criteria['order'] = $_POST['order_by'];
+    
+    if (!empty($_POST['employer'])) {
+        $criteria['match'] .= " AND employers.id = '". $_POST['employer']. "'";
+    }
+    
+    $limit = "0, 20";
+    if (!empty($_POST['page']) || $_POST['page'] > 0) {
+        $offset = ($_POST['page'] + 20) - 1;
+        $limit = $offset. ", 20";
     }
     
     $total_pages = ceil(count($result) / 20);
@@ -97,6 +119,9 @@ if ($_POST['action'] == 'get_applications') {
     
     header('Content-type: text/xml');
     $response = array(
+        'found_employers' => array(
+            'found_employer' => $found_employers
+        ),
         'pagination' => array(
             'total_pages' => $total_pages,
             'current_page' => $_POST['page']

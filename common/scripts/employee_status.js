@@ -54,10 +54,16 @@ function goto_page() {
 }
 
 function update_applications() {
+    var employer_filter = '';
+    if ($('employers_filter') != null) {
+        employer_filter = $('employers_filter').options[$('employers_filter').selectedIndex].value;
+    }
+    
     var params = 'id=' + id;
     params = params + '&action=get_applications';
     params = params + '&order_by=' + order_by + ' ' + order;
     params = params + '&filter=' + filter;
+    params = params + '&employer=' + employer_filter;
     params = params + '&page=' + current_page;
     params = params + '&period=' + period;
     
@@ -66,8 +72,8 @@ function update_applications() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            //set_status('<pre>' + txt + '</pre>');
-            //return;
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
             set_status('');
             if (txt == 'ko') {
                 alert('An error occured while getting applications.');
@@ -106,6 +112,22 @@ function update_applications() {
                     $('current_page_bottom').add(page);
                 }
                 
+                var emp_ids = xml.getElementsByTagName('emp_id');
+                var emp_names = xml.getElementsByTagName('emp_name');
+                var emp_selected = xml.getElementsByTagName('emp_selected');
+                
+                var employers_filter = '<select id="employers_filter" onChange="update_applications();">';
+                employers_filter = employers_filter + '<option value="">All Employers</option>';
+                employers_filter = employers_filter + '<option value="" disabled>&nbsp;</option>';
+                for (var i=0; i < emp_ids.length; i++) {
+                    var selected = '';
+                    if (emp_selected[i].childNodes[0].nodeValue == '1') {
+                        selected = 'selected';
+                    }
+                    employers_filter = employers_filter + '<option value="' + emp_ids[i].childNodes[0].nodeValue + '" ' + selected + '>' + emp_names[i].childNodes[0].nodeValue + '</option>';
+                }
+                employers_filter = employers_filter + '</select>';
+                
                 var ids = xml.getElementsByTagName('id');
                 var jobs = xml.getElementsByTagName('job');
                 var job_ids = xml.getElementsByTagName('job_id');
@@ -120,6 +142,7 @@ function update_applications() {
                 var employed_ons = xml.getElementsByTagName('formatted_employed_on');
                 var rejected_ons = xml.getElementsByTagName('formatted_employer_rejected_on');
                 var deleted_ons = xml.getElementsByTagName('formatted_employer_removed_on');
+                var confirmed_ons = xml.getElementsByTagName('formatted_referee_confirmed_hired_on');
                 var has_testimonies = xml.getElementsByTagName('has_testimony');
                 var has_remarks = xml.getElementsByTagName('has_employer_remarks');
                 var resume_ids = xml.getElementsByTagName('resume_id');
@@ -127,22 +150,31 @@ function update_applications() {
                 
                 var applications_table = new FlexTable('applications_table', 'applications');
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'employers.name');\">Employers</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrers.lastname');\">Referrer</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'candidates.lastname');\">Candidate</a>", '', 'header'));
-                header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
-                header.set(5, new Cell("Status", '', 'header'));
-                header.set(6, new Cell("Testimony", '', 'header'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'candidates.lastname');\">Candidate</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a> from " + employers_filter, '', 'header'));
+                header.set(3, new Cell("Status", '', 'header'));
                 applications_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
                     var row = new Row('');
-                    row.set(0, new Cell('<a href="employer.php?id=' + employer_ids[i].childNodes[0].nodeValue + '">' + employers[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
-                    row.set(1, new Cell('<a class="no_link" onClick="show_job_desc(' + job_ids[i].childNodes[0].nodeValue + ');">' + jobs[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
-                    row.set(2, new Cell('<a href="member.php?member_email_addr=' + add_slashes(referrers[i].childNodes[0].nodeValue) + '">' + referrer_names[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
-                    row.set(3, new Cell('<a href="member.php?member_email_addr=' + add_slashes(candidates[i].childNodes[0].nodeValue) + '">' + candidate_names[i].childNodes[0].nodeValue + '</a><div class="resume"><span style="font-weight: bold;">Resume:</span> <a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">' + resume_files[i].childNodes[0].nodeValue + '</a></div>', '', 'cell'));
-                    row.set(4, new Cell(referred_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(0, new Cell(referred_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    
+                    var candidate_details = '<a href="member.php?member_email_addr=' + add_slashes(candidates[i].childNodes[0].nodeValue) + '">' + candidate_names[i].childNodes[0].nodeValue + '</a>';
+                    candidate_details = candidate_details + '<div class="resume"><span style="font-weight: bold;">Resume:</span> <a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">' + resume_files[i].childNodes[0].nodeValue + '</a></div>';
+                    
+                    var ref_email = referrers[i].childNodes[0].nodeValue.split('@');
+                    var ref_email_front = ref_email[0].split('.');
+                    if (ref_email_front[0] == 'team' && ref_email[1] == 'yellowelevator.com') {
+                        candidate_details = candidate_details + '<br/><div class="referrer">Self Applied</div>';
+                    } else {
+                        candidate_details = candidate_details + '<br/><div class="referrer"><a href="member.php?member_email_addr=' + referrers[i].childNodes[0].nodeValue + '">' + referrer_names[i].childNodes[0].nodeValue + '</a></div>';
+                    }
+                    row.set(1, new Cell(candidate_details, '', 'cell'));
+                    
+                    var job_details = '<a class="no_link" onClick="show_job_desc(' + job_ids[i].childNodes[0].nodeValue + ');">' + jobs[i].childNodes[0].nodeValue + '</a>';
+                    job_details = job_details + '<br/><br/><div class="employer"><a href="employer.php?id=' + employer_ids[i].childNodes[0].nodeValu + '">' + employers[i].childNodes[0].nodeValue + '</a></div>';
+                    row.set(2, new Cell(job_details, '', 'cell'));
                     
                     var status = '<span class="not_viewed_yet">Not Viewed Yet</span>';
                     if (viewed_ons[i].childNodes.length > 0) {
@@ -164,13 +196,11 @@ function update_applications() {
                     if (has_remarks[i].childNodes[0].nodeValue == '1') {
                         status = status + '<br/><a class="no_link" onClick="show_employer_remarks(' + ids[i].childNodes[0].nodeValue + ');">Employer Remarks</a>';
                     }
-                    row.set(5, new Cell(status, '', 'cell testimony'));
                     
-                    var testimony = 'None Provided';
-                    if (has_testimonies[i].childNodes[0].nodeValue == '1') {
-                        testimony = '<a class="no_link" onClick="show_testimony(' + ids[i].childNodes[0].nodeValue + ');">Show</a>';
+                    if (confirmed_ons[i].childNodes.length > 0) {
+                        status = status + '<br/><span class="confirmed">Confirmed On:</span> ' + confirmed_ons[i].childNodes[0].nodeValue;
                     }
-                    row.set(6, new Cell(testimony, '', 'cell testimony'));
+                    row.set(3, new Cell(status, '', 'cell testimony'));
                     
                     applications_table.set((parseInt(i)+1), row);
                 }

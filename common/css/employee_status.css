@@ -89,6 +89,10 @@ div.resume {
     font-size: 9pt;
 }
 
+div.employer, div.referrer {
+    font-style: italic;
+}
+
 #testimony_window,
 #job_desc_window, 
 #employer_remarks_window {
@@ -127,4 +131,9 @@ span.rejected {
 
 span.removed {
     font-weight: bold;
+}
+
+span.confirmed {
+    font-weight: bold;
+    color: #0F07FF;
 }
