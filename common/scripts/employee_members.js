@@ -308,7 +308,7 @@ function update_members() {
                         row.set(2, new Cell('<a class="no_link" onClick="show_notes_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Add</a>', '', 'cell'));
                     }
                     
-                    var resume_details = '<a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=resumes">View/Refer</a><br/><br/>';
+                    var resume_details = '<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">View/Refer</a><br/><br/>';
                     resume_details = resume_details + '<span style="color: #666666;">YEL: ' + yel_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
                     resume_details = resume_details + '<span style="color: #666666;">Self: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
                     row.set(3, new Cell(resume_details, '', 'cell'));
