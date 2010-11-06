@@ -1044,6 +1044,13 @@ function get_job_description() {
     request.send(params);
 }
 
+function clear_pre_selected_jobs() {
+    if (confirm('Are you sure to clear all pre-selected jobs?')) {
+        $('pre_selected_jobs_list').set('html', '(None Selected)');
+        $('selected_jobs').value = '';
+    }
+}
+
 function onDomReady() {
     initialize_page();
     

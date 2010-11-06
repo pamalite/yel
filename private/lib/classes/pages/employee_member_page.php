@@ -854,7 +854,14 @@ class EmployeeMemberPage extends Page {
                 <span id="resume_file_name"></span><br/>
                 <table class="pre_selected_jobs_table">
                     <tr>
-                        <td class="label"><span style="font-weight: bold;">Pre-selected Jobs:</span></td>
+                        <td class="label">
+                            <span style="font-weight: bold;">Pre-selected Jobs:</span><br/>
+                            <span style="font-size: 9pt;">
+                                <a class="no_link" onClick="clear_pre_selected_jobs();">
+                                    (clear)
+                                </a>
+                            </span>
+                        </td>
                         <td>
                             <div id="pre_selected_jobs_list">
                                 <?php echo $this->get_pre_selected_jobs(); ?>
