@@ -60,12 +60,14 @@ class EmployeeMembersPage extends Page {
                           CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
                           DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
                           COUNT(DISTINCT resumes.id) AS num_yel_resumes, 
-                          COUNT(DISTINCT resumes_1.id) AS num_self_resumes",
+                          COUNT(DISTINCT resumes_1.id) AS num_self_resumes,
+                          COUNT(DISTINCT member_jobs.id) AS num_attached_jobs",
             'joins' => "resumes AS resumes ON resumes.member = members.email_addr AND 
                             resumes.is_yel_uploaded = TRUE,
                         resumes AS resumes_1 ON resumes_1.member = members.email_addr AND
                             resumes_1.is_yel_uploaded = FALSE, 
-                        member_index ON member_index.member = members.email_addr",
+                        member_index ON member_index.member = members.email_addr, 
+                        member_jobs ON member_jobs.member = members.email_addr",
             'match' => "members.email_addr <> 'initial@yellowelevator.com' AND 
                         members.email_addr NOT LIKE 'team%@yellowelevator.com'",
             'group' => "members.email_addr", 
@@ -382,19 +384,23 @@ class EmployeeMembersPage extends Page {
                         $members_table->set($i+1, 2, '<a class="no_link" onClick="show_notes_popup(\''. $member['email_addr']. '\');">Add</a>', '', 'cell');
                     }
                     
-                    $resume_details = '<a href="member.php?member_email_addr='. $member['email_addr']. '&page=resumes">View/Refer</a><br/><br/>'. "\n";
+                    $resume_details = '<a class="no_link" onClick="show_resumes_page(\''. addslashes($member['email_addr']). '\');">View/Refer</a><br/><br/>'. "\n";
                     $resume_details .= '<span style="color: #666666;">YEL: '. $member['num_yel_resumes']. "</span><br/>\n";
                     $resume_details .= '<span style="color: #666666;">Self: '. $member['num_self_resumes']. "</span><br/>\n";
                     $members_table->set($i+1, 3, $resume_details, '', 'cell');
                     
-                    $members_table->set($i+1, 4, '<a class="no_link" onClick="show_jobs_popup(false, \''. $member['email_addr']. '\', true);">View</a>', '', 'cell');
+                    $jobs_attached = '<span style="font-style: italic; color: #666666;">No jobs attached.</span>';
+                    if ($member['num_attached_jobs'] > 0) {
+                        $jobs_attached = '<a class="no_link" onClick="show_jobs_popup(false, \''. $member['email_addr']. '\', true);">'. $member['num_attached_jobs']. '</a>';
+                    }
+                    $members_table->set($i+1, 4, $jobs_attached, '', 'cell');
                     
                     $progress_note = '<a class="no_link" onClick="show_progress_popup(\''. $member['email_addr']. '\');">Add</a>';
-                    if (!is_null($member['progress_notes'])) {
-                        $progress_note = $member['progress_notes']. '<br/><br/>';
-                        $progress_note .= '<a class="no_link" onClick="show_progress_popup(\''. $member['email_addr']. '\');">Update</a>';
+                    if (!is_null($member['progress_notes']) && !empty($member['progress_notes'])) {
+                        $progress_note = '<div class="progress_cell">'. str_replace("\n", '<br/>', $member['progress_notes']). '</div>';
+                        $progress_note .= '<br/><a class="no_link" onClick="show_progress_popup(\''. $member['email_addr']. '\');">Update</a>';
                     }
-                    $members_table->set($i+1, 5, $progress_note, '', 'cell');
+                    $members_table->set($i+1, 5, $progress_note, '', 'cell progress_cell');
                     
                     $actions = '';
                     if ($member['active'] == 'Y') {
@@ -432,6 +438,7 @@ class EmployeeMembersPage extends Page {
             <div class="popup_window_title">Notes</div>
             <form onSubmit="return false;">
                 <input type="hidden" id="app_id" value="" />
+                <input type="hidden" id="notes_email" value="" />
                 <div class="notes_form">
                     <textarea id="notes" class="notes"></textarea>
                 </div>
@@ -533,6 +540,19 @@ class EmployeeMembersPage extends Page {
             </div>
         </div>
         
+        <div id="progress_notes_window" class="popup_window">
+            <div class="popup_window_title">Progress Notes</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="progress_email" value="" />
+                <div class="notes_form">
+                    <textarea id="progress_notes" class="notes"></textarea>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_progress_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_progress_popup(false);" />
+            </div>
+        </div>
         <?php
     }
 }

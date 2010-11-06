@@ -83,6 +83,13 @@ a.menu {
     font-weight: bold;
 }
 
+.progress_cell {
+    font-size: 9pt;
+    width: 275px;
+    height: 75px;
+    overflow: auto;
+}
+
 td.vtop {
     vertical-align: top;
 }
@@ -102,7 +109,7 @@ td.vtop {
     display: none;
 }
 
-#notes_window {
+#notes_window, #progress_notes_window {
     width: 650px;
     display: none;
 }
@@ -114,7 +121,7 @@ div.notes_form {
     text-align: center;
 }
 
-textarea.notes {
+textarea.notes, textarea.progress_notes {
     width: 98%;
     height: 550px;
     font-size: 12pt;

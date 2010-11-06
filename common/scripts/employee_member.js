@@ -889,7 +889,7 @@ function close_apply_job_popup(_is_apply_job) {
     if (_is_apply_job) {
         var selected_jobs = jobs_list.get_selected_values();
         
-        if (selected_jobs.length <= 0) {
+        if (selected_jobs.length <= 0 && isEmpty($('selected_jobs').value)) {
             alert('Please select at least one job.');
             return;
         }
@@ -903,13 +903,16 @@ function close_apply_job_popup(_is_apply_job) {
         params = params + '&employee=' + user_id;
         params = params + '&resume=' + $('resume_id').value;
         
-        var selected_job_str = '';
-        for (var i=0; i < selected_jobs.length; i++) {
-            var item_value = selected_jobs[i].split('|');
-            selected_job_str = selected_job_str + item_value[item_value.length-1];
-            
-            if (i < selected_jobs.length-1) {
-                selected_job_str = selected_job_str + ',';
+        var selected_job_str = $('selected_jobs').value;
+        if (selected_jobs.length > 0) {
+            selected_job_str = selected_job_str + ',';
+            for (var i=0; i < selected_jobs.length; i++) {
+                var item_value = selected_jobs[i].split('|');
+                selected_job_str = selected_job_str + item_value[item_value.length-1];
+
+                if (i < selected_jobs.length-1) {
+                    selected_job_str = selected_job_str + ',';
+                }
             }
         }
         params = params + '&jobs=' + selected_job_str;

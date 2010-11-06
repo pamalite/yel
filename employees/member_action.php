@@ -463,6 +463,7 @@ if ($_POST['action'] == 'apply_job') {
     $referee = $_POST['id'];
     $resume = $_POST['resume'];
     $job_ids = explode(',', $_POST['jobs']);
+    $job_ids = array_unique($job_ids);
     
     $referral = new Referral();
     $timestamp = date('Y-m-d h:i:s');

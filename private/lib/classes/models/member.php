@@ -779,5 +779,33 @@ class Member implements Model {
         
         return false;
     }
+    
+    public function getJobsApplied() {
+        $query = "SELECT member_jobs.id, jobs.title AS job, employers.name AS employer, 
+                  DATE_FORMAT(member_jobs.applied_on, '%e %b, %Y')  AS formatted_requested_on
+                  FROM member_jobs 
+                  LEFT JOIN jobs ON jobs.id = member_jobs.job
+                  LEFT JOIN employers ON employers.id = jobs.employer
+                  WHERE member_jobs.member = '". $this->id. "' 
+                  ORDER BY member_jobs.applied_on DESC, jobs.title";
+        return $this->mysqli->query($query);
+    }
+    
+    public function getProgressNotes() {
+        $query = "SELECT progress_notes FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
+        $result = $this->mysqli->query($query);
+        return $result[0]['progress_notes'];
+    }
+    
+    public function saveProgressNotes($_notes) {
+        $simplified_notes = '';
+        $simplified_notes = htmlspecialchars_decode($_notes);
+        $simplified_notes = str_replace('<br/>', "\n", $simplified_notes);
+        $simplified_notes = addslashes($simplified_notes);
+        
+        $query = "UPDATE members SET progress_notes = '". $simplified_notes. "' 
+                  WHERE email_addr = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
 }
 ?>

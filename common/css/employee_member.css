@@ -357,7 +357,7 @@ span.removed {
 div.apply_job_form, 
 div.apply_job_testimony_form {
     width: 99%;
-    height: 500px;
+    height: 400px;
     margin: auto;
     overflow: auto;
     padding-bottom: 3px;
@@ -371,6 +371,26 @@ textarea.apply_job_testimony {
 
 div.resume_info {
     padding: 5px 5px 5px 5px;
+}
+
+table.pre_selected_jobs_table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table.pre_selected_jobs_table td {
+    border-spacing: 0px;
+    vertical-align: top;
+}
+
+table.pre_selected_jobs_table td.label {
+    width: 150px;
+}
+
+#pre_selected_jobs_list {
+    height: 75px;
+    width: 100%;
+    overflow: auto;
 }
 
 #employers {

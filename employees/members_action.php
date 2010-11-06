@@ -399,17 +399,46 @@ if ($_POST['action'] == 'reset_password') {
 }
 
 if ($_POST['action'] == 'get_notes') {
-    $referral_buffer = new ReferralBuffer($_POST['id']);
-    $record = $referral_buffer->get();
-    echo htmlspecialchars_decode(stripslashes($record[0]['notes']));
+    if ($_POST['is_app'] == '1') {
+        $referral_buffer = new ReferralBuffer($_POST['id']);
+        $record = $referral_buffer->get();
+        echo htmlspecialchars_decode(stripslashes($record[0]['notes']));
+    } else {
+        $member = new Member($_POST['id']);
+        echo htmlspecialchars_decode(stripslashes($member->getNotes()));
+    }
     exit();
 }
 
 if ($_POST['action'] == 'update_notes') {
-    $data['notes'] = sanitize(stripslashes($_POST['notes']));
+    if ($_POST['is_app'] == '1') {
+        $data['notes'] = sanitize(stripslashes($_POST['notes']));
+        $referral_buffer = new ReferralBuffer($_POST['id']);
+        if ($referral_buffer->update($data) === false) {
+            echo 'ko';
+            exit();
+        }
+    } else {
+        $member = new Member($_POST['id']);
+        if ($member->saveNotes($_POST['notes']) === false) {
+            echo 'ko';
+            exit();
+        }
+    }
+    
+    echo 'ok';
+    exit();
+}
 
-    $referral_buffer = new ReferralBuffer($_POST['id']);
-    if ($referral_buffer->update($data) === false) {
+if ($_POST['action'] == 'get_progress_notes') {
+    $member = new Member($_POST['id']);
+    echo htmlspecialchars_decode(stripslashes($member->getProgressNotes()));
+    exit();
+}
+
+if ($_POST['action'] == 'update_progress_notes') {
+    $member = new Member($_POST['id']);
+    if ($member->saveProgressNotes($_POST['notes']) === false) {
         echo 'ko';
         exit();
     }
@@ -695,24 +724,30 @@ if ($_POST['action'] == 'save_referrer') {
 }
 
 if ($_POST['action'] == 'get_other_jobs') {
-    $match = "referral_buffers.job IS NOT NULL";
-    if (isset($_POST['candidate_email'])) {
-        $match .= " AND referral_buffers.candidate_email = '". $_POST['candidate_email']. "'";
-    } else if (isset($_POST['candidate_name'])) {
-        $match .= " AND referral_buffers.candidate_name LIKE '". $_POST['candidate_name']. "'";
+    $result = array();
+    if ($_POST['is_app'] == '1') {
+        $match = "referral_buffers.job IS NOT NULL";
+        if (isset($_POST['candidate_email'])) {
+            $match .= " AND referral_buffers.candidate_email = '". $_POST['candidate_email']. "'";
+        } else if (isset($_POST['candidate_name'])) {
+            $match .= " AND referral_buffers.candidate_name LIKE '". $_POST['candidate_name']. "'";
+        }
+
+        $criteria = array(
+            'columns' => "jobs.title AS job, employers.name AS employer,
+                          DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on", 
+            'joins' => "jobs ON jobs.id = referral_buffers.job, 
+                        employers ON employers.id = jobs.employer", 
+            'match' => $match, 
+            'order' => "referral_buffers.requested_on DESC, jobs.title"
+        );
+
+        $referral_buffer = new ReferralBuffer();
+        $result = $referral_buffer->find($criteria);
+    } else {
+        $member = new Member($_POST['email_addr']);
+        $result = $member->getJobsApplied();
     }
-    
-    $criteria = array(
-        'columns' => "jobs.title AS job, employers.name AS employer,
-                      DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on", 
-        'joins' => "jobs ON jobs.id = referral_buffers.job, 
-                    employers ON employers.id = jobs.employer", 
-        'match' => $match, 
-        'order' => "referral_buffers.requested_on DESC, jobs.title"
-    );
-    
-    $referral_buffer = new ReferralBuffer();
-    $result = $referral_buffer->find($criteria);
     
     if ($result === false || is_null($result)  || empty($result)) {
         echo 'ko';

@@ -66,6 +66,10 @@ if (isset($_GET['error'])) {
     $page->set_error($_GET['error']);
 }
 
+if (isset($_GET['selected_jobs'])) {
+    $page->set_selected_jobs($_GET['selected_jobs']);
+}
+
 $page->new_member($is_new);
 $page->set_page($section);
 $page->header(array('root_dir' => '../', 

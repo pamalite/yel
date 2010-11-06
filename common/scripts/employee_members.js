@@ -270,6 +270,7 @@ function update_members() {
                 var joined_ons = xml.getElementsByTagName('formatted_joined_on');
                 var yel_resumes = xml.getElementsByTagName('num_yel_resumes');
                 var self_resumes = xml.getElementsByTagName('num_self_resumes');
+                var applied_jobs = xml.getElementsByTagName('num_attached_jobs');
                 var is_actives = xml.getElementsByTagName('active');
                 
                 var members_table = new FlexTable('members_table', 'members');
@@ -312,14 +313,23 @@ function update_members() {
                     resume_details = resume_details + '<span style="color: #666666;">Self: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
                     row.set(3, new Cell(resume_details, '', 'cell'));
                     
-                    row.set(4, new Cell('<a class="no_link" onClick="show_jobs_popup(false, \'' + emails[i].childNodes[0].nodeValue + '\', true);">View</a>', '', 'cell'));
+                    if (parseInt(applied_jobs[i].childNodes[0].nodeValue) > 0) {
+                        row.set(4, new Cell('<a class="no_link" onClick="show_jobs_popup(false, \'' + emails[i].childNodes[0].nodeValue + '\', true);">' + applied_jobs[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
+                    } else {
+                        row.set(4, new Cell('<span style="font-style: italic; color: #666666;">No jobs attached.</span>', '', 'cell'));
+                    }
                     
                     var progress = '<a class="no_link" onClick="show_progress_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Add</a>';
-                    if (progress_notes[i].length > 0) {
-                        progress = progress_notes[i].childNodes[0].nodeValue + '<br/><br/>';
-                        progress = progress + '<a class="no_link" onClick="show_progress_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Update</a>';
+                    if (progress_notes[i].childNodes.length > 0) {
+                        var lines = progress_notes[i].childNodes[0].nodeValue.split("\n");
+                        var notes_str = '';
+                        for (var l=0; l < lines.length; l++) {
+                            notes_str = notes_str + lines[l] + '<br/>';
+                        }
+                        progress = '<div class="progress_cell">' + notes_str  + '</div>';
+                        progress = progress + '<br/><a class="no_link" onClick="show_progress_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Update</a>';
                     }
-                    row.set(5, new Cell(progress, '', 'cell'));
+                    row.set(5, new Cell(progress, '', 'cell progress_cell'));
                     
                     var actions = '';
                     if (is_actives[i].childNodes[0].nodeValue == 'Y') {
@@ -733,7 +743,19 @@ function show_search_members() {
 }
 
 function show_resumes_page(_member_id) {
-    location.replace('member.php?member_email_addr=' + _member_id + '&page=resumes');
+    var selected_jobs = '';
+    if ($('jobs') != null) {
+        for (var i=0; i < $('jobs').options.length; i++) {
+            if ($('jobs').options[i].selected) {
+                if (isEmpty(selected_jobs)) {
+                    selected_jobs = $('jobs').options[i].value;
+                } else {
+                    selected_jobs = selected_jobs + ',' + $('jobs').options[i].value;
+                }
+            }
+        }
+    }
+    location.replace('member.php?member_email_addr=' + _member_id + '&page=resumes&selected_jobs=' + selected_jobs);
 }
 
 function delete_application(_app_id) {
@@ -754,7 +776,7 @@ function delete_application(_app_id) {
             }
             
             set_status('');
-            show_applications();
+            update_applications();
         },
         onRequest: function(instance) {
             set_status('Deleting application...');
@@ -849,10 +871,18 @@ function transfer_to_member(_app_id) {
 }
 
 function show_notes_popup(_app_id) {
-    $('app_id').value = _app_id;
-    
     var params = 'id=' + _app_id;
     params = params + '&action=get_notes';
+    
+    if (isEmail(_app_id)) {
+        $('app_id').value = '';
+        $('notes_email').value = _app_id;
+        params = params + '&is_app=0';
+    } else {
+        $('app_id').value = _app_id;
+        $('notes_email').value = '';
+        params = params + '&is_app=1';
+    }
     
     var uri = root + "/employees/members_action.php";
     var request = new Request({
@@ -877,7 +907,14 @@ function show_notes_popup(_app_id) {
 
 function close_notes_popup(_is_save) {
     if (_is_save) {
-        var params = 'id=' + $('app_id').value;
+        var params = '';
+        if (isEmpty($('app_id').value)) {
+            params = 'id=' + $('notes_email').value;
+            params = params + '&is_app=0';
+        } else {
+            params = 'id=' + $('app_id').value;
+            params = params + '&is_app=1';
+        }
         params = params + '&action=update_notes';
         
         var notes = $('notes').value.replace("\n", '<br/>');
@@ -890,7 +927,12 @@ function close_notes_popup(_is_save) {
             onSuccess: function(txt, xml) {
                 close_window('notes_window');
                 set_status('');
-                show_applications();
+                
+                if (isEmpty($('app_id').value)) {
+                    update_members();
+                } else {
+                    update_applications();
+                }
             },
             onRequest: function(instance) {
                 set_status('Saving notes...');
@@ -920,7 +962,7 @@ function edit_candidate_phone(_id) {
                     return;
                 }
                 
-                show_applications();
+                update_applications();
             },
             onRequest: function(instance) {
                 set_status('Saving phone number...');
@@ -948,7 +990,7 @@ function edit_candidate_email(_id) {
                     return;
                 }
                 
-                show_applications();
+                update_applications();
             },
             onRequest: function(instance) {
                 set_status('Saving email address...');
@@ -976,7 +1018,7 @@ function edit_referrer_phone(_id) {
                     return;
                 }
                 
-                show_applications();
+                update_applications();
             },
             onRequest: function(instance) {
                 set_status('Saving phone number...');
@@ -1004,7 +1046,7 @@ function edit_referrer_email(_id) {
                     return;
                 }
                 
-                show_applications();
+                update_applications();
             },
             onRequest: function(instance) {
                 set_status('Saving email address...');
@@ -1117,7 +1159,7 @@ function close_new_application_popup(_is_save) {
                     return;
                 }
                 
-                show_applications();
+                update_applications();
             },
             onRequest: function(instance) {
                 set_status('Saving new application...');
@@ -1201,7 +1243,7 @@ function close_referrer_popup(_is_save) {
                 }
                 
                 close_window('referrer_window');
-                show_applications();
+                update_applications();
             }
         });
 
@@ -1213,10 +1255,16 @@ function close_referrer_popup(_is_save) {
 
 function show_jobs_popup(_use_email, _match) {
     var params = 'id=0&action=get_other_jobs';
-    if (_use_email) {
-        params = params + '&candidate_email=' + _match;
+    if (arguments.length < 3) {
+        if (_use_email) {
+            params = params + '&candidate_email=' + _match;
+        } else {
+            params = params + '&candidate_name=' + _match;
+        }
+        params = params + '&is_app=1';
     } else {
-        params = params + '&candidate_name=' + _match;
+        params = params + '&email_addr=' + _match;
+        params = params + '&is_app=0';
     }
     
     var uri = root + "/employees/members_action.php";
@@ -1266,6 +1314,63 @@ function show_jobs_popup(_use_email, _match) {
 function close_jobs_popup() {
     close_window('other_jobs_window');
 }
+
+function show_progress_popup(_id) {
+    $('progress_email').value = _id;
+    
+    var params = 'id=' + _id;
+    params = params + '&action=get_progress_notes';
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            txt = txt.replace('&lt;br/&gt;' , '<br/>');
+            txt = txt.replace(/<br\/>/g, "\n");
+            $('progress_notes').value = txt;
+            set_status('');
+            show_window('progress_notes_window');
+            window.scrollTo(0, 0);
+            $('notes').focus();
+        },
+        onRequest: function(instance) {
+            set_status('Loading progress notes...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_progress_popup(_is_save) {
+    if (_is_save) {
+        params = 'id=' + $('progress_email').value;
+        params = params + '&action=update_progress_notes';
+        
+        var notes = $('progress_notes').value.replace("\n", '<br/>');
+        params = params + '&notes=' + notes;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                close_window('progress_notes_window');
+                set_status('');
+                
+                update_members();
+            },
+            onRequest: function(instance) {
+                set_status('Saving progress notes...');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('progress_notes_window');
+    }
+}
+
 
 function onDomReady() {
     initialize_page();

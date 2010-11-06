@@ -8,6 +8,7 @@ class EmployeeMemberPage extends Page {
     private $is_new = false;
     private $current_page = 'profile';
     private $error_message = '';
+    private $selected_jobs = array();
     
     function __construct($_session, $_member_id = '') {
         $this->employee = new Employee($_session['id'], $_session['sid']);
@@ -16,6 +17,10 @@ class EmployeeMemberPage extends Page {
     
     public function new_member($_is_new) {
         $this->is_new = $_is_new;
+    }
+    
+    public function set_selected_jobs($_jobs_str) {
+        $this->selected_jobs = explode(',', $_jobs_str);
     }
     
     public function set_page($_page) {
@@ -239,6 +244,31 @@ class EmployeeMemberPage extends Page {
         
         $job = new Job();
         return $job->find($criteria);
+    }
+    
+    private function get_pre_selected_jobs() {
+        $criteria = array(
+            'columns' => "jobs.employer, jobs.title", 
+            'match' => "id IN (". implode(',', $this->selected_jobs). ")"
+        );
+        
+        $job = new Job();
+        $result = $job->find($criteria);
+        
+        if ($result === false || is_null($result) || empty($result)) {
+            return '(None Selected)';
+        }
+        
+        $jobs_str = '';
+        foreach ($result as $i=>$row) {
+            $jobs_str .= '['. $row['employer']. '] '. $row['title'];
+            
+            if ($i < count($result)-1) {
+                $jobs_str .= '<br/>';
+            }
+        }
+        
+        return $jobs_str;
     }
     
     public function show() {
@@ -822,6 +852,16 @@ class EmployeeMemberPage extends Page {
             <div id="div_resume_info" class="resume_info">
                 <span style="font-weight: bold;">Resume selected:</span>
                 <span id="resume_file_name"></span><br/>
+                <table class="pre_selected_jobs_table">
+                    <tr>
+                        <td class="label"><span style="font-weight: bold;">Pre-selected Jobs:</span></td>
+                        <td>
+                            <div id="pre_selected_jobs_list">
+                                <?php echo $this->get_pre_selected_jobs(); ?>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
                 <span style="font-weight: bold;">Referrer: </span>
                 <?php
                     $referrers = $this->get_referrers();
@@ -849,6 +889,7 @@ class EmployeeMemberPage extends Page {
             </div>
             <form id="apply_job_form" onSubmit="return false;">
                 <input type="hidden" id="resume_id" name="resume_id" value="0" />
+                <input type="hidden" id="selected_jobs" value="<?php echo implode(',', $this->selected_jobs); ?>" />
                 <div id="div_apply_job_form" class="apply_job_form">
                     <table class="jobs_selection">
                         <tr>
