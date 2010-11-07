@@ -135,7 +135,7 @@ class MemberResumesPage extends Page {
                         <input id="my_file" name="my_file" type="file" />
                         <div style="font-size: 9pt; margin-top: 15px;">
                             <ol>
-                                <li>Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf), Rich Text Format (*.rtf) or MS Word document (*.doc) with the file size of less than 1MB are allowed.</li>
+                                <li>Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf) or MS Word document (*.doc) with the file size of less than 1MB are allowed.</li>
                                 <li>You can upload as many resumes as you want and designate them for different job applications.</li>
                                 <li>You can update your resume by clicking &quot;Update&quot; then upload an updated version.</li>
                             </ol>

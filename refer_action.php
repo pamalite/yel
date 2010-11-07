@@ -97,13 +97,6 @@ if (!empty($_FILES['candidate_resume']['name'])) {
                                 // }
                                 // $resume_text = sanitize($tmp);
                                 break;
-                            case 'application/rtf':
-                                $tmp = Resume::getTextFromRTF($file_path);
-                                if (empty($tmp)) {
-                                    $tmp = Resume::getTextFromMsword($file_path);
-                                }
-                                $resume_text = sanitize($tmp);
-                                break;
                         }
                         
                         if (!empty($resume_text)) {

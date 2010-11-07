@@ -375,13 +375,6 @@ class Resume implements Model{
                                     // $resume_text = sanitize($tmp);
                                     // break;
                                     return true;
-                                case 'application/rtf':
-                                    $tmp = Resume::getTextFromRTF($GLOBALS['resume_dir']. "/". $new_name);
-                                    if (empty($tmp)) {
-                                        $tmp = Resume::getTextFromMsword($GLOBALS['resume_dir']. "/". $new_name);
-                                    }
-                                    $resume_text = sanitize($tmp);
-                                    break;
                             }
                             
                             if (!empty($resume_text)) {

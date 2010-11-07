@@ -24,8 +24,7 @@ $resume_size_limit = "1048576 "; // ~1MB
 $allowable_resume_types = array("text/plain",
                                 "text/html",
                                 "application/pdf",
-                                "application/msword",
-                                "application/rtf");
+                                "application/msword");
 
 // Photo upload settings
 $photo_dir = $data_path. "/photos";
