@@ -13,21 +13,20 @@ class MemberSearch {
     private $can_travel_relocate = '';
     private $notice_period = '';
     
-    private $order_by = 'jobs.created_on DESC';
+    private $order_by = 'member_name DESC';
     private $limit = '';
     private $offset = 0;
     private $punctuations = array(",", ".",";","\"","\'","(",")","[","]","{","}","<",">");
     private $total = 0;
     private $pages = 1;
     private $time_elapsed = 0;
-    private $special = '';
-    
-    public $result_countries = array();
-    public $result_employers = array();
-    public $result_industries = array();
-    public $result_salaries = array();
+    private $mysqli = NULL;
     
     function __construct() {
+        if (!is_a($this->mysqli, "MySQLi")) {
+            $this->mysqli = Database::connect();
+        }
+        
         $this->country_code = $GLOBALS['default_country_code'];
         $this->limit = $GLOBALS['default_results_per_page'];
         
@@ -80,119 +79,230 @@ class MemberSearch {
     }
     
     private function make_query($with_limit = false) {
-        $match_against = "MATCH (job_index.title, 
-                                 job_index.description, 
-                                 job_index.state) 
-                          AGAINST ('". $this->keywords. "' IN BOOLEAN MODE)";
+        $is_union_buffer = false;
         
-        $filter_job_status = "(jobs.closed = 'N' OR jobs.closed = 'Y')";
-        //$filter_job_status = "jobs.closed = 'N'";
+        // 1. work out how many match_against needed
+        $match_against = array();
         
-        $filter_employer = "jobs.employer IS NOT NULL";
-        if (!empty($this->employer)) {
-            $filter_employer = "jobs.employer = '". $this->employer. "'";
-        }
-        
-        $filter_industry = "jobs.industry <> 0";
-        if ($this->industry > 0) {
-            $children = Industry::getSubIndustriesOf($this->industry);
-            $industries = '('. $this->industry;
-            if (count($children) > 0) {
-                $industries .= ', ';
+        // resume keywords
+        if (!empty($this->resume_keywords['keywords'])) {
+            $match_against['resume'] = array();
+            
+            $keywords_str = $this->resume_keywords['keywords'];
+            $mode = " WITH QUERY EXPANSION";
+            if ($this->resume_keywords['is_boolean']) {
+                $mode = " IN BOOLEAN MODE";
+                
+                if ($this->resume_keywords['is_use_all_words']) {
+                    $keywords_str = '+'. str_replace(' ', ' +', $this->keywords['keywords']);
+                }
             }
             
-            $i = 0;
-            foreach ($children as $child) {
-                $industries .= $child['id'];
-                if ($i < (count($children)-1)) {
-                    $industries .= ', ';
+            $match_against['resume']['member'] = "MATCH (resume_index.file_text) 
+                                                  AGAINST ('". $keywords_str. "'". $mode. ")";
+            $match_against['resume']['buffer'] = "MATCH (referral_buffers.resume_file_text) 
+                                                  AGAINST ('". $keywords_str. "'". $mode. ")";
+            $is_union_buffer = true;
+        }
+        
+        // notes keywords
+        if (!empty($this->notes_keywords['keywords'])) {
+            $match_against['notes'] = array();
+            
+            $keywords_str = $this->notes_keywords['keywords'];
+            $mode = " WITH QUERY EXPANSION";
+            if ($this->notes_keywords['is_boolean']) {
+                $mode = " IN BOOLEAN MODE";
+                
+                if ($this->notes_keywords['is_use_all_words']) {
+                    $keywords_str = '+'. str_replace(' ', ' +', $this->keywords['keywords']);
                 }
-                $i++;
             }
-            $industries .= ')';
-            $filter_industry = "jobs.industry IN ". $industries;
+            
+            $match_against['notes']['member'] = "MATCH (member_index.notes) 
+                                                 AGAINST ('". $keywords_str. "'". $mode. ")";
+            $match_against['notes']['buffer'] = "MATCH (referral_buffers.notes) 
+                                                 AGAINST ('". $keywords_str. "'". $mode. ")";
+            $is_union_buffer = true;
         }
         
-        $filter_country = "jobs.country LIKE '%'";
-        if (!empty($this->country_code) && !is_null($this->country_code)) {
-            $filter_country = "jobs.country = '". $this->country_code. "'";
+        // seeking keywords (members only)
+        if (!empty($this->seeking_keywords['keywords'])) {
+            $match_against['seeking'] = array();
+            
+            $keywords_str = $this->seeking_keywords['keywords'];
+            $mode = " WITH QUERY EXPANSION";
+            if ($this->seeking_keywords['is_boolean']) {
+                $mode = " IN BOOLEAN MODE";
+                
+                if ($this->seeking_keywords['is_use_all_words']) {
+                    $keywords_str = '+'. str_replace(' ', ' +', $this->keywords['keywords']);
+                }
+            }
+            
+            $match_against['seeking']['member'] = "MATCH (member_index.seeking) 
+                                                   AGAINST ('". $keywords_str. "'". $mode. ")";
         }
         
-        $filter_salary = "";
-        if ($this->salary > 0) {
-            $filter_salary = "jobs.salary >= ". $this->salary;
-            if ($this->salary_end > 0) {
-                $filter_salary = "(jobs.salary BETWEEN ". $this->salary. " AND ". $this->salary_end. ")";
+        // 2. salaries
+        // expected
+        $salaries = array();
+        if ($this->expected_salary['start'] > 0) {
+            $salaries['expected'] = "members.expected_salary <= ". $this->expected_salary['start'];
+            
+            if ($this->expected_salary['end'] > 0) {
+                $salaries['expected'] .= " AND members.expected_salary_end >= ". $this->expected_salary['end'];
             }
         }
         
-        $filter_latest = "";
-        if ($this->special == 'latest') {
-            $filter_latest = "jobs.created_on BETWEEN date_add(CURDATE(), INTERVAL -5 DAY) AND CURDATE() ";
-            $this->offset = 0;
-            $this->limit = 10;
-            $with_limit = true;
-        } else if ($this->special == 'top') {
-            $this->order_by = "jobs.potential_reward DESC";
-            $this->offset = 0;
-            $this->limit = 10;
-            $with_limit = true;
+        // current
+        if ($this->current_salary['start'] > 0) {
+            $salaries['current'] = "members.current_salary <= ". $this->current_salary['start'];
+            
+            if ($this->current_salary['end'] > 0) {
+                $salaries['current'] .= " AND members.current_salary_end >= ". $this->current_salary['end'];
+            }
         }
         
-        $columns = "jobs.id, jobs.title, jobs.state, jobs.salary, jobs.salary_end, jobs.description, 
-                    jobs.potential_reward, branches.currency, jobs.alternate_employer, 
-                    jobs.employer AS employer_id, employers.name AS employer, 
-                    industries.industry, industries.id AS industry_id, 
-                    countries.country, countries.country_code, 
-                    DATE_FORMAT(jobs.expire_on, '%e %b %Y') AS formatted_expire_on";
-        
-        $joins = "job_index ON job_index.job = jobs.id, 
-                  employers ON employers.id = jobs.employer, 
-                  employees ON employees.id = employers.registered_by, 
-                  branches ON branches.id = employees.branch, 
-                  industries ON industries.id = jobs.industry, 
-                  countries ON countries.country_code = jobs.country";
-        
-        $match = "";
-        if (!is_null($this->keywords) && !empty($this->keywords)) {
-            $match .= $match_against. " AND ";
-        } 
-       
-        $match .= "jobs.deleted = FALSE 
-                   AND ". $filter_job_status. " 
-                   AND ". $filter_industry. " 
-                   AND ". $filter_country. " 
-                   AND ". $filter_employer. " "; 
-        
-        if (!empty($filter_salary)) {
-            $match .= "AND ". $filter_salary. " ";
+        // 3. others
+        $query_others = "";
+        if (!empty($this->hrm_gender)) {
+            $query_others = "members.hrm_gender = '". $this->hrm_gender. "'";
         }
         
-        if (!empty($filter_latest)) {
-            $match .= "AND ". $filter_latest. " ";
+        if (!empty($this->hrm_ethnicity)) {
+            if (!empty($query_others)) {
+                $query_others .= " AND members.hrm_ethnicity LIKE '". $this->hrm_ethnicity. "'";
+            } else {
+                $query_others = "members.hrm_ethnicity LIKE '". $this->hrm_ethnicity. "'";
+            }
         }
         
-        $order = $this->order_by;
+        if (!empty($this->is_active_seeking_job)) {
+            if (!empty($query_others)) {
+                $query_others .= " AND members.is_active_seeking_job = '". $this->is_active_seeking_job. "'";
+            } else {
+                $query_others = "members.is_active_seeking_job = '". $this->is_active_seeking_job. "'";
+            }
+        }
+        
+        if (!empty($this->can_travel_relocate)) {
+            if (!empty($query_others)) {
+                $query_others .= " AND members.can_travel_relocate = '". $this->can_travel_relocate. "'";
+            } else {
+                $query_others = "members.can_travel_relocate = '". $this->can_travel_relocate. "'";
+            }
+        }
+        
+        if (!empty($this->notice_period)) {
+            if (!empty($query_others)) {
+                $query_others .= " AND members.notice_period >= '". $this->notice_period. "'";
+            } else {
+                $query_others = "members.notice_period >= '". $this->notice_period. "'";
+            }
+        }
+        
+        // 4. setup columns and joins
+        $columns = array();
+        $columns['member'] = "'0' AS buffer_id, members.email_addr, members.phone_num, 
+                               CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
+                               resumes.name AS resume_name, resumes.file_hash, resumes.id AS resume_id";
+        if ($is_union_buffer) {
+            $columns['buffer'] = "referral_buffers.id, referral_buffers.candidate_email,     
+                                  referral_buffers.candidate_phone, referral_buffers.candidate_name,
+                                  referral_buffers.resume_file_name, referral_buffers.resume_file_hash, '0'";
+                                  
+            if (array_key_exists('resume', $match_against)) {
+                $columns['member'] .= ", ". $match_against['resume']['member']. " AS resume_score";
+                $columns['buffer'] .= ", ". $match_against['resume']['buffer'];
+            }
+            
+            if (array_key_exists('notes', $match_against)) {
+                $columns['member'] .= ", ". $match_against['notes']['member']. " AS notes_score";
+                $columns['buffer'] .= ", ". $match_against['notes']['buffer'];
+            }
+        }
+        
+        if (array_key_exists('seeking', $match_against)) {
+            $columns['member'] .= ", ". $match_against['seeking']['member']. " AS seeking_score";
+            
+            if ($is_union_buffer) {
+                $columns['buffer'] .= ", '0'";
+            }
+        }
+        
+        $joins['member'] = "LEFT JOIN resumes ON resumes.member = members.email_addr 
+                            LEFT JOIN resume_index ON resume_index.resume = resumes.id";
+        if (array_key_exists('seeking', $match_against) || 
+            array_key_exists('notes', $match_against)) {
+            $joins['member'] .= " LEFT JOIN member_index ON members.email_addr = member_index.member";
+        }
+        
+        // 5. setup query
+        $query = "SELECT ". $columns['member']. " 
+                  FROM members 
+                  ". $joins['member']. " 
+                  WHERE ";
+        if (!empty($match_against)) {
+            foreach ($match_against as $i=>$table) {
+                $query .= $table['member']. " ";
+
+                if ($i <= count($match_against)-1) {
+                    $query .= "AND ";
+                }
+            }
+        }
+        
+        if (!empty($salaries)) {
+            if (empty($match_against)) {
+                $query .= "AND ";
+            }
+            
+            foreach ($salaries as $i=>$criteria) {
+                $query .= $criteria. " ";
+                
+                if ($i <= count($salaries)) {
+                    $query .= "AND ";
+                }
+            }
+        }
+        
+        if (!empty($query_others)) {
+            if (!empty($match_against) || !empty($salaries)) {
+                $query .= "AND ";
+            }
+            
+            $query .= $query_others;
+        }
+        
+        // 6. setup union, if any
+        if ($is_union_buffer) {
+            $query .= "UNION 
+                       SELECT ". $columns['buffer']. "
+                       FROM referral_buffers 
+                       WHERE ";
+            if (!empty($match_against)) {
+                foreach ($match_against as $i=>$table) {
+                   $query .= $table['buffer']. " ";
+
+                   if ($i <= count($match_against)-1) {
+                       $query .= "AND ";
+                   }
+                }
+            }
+        }
+        
+        // 7. setup query order, limit and offset
+        $query .= $this->order_by;
         
         $limit = "";
         if ($with_limit) {
             $limit = $this->offset. ", ". $this->limit; 
             
-            return array(
-                'columns' => $columns, 
-                'joins' => $joins, 
-                'match' => $match, 
-                'order' => $order, 
-                'limit' => $limit
-            );
+            return $query. " LIMIT ". $limit;
         }
         
-        return array(
-            'columns' => $columns, 
-            'joins' => $joins, 
-            'match' => $match, 
-            'order' => $order
-        );
+        return $query;
     }
     
     public function total_results() {
@@ -260,23 +370,32 @@ class MemberSearch {
             }
         }
         
+        if (array_key_exists('is_active_seeking_job', $_criteria)) {
+            $this->is_active_seeking_job = ($_criteria['is_active_seeking_job']) ? 'TRUE' : 'FALSE';
+        }
         
-        // old
+        if (array_key_exists('can_travel_relocate', $_criteria)) {
+            $this->can_travel_relocate = ($_criteria['can_travel_relocate']) ? 'Y' : 'N';
+        }
         
-        if (array_key_exists('country_code', $_criterias)) {
-            $this->country_code = $_criterias['country_code'];
-        } else {
-            if ($_criterias['is_local'] <= 0) {
-                $this->country_code = NULL;
+        if (array_key_exists('hrm_ethnicity', $_criteria)) {
+            $ethnicities = explode(',', $_criteria['hrm_ethnicity']);
+            $ethnicities_str = '';
+            foreach ($ethnicities as $i=>$ethnicity) {
+                $ethnicities_str .= trim($ethnicity);
+                if ($i <= count($ethnicities)-1) {
+                    $ethnicities_str .= '%';
+                }
             }
+            $this->hrm_ethnicity = $ethnicities_str;
         }
         
-        if ($_criterias['salary'] > 0) {
-            $this->salary = $_criterias['salary'];
+        if (array_key_exists('hrm_gender', $_criteria)) {
+            $this->hrm_gender = $_criteria['hrm_gender'];
         }
         
-        if (array_key_exists('salary_end', $_criterias)) {
-            $this->salary_end = $_criterias['salary_end'];
+        if (array_key_exists('notice_period', $_criteria)) {
+            $this->notice_period = $criteria['notice_period'];
         }
         
         if (array_key_exists('order_by', $_criterias)) {
@@ -291,13 +410,7 @@ class MemberSearch {
             $this->offset = $_criterias['offset'];
         }
         
-        if (array_key_exists('special', $_criterias)) {
-            $this->special = $_criterias['special'];
-        }
-        
-        $criteria = $this->make_query();
-        $job = new Job();
-        $result = $job->find($criteria);
+        $result = $this->mysqli->query($this->make_query());
         if (!is_null($result) && !empty($result)) {
             $this->total = count($result);
         }
@@ -308,7 +421,7 @@ class MemberSearch {
         }
         
         $start = microtime();
-        $result = $job->find($this->make_query(true));
+        $result = $this->mysqli->find($this->make_query(true));
         $end = microtime();
         
         list($ustart, $istart) = explode(" ", $start);
@@ -320,86 +433,7 @@ class MemberSearch {
             return false;
         }
         
-        // find the unique employers
-        $i = 0;
-        foreach ($result as $row) {
-            $is_in_array = false;
-            if (count($this->result_employers) > 0) {
-                foreach ($this->result_employers as $employer) {
-                    if ($row['employer_id'] == $employer['id']) {
-                        $is_in_array = true;
-                        break;
-                    }
-                }
-            }
-            
-            if (!$is_in_array) {
-                $name = $row['employer'];
-                if (!is_null($row['alternate_employer']) && !empty($row['alternate_employer'])) {
-                    $name = $row['employer'];
-                }
-                
-                $this->result_employers[$i]['id'] = $row['employer_id'];
-                $this->result_employers[$i]['name'] = $name;
-                $i++;
-            }
-        }
-        
-        // find the unique industries
-        $i = 0;
-        foreach ($result as $row) {
-            $is_in_array = false;
-            if (count($this->result_industries) > 0) {
-                foreach ($this->result_industries as $industry) {
-                    if ($row['industry_id'] == $industry['id']) {
-                        $is_in_array = true;
-                        break;
-                    }
-                }
-            }
-            
-            if (!$is_in_array) {
-                $this->result_industries[$i]['id'] = $row['industry_id'];
-                $this->result_industries[$i]['name'] = $row['industry'];
-                $i++;
-            }
-        }
-        
-        // find the unique countries
-        $i = 0;
-        foreach ($result as $row) {
-            $is_in_array = false;
-            if (count($this->result_countries) > 0) {
-                foreach ($this->result_countries as $country) {
-                    if ($row['country_code'] == $country['id']) {
-                        $is_in_array = true;
-                        break;
-                    }
-                }
-            }
-            
-            if (!$is_in_array) {
-                $this->result_countries[$i]['id'] = $row['country_code'];
-                $this->result_countries[$i]['name'] = $row['country'];
-                $i++;
-            }
-        }
-        
-        // find the unique salary beginning
-        foreach ($result as $row) {
-            $is_in_array = in_array($row['salary'], $this->result_salaries);
-            
-            if (!$is_in_array) {
-                $this->result_salaries[] = $row['salary'];
-            }
-        }
-        sort($this->result_salaries);
-        
         return $result;
-    }
-    
-    public function country_code_changed() {
-        return $this->changed_country_code;
     }
     
     public function time_elapsed() {
