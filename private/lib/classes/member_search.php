@@ -1,28 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../utilities.php";
 
-function sort_by_total_score($before, $after) {
-    $before_resume_score = (isset($before['resume_score'])) ? $before['resume_score'] : 0;
-    $before_notes_score = (isset($before['notes_score'])) ? $before['notes_score'] : 0;
-    $before_seeking_score = (isset($before['seeking_score'])) ? $before['seeking_score'] : 0;
-    $after_resume_score = (isset($after['resume_score'])) ? $after['resume_score'] : 0;
-    $after_notes_score = (isset($after['notes_score'])) ? $after['notes_score'] : 0;
-    $after_seeking_score = (isset($after['seeking_score'])) ? $after['seeking_score'] : 0;
-
-    $before_total_score = $before_resume_score + $before_notes_score + $before_seeking_score; 
-    $after_total_score = $after_resume_score + $after_notes_score + $after_seeking_score; 
-
-    if ($before_total_score == $after_total_score) {
-        return 0;
-    }
-
-    if ($before_total_score < $after_total_score) {
-        return 1;
-    } else {
-        return -1;
-    }
-}
-
 class MemberSearch {
     private $resume_keywords = array();
     private $notes_keywords = array();
@@ -318,7 +296,7 @@ class MemberSearch {
         }
         
         // 7. setup query order, limit and offset
-        if ($this->order_by == 'score') {
+        if (substr_compare($this->order_by, 'score', 0) !== false) {
             return $query;
         }
         
@@ -451,9 +429,14 @@ class MemberSearch {
         }
         
         $start = microtime();
-        if ($this->order_by == 'score') {
+        if (substr_compare($this->order_by, 'score', 0) !== false) {
             // sort and paginate manually
             usort($result, "sort_by_total_score");
+            $order = explode(' ', $this->order_by);
+            if ($order[1] == 'ASC') {
+                $tmp = array_reverse($result);
+                $result = $tmp;
+            }
             $rows = array();
             for ($i=$this->offset; $i <= ($this->offset + $this->limit) - 1; $i++) {
                 $rows[] = $result[$i];
@@ -490,4 +473,27 @@ class MemberSearch {
         return $this->query;
     }
 }
+
+function sort_by_total_score($before, $after) {
+    $before_resume_score = (isset($before['resume_score'])) ? $before['resume_score'] : 0;
+    $before_notes_score = (isset($before['notes_score'])) ? $before['notes_score'] : 0;
+    $before_seeking_score = (isset($before['seeking_score'])) ? $before['seeking_score'] : 0;
+    $after_resume_score = (isset($after['resume_score'])) ? $after['resume_score'] : 0;
+    $after_notes_score = (isset($after['notes_score'])) ? $after['notes_score'] : 0;
+    $after_seeking_score = (isset($after['seeking_score'])) ? $after['seeking_score'] : 0;
+
+    $before_total_score = $before_resume_score + $before_notes_score + $before_seeking_score; 
+    $after_total_score = $after_resume_score + $after_notes_score + $after_seeking_score; 
+
+    if ($before_total_score == $after_total_score) {
+        return 0;
+    }
+
+    if ($before_total_score < $after_total_score) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
+
 ?>

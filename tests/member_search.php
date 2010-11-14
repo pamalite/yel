@@ -63,8 +63,7 @@ echo '<br/>';
 
 $search_criterias = array(
     'resume_keywords' => $keywords_entered['resume'], 
-    'order_by' => 'score',
-    'offset' => 10
+    'order_by' => 'score DESC'
 );
 
 $search = new MemberSearch();
@@ -77,6 +76,27 @@ show($search->get_query());
 echo '<br/>';
 
 ?><b>Result sorting...</b><br><br><?php
+if ($result <= 0 || $result === false) {
+    show('no results');
+    exit();
+}
+
+show('results');
+show($result);
+
+echo '<br/>';
+
+?><b>Result sorting ascending...</b><br><br><?php
+
+$search_criterias = array(
+    'resume_keywords' => $keywords_entered['resume'], 
+    'order_by' => 'score ASC', 
+    'offset' => 10
+);
+
+$search->reset_query();
+$result = $search->search_using($search_criterias);
+
 if ($result <= 0 || $result === false) {
     show('no results');
     exit();
