@@ -81,7 +81,7 @@ class EmployeeStatusPage extends Page {
         }
         
         $this->initial_total_pages = ceil(count($result) / 20);
-        $criteria['limit'] = "0, 20";
+        $criteria['limit'] = "0, ". $GLOBALS['default_results_per_page'];
         return $this->referrals->find($criteria);
     }
     
