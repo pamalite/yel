@@ -29,6 +29,10 @@ class MemberSearch {
             $this->mysqli = Database::connect();
         }
         
+        $this->initialize();
+    }
+    
+    private function initialize() {
         $this->country_code = $GLOBALS['default_country_code'];
         $this->limit = $GLOBALS['default_results_per_page'];
         
@@ -59,6 +63,18 @@ class MemberSearch {
             'start' => 0,
             'end' => 0
         );
+        
+        $this->hrm_gender = '';
+        $this->hrm_ethnicity = '';
+        $this->is_active_seeking_job = '';
+        $this->can_travel_relocate = '';
+        $this->notice_period = '';
+        $this->filter = '';
+        $this->order_by = 'member_name DESC';
+        $this->offset = 0;
+        $this->punctuations = array(",", ".",";","\"","\'","(",")","[","]","{","}","<",">");
+        $this->total = 0;
+        $this->pages = 1;
     }
     
     private function remove_punctuations_from($_keywords) {
@@ -240,15 +256,19 @@ class MemberSearch {
             if (array_key_exists('resume', $match_against)) {
                 if ($is_union_buffer) {
                     $columns['member'] .= ", ". $match_against['resume']['member']. " AS resume_score";
-                }                
-                $columns['buffer'] .= ", ". $match_against['resume']['buffer'];
+                    $columns['buffer'] .= ", ". $match_against['resume']['buffer'];
+                } else {
+                    $columns['buffer'] .= ", ". $match_against['resume']['buffer']. " AS resume_score";
+                }
             }
             
             if (array_key_exists('notes', $match_against)) {
                 if ($is_union_buffer) {
                     $columns['member'] .= ", ". $match_against['notes']['member']. " AS notes_score";
+                    $columns['buffer'] .= ", ". $match_against['notes']['buffer'];
+                } else {
+                    $columns['buffer'] .= ", ". $match_against['notes']['buffer']. " AS notes_score";
                 }
-                $columns['buffer'] .= ", ". $match_against['notes']['buffer'];
             }
         }
         
@@ -272,7 +292,7 @@ class MemberSearch {
         
         // 5. setup query
         $query = "";
-        if ($is_bypassed) {
+        if (!$is_bypassed) {
             $query = "SELECT ". $columns['member']. " 
                       FROM members 
                       ". $joins['member']. " 
@@ -332,7 +352,7 @@ class MemberSearch {
         }
         
         // 7. setup query order, limit and offset
-        if (substr_compare($this->order_by, 'score', 0) !== false) {
+        if (substr(trim($this->order_by), 0, 5) == 'score') {
             return $query;
         }
         
@@ -442,7 +462,7 @@ class MemberSearch {
         }
         
         if (array_key_exists('filter', $_criterias)) {
-            $this->filter = $_criteria['filter'];
+            $this->filter = $_criterias['filter'];
         }
         
         if (array_key_exists('order_by', $_criterias)) {
@@ -465,11 +485,12 @@ class MemberSearch {
         
         $total_pages = ceil($this->total / $this->limit);
         if ($total_pages <= 0) {
+            echo $this->query;
             return 0;
         }
         
         $start = microtime();
-        if (substr_compare($this->order_by, 'score', 0) !== false) {
+        if (substr(trim($this->order_by), 0, 5) == 'score') {
             // sort and paginate manually
             usort($result, "sort_by_total_score");
             $order = explode(' ', $this->order_by);
@@ -479,8 +500,11 @@ class MemberSearch {
             }
             $rows = array();
             for ($i=$this->offset; $i <= ($this->offset + $this->limit) - 1; $i++) {
-                $rows[] = $result[$i];
+                if (isset($result[$i])) {
+                    $rows[] = $result[$i];
+                }
             }
+            
             $result = $rows;
         } else {
             // just sort and paginate normally
@@ -507,6 +531,7 @@ class MemberSearch {
     
     public function reset_query() {
         $this->query = "";
+        $this->initialize();
     }
     
     public function get_query() {

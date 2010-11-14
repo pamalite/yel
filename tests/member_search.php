@@ -105,5 +105,46 @@ if ($result <= 0 || $result === false) {
 show('results');
 show($result);
 
+echo '<br/>';
+
+?><b>Result filter members only...</b><br><br><?php
+
+$search_criterias = array(
+    'resume_keywords' => $keywords_entered['resume'], 
+    'filter' => 'members_only'
+);
+
+$search->reset_query();
+$result = $search->search_using($search_criterias);
+
+if ($result <= 0 || $result === false) {
+    show('no results');
+    exit();
+}
+
+show('results');
+show($result);
+
+echo '<br/>';
+
+?><b>Result buffer only...</b><br><br><?php
+
+$search_criterias = array(
+    'resume_keywords' => $keywords_entered['resume'], 
+    'filter' => 'buffer_only', 
+    'order_by' => 'score DESC'
+);
+
+$search->reset_query();
+$result = $search->search_using($search_criterias);
+
+if ($result <= 0 || $result === false) {
+    show('no results');
+    exit();
+}
+
+show('results');
+show($result);
+
 exit();
 ?>
