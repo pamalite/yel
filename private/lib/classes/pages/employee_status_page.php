@@ -80,8 +80,9 @@ class EmployeeStatusPage extends Page {
             }
         }
         
-        $this->initial_total_pages = ceil(count($result) / 20);
-        $criteria['limit'] = "0, ". $GLOBALS['default_results_per_page'];
+        $page_limit = $GLOBALS['default_results_per_page'] + 10;
+        $this->initial_total_pages = ceil(count($result) / $page_limit);
+        $criteria['limit'] = "0, ". $page_limit;
         return $this->referrals->find($criteria);
     }
     
