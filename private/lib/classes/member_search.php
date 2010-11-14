@@ -12,6 +12,7 @@ class MemberSearch {
     private $current_salary = array();
     private $can_travel_relocate = '';
     private $notice_period = '';
+    private $filter = '';
     
     private $order_by = 'member_name DESC';
     private $limit = '';
@@ -145,142 +146,177 @@ class MemberSearch {
                                                    AGAINST ('". $keywords_str. "'". $mode. ")";
         }
         
-        // 2. salaries
-        // expected
+        // 1.5 If filter for buffer only is turned on, then bypass the rest.
+        $is_bypassed = false;
+        if ($this->filter == trim('members_only')) {
+            $is_union_buffer = false;
+        } elseif ($this->filter == trim('buffer_only')) {
+            $is_union_buffer = false;
+            $is_bypassed = true;
+        }
+        
         $salaries = array();
-        if ($this->expected_salary['start'] > 0) {
-            $salaries['expected'] = "members.expected_salary <= ". $this->expected_salary['start'];
-            
-            if ($this->expected_salary['end'] > 0) {
-                $salaries['expected'] .= " AND members.expected_salary_end >= ". $this->expected_salary['end'];
-            }
-        }
-        
-        // current
-        if ($this->current_salary['start'] > 0) {
-            $salaries['current'] = "members.current_salary <= ". $this->current_salary['start'];
-            
-            if ($this->current_salary['end'] > 0) {
-                $salaries['current'] .= " AND members.current_salary_end >= ". $this->current_salary['end'];
-            }
-        }
-        
-        // 3. others
         $query_others = "";
-        if (!empty($this->hrm_gender)) {
-            $query_others = "members.hrm_gender = '". $this->hrm_gender. "'";
-        }
-        
-        if (!empty($this->hrm_ethnicity)) {
-            if (!empty($query_others)) {
-                $query_others .= " AND members.hrm_ethnicity LIKE '". $this->hrm_ethnicity. "'";
-            } else {
-                $query_others = "members.hrm_ethnicity LIKE '". $this->hrm_ethnicity. "'";
+        if (!$is_bypassed) {
+            // 2. salaries
+            // expected
+            if ($this->expected_salary['start'] > 0) {
+                $salaries['expected'] = "members.expected_salary <= ". $this->expected_salary['start'];
+
+                if ($this->expected_salary['end'] > 0) {
+                    $salaries['expected'] .= " AND members.expected_salary_end >= ". $this->expected_salary['end'];
+                }
             }
-        }
-        
-        if (!empty($this->is_active_seeking_job)) {
-            if (!empty($query_others)) {
-                $query_others .= " AND members.is_active_seeking_job = '". $this->is_active_seeking_job. "'";
-            } else {
-                $query_others = "members.is_active_seeking_job = '". $this->is_active_seeking_job. "'";
+
+            // current
+            if ($this->current_salary['start'] > 0) {
+                $salaries['current'] = "members.current_salary <= ". $this->current_salary['start'];
+
+                if ($this->current_salary['end'] > 0) {
+                    $salaries['current'] .= " AND members.current_salary_end >= ". $this->current_salary['end'];
+                }
             }
-        }
-        
-        if (!empty($this->can_travel_relocate)) {
-            if (!empty($query_others)) {
-                $query_others .= " AND members.can_travel_relocate = '". $this->can_travel_relocate. "'";
-            } else {
-                $query_others = "members.can_travel_relocate = '". $this->can_travel_relocate. "'";
+            
+            // 3. others
+            if (!empty($this->hrm_gender)) {
+                $query_others = "members.hrm_gender = '". $this->hrm_gender. "'";
             }
-        }
-        
-        if (!empty($this->notice_period)) {
-            if (!empty($query_others)) {
-                $query_others .= " AND members.notice_period >= '". $this->notice_period. "'";
-            } else {
-                $query_others = "members.notice_period >= '". $this->notice_period. "'";
+
+            if (!empty($this->hrm_ethnicity)) {
+                if (!empty($query_others)) {
+                    $query_others .= " AND members.hrm_ethnicity LIKE '". $this->hrm_ethnicity. "'";
+                } else {
+                    $query_others = "members.hrm_ethnicity LIKE '". $this->hrm_ethnicity. "'";
+                }
+            }
+
+            if (!empty($this->is_active_seeking_job)) {
+                if (!empty($query_others)) {
+                    $query_others .= " AND members.is_active_seeking_job = '". $this->is_active_seeking_job. "'";
+                } else {
+                    $query_others = "members.is_active_seeking_job = '". $this->is_active_seeking_job. "'";
+                }
+            }
+
+            if (!empty($this->can_travel_relocate)) {
+                if (!empty($query_others)) {
+                    $query_others .= " AND members.can_travel_relocate = '". $this->can_travel_relocate. "'";
+                } else {
+                    $query_others = "members.can_travel_relocate = '". $this->can_travel_relocate. "'";
+                }
+            }
+
+            if (!empty($this->notice_period)) {
+                if (!empty($query_others)) {
+                    $query_others .= " AND members.notice_period >= '". $this->notice_period. "'";
+                } else {
+                    $query_others = "members.notice_period >= '". $this->notice_period. "'";
+                }
             }
         }
         
         // 4. setup columns and joins
         $columns = array();
-        $columns['member'] = "'0' AS buffer_id, members.email_addr, members.phone_num, 
-                               CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
-                               resumes.name AS resume_name, resumes.file_hash, resumes.id AS resume_id";
-        if ($is_union_buffer) {
+        if (!$is_bypassed) {
+            $columns['member'] = "'0' AS buffer_id, members.email_addr, members.phone_num, 
+                                   CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
+                                   resumes.name AS resume_name, resumes.file_hash, resumes.id AS resume_id";
+        }
+        
+        if ($is_union_buffer || ($is_union_buffer === false && $is_bypassed)) {
             $columns['buffer'] = "referral_buffers.id, referral_buffers.candidate_email,     
                                   referral_buffers.candidate_phone, referral_buffers.candidate_name,
                                   referral_buffers.resume_file_name, referral_buffers.resume_file_hash, '0'";
+            if ($is_union_buffer === false && $is_bypassed) {
+                $columns['buffer'] = "referral_buffers.id AS buffer_id, 
+                                      referral_buffers.candidate_email AS email_addr,
+                                      referral_buffers.candidate_phone, referral_buffers.candidate_name AS member_name,
+                                      referral_buffers.resume_file_name AS resume_name,
+                                      referral_buffers.resume_file_hash AS file_hash, 
+                                      '0' AS resume_id";
+                
+            }
                                   
             if (array_key_exists('resume', $match_against)) {
-                $columns['member'] .= ", ". $match_against['resume']['member']. " AS resume_score";
+                if ($is_union_buffer) {
+                    $columns['member'] .= ", ". $match_against['resume']['member']. " AS resume_score";
+                }                
                 $columns['buffer'] .= ", ". $match_against['resume']['buffer'];
             }
             
             if (array_key_exists('notes', $match_against)) {
-                $columns['member'] .= ", ". $match_against['notes']['member']. " AS notes_score";
+                if ($is_union_buffer) {
+                    $columns['member'] .= ", ". $match_against['notes']['member']. " AS notes_score";
+                }
                 $columns['buffer'] .= ", ". $match_against['notes']['buffer'];
             }
         }
         
-        if (array_key_exists('seeking', $match_against)) {
-            $columns['member'] .= ", ". $match_against['seeking']['member']. " AS seeking_score";
-            
-            if ($is_union_buffer) {
-                $columns['buffer'] .= ", '0'";
+        $joins = array();
+        if (!$is_bypassed) {
+            if (array_key_exists('seeking', $match_against)) {
+                $columns['member'] .= ", ". $match_against['seeking']['member']. " AS seeking_score";
+                
+                if ($is_union_buffer) {
+                    $columns['buffer'] .= ", '0'";
+                }
             }
-        }
-        
-        $joins['member'] = "LEFT JOIN resumes ON resumes.member = members.email_addr 
-                            LEFT JOIN resume_index ON resume_index.resume = resumes.id";
-        if (array_key_exists('seeking', $match_against) || 
-            array_key_exists('notes', $match_against)) {
-            $joins['member'] .= " LEFT JOIN member_index ON members.email_addr = member_index.member";
+            
+            $joins['member'] = "LEFT JOIN resumes ON resumes.member = members.email_addr 
+                                LEFT JOIN resume_index ON resume_index.resume = resumes.id";
+            if (array_key_exists('seeking', $match_against) || 
+                array_key_exists('notes', $match_against)) {
+                $joins['member'] .= " LEFT JOIN member_index ON members.email_addr = member_index.member";
+            }
         }
         
         // 5. setup query
-        $query = "SELECT ". $columns['member']. " 
-                  FROM members 
-                  ". $joins['member']. " 
-                  WHERE ";
-        if (!empty($match_against)) {
-            $sub_query_array = array();
-            foreach ($match_against as $table) {
-                if (isset($table['member'])) {
-                    $sub_query_array[] = $table['member'];
+        $query = "";
+        if ($is_bypassed) {
+            $query = "SELECT ". $columns['member']. " 
+                      FROM members 
+                      ". $joins['member']. " 
+                      WHERE ";
+            if (!empty($match_against)) {
+                $sub_query_array = array();
+                foreach ($match_against as $table) {
+                    if (isset($table['member'])) {
+                        $sub_query_array[] = $table['member'];
+                    }
                 }
+                $query .= implode(" AND ", $sub_query_array);
+                $query .= " ";
             }
-            $query .= implode(" AND ", $sub_query_array);
-            $query .= " ";
-        }
-        
-        if (!empty($salaries)) {
-            if (empty($match_against)) {
-                $query .= "AND ";
-            }
-            
-            foreach ($salaries as $i=>$criteria) {
-                $query .= $criteria. " ";
-                
-                if ($i <= count($salaries)) {
+
+            if (!empty($salaries)) {
+                if (empty($match_against)) {
                     $query .= "AND ";
                 }
+
+                foreach ($salaries as $i=>$criteria) {
+                    $query .= $criteria. " ";
+
+                    if ($i <= count($salaries)) {
+                        $query .= "AND ";
+                    }
+                }
             }
-        }
-        
-        if (!empty($query_others)) {
-            if (!empty($match_against) || !empty($salaries)) {
-                $query .= "AND ";
+
+            if (!empty($query_others)) {
+                if (!empty($match_against) || !empty($salaries)) {
+                    $query .= "AND ";
+                }
+
+                $query .= $query_others;
             }
-            
-            $query .= $query_others;
         }
         
         // 6. setup union, if any
-        if ($is_union_buffer) {
-            $query .= "UNION 
-                       SELECT ". $columns['buffer']. "
+        if ($is_union_buffer || ($is_union_buffer === false && $is_bypassed)) {
+            if (!$is_bypassed) {
+                $query .= "UNION ";
+            }
+            $query .= "SELECT ". $columns['buffer']. "
                        FROM referral_buffers 
                        WHERE ";
             if (!empty($match_against)) {
@@ -403,6 +439,10 @@ class MemberSearch {
         
         if (array_key_exists('notice_period', $_criterias)) {
             $this->notice_period = $criteria['notice_period'];
+        }
+        
+        if (array_key_exists('filter', $_criterias)) {
+            $this->filter = $_criteria['filter'];
         }
         
         if (array_key_exists('order_by', $_criterias)) {
