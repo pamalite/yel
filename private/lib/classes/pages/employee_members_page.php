@@ -132,7 +132,7 @@ class EmployeeMembersPage extends Page {
         </div>
         
         <!-- main filter -->
-        <div class="main_filter_toggle">
+        <div id="div_main_filter_toggle" class="main_filter_toggle">
             <a class="no_link" onClick="toggle_main_filter();">
                 <span id="hide_show_lbl">Toggle Filter</span>
             </a>

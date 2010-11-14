@@ -85,6 +85,7 @@ function update_applications() {
                 return;
             } else {
                 var total_pages = xml.getElementsByTagName('total_pages');
+                
                 $('total_pages').set('html', total_pages[0].childNodes[0].nodeValue);
                 $('total_pages_bottom').set('html', total_pages[0].childNodes[0].nodeValue);
                 

@@ -48,6 +48,20 @@ function toggle_main_filter() {
     sliding_filter_fx.toggle();
 }
 
+function swap_filter_with_search(_is_search) {
+    if (_is_search) {
+        $('div_main_filter').setStyle('display', 'none');
+        $('div_main_filter_toggle').setStyle('display', 'none');
+        // $('div_search_form').setStyle('display', 'block');
+        // $('div_search_filter_toggle').setStyle('display', 'block');
+    } else {
+        $('div_main_filter').setStyle('display', 'block');
+        $('div_main_filter_toggle').setStyle('display', 'block');
+        // $('div_search_form').setStyle('display', 'none');
+        // $('div_search_filter_toggle').setStyle('display', 'none');
+    }
+}
+
 function populate_jobs_list() {
     var ids = '';
     for (var i=0; i < $('employers').options.length; i++) {
@@ -192,6 +206,8 @@ function show_members() {
     $('item_applications').setStyle('background-color', '');
     $('item_members').setStyle('background-color', '#CCCCCC');
     $('item_search').setStyle('background-color', '');
+    
+    swap_filter_with_search(false);
     
     if (filter_is_dirty) {
         filter_is_dirty = false;
@@ -524,6 +540,8 @@ function show_applications() {
     $('item_members').setStyle('background-color', '');
     $('item_search').setStyle('background-color', '');
     
+    swap_filter_with_search(false);
+    
     if (filter_is_dirty) {
         filter_is_dirty = false;
         filter_applications();
@@ -740,6 +758,7 @@ function show_search_members() {
     $('item_members').setStyle('background-color', '');
     $('item_search').setStyle('background-color', '#CCCCCC');
     
+    swap_filter_with_search(true);
 }
 
 function show_resumes_page(_member_id) {

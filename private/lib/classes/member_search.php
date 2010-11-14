@@ -1,6 +1,28 @@
 <?php
 require_once dirname(__FILE__). "/../utilities.php";
 
+function sort_by_total_score($before, $after) {
+    $before_resume_score = (isset($before['resume_score'])) ? $before['resume_score'] : 0;
+    $before_notes_score = (isset($before['notes_score'])) ? $before['notes_score'] : 0;
+    $before_seeking_score = (isset($before['seeking_score'])) ? $before['seeking_score'] : 0;
+    $after_resume_score = (isset($after['resume_score'])) ? $after['resume_score'] : 0;
+    $after_notes_score = (isset($after['notes_score'])) ? $after['notes_score'] : 0;
+    $after_seeking_score = (isset($after['seeking_score'])) ? $after['seeking_score'] : 0;
+
+    $before_total_score = $before_resume_score + $before_notes_score + $before_seeking_score; 
+    $after_total_score = $after_resume_score + $after_notes_score + $after_seeking_score; 
+
+    if ($before_total_score == $after_total_score) {
+        return 0;
+    }
+
+    if ($before_total_score < $after_total_score) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
+
 class MemberSearch {
     private $resume_keywords = array();
     private $notes_keywords = array();
@@ -21,6 +43,7 @@ class MemberSearch {
     private $pages = 1;
     private $time_elapsed = 0;
     private $mysqli = NULL;
+    private $query = "";
     
     function __construct() {
         if (!is_a($this->mysqli, "MySQLi")) {
@@ -244,13 +267,14 @@ class MemberSearch {
                   ". $joins['member']. " 
                   WHERE ";
         if (!empty($match_against)) {
-            foreach ($match_against as $i=>$table) {
-                $query .= $table['member']. " ";
-
-                if ($i <= count($match_against)-1) {
-                    $query .= "AND ";
+            $sub_query_array = array();
+            foreach ($match_against as $table) {
+                if (isset($table['member'])) {
+                    $sub_query_array[] = $table['member'];
                 }
             }
+            $query .= implode(" AND ", $sub_query_array);
+            $query .= " ";
         }
         
         if (!empty($salaries)) {
@@ -282,18 +306,23 @@ class MemberSearch {
                        FROM referral_buffers 
                        WHERE ";
             if (!empty($match_against)) {
-                foreach ($match_against as $i=>$table) {
-                   $query .= $table['buffer']. " ";
-
-                   if ($i <= count($match_against)-1) {
-                       $query .= "AND ";
-                   }
+                $sub_query_array = array();
+                foreach ($match_against as $table) {
+                    if (isset($table['buffer'])) {
+                        $sub_query_array[] = $table['buffer'];
+                    }
                 }
+                $query .= implode(" AND ", $sub_query_array);
+                $query .= " ";
             }
         }
         
         // 7. setup query order, limit and offset
-        $query .= $this->order_by;
+        if ($this->order_by == 'score') {
+            return $query;
+        }
+        
+        $query .= "ORDER BY ". $this->order_by;
         
         $limit = "";
         if ($with_limit) {
@@ -370,15 +399,15 @@ class MemberSearch {
             }
         }
         
-        if (array_key_exists('is_active_seeking_job', $_criteria)) {
+        if (array_key_exists('is_active_seeking_job', $_criterias)) {
             $this->is_active_seeking_job = ($_criteria['is_active_seeking_job']) ? 'TRUE' : 'FALSE';
         }
         
-        if (array_key_exists('can_travel_relocate', $_criteria)) {
+        if (array_key_exists('can_travel_relocate', $_criterias)) {
             $this->can_travel_relocate = ($_criteria['can_travel_relocate']) ? 'Y' : 'N';
         }
         
-        if (array_key_exists('hrm_ethnicity', $_criteria)) {
+        if (array_key_exists('hrm_ethnicity', $_criterias)) {
             $ethnicities = explode(',', $_criteria['hrm_ethnicity']);
             $ethnicities_str = '';
             foreach ($ethnicities as $i=>$ethnicity) {
@@ -390,11 +419,11 @@ class MemberSearch {
             $this->hrm_ethnicity = $ethnicities_str;
         }
         
-        if (array_key_exists('hrm_gender', $_criteria)) {
+        if (array_key_exists('hrm_gender', $_criterias)) {
             $this->hrm_gender = $_criteria['hrm_gender'];
         }
         
-        if (array_key_exists('notice_period', $_criteria)) {
+        if (array_key_exists('notice_period', $_criterias)) {
             $this->notice_period = $criteria['notice_period'];
         }
         
@@ -410,7 +439,8 @@ class MemberSearch {
             $this->offset = $_criterias['offset'];
         }
         
-        $result = $this->mysqli->query($this->make_query());
+        $this->query = $this->make_query();
+        $result = $this->mysqli->query($this->query);
         if (!is_null($result) && !empty($result)) {
             $this->total = count($result);
         }
@@ -421,7 +451,19 @@ class MemberSearch {
         }
         
         $start = microtime();
-        $result = $this->mysqli->find($this->make_query(true));
+        if ($this->order_by == 'score') {
+            // sort and paginate manually
+            usort($result, "sort_by_total_score");
+            $rows = array();
+            for ($i=$this->offset; $i <= ($this->offset + $this->limit) - 1; $i++) {
+                $rows[] = $result[$i];
+            }
+            $result = $rows;
+        } else {
+            // just sort and paginate normally
+            $this->query = $this->make_query(true);
+            $result = $this->mysqli->query($this->query);
+        }
         $end = microtime();
         
         list($ustart, $istart) = explode(" ", $start);
@@ -438,6 +480,14 @@ class MemberSearch {
     
     public function time_elapsed() {
         return $this->time_elapsed;
+    }
+    
+    public function reset_query() {
+        $this->query = "";
+    }
+    
+    public function get_query() {
+        return $this->query;
     }
 }
 ?>

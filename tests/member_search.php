@@ -1,0 +1,89 @@
+<?php
+require_once "../private/lib/utilities.php";
+require_once "../private/lib/classes/member_search.php";
+
+function show($_message) {
+    echo '<pre>';
+    if (is_array($_message)) {
+        print_r($_message);
+    } else {
+        echo $_message;
+    }
+    echo '</pre>';
+}
+
+
+
+$xml_seed = new XMLDOM();
+
+$keywords_entered = array();
+$search_criterias = array();
+
+?><b>Criteria...</b><br><br><?php
+
+$keywords_entered = array(
+    'resume' => 'software developer', 
+    'notes' => 'qwerty',
+    'seeking' => 'asdfg'
+);
+
+$search_criterias = array(
+    'resume_keywords' => $keywords_entered['resume'],
+    'resume_is_boolean' => false,
+    'resume_is_use_all_words' => false,
+    'notes_keywords' => $keywords_entered['notes'],
+    'notes_is_boolean' => false,
+    'notes_is_use_all_words' => false,
+    'seeking_keywords' => $keywords_entered['seeking'],
+    'seeking_is_boolean' => false,
+    'seeking_is_use_all_words' => false
+);
+
+show('keywords: ');
+show($keywords_entered);
+
+echo '<br/>';
+
+show('criteria: ');
+show($search_criterias);
+
+echo '<br/>';
+
+?><b>Query #1...</b><br><br><?php
+$search = new MemberSearch();
+
+$result = $search->search_using($search_criterias);
+
+show('query: ');
+show($search->get_query());
+
+echo '<br/>';
+
+?><b>Query #2...</b><br><br><?php
+
+$search_criterias = array(
+    'resume_keywords' => $keywords_entered['resume'], 
+    'order_by' => 'score',
+    'offset' => 10
+);
+
+$search = new MemberSearch();
+
+$result = $search->search_using($search_criterias);
+
+show('query: ');
+show($search->get_query());
+
+echo '<br/>';
+
+?><b>Result sorting...</b><br><br><?php
+if ($result <= 0 || $result === false) {
+    show('no results');
+    exit();
+}
+
+show('results');
+show($result);
+
+exit();
+?>

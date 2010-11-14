@@ -14,6 +14,8 @@ if (!isset($_POST['action'])) {
 $xml_dom = new XMLDOM();
 
 if ($_POST['action'] == 'get_applications') {
+    $page_limit = $GLOBALS['default_results_per_page'] + 10;
+    
     $period = explode(';', $_POST['period']);
     $match = "referrals.referred_on BETWEEN '". $period[0]. "' AND '". $period[1]. "' ";
     
@@ -102,13 +104,13 @@ if ($_POST['action'] == 'get_applications') {
         $criteria['match'] .= " AND employers.id = '". $_POST['employer']. "'";
     }
     
-    $limit = "0, 20";
+    $limit = "0, ". $page_limit;
     if (!empty($_POST['page']) || $_POST['page'] > 0) {
-        $offset = ($_POST['page'] + 20) - 1;
-        $limit = $offset. ", 20";
+        $offset = ($_POST['page'] + $page_limit) - 1;
+        $limit = $offset. ", ". $page_limit;
     }
     
-    $total_pages = ceil(count($result) / 20);
+    $total_pages = ceil(count($result) / $page_limit);
     $criteria['limit'] = $limit;
     $result = $referral->find($criteria);
     foreach($result as $i=>$row) {
