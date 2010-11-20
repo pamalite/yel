@@ -347,7 +347,7 @@ class MemberSearch {
         // 6. setup union, if any
         if ($is_union_buffer || ($is_union_buffer === false && $is_bypassed)) {
             if (!$is_bypassed) {
-                $query .= "UNION ";
+                $query .= " UNION ";
             }
             $query .= "SELECT ". $columns['buffer']. "
                        FROM referral_buffers 

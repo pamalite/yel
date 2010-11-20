@@ -132,7 +132,6 @@ echo '<br/>';
 
 $search_criterias = array(
     'resume_keywords' => $keywords_entered['resume'], 
-    'notes_keywords' => 'qwerty',
     'filter' => 'buffer_only', 
     'order_by' => 'score DESC'
 );
@@ -154,13 +153,18 @@ echo '<br/>';
 ?><b>Result with no keywords...</b><br><br><?php
 
 $search_criterias = array(
-    // 'hrm_gender' => 'male', 
-    // 'expected_salary' => '10',
-    // 'can_travel_relocate' => false, 
-    // 'current_salary' => '1', 
-    // 'is_active_seeking_job' => true, 
-    // 'notice_period' => 3, 
-    'hrm_ethnicity' => '%malay%'
+    'hrm_gender' => 'male', 
+    'expected_salary' => '10',
+    'can_travel_relocate' => false, 
+    'current_salary' => '1', 
+    'is_active_seeking_job' => true, 
+    'notice_period' => 3, 
+    'hrm_ethnicity' => '%malay%', 
+    'resume_keywords' => $keywords_entered['resume'], 
+    'notes_keywords' => 'qwerty', 
+    'seeking_keywords' => 'qwerty asdfg', 
+    'order_by' => 'score DESC', 
+    'filter' => 'buffer_only'
 );
 
 $search->reset_query();
