@@ -163,8 +163,7 @@ $search_criterias = array(
     'resume_keywords' => $keywords_entered['resume'], 
     'notes_keywords' => 'qwerty', 
     'seeking_keywords' => 'qwerty asdfg', 
-    'order_by' => 'score DESC', 
-    'filter' => 'buffer_only'
+    'order_by' => 'score DESC'
 );
 
 $search->reset_query();
