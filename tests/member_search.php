@@ -111,7 +111,8 @@ echo '<br/>';
 
 $search_criterias = array(
     'resume_keywords' => $keywords_entered['resume'], 
-    'filter' => 'members_only'
+    'filter' => 'members_only', 
+    'order_by' => 'score DESC'
 );
 
 $search->reset_query();
@@ -131,12 +132,14 @@ echo '<br/>';
 
 $search_criterias = array(
     'resume_keywords' => $keywords_entered['resume'], 
+    'notes_keywords' => 'qwerty',
     'filter' => 'buffer_only', 
     'order_by' => 'score DESC'
 );
 
 $search->reset_query();
 $result = $search->search_using($search_criterias);
+show($search->get_query());
 
 if ($result <= 0 || $result === false) {
     show('no results');
@@ -145,6 +148,33 @@ if ($result <= 0 || $result === false) {
 
 show('results');
 show($result);
+
+echo '<br/>';
+
+?><b>Result with no keywords...</b><br><br><?php
+
+$search_criterias = array(
+    // 'hrm_gender' => 'male', 
+    // 'expected_salary' => '10',
+    // 'can_travel_relocate' => false, 
+    // 'current_salary' => '1', 
+    // 'is_active_seeking_job' => true, 
+    // 'notice_period' => 3, 
+    'hrm_ethnicity' => '%malay%'
+);
+
+$search->reset_query();
+$result = $search->search_using($search_criterias);
+show($search->get_query());
+
+if ($result <= 0 || $result === false) {
+    show('no results');
+    exit();
+}
+
+show('results');
+show($result);
+
 
 exit();
 ?>

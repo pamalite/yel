@@ -182,6 +182,8 @@ class MemberSearch {
                 if ($this->expected_salary['end'] > 0) {
                     $salaries['expected'] .= " AND members.expected_salary_end >= ". $this->expected_salary['end'];
                 }
+                
+                $salaries['expected'] = "(". $salaries['expected']. ")";
             }
 
             // current
@@ -191,6 +193,8 @@ class MemberSearch {
                 if ($this->current_salary['end'] > 0) {
                     $salaries['current'] .= " AND members.current_salary_end >= ". $this->current_salary['end'];
                 }
+                
+                $salaries['current'] = "(". $salaries['current']. ")";
             }
             
             // 3. others
@@ -208,9 +212,9 @@ class MemberSearch {
 
             if (!empty($this->is_active_seeking_job)) {
                 if (!empty($query_others)) {
-                    $query_others .= " AND members.is_active_seeking_job = '". $this->is_active_seeking_job. "'";
+                    $query_others .= " AND members.is_active_seeking_job = ". $this->is_active_seeking_job;
                 } else {
-                    $query_others = "members.is_active_seeking_job = '". $this->is_active_seeking_job. "'";
+                    $query_others = "members.is_active_seeking_job = ". $this->is_active_seeking_job;
                 }
             }
 
@@ -224,9 +228,9 @@ class MemberSearch {
 
             if (!empty($this->notice_period)) {
                 if (!empty($query_others)) {
-                    $query_others .= " AND members.notice_period >= '". $this->notice_period. "'";
+                    $query_others .= " AND members.notice_period >= ". $this->notice_period;
                 } else {
-                    $query_others = "members.notice_period >= '". $this->notice_period. "'";
+                    $query_others = "members.notice_period >= ". $this->notice_period;
                 }
             }
         }
@@ -252,23 +256,29 @@ class MemberSearch {
                                       '0' AS resume_id";
                 
             }
-                                  
-            if (array_key_exists('resume', $match_against)) {
-                if ($is_union_buffer) {
-                    $columns['member'] .= ", ". $match_against['resume']['member']. " AS resume_score";
-                    $columns['buffer'] .= ", ". $match_against['resume']['buffer'];
-                } else {
-                    $columns['buffer'] .= ", ". $match_against['resume']['buffer']. " AS resume_score";
-                }
-            }
+        }
+         
+        if (array_key_exists('resume', $match_against)) {
+            $columns['member'] .= ", ". $match_against['resume']['member']. " AS resume_score";
             
-            if (array_key_exists('notes', $match_against)) {
-                if ($is_union_buffer) {
-                    $columns['member'] .= ", ". $match_against['notes']['member']. " AS notes_score";
-                    $columns['buffer'] .= ", ". $match_against['notes']['buffer'];
-                } else {
-                    $columns['buffer'] .= ", ". $match_against['notes']['buffer']. " AS notes_score";
-                }
+            if ($is_union_buffer) {
+                $columns['buffer'] .= ", ". $match_against['resume']['buffer'];
+            } 
+            
+            if ($is_union_buffer === false && $is_bypassed) {
+                $columns['buffer'] .= ", ". $match_against['resume']['buffer']. " AS resume_score";
+            }
+        }
+        
+        if (array_key_exists('notes', $match_against)) {
+            $columns['member'] .= ", ". $match_against['notes']['member']. " AS notes_score";
+            
+            if ($is_union_buffer) {
+                $columns['buffer'] .= ", ". $match_against['notes']['buffer'];
+            } 
+            
+            if ($is_union_buffer === false && $is_bypassed) {
+                $columns['buffer'] .= ", ". $match_against['notes']['buffer']. " AS notes_score";
             }
         }
         
@@ -309,16 +319,19 @@ class MemberSearch {
             }
 
             if (!empty($salaries)) {
-                if (empty($match_against)) {
+                if (!empty($match_against)) {
                     $query .= "AND ";
                 }
-
-                foreach ($salaries as $i=>$criteria) {
+                
+                $i = 0;
+                foreach ($salaries as $criteria) {
                     $query .= $criteria. " ";
 
-                    if ($i <= count($salaries)) {
+                    if ($i < count($salaries)-1) {
                         $query .= "AND ";
                     }
+                    
+                    $i++;
                 }
             }
 
@@ -356,7 +369,7 @@ class MemberSearch {
             return $query;
         }
         
-        $query .= "ORDER BY ". $this->order_by;
+        $query .= " ORDER BY ". $this->order_by;
         
         $limit = "";
         if ($with_limit) {
@@ -434,19 +447,19 @@ class MemberSearch {
         }
         
         if (array_key_exists('is_active_seeking_job', $_criterias)) {
-            $this->is_active_seeking_job = ($_criteria['is_active_seeking_job']) ? 'TRUE' : 'FALSE';
+            $this->is_active_seeking_job = ($_criterias['is_active_seeking_job']) ? 'TRUE' : 'FALSE';
         }
         
         if (array_key_exists('can_travel_relocate', $_criterias)) {
-            $this->can_travel_relocate = ($_criteria['can_travel_relocate']) ? 'Y' : 'N';
+            $this->can_travel_relocate = ($_criterias['can_travel_relocate']) ? 'Y' : 'N';
         }
         
         if (array_key_exists('hrm_ethnicity', $_criterias)) {
-            $ethnicities = explode(',', $_criteria['hrm_ethnicity']);
+            $ethnicities = explode(',', $_criterias['hrm_ethnicity']);
             $ethnicities_str = '';
             foreach ($ethnicities as $i=>$ethnicity) {
                 $ethnicities_str .= trim($ethnicity);
-                if ($i <= count($ethnicities)-1) {
+                if ($i < count($ethnicities)-1) {
                     $ethnicities_str .= '%';
                 }
             }
@@ -454,11 +467,11 @@ class MemberSearch {
         }
         
         if (array_key_exists('hrm_gender', $_criterias)) {
-            $this->hrm_gender = $_criteria['hrm_gender'];
+            $this->hrm_gender = $_criterias['hrm_gender'];
         }
         
         if (array_key_exists('notice_period', $_criterias)) {
-            $this->notice_period = $criteria['notice_period'];
+            $this->notice_period = $_criterias['notice_period'];
         }
         
         if (array_key_exists('filter', $_criterias)) {
@@ -483,6 +496,7 @@ class MemberSearch {
             $this->total = count($result);
         }
         
+        // paginate
         $total_pages = ceil($this->total / $this->limit);
         if ($total_pages <= 0) {
             echo $this->query;
@@ -491,6 +505,24 @@ class MemberSearch {
         
         $start = microtime();
         if (substr(trim($this->order_by), 0, 5) == 'score') {
+            // get the total score and relevance
+            $score_max = 1;
+            foreach ($result as $i=>$row) {
+                $resume_score = (isset($row['resume_score'])) ? $row['resume_score'] : 0;
+                $notes_score = (isset($row['notes_score'])) ? $row['notes_score'] : 0;
+                $seeking_score = (isset($row['seeking_score'])) ? $row['seeking_score'] : 0;
+                $total_score = $resume_score + $notes_score + $seeking_score;
+                $result[$i]['total_score'] = $total_score;
+
+                if ($total_score > $score_max) {
+                    $score_max = $total_score;
+                }
+            }
+
+            foreach ($result as $i=>$row) {
+                $result[$i]['relevance'] = floor(($row['total_score'] / $score_max) * 100);
+            }
+            
             // sort and paginate manually
             usort($result, "sort_by_total_score");
             $order = explode(' ', $this->order_by);
@@ -540,15 +572,8 @@ class MemberSearch {
 }
 
 function sort_by_total_score($before, $after) {
-    $before_resume_score = (isset($before['resume_score'])) ? $before['resume_score'] : 0;
-    $before_notes_score = (isset($before['notes_score'])) ? $before['notes_score'] : 0;
-    $before_seeking_score = (isset($before['seeking_score'])) ? $before['seeking_score'] : 0;
-    $after_resume_score = (isset($after['resume_score'])) ? $after['resume_score'] : 0;
-    $after_notes_score = (isset($after['notes_score'])) ? $after['notes_score'] : 0;
-    $after_seeking_score = (isset($after['seeking_score'])) ? $after['seeking_score'] : 0;
-
-    $before_total_score = $before_resume_score + $before_notes_score + $before_seeking_score; 
-    $after_total_score = $after_resume_score + $after_notes_score + $after_seeking_score; 
+    $before_total_score = $before['total_score']; 
+    $after_total_score = $after['total_score']; 
 
     if ($before_total_score == $after_total_score) {
         return 0;
