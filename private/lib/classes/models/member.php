@@ -807,5 +807,90 @@ class Member implements Model {
                   WHERE email_addr = '". $this->id. "'";
         return $this->mysqli->execute($query);
     }
+    
+    public function addJobProfile($_data) {
+        if (!$this->hasData($_data)) {
+            return false;
+        }
+        
+        $data = sanitize($_data);
+        $query = "INSERT INTO member_job_profiles SET ";
+        $i = 0;
+        foreach ($data as $key => $value) {
+            if (strtoupper($key) != "ID" && strtoupper($key) != "MEMBER") {
+                if (is_string($value)) {
+                    if (strtoupper($value) == "NULL") {
+                        $query .= "`". $key. "` = NULL";
+                    } else {
+                        $query .= "`". $key. "` = '". $value. "'";
+                    }
+                } else if (is_null($value) || empty($value)) {
+                    $query .= "`". $key. "` = ''";
+                } else {
+                    $query .= "`". $key. "` = ". $value;
+                }
+
+                if ($i < count($data) - 1) {
+                    $query .= ", ";
+                }
+            }
+            
+            $i++;
+        }
+        
+        if ($i == 0) {
+            $query .= "`member` = '". $this->id. "'";
+        } else {
+            $query .= ", `member` = '". $this->id. "'";
+        }
+        
+        return $this->mysqli->execute($query);
+    }
+    
+    public function saveJobProfile($_id, $_data) {
+        if (empty($_id) || is_null($_id) || $_id <= 0) {
+            return false;
+        }
+        
+        if (!$this->hasData($_data)) {
+            return false;
+        }
+        
+        $data = sanitize($_data);
+        $query = "UPDATE member_job_profiles SET ";
+        $i = 0;
+        foreach ($data as $key => $value) {
+            if (strtoupper($key) != "MEMBER" && strtoupper($key) != "ID") {
+                if (is_string($value)) {
+                    if (strtoupper($value) == "NULL") {
+                        $query .= "`". $key. "` = NULL";
+                    } else {
+                        $query .= "`". $key. "` = '". $value. "'";
+                    }
+                } else if (is_null($value) || empty($value)) {
+                    $query .= "`". $key. "` = ''";
+                } else {
+                    $query .= "`". $key. "` = ". $value;
+                }
+
+                if ($i < count($data) - 1) {
+                    $query .= ", ";
+                } else {
+                    $query .= " ";
+                }
+            }
+            
+            $i++;
+        }
+    
+        $query .= "WHERE `id` = ". $_id;
+        
+        return $this->mysqli->execute($query);
+    }
+    
+    public function removeJobProfile($_id) {
+        $query = "DELETE FROM member_job_profiles WHERE id = ". $_id;
+        return $this->mysqli->execute($query);
+    }
 }
 ?>

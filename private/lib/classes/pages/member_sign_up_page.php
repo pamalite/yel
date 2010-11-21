@@ -1,16 +1,12 @@
 <?php
+require_once dirname(__FILE__). '/../../../config/job_profile.inc';
 require_once dirname(__FILE__). "/../../utilities.php";
 
 class MemberSignUpPage extends Page {
-    private $referee = '';
     private $member = '';
     private $error_message = '';
     
-    function __construct($_referee = '', $_member = '') {
-        if (!empty($_referee)) {
-            $this->referee = desanitize($_referee);
-        }
-        
+    function __construct($_member = '') {
         if (!empty($_member)) {
             $this->member = desanitize($_member);
         }
@@ -34,13 +30,10 @@ class MemberSignUpPage extends Page {
     
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
-        echo 'var referee = "'. $this->referee. '";'. "\n";
-        echo 'var member = "'. $this->member. '";'. "\n";
-        echo 'var error_message = "'. $this->error_message. '";'. "\n";
         echo '</script>'. "\n";
     }
     
-    private function generateCountries($_selected, $_name = 'country') {
+    private function generate_countries($_selected, $_name = 'country') {
         $criteria = array(
             'columns' => "country_code, country", 
             'order' => "country"
@@ -90,12 +83,18 @@ class MemberSignUpPage extends Page {
         echo '</select>'. "\n";
     }
     
-    private function generate_industries($_id, $_selecteds) {
+    private function generate_industries($_id, $_selecteds, $_is_multi=false) {
         $criteria = array('columns' => "id, industry, parent_id");
         $industries = Industry::find($criteria);
         
-        echo '<select class="multiselect" id="'. $_id. '" name="'. $_id. '[]" multiple>'. "\n";
+        if ($_is_multi) {
+            echo '<select class="multiselect" id="'. $_id. '" name="'. $_id. '[]" multiple>'. "\n";
+        } else {
+            echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+        }
         
+        $options_str = '';
+        $has_selected = false;
         foreach ($industries as $industry) {
             $css_class = '';
             $spacing = '';
@@ -106,104 +105,75 @@ class MemberSignUpPage extends Page {
             }
             
             $selected = false;
-            foreach ($_selecteds as $expertise) {
-                if ($expertise == $industry['id']) {
-                    $selected = true;
-                    break;
-                }
+            if (in_array($industry['id'], $_selecteds)) {
+                $selected = true;
+                $has_selected = true;
             }
             
             if ($selected) {
-                echo '<option value="'. $industry['id']. '" '. $css_class. ' selected>'. $spacing. $industry['industry']. '</option>'. "\n";
+                $options_str .= '<option value="'. $industry['id']. '" '. $css_class. ' selected>'. $spacing. $industry['industry']. '</option>'. "\n";
             } else {
-                echo '<option value="'. $industry['id']. '" '. $css_class. '>'. $spacing. $industry['industry']. '</option>'. "\n";
+                $options_str .= '<option value="'. $industry['id']. '" '. $css_class. '>'. $spacing. $industry['industry']. '</option>'. "\n";
+            }
+        }
+        
+        echo '<option value="0" '. (($has_selected) ? '' : 'selected'). '>Select a Specialization</option>'. "\n";
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        echo $options_str;
+        echo '</select>'. "\n";
+    }
+    
+    private function generate_employer_description($_id, $_selected) {
+        $descs = $GLOBALS['emp_descs'];
+        
+        echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+        if (empty($_selected) || is_null($_selected) || $_selected < 0) {
+            echo '<option value="0" selected>Please select one</option>'. "\n";    
+        } else {
+            echo '<option value="0">Please select One</option>'. "\n";
+        }
+        
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        foreach ($descs as $i=>$desc) {
+            if ($i != $_selected) {
+                echo '<option value="'. $i. '">'. $desc. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $i. '" selected>'. $desc. '</option>'. "\n";
             }
         }
         
         echo '</select>'. "\n";
     }
     
-    public function set_error($_error) {
-        switch ($_error) {
-            case '1':
-                $this->error_message = 'Our system indicates that this e-mail address has already been registered with us. <br/>Please sign up with a different e-mail address. Thank you.';
-                break;
-            case '2':
-                $this->error_message = 'The security code provided is invalid. Please try again.';
-                break;
-            default:
-                $this->error_message = 'An unknown error occured.';
-                break;
-        }
-    }
-    
     public function show($_session) {
         $this->begin();
-        
-        if (!empty($this->member)) {
-            $member = new Member($this->member);
-            $this->top("Member Sign Up (Invited by ". $member->getFullName(). ")");
-        } else {
-            $this->top("Member Sign Up");
-        }
+        $this->top("Member Sign Up");
         
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
 
-        <div class="profile">
-            <form id="profile" method="post" action="sign_up_action.php">
-                <input type="hidden" name="member" value="<?php echo $this->member ?>" />
-                <input type="hidden" name="referee" value="<?php echo $this->referee ?>" />
+        <div id="div_sign_up">
+            <form id="profile">
                 <table class="profile_form">
                     <tr>
                         <td class="instruction" colspan="2">Please fill up <span style="font-weight: bold; text-decoration: underline;">ALL</span> the fields.</td>
                     </tr>
                     <tr>
-                        <td class="section_title" colspan="2">About You</td>
+                        <td class="label"><label for="firstname">First Name:</label></td>
+                        <td class="field"><input class="field" type="text" id="firstname" name="firstname" /></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="firstname">First Name / Given Names:</label></td>
-                        <td class="field"><input class="field" type="text" id="firstname" name="firstname" value="<?php echo $_session['firstname'] ?>"/></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="lastname">Last Name / Surname:</label></td>
+                        <td class="label"><label for="lastname">Last Name:</label></td>
                         <td class="field">
-                            <input class="field" type="text" id="lastname" name="lastname" value="<?php echo $_session['lastname'] ?>"/>
+                            <input class="field" type="text" id="lastname" name="lastname" />
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="label">&nbsp;</td>
-                        <td class="note">Your full name will be used for processing payments (rewards) into your bank account. Please ensure that the name you enter is genuine and accurate. Failure to do so may result in you not receiving your rewards.</td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="citizenship">Nationality:</label></td>
-                        <td class="field">
-                            <?php $this->generateCountries($_session['citizenship'], 'citizenship') ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="label center"><input type="checkbox" id="individual_headhunter" name="individual_headhunter" <?php echo ($_session['individual_headhunter'] == 'Y' || isset($_GET['indiv_hh'])) ? 'checked' : '' ?> />&nbsp;<label for="individual_headhunter">I am an Independent Recruitment Consultant</label></td>
-                    </tr>
-                    <tr>
-                        <td class="section_title" colspan="2">Sign In Details</td>
                     </tr>
                     <tr>
                         <td class="label"><label for="email_addr">E-mail Address:</label></td>
                         <td class="field">
-                            <?php
-                                if (empty($this->referee)) {
-                            ?>
-                                    <input class="field" type="text" id="email_addr" name="email_addr" value="<?php echo $_session['email_addr'] ?>"/>
-                            <?php
-                                } else {
-                            ?>
-                                    <input id="email_addr" type="hidden" name="email_addr" value="<?php echo $this->referee; ?>" />
-                            <?php
-                                    echo $this->referee;
-                                }
-                            ?>
+                            <input class="field" type="text" id="email_addr" name="email_addr" />
                         </td>
                     </tr>
                     <tr>
@@ -217,70 +187,119 @@ class MemberSignUpPage extends Page {
                     <tr>
                         <td class="label"><label for="forget_password_question">Password hint:</label></td>
                         <td class="field">
-                            <?php $this->generate_password_reset_questions($_session['forget_question']); ?>
+                            <?php $this->generate_password_reset_questions(0); ?>
                         </td>
                     </tr>
                     <tr>
                         <td class="label"><label for="forget_password_answer">Password hint answer:</label></td>
-                        <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" value="<?php echo $_session['forget_answer'] ?>" /></td>
+                        <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" /></td>
                     </tr>
                     <tr>
-                        <td class="section_title" colspan="2">Contact Details</td>
+                        <td class="label"><label for="phone_num">Telephone Number:</label></td>
+                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" /></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="phone_num">Contact Number:</label></td>
-                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $_session['phone_num'] ?>"/></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="address">Mailing Address:</label></td>
-                        <td class="field"><textarea id="address" name="address"><?php echo $_session['address'] ?></textarea></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="state">State/Province:</label></td>
-                        <td class="field"><input class="field" type="text" id="state" name="state" value="<?php echo $_session['state'] ?>"/></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="zip">Zip/Postal Code:</label></td>
-                        <td class="field"><input class="field" type="text" id="zip" name="zip" value="<?php echo $_session['zip'] ?>"/></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="country">Country:</label></td>
-                        <td class="field">
-                            <?php $this->generateCountries($_session['country']) ?>
+                        <td colspan="2">
+                            <!-- reCAPTCHA goes here -->
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="section_title" colspan="2">Top 3 Specializations &amp; Preference</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="label center">Please choose your top 3 industrial sectors, or majors. We collect these information is to better understand the needs of our members.</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="center">
-                            <?php $this->generate_industries('industry', $_session['industry']); ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="note center">
-                            Hold down the CTRL or Command (Mac) key while selecting multiple specializations.
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="label center"><input type="checkbox" id="like_newsletter" name="like_newsletter" <?php echo ($_session['like_newsletter'] == 'N') ? '' : 'checked' ?> />&nbsp;<label for="like_newsletter">I want to receive weekly highlights of the latest jobs</label></td>
-                    </tr>
-                    <tr>
-                        <td class="section_title" colspan="2">Security</td>
-                    </tr>
-                    <tr>
-                        <td class="instruction" colspan="2">Please type the characters as shown on the left.</td>
-                    </tr>
-                    <tr>
-                        <td class="label"><img src="CaptchaSecurityImages.php?characters=6" /></td>
-                        <td class="field"><input class="field" type="text" id="security_code" name="security_code" /></td>
                     </tr>
                     <tr>
                         <td class="buttons_bar" colspan="2">
-                            <input type="checkbox" id="agreed_terms" name="agreed_terms" />&nbsp;<span style="font-size: 10pt;vertical-align: middle;"><label for="agreed_terms">I have read, understood and accepted the <a target="_new" href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/terms.php">Terms of Use of Yellow Elevator</a>.</label></span>&nbsp;<input type="submit" id="save" value="Sign Me Up!" />
+                            <input type="checkbox" id="agreed_terms" name="agreed_terms" />&nbsp;<span style="font-size: 10pt;vertical-align: middle;"><label for="agreed_terms">I have read, understood and accepted the <a target="_new" href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/terms.php">Terms of Use of Yellow Elevator</a>.</label></span>&nbsp;<input type="button" id="save" onClick="sign_up();" value="Sign Me Up!" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        
+        <div id="div_job_profile">
+            <form id="job_profile">
+                <input type="hidden" id="member_email_addr" value="" />
+                <table class="job_profile_form">
+                    <tr>
+                        <td class="instruction" colspan="2">
+                            Congratulations! You are now signed up with YellowElevator.com. <br/>
+                            An activation email had been send to your email inbox. Please follow the instructions in the email to fully activate your account.<br/>
+                            In the mean time, please help our Recruitment Consultants identify suitable opportunities for you. <br/>
+                            <br/>
+                            Please fill up <span style="font-weight: bold; text-decoration: underline;">ALL</span> the fields to your best of knowledge.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section_title" colspan="2">
+                            Current Job Profile
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="specialization">Specialization:</label></td>
+                        <td class="field">
+                            <?php $this->generate_industries('specialization', array()); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="position_title">Job Title:</label></td>
+                        <td class="field">
+                            <input class="field" type="text" id="position_title" name="position_title" alt="eg: Director, Manager, GM, VP, etc." />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="position_superior_title">Superior Title:</label></td>
+                        <td class="field">
+                            <input class="field" type="text" id="position_superior_title" name="position_superior_title" alt="eg: Director, Manager, GM, VP, etc." />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="organization_size">Number of Direct Reports:</label></td>
+                        <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="work_from_month">Duration:</label></td>
+                        <td class="field">
+                            <?php echo generate_month_dropdown('work_from_month', ''); ?>
+                            <input type="text" maxlength="4" size="4" id="work_from_year" alt="yyyy" />
+                            to
+                            <span id="work_to_dropdown">
+                                <?php echo generate_month_dropdown('work_to_month', ''); ?>
+                                <input type="text" maxlength="4" size="4" id="work_to_year" alt="yyyy" />
+                            </span>
+                            <input type="checkbox" id="work_to_present" onClick="toggle_work_to();" /> 
+                            <label for="work_to_present">Present</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="company">Employer:</label></td>
+                        <td class="field"><input class="field" type="text" id="company" name="company" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="emp_desc">Employer Description:</label></td>
+                        <td class="field">
+                            <?php $this->generate_employer_description('emp_desc', -1); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="emp_specialization">Employer Specialization:</label></td>
+                        <td class="field">
+                            <?php $this->generate_industries('emp_specialization', array()); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="section_title" colspan="2">
+                            Career Goals &amp; Experiences
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="total_work_years">Total Years of Work Experience:</label></td>
+                        <td class="field"><input class="field" type="text" id="total_work_years" name="total_work_years" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="seeking">Goals &amp; Experiences:</label></td>
+                        <td class="field">
+                            <textarea id="seeking" class="field" alt="Brief our Recruitment Consulstants about your career goals and experiences, enough to help them identify suitable opportunities for your recommendation."></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="buttons_bar" colspan="2">
+                            <input type="button" id="save" onClick="save_job_profile();" value="Save Job Profile" />
                         </td>
                     </tr>
                 </table>

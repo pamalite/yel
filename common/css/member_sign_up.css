@@ -1,17 +1,24 @@
-div.profile {
+#div_sign_up, #div_job_profile {
     padding-top: 20px;
 }
 
-.profile_form {
+#div_job_profile {
+    display: none;
+}
+
+.profile_form, 
+.job_profile_form {
     width: 55%;
     margin: auto;
 }
 
-.profile_form td {
+.profile_form td, 
+.job_profile_form td {
     padding: 3px 3px 3px 3px;
 }
 
-.profile_form td.section_title {
+.profile_form td.section_title, 
+.job_profile_form td.section_title {
     font-size: 14pt;
     font-weight: bold;
     text-align: center;
@@ -20,7 +27,8 @@ div.profile {
     padding-bottom: 5px;
 }
 
-.profile_form td.instruction {
+.profile_form td.instruction, 
+.job_profile_form td.instruction {
     text-align: center;
     font-style: italic;
     padding-top: 10px;
@@ -28,7 +36,8 @@ div.profile {
     font-size: 12pt;
 }
 
-.profile_form td.note {
+.profile_form td.note, 
+.job_profile_form td.note {
     font-size: 9pt;
     color: #666666;
     font-style: italic;
@@ -36,16 +45,20 @@ div.profile {
     padding-bottom: 5px;
 }
 
-.profile_form td.label {
-    width: 45%;
+.profile_form td.label, 
+.job_profile_form td.label {
+    text-align: right;
+    width: 35%;
     font-size: 12pt;
 }
 
-.profile_form .center {
+.profile_form .center, 
+.job_profile_form .center {
     text-align: center;
 }
 
-.profile_form td.buttons_bar {
+.profile_form td.buttons_bar, 
+.job_profile_form td.buttons_bar {
     text-align: right;
     border-top: 1px solid #CCCCCC;
     font-size: 12pt;
@@ -68,6 +81,6 @@ select.multiselect {
 textarea {
     font-size: 12pt;
     width: 99%;
-    height: 90px;
+    height: 150px;
 }
 
