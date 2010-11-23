@@ -294,7 +294,7 @@ class MemberSignUpPage extends Page {
                     <tr>
                         <td class="label"><label for="seeking">Goals &amp; Experiences:</label></td>
                         <td class="field">
-                            <textarea id="seeking" class="field" alt="Brief our Recruitment Consulstants about your career goals and experiences, enough to help them identify suitable opportunities for your recommendation."></textarea>
+                            <textarea id="seeking" class="field">Brief our Recruitment Consulstants about your career goals and experiences, enough to help them identify suitable opportunities for your recommendation.</textarea>
                         </td>
                     </tr>
                     <tr>

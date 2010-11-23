@@ -168,6 +168,12 @@ function validate_job_profile() {
 }
 
 function sign_up() {
+    $('div_sign_up').setStyle('display', 'none');
+    $('div_job_profile').setStyle('display', 'block');
+    
+    update_overtexts();
+    
+    return;
     if (!validate_sign_up()) {
         return;
     }
@@ -270,6 +276,13 @@ function toggle_work_to() {
     } else {
         $('work_to_dropdown').setStyle('display', 'inline');
     }
+}
+
+function update_overtexts() {
+    new OverText($('position_title'));
+    new OverText($('position_superior_title'));
+    new OverText($('work_from_year'));
+    new OverText($('work_to_year'));
 }
 
 function onDomReady() {
