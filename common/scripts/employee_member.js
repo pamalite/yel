@@ -935,7 +935,7 @@ function close_apply_job_popup(_is_apply_job) {
                     return;
                 }
                 
-                if (xml) {
+                if (txt.indexOf('failed_jobs') > -1) {
                     var job_titles = xml.getElementsByTagName('title');
                     var employers = xml.getElementsByTagName('employer');
                     var expire_ons = xml.getElementsByTagName('expire_on');
