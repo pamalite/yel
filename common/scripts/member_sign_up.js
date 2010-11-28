@@ -9,7 +9,7 @@ function validate_sign_up() {
         $('firstname').setStyle('border', '2px solid #FF0000');
         return false;
     } else {
-        rset_field($('firstname'));
+        reset_field($('firstname'));
     }
     
     if ($('lastname').value == '') {
@@ -168,12 +168,6 @@ function validate_job_profile() {
 }
 
 function sign_up() {
-    $('div_sign_up').setStyle('display', 'none');
-    $('div_job_profile').setStyle('display', 'block');
-    
-    update_overtexts();
-    
-    return;
     if (!validate_sign_up()) {
         return;
     }
@@ -197,6 +191,7 @@ function sign_up() {
                 $('div_sign_up').setStyle('display', 'none');
                 $('div_job_profile').setStyle('display', 'block');
                 $('member_email_addr').value = $('email_addr').value;
+                update_overtexts();
                 window.scrollTo(0, 0);
                 return;
             }
@@ -208,6 +203,8 @@ function sign_up() {
                 alert('An error occured when signing up.' + "\n\n" + 'Please try again later.');
             } else if (responses[1] == 'error_activation') {
                 alert('An error when trying to send an activation email.' + "\n\n" + 'Please contact us to have the problem sorted.');
+            } else if (responses[1] == 'captcha') {
+                alert('The security code was incorrectly entered.');
             }
         },
         onRequest: function(instance) {

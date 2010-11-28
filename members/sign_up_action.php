@@ -20,15 +20,17 @@ if ($_POST['action'] == 'sign_up') {
     }
     
     // 1. Check whether the e-mail has been taken. If taken, then inform user to use another.
-    $mysqli = Database::connect();
+    $member = new Member();
+    $criteria = array(
+        'columns' => "COUNT(*) AS id_used",
+        'match' => "email_addr = '". $_POST['email_addr']. "'"
+    );
+    $result = $member->find($criteria);
     $inactive = false;
-    $query = "SELECT COUNT(*) AS id_used FROM members WHERE email_addr = '". $_POST['email_addr']. "'";
-    $result = $mysqli->query($query);
     if ($result[0]['id_used'] != '0') {
         // 1.1 Check whether this e-mail was previously unsubscribed or not active.
-        $query = "SELECT active FROM members WHERE email_addr = '". $_POST['email_addr']. "'";
-        $result = $mysqli->query($query);
-        if ($result[0]['active'] != 'N') {
+        $member = new Member($_POST['email_addr']);
+        if ($member->isActive()) {
             echo 'ko - email_taken';
         } else {
             $inactive = true;
@@ -82,13 +84,12 @@ if ($_POST['action'] == 'sign_up') {
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     $subject = "Member Activation Required";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    mail($_POST['email_addr'], $subject, $message, $headers);
+    //mail($_POST['email_addr'], $subject, $message, $headers);
     
-    /*$handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
+    $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
     fwrite($handle, 'Subject: '. $subject. "\n\n");
     fwrite($handle, $message);
-    fclose($handle);*/
-    
+    fclose($handle);
     
     echo 'ok';
     exit();

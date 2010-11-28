@@ -162,27 +162,27 @@ class MemberSignUpPage extends Page {
                     </tr>
                     <tr>
                         <td class="label"><label for="firstname">First Name:</label></td>
-                        <td class="field"><input class="field" type="text" id="firstname" name="firstname" /></td>
+                        <td class="field"><input class="field" type="text" id="firstname" name="firstname" alt="Jane" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="lastname">Last Name:</label></td>
                         <td class="field">
-                            <input class="field" type="text" id="lastname" name="lastname" />
+                            <input class="field" type="text" id="lastname" name="lastname" alt="Doe" />
                         </td>
                     </tr>
                     <tr>
                         <td class="label"><label for="email_addr">E-mail Address:</label></td>
                         <td class="field">
-                            <input class="field" type="text" id="email_addr" name="email_addr" />
+                            <input class="field" type="text" id="email_addr" name="email_addr" alt="jane.doe@acme.com" />
                         </td>
                     </tr>
                     <tr>
                         <td class="label"><label for="password">Password:</label></td>
-                        <td class="field"><input class="field" type="password" id="password" name="password" /></td>
+                        <td class="field"><input class="field" type="password" id="password" name="password" alt="create a password" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="password_confirm">Confirm Password:</label></td>
-                        <td class="field"><input class="field" type="password" id="password_confirm" name="password_confirm" /></td>
+                        <td class="field"><input class="field" type="password" id="password_confirm" name="password_confirm" alt="type the password again" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="forget_password_question">Password hint:</label></td>
@@ -196,7 +196,7 @@ class MemberSignUpPage extends Page {
                     </tr>
                     <tr>
                         <td class="label"><label for="phone_num">Telephone Number:</label></td>
-                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" /></td>
+                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" alt="123-1234 5678" /></td>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -256,11 +256,11 @@ class MemberSignUpPage extends Page {
                         <td class="label"><label for="work_from_month">Duration:</label></td>
                         <td class="field">
                             <?php echo generate_month_dropdown('work_from_month', ''); ?>
-                            <input type="text" maxlength="4" size="4" id="work_from_year" alt="yyyy" />
+                            <input type="text" class="year" maxlength="4" id="work_from_year" alt="yyyy" />
                             to
                             <span id="work_to_dropdown">
                                 <?php echo generate_month_dropdown('work_to_month', ''); ?>
-                                <input type="text" maxlength="4" size="4" id="work_to_year" alt="yyyy" />
+                                <input type="text" class="year" maxlength="4" id="work_to_year" alt="yyyy" />
                             </span>
                             <input type="checkbox" id="work_to_present" onClick="toggle_work_to();" /> 
                             <label for="work_to_present">Present</label>

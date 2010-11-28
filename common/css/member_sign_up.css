@@ -73,6 +73,10 @@ input.field, select.field {
     font-size: 12pt;
 }
 
+input.year {
+    width: 50px;
+}
+
 select.multiselect {
     height: 250px;
     font-size: 12pt;
