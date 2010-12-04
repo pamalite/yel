@@ -8,8 +8,8 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'sign_up') {
-    echo 'ok';
-    exit();
+    // echo 'ok';
+    // exit();
     // verify captcha first
     // if not valid echo 'ko - captcha';
     
@@ -64,6 +64,7 @@ if ($_POST['action'] == 'sign_up') {
     
     // 3. Create activation token and email
     $activation_id = microtime(true);
+    $mysqli = Database::connect();
     $query = "INSERT INTO member_activation_tokens SET 
               id = '". $activation_id. "', 
               member = '". $_POST['email_addr']. "', 

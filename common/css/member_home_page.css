@@ -163,6 +163,11 @@
     background-color: #EEEEEE;
 }
 
+.profile_form_table td.action {
+    text-align: center;
+    width: 5%;
+}
+
 textarea {
     width: 75%;
     height: 100px;
@@ -170,4 +175,48 @@ textarea {
 
 .notice_period {
     width: 45px;
+}
+
+#notes_window, #texts_window, #ranges_window, 
+#choices_window, #job_profile_window {
+    display: none;
+}
+
+input.texts {
+    width: 97%;
+    font-size: 12pt;
+}
+
+input.range {
+    font-size: 12pt;
+}
+
+div.notes_form, div.texts_form, 
+div.ranges_form, div.choices_form {
+    text-align: center;
+}
+
+#notes_window div.notes_form {
+    width: 640px;
+}
+
+#notes_window textarea {
+    width: 98%;
+    height: 480px;
+    font-size: 12pt;
+}
+
+#choices_window div.choices_form {
+    width: 250px;
+    padding: 3px 3px 3px 3px;
+}
+
+#texts_window div.texts_form {
+    width: 250px;
+    padding: 3px 3px 3px 3px;
+}
+
+#texts_window input.text {
+    width: 50%;
+    font-size: 12pt;
 }

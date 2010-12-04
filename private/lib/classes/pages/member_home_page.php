@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
+require_once dirname(__FILE__). "/../../../config/job_profile.inc";
 
 class MemberHomePage extends Page {
     private $member = NULL;
@@ -69,15 +70,24 @@ class MemberHomePage extends Page {
     
     private function get_answers() {
         $criteria = array(
-            'columns' => "is_active_seeking_job, seeking, expected_salary, 
+            'columns' => "is_active_seeking_job, seeking, expected_salary_currency, expected_salary, 
                           expected_salary_end, can_travel_relocate, reason_for_leaving, 
-                          current_position, current_salary, current_salary_end, 
+                          current_position, current_salary_currency, current_salary, current_salary_end, 
                           notice_period", 
             'match' => "email_addr = '". $this->member->getId(). "'", 
             'limit' => "1"
         );
         
         $result = $this->member->find($criteria);
+        
+        $result[0]['seeking'] = str_replace("\n", '<br/>', $result[0]['seeking']);
+        $result[0]['reason_for_leaving'] = str_replace("\n", '<br/>', $result[0]['reason_for_leaving']);
+        $result[0]['current_position'] = str_replace("\n", '<br/>', $result[0]['current_position']);
+        
+        $result[0]['seeking'] = addslashes($result[0]['seeking']);
+        $result[0]['reason_for_leaving'] = addslashes($result[0]['reason_for_leaving']);
+        $result[0]['current_position'] = addslashes($result[0]['current_position']);
+        
         return $result[0];
     }
     
@@ -182,175 +192,203 @@ class MemberHomePage extends Page {
                     </div>
                     
                     <div class="profile">
-                        <div class="profile_title">Quick Profile</div>
+                        <div class="profile_title">Summary</div>
                         <div class="profile_form">
                             Please help us answer the following questions as part of our on-going effort to understand you better. You may also update youe answers if necessary.<br/>
                             <table class="profile_form_table">
                                 <tr>
-                                    <td class="field"><label for="is_seeking_job">Are you actively seeking for a new job or experience?</label></td>
+                                    <td class="field">Are you actively seeking for a new job or experience?</td>
                                     <td>
-                                        <select id="is_seeking_job" onChange="toggle_the_rest_of_form();">
                                         <?php
                                         if ($is_active) {
                                         ?>
-                                            <option value="1" selected>Yes</option>
-                                            <option value="0">No</option>
+                                        Yes
                                         <?php
                                         } else {
                                         ?>
-                                            <option value="1">Yes</option>
-                                            <option value="0" selected>No</option>
-                                        <?php
+                                        No
+                                        <?php    
                                         }
                                         ?>
-                                        </select>
+                                    </td>
+                                    <td class="action"><a class="no_link edit" onClick="show_choices_popup('Active Job Seeker?', 'Yes|No', '<?php echo ($is_active) ? 'Yes' : 'No'; ?>', 'save_is_active_job_seeker');">edit</a>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field odd"><label for="seeking">Briefly, what sort of job or experience are you seeking?</label></td>
+                                    <td class="field odd">Briefly, tell us what are your goals and experiences.</td>
                                     <td class="odd">
+                                        <span id="seeking_field">
+                                        <?php
+                                        if ($is_active) {
+                                            echo $answers['seeking'];
+                                        }
+                                        ?>
+                                        </span>
+                                    </td>
+                                    <td class="action">
+                                        <span id="seeking_edit">
                                         <?php
                                         if ($is_active) {
                                         ?>
-                                            <textarea id="seeking"><?php echo $answers['seeking']; ?></textarea>
-                                        <?php
-                                        } else {
-                                        ?>
-                                            <textarea id="seeking" disabled></textarea>
+                                            <a class="no_link edit" onClick="show_notes_popup('Goals and Experiences', '<?php echo $answers['seeking']; ?>', 'save_seeking');">edit</a>
                                         <?php
                                         }
                                         ?>
+                                        </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field"><label for="expected_salary">What will be your expected salary range?</label></td>
+                                    <td class="field">What will be your expected salary range?</td>
                                     <td>
-                                        <?php echo $currency. '$&nbsp;'; ?>
+                                        <span id="expected_salary_field">
+                                        <?php echo $answers['expected_salary_currency']. '$&nbsp;'; ?>
                                         <?php 
                                         if ($is_active) {
+                                            echo number_format($answers['expected_salary'], 2, '.', ' '). ' to '. number_format($answers['expected_salary_end'], 2, '.', ' ');
+                                        }
                                         ?>
-                                            <input type="input" id="expected_salary" value="<?php echo $answers['expected_salary']; ?>" /> 
-                                            to
-                                            <input type="input" id="expected_salary_end" value="<?php echo $answers['expected_salary_end']; ?>"/>
+                                        </span>
+                                    </td>
+                                    <td class="action">
+                                        <span id="expected_salary_edit">
                                         <?php
-                                        } else {
+                                        if ($is_active) {
                                         ?>
-                                            <input type="input" id="expected_salary" value="" disabled /> 
-                                            to
-                                            <input type="input" id="expected_salary_end" value="" disabled />
+                                            <a class="no_link edit" onClick="show_ranges_popup('Expected Salary Range', '<?php echo $answers['expected_salary']; ?>', '<?php echo $answers['expected_salary_end']; ?>', '<?php echo $answers['expected_salary_currency']; ?>', 'save_expected_salary');">edit</a>
                                         <?php
                                         }
                                         ?>
+                                        </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field odd"><label for="can_travel_relocate">Perhaps you can travel, or relocate, if the new job requires it?</label></td>
+                                    <td class="field odd">Perhaps you can travel, or relocate, if the new job requires it?</td>
                                     <td class="odd">
+                                        <span id="travel_field">
                                         <?php
                                         if ($is_active) {
-                                        ?>
-                                            <select id="can_travel_relocate">
-                                            <?php
-                                            if ($answers['can_travel_relocate'] == 'Y') {
-                                            ?>
-                                                <option value="1" selected>Yes</option>
-                                                <option value="0">No</option>
-                                            <?php
-                                            } else {
-                                            ?>
-                                                <option value="1">Yes</option>
-                                                <option value="0" selected>No</option>
-                                            <?php
-                                            }
-                                            ?>
-                                            </select>
-                                        <?php
-                                        } else {
-                                        ?>
-                                            <select id="can_travel_relocate" disabled>
-                                                <option value="1" selected>Yes</option>
-                                                <option value="0">No</option>
-                                            </select>
-                                        <?php
+                                            echo ($answers['can_travel_relocate'] == 'Y') ? 'Yes' : 'No';
                                         }
                                         ?>
                                     </td>
+                                    <td class="action">
+                                        <span id="travel_edit">
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <a class="no_link edit" onClick="show_choices_popup('Can Travel/Relocate?', 'Yes|No', '<?php echo ($answers['can_travel_relocate'] == 'Y') ? 'Yes' : 'No'; ?>', 'save_travel_relocate');">edit</a>
+                                        <?php
+                                        }
+                                        ?>
+                                        </span>
+                                    </td>
                                 </tr>
                                 <tr>
-                                    <td class="field"><label for="reason_for_leaving">Briefly, why do you want to leave your current job?</label></td>
+                                    <td class="field">Briefly, why do you want to leave your current job?</td>
                                     <td>
+                                        <span id="leaving_field">
+                                        <?php
+                                        if ($is_active) {
+                                            echo $answers['reason_for_leaving'];
+                                        }
+                                        ?>
+                                        </span>
+                                    </td>
+                                    <td class="action">
+                                        <span id="leaving_edit">
                                         <?php
                                         if ($is_active) {
                                         ?>
-                                            <textarea id="reason_for_leaving"><?php echo $answers['reason_for_leaving']; ?></textarea>
-                                        <?php
-                                        } else {
-                                        ?>
-                                            <textarea id="reason_for_leaving" disabled></textarea>
+                                            <a class="no_link edit" onClick="show_notes_popup('Reason for Leaving', '<?php echo $answers['reason_for_leaving']; ?>', 'save_reason_for_leaving');">edit</a>
                                         <?php
                                         }
                                         ?>
+                                        </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field odd"><label for="current_position">Briefly, what is your current position, and what do you do?</label></td>
+                                    <td class="field odd">Briefly, what is your current position, and what do you do?</td>
                                     <td class="odd">
+                                        <span id="current_job_field">
+                                        <?php
+                                        if ($is_active) {
+                                            echo stripslashes($answers['current_position']);
+                                        }
+                                        ?>
+                                        </span>
+                                    </td>
+                                    <td class="action">
+                                        <span id="current_job_edit">
                                         <?php
                                         if ($is_active) {
                                         ?>
-                                            <textarea id="current_position"><?php echo $answers['current_position']; ?></textarea>
-                                        <?php
-                                        } else {
-                                        ?>
-                                            <textarea id="current_position" disabled></textarea>
+                                            <a class="no_link edit" onClick="show_notes_popup('Current Job Description', '<?php echo $answers['current_position']; ?>', 'save_current_job_desc');">edit</a>
                                         <?php
                                         }
                                         ?>
+                                        </span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field"><label for="current_salary">What is your current salary range?</label></td>
+                                    <td class="field">What is your current salary range?</td>
                                     <td>
-                                        <?php echo $currency. '$&nbsp;'; ?>
+                                        <span id="current_salary_field">
+                                        <?php echo $answers['current_salary_currency']. '$&nbsp;'; ?>
                                         <?php 
                                         if ($is_active) {
-                                        ?>
-                                            <input type="input" id="current_salary" value="<?php echo $answers['current_salary']; ?>" /> 
-                                            to
-                                            <input type="input" id="current_salary_end" value="<?php echo $answers['current_salary_end']; ?>"/>
-                                        <?php
-                                        } else {
-                                        ?>
-                                            <input type="input" id="current_salary" value="" disabled /> 
-                                            to
-                                            <input type="input" id="current_salary_end" value="" disabled />
-                                        <?php
+                                            echo number_format($answers['current_salary'], 2, '.', ' ') .' to '.  number_format($answers['current_salary_end'], 2, '.' , ' ');
                                         }
                                         ?>
+                                        </span>
                                     </td>
-                                </tr>
-                                <tr>
-                                    <td class="field odd"><label for="notice_period">What is your notice period?</label></td>
-                                    <td class="odd">
+                                    <td class="action">
+                                        <span id="current_salary_edit">
                                         <?php
                                         if ($is_active) {
                                         ?>
-                                            <input type="text" class="notice_period" id="notice_period" value="<?php echo $answers['notice_period']; ?>" />
+                                            <a class="no_link edit" onClick="show_ranges_popup('Current Salary Range', '<?php echo $answers['current_salary']; ?>', '<?php echo $answers['current_salary_end']; ?>', '<?php echo $answers['current_salary_currency']; ?>', 'save_current_salary');">edit</a>
                                         <?php
-                                        } else {
+                                        }
                                         ?>
-                                            <input type="text" class="notice_period" id="notice_period" value="" disabled />
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field odd">What is your notice period?</td>
+                                    <td class="odd">
+                                        <span id="notice_period_field">
                                         <?php
+                                        if ($is_active) {
+                                            echo $answers['notice_period'];
                                         }
                                         ?>
                                         months
+                                        </span>
+                                    </td>
+                                    <td class="action">
+                                        <span id="notice_period_edit">
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <a class="no_link edit" onClick="show_texts_popup('Notice Period (in Months)', '<?php echo $answers['notice_period']; ?>', 'save_notice_period');">edit</a>
+                                        <?php
+                                        }
+                                        ?>
+                                        </span>
                                     </td>
                                 </tr>
                             </table>
                         </div>
+                    </div>
+                    
+                    <div id="job_profiles" class="profile">
+                        <div class="profile_title">Positions Held &amp; Holding</div>
                         <div class="buttons">
-                            <input type="button" value="Save" onClick="save_answers();" />
+                            <input type="button" value="Add Position" onClick="show_job_profile(0);" />
                         </div>
+                        <table class="job_profiles_list">
+                            <?php //TODO: list all the job profiles here ?>
+                        </table>
                     </div>
                 </td>
                 <td class="right_content">
@@ -379,6 +417,95 @@ class MemberHomePage extends Page {
             </tr>
         </table>
         
+        <!-- popup windows goes here -->
+        <div id="notes_window" class="popup_window">
+            <div id="notes_title" class="popup_window_title">Career Profile Update</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="id" value="" />
+                <input type="hidden" id="notes_action" value="" />
+                <div class="notes_form">
+                    <textarea id="notes" class="notes"></textarea>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_notes_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_notes_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="texts_window" class="popup_window">
+            <div id="texts_title" class="popup_window_title">Career Profile Update</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="id" value="" />
+                <input type="hidden" id="texts_action" value="" />
+                <div class="texts_form">
+                    <input type="text" class="texts" id="texts" />
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_texts_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_texts_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="ranges_window" class="popup_window">
+            <div id="ranges_title" class="popup_window_title">Career Profile Update</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="id" value="" />
+                <input type="hidden" id="action" value="" />
+                <div class="ranges_form">
+                    <select id="currency">
+                    <?php
+                    foreach ($GLOBALS['currencies'] as $i=>$currency) {
+                        if ($i == 0) {
+                    ?>
+                        <option value="<?php echo $currency; ?>" selected><?php echo $currency; ?></option>
+                    <?php
+                        } else {
+                    ?>
+                        <option value="<?php echo $currency; ?>"><?php echo $currency; ?></option>
+                    <?php
+                        }
+                    }
+                    ?>
+                    </select>
+                    <input type="text" class="range" id="range_start" /> to <input type="text" class="range" id="range_end" />
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_ranges_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_ranges_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="choices_window" class="popup_window">
+            <div id="choices_title" class="popup_window_title">Career Profile Update</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="id" value="" />
+                <input type="hidden" id="choices_action" value="" />
+                <div class="choices_form">
+                    <span id="choices_dropdown"></span>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_choices_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_choices_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="job_profile_window" class="popup_window">
+            <div class="popup_window_title">Job Profile</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="id" value="" />
+                <div class="job_profile_form">
+                    
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_job_profile_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_job_profile_popup(false);" />
+            </div>
+        </div>
         <?php
     }
 }

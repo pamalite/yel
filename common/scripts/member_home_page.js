@@ -199,7 +199,7 @@ function save_answers() {
             params = params + '&notice_period=' + $('notice_period').value;
         }
     }
-    alert(params);
+    
     var uri = root + "/members/home_action.php";
     var request = new Request({
         url: uri,
@@ -220,27 +220,183 @@ function save_answers() {
     request.send(params);
 }
 
-function toggle_the_rest_of_form() {
+function toggle_the_rest_of_form(_is_active) {
     if ($('is_seeking_job').options[$('is_seeking_job').selectedIndex].value == '0') {
-        $('seeking').disabled = true;
-        $('expected_salary').disabled = true;
-        $('expected_salary_end').disabled = true;
-        $('can_travel_relocate').disabled = true;
-        $('reason_for_leaving').disabled = true;
-        $('current_position').disabled = true;
-        $('current_salary').disabled = true;
-        $('current_salary_end').disabled = true;
-        $('notice_period').disabled = true;
+        $('seeking_field').setStyle('display', 'block');
+        $('seeking_edit').setStyle('display', 'block');
+        $('expected_salary_field').setStyle('display', 'block');
+        $('expected_salary_edit').setStyle('display', 'block');
+        $('travel_field').setStyle('display', 'block');
+        $('travel_edit').setStyle('display', 'block');
+        $('leaving_field').setStyle('display', 'block');
+        $('leaving_edit').setStyle('display', 'block');
+        $('current_job_field').setStyle('display', 'block');
+        $('current_job_edit').setStyle('display', 'block');
+        $('current_salary_field').setStyle('display', 'block');
+        $('current_salary_edit').setStyle('display', 'block');
+        $('notice_period_field').setStyle('display', 'block');
+        $('notice_period_edit').setStyle('display', 'block');
     } else {
-        $('seeking').disabled = false;
-        $('expected_salary').disabled = false;
-        $('expected_salary_end').disabled = false;
-        $('can_travel_relocate').disabled = false;
-        $('reason_for_leaving').disabled = false;
-        $('current_position').disabled = false;
-        $('current_salary').disabled = false;
-        $('current_salary_end').disabled = false;
-        $('notice_period').disabled = false;
+        $('seeking_field').setStyle('display', 'none');
+        $('seeking_edit').setStyle('display', 'none');
+        $('expected_salary_field').setStyle('display', 'none');
+        $('expected_salary_edit').setStyle('display', 'none');
+        $('travel_field').setStyle('display', 'none');
+        $('travel_edit').setStyle('display', 'none');
+        $('leaving_field').setStyle('display', 'none');
+        $('leaving_edit').setStyle('display', 'none');
+        $('current_job_field').setStyle('display', 'none');
+        $('current_job_edit').setStyle('display', 'none');
+        $('current_salary_field').setStyle('display', 'none');
+        $('current_salary_edit').setStyle('display', 'none');
+        $('notice_period_field').setStyle('display', 'none');
+        $('notice_period_edit').setStyle('display', 'none');
+    }
+}
+
+function show_choices_popup(_title, _choices_str, _selected, _action) {
+    $('choices_title').set('html', _title);
+    $('choices_action').value = _action;
+    
+    var choices = _choices_str.split('|');
+    if (choices.length <= 0) {
+        return;
+    }
+    
+    var html = '<select id="choices" class="choices">' + "\n";
+    for (var i=0; i < choices.length; i++) {
+        if (choices[i].toUpperCase() == _selected.toUpperCase()) {
+            html = html + '<option value="' + choices[i] + '" selected>' + choices[i] + '</option>' + "\n";
+        } else {
+            html = html + '<option value="' + choices[i] + '">' + choices[i] + '</option>' + "\n";
+        }
+    }
+    html = html + '</select>' + "\n";
+    
+    $('choices_dropdown').set('html', html);
+    
+    show_window('choices_window');
+    window.scrollTo(0, 0);
+}
+
+function close_choices_popup(_is_save) {
+    if (_is_save) {
+        var choice = $('choices').options[$('choices').selectedIndex].value;
+        var params = 'id=' + id + '&action=' + $('choices_action').value + '&choice=' + choice;
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error occured when saving. Please try again later.');
+                    return;
+                }
+                
+                if ($('choices_action') == 'save_is_active_job_seeker') {
+                    // toggle the rest            
+                    toggle_the_rest_of_form((choice.toUpperCase() == 'YES'));
+                }
+                
+                close_window('choices_window');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('choices_window');
+    }
+}
+
+function show_notes_popup(_title, _texts, _action) {
+    $('notes_title').set('html', _title);
+    $('notes_action').value = _action;
+    
+    $('notes').value = _texts.replace(/<br\/>/g, "\n");
+    
+    show_window('notes_window');
+    window.scrollTo(0, 0);
+}
+
+function close_notes_popup(_is_save) {
+    if (_is_save) {
+        var text = $('notes').value.replace(/\n/g, "<br/>");
+        text = add_slashes(text);
+        
+        if (isEmpty(text)) {
+            alert('You need to enter some texts in order to save.' + "\n\n" + 'You can click the \'Cancel\' button to close this popup window.');
+            return;
+        }
+        
+        var params = 'id=' + id + '&action=' + $('notes_action').value;
+        params = params + '&text=' + text;
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error occured when saving. Please try again later.');
+                    return;
+                }
+                
+                close_window('notes_window');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('notes_window');
+    }
+}
+
+function show_texts_popup(_title, _texts, _action) {
+    $('texts_title').set('html', _title);
+    $('texts_action').value = _action;
+    
+    $('texts').value = _texts;
+    
+    show_window('texts_window');
+    window.scrollTo(0, 0);
+}
+
+function close_texts_popup(_is_save) {
+    if (_is_save) {
+        var text = add_slashes($('texts').value);
+        
+        if (isEmpty(text)) {
+            alert('You need to enter some texts in order to save.' + "\n\n" + 'You can click the \'Cancel\' button to close this popup window.');
+            return;
+        }
+        
+        var params = 'id=' + id + '&action=' + $('texts_action').value;
+        params = params + '&text=' + text;
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error occured when saving. Please try again later.');
+                    return;
+                }
+                
+                close_window('texts_window');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('texts_window');
     }
 }
 

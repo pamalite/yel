@@ -127,10 +127,10 @@ function validate_job_profile() {
     
     if (isEmpty($('company').value)) {
         alert('Employer cannot be empty.');
-        $('employer').setStyle('border', '2px solid #FF0000');
+        $('company').setStyle('border', '2px solid #FF0000');
         return false;
     } else {
-        reset_field($('employer'));
+        reset_field($('company'));
     }
     
     if ($('emp_desc').selectedIndex == 0) {
