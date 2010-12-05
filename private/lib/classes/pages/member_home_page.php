@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
 require_once dirname(__FILE__). "/../../../config/job_profile.inc";
+require_once dirname(__FILE__). "/../htmltable.php";
 
 class MemberHomePage extends Page {
     private $member = NULL;
@@ -80,6 +81,10 @@ class MemberHomePage extends Page {
         
         $result = $this->member->find($criteria);
         
+        $result[0]['seeking'] = htmlspecialchars_decode(stripslashes($result[0]['seeking']));
+        $result[0]['reason_for_leaving'] = htmlspecialchars_decode(stripslashes($result[0]['reason_for_leaving']));
+        $result[0]['current_position'] = htmlspecialchars_decode(stripslashes($result[0]['current_position']));
+        
         $result[0]['seeking'] = str_replace("\n", '<br/>', $result[0]['seeking']);
         $result[0]['reason_for_leaving'] = str_replace("\n", '<br/>', $result[0]['reason_for_leaving']);
         $result[0]['current_position'] = str_replace("\n", '<br/>', $result[0]['current_position']);
@@ -89,6 +94,88 @@ class MemberHomePage extends Page {
         $result[0]['current_position'] = addslashes($result[0]['current_position']);
         
         return $result[0];
+    }
+    
+    private function get_job_profiles() {
+        $criteria = array(
+            'columns' => "member_job_profiles.id, member_job_profiles.position_title, 
+                          member_job_profiles.employer, 
+                          DATE_FORMAT(member_job_profiles.work_from, '%b, %Y') AS formatted_work_from, 
+                          DATE_FORMAT(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
+            'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr",
+            'match' => "members.email_addr = '". $this->member->getId(). "'",
+            'having' => "member_job_profiles.id IS NOT NULL",
+            'order' => "work_from DESC"
+        );
+        
+        $result = $this->member->find($criteria);
+        if (is_null($result) || count($result) <= 0) {
+            return array();
+        }
+        
+        return $result;
+    }
+    
+    private function generate_industries($_id, $_selecteds, $_is_multi=false) {
+        $criteria = array('columns' => "id, industry, parent_id");
+        $industries = Industry::find($criteria);
+        
+        if ($_is_multi) {
+            echo '<select class="multiselect" id="'. $_id. '" name="'. $_id. '[]" multiple>'. "\n";
+        } else {
+            echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+        }
+        
+        $options_str = '';
+        $has_selected = false;
+        foreach ($industries as $industry) {
+            $css_class = '';
+            $spacing = '';
+            if (is_null($industry['parent_id'])) {
+                $css_class = 'class = "main_industry"';
+            } else {
+                $spacing = '&nbsp;&nbsp;&nbsp;';
+            }
+            
+            $selected = false;
+            if (in_array($industry['id'], $_selecteds)) {
+                $selected = true;
+                $has_selected = true;
+            }
+            
+            if ($selected) {
+                $options_str .= '<option value="'. $industry['id']. '" '. $css_class. ' selected>'. $spacing. $industry['industry']. '</option>'. "\n";
+            } else {
+                $options_str .= '<option value="'. $industry['id']. '" '. $css_class. '>'. $spacing. $industry['industry']. '</option>'. "\n";
+            }
+        }
+        
+        echo '<option value="0" '. (($has_selected) ? '' : 'selected'). '>Select a Specialization</option>'. "\n";
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        echo $options_str;
+        echo '</select>'. "\n";
+    }
+    
+    private function generate_employer_description($_id, $_selected) {
+        $descs = $GLOBALS['emp_descs'];
+        
+        echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+        if (empty($_selected) || is_null($_selected) || $_selected < 0) {
+            echo '<option value="0" selected>Please select one</option>'. "\n";    
+        } else {
+            echo '<option value="0">Please select One</option>'. "\n";
+        }
+        
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        foreach ($descs as $i=>$desc) {
+            if ($i != $_selected) {
+                echo '<option value="'. $i. '">'. $desc. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $i. '" selected>'. $desc. '</option>'. "\n";
+            }
+        }
+        
+        echo '</select>'. "\n";
     }
     
     public function show() {
@@ -131,6 +218,8 @@ class MemberHomePage extends Page {
         
         $answers = $this->get_answers();
         $is_active = ($answers['is_active_seeking_job'] == '1') ? true : false;
+        
+        $job_profiles = $this->get_job_profiles();
         
         ?>
         <div id="div_status" class="status">
@@ -241,9 +330,9 @@ class MemberHomePage extends Page {
                                     <td class="field">What will be your expected salary range?</td>
                                     <td>
                                         <span id="expected_salary_field">
-                                        <?php echo $answers['expected_salary_currency']. '$&nbsp;'; ?>
                                         <?php 
                                         if ($is_active) {
+                                            echo $answers['expected_salary_currency']. '$&nbsp;';
                                             echo number_format($answers['expected_salary'], 2, '.', ' '). ' to '. number_format($answers['expected_salary_end'], 2, '.', ' ');
                                         }
                                         ?>
@@ -333,9 +422,9 @@ class MemberHomePage extends Page {
                                     <td class="field">What is your current salary range?</td>
                                     <td>
                                         <span id="current_salary_field">
-                                        <?php echo $answers['current_salary_currency']. '$&nbsp;'; ?>
                                         <?php 
                                         if ($is_active) {
+                                            echo $answers['current_salary_currency']. '$&nbsp;';
                                             echo number_format($answers['current_salary'], 2, '.', ' ') .' to '.  number_format($answers['current_salary_end'], 2, '.' , ' ');
                                         }
                                         ?>
@@ -359,10 +448,9 @@ class MemberHomePage extends Page {
                                         <span id="notice_period_field">
                                         <?php
                                         if ($is_active) {
-                                            echo $answers['notice_period'];
+                                            echo $answers['notice_period']. ' months';
                                         }
                                         ?>
-                                        months
                                         </span>
                                     </td>
                                     <td class="action">
@@ -382,13 +470,44 @@ class MemberHomePage extends Page {
                     </div>
                     
                     <div id="job_profiles" class="profile">
-                        <div class="profile_title">Positions Held &amp; Holding</div>
+                        <div class="profile_title">Positions Held &amp; Currently Holding</div>
                         <div class="buttons">
-                            <input type="button" value="Add Position" onClick="show_job_profile(0);" />
+                            <input type="button" value="Add Position" onClick="show_job_profile_popup(0);" />
                         </div>
-                        <table class="job_profiles_list">
-                            <?php //TODO: list all the job profiles here ?>
-                        </table>
+                        <div class="job_profiles">
+                        <?php
+                        if (empty($job_profiles)) {
+                        ?>
+                        <div class="empty_results">No positions found.</div>
+                        <?php
+                        } else {
+                            $job_profiles_table = new HTMLTable('job_profiles_table', 'job_profiles');
+
+                            $job_profiles_table->set(0, 0, '&nbsp;', '', 'header action');
+                            $job_profiles_table->set(0, 1, 'From', '', 'header');
+                            $job_profiles_table->set(0, 2, 'To', '', 'header');
+                            $job_profiles_table->set(0, 3, 'Employer', '', 'header');
+                            $job_profiles_table->set(0, 4, 'Position', '', 'header');
+                            $job_profiles_table->set(0, 5, '&nbsp;', '', 'header action');
+
+                            foreach ($job_profiles as $i => $job_profile) {
+                                $job_profiles_table->set($i+1, 0, '<a class="no_link" onClick="delete_job_profile('. $job_profile['id']. ')">delete</a>', '', 'cell action');
+                                $job_profiles_table->set($i+1, 1, $job_profile['formatted_work_from'], '', 'cell');
+                                $work_to = $job_profile['formatted_work_to'];
+                                if (is_null($work_to) || empty($work_to) || $work_to == '0000-00-00') {
+                                    $work_to = 'Present';
+                                }
+                                $job_profiles_table->set($i+1, 2, $work_to, '', 'cell');
+                                
+                                $job_profiles_table->set($i+1, 3, $job_profile['employer'], '', 'cell');
+                                $job_profiles_table->set($i+1, 4, $job_profile['position_title'], '', 'cell');
+                                $job_profiles_table->set($i+1, 5, '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">edit</a>', '', 'cell action');
+                            }
+                            
+                            echo $job_profiles_table->get_html();
+                        }
+                        ?>
+                        </div>
                     </div>
                 </td>
                 <td class="right_content">
@@ -452,20 +571,14 @@ class MemberHomePage extends Page {
             <div id="ranges_title" class="popup_window_title">Career Profile Update</div>
             <form onSubmit="return false;">
                 <input type="hidden" id="id" value="" />
-                <input type="hidden" id="action" value="" />
+                <input type="hidden" id="ranges_action" value="" />
                 <div class="ranges_form">
-                    <select id="currency">
+                    <select id="range_currency" class="range_currency">
                     <?php
                     foreach ($GLOBALS['currencies'] as $i=>$currency) {
-                        if ($i == 0) {
-                    ?>
-                        <option value="<?php echo $currency; ?>" selected><?php echo $currency; ?></option>
-                    <?php
-                        } else {
                     ?>
                         <option value="<?php echo $currency; ?>"><?php echo $currency; ?></option>
                     <?php
-                        }
                     }
                     ?>
                     </select>
@@ -496,9 +609,66 @@ class MemberHomePage extends Page {
         <div id="job_profile_window" class="popup_window">
             <div class="popup_window_title">Job Profile</div>
             <form onSubmit="return false;">
-                <input type="hidden" id="id" value="" />
+                <input type="hidden" id="job_profile_id" value="0" />
                 <div class="job_profile_form">
-                    
+                    <table class="job_profile_form">
+                        <tr>
+                            <td class="label"><label for="specialization">Specialization:</label></td>
+                            <td class="field">
+                                <?php $this->generate_industries('specialization', array()); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="position_title">Job Title:</label></td>
+                            <td class="field">
+                                <input class="field" type="text" id="position_title" name="position_title" />
+                                <br/>
+                                <span class="tips">eg: Director, Manager, GM, VP, etc.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="position_superior_title">Superior Title:</label></td>
+                            <td class="field">
+                                <input class="field" type="text" id="position_superior_title" name="position_superior_title" />
+                                <br/>
+                                <span class="tips">eg: Director, Manager, GM, VP, etc.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="organization_size">Number of Direct Reports:</label></td>
+                            <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="work_from_month">Duration:</label></td>
+                            <td class="field">
+                                <?php echo generate_month_dropdown('work_from_month', ''); ?>
+                                <input type="text" class="year" maxlength="4" id="work_from_year" value="yyyy" /> 
+                                to 
+                                <span id="work_to_dropdown">
+                                    <?php echo generate_month_dropdown('work_to_month', ''); ?>
+                                    <input type="text" class="year" maxlength="4" id="work_to_year" value="yyyy" />
+                                </span>
+                                <input type="checkbox" id="work_to_present" onClick="toggle_work_to();" /> 
+                                <label for="work_to_present">Present</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="company">Employer:</label></td>
+                            <td class="field"><input class="field" type="text" id="company" name="company" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="emp_desc">Employer Description:</label></td>
+                            <td class="field">
+                                <?php $this->generate_employer_description('emp_desc', -1); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="emp_specialization">Employer Specialization:</label></td>
+                            <td class="field">
+                                <?php $this->generate_industries('emp_specialization', array()); ?>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </form>
             <div class="popup_window_buttons_bar">

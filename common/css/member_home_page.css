@@ -191,6 +191,10 @@ input.range {
     font-size: 12pt;
 }
 
+select.range_currency {
+    font-size: 12pt;
+}
+
 div.notes_form, div.texts_form, 
 div.ranges_form, div.choices_form {
     text-align: center;
@@ -219,4 +223,93 @@ div.ranges_form, div.choices_form {
 #texts_window input.text {
     width: 50%;
     font-size: 12pt;
+}
+
+#ranges_window div.ranges_form {
+    width: 500px;
+    padding: 5px 5px 5px 5px;
+}
+
+div.job_profiles {
+    padding-bottom: 5px;
+}
+
+#job_profiles_table {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+#job_profiles_table td.odd {
+    background-color: #EEEEEE;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.action {
+    width: 50px;
+    text-align: center;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+#job_profiles_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+.center {
+    text-align: center;
+}
+
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+#job_profile_window div.job_profile_form {
+    width: 700px;
+}
+
+#job_profile_window table.job_profile_form {
+    width: 98%;
+    margin: auto;
+}
+
+#job_profile_window table td.label {
+    width: 30%;
+}
+
+#job_profile_window input.field, 
+#job_profile_window select.field {
+    width: 100%;
+    font-size: 12pt;
+}
+
+#job_profile_window select, 
+#job_profile_window input.year {
+    font-size: 12pt;
+}
+
+#job_profile_window input.year {
+    width: 50px;
+}
+
+.tips {
+    font-size: 9pt;
+    color: #666666;
 }

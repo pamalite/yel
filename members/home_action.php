@@ -1,15 +1,14 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
+require_once dirname(__FILE__). "/../private/config/job_profile.inc";
 
 session_start();
 
-if (!isset($_POST['id'])) {
-    echo "ko";
-    exit();
-    //redirect_to('login.php');
-}
-
 $xml_dom = new XMLDOM();
+
+if (!isset($_POST['id'])) {
+    redirect_to('home.php');
+}
 
 if (!isset($_POST['action'])) {
     redirect_to('home.php');
@@ -31,34 +30,174 @@ if ($_POST['action'] == 'save_census_answers') {
     exit();
 }
 
-if ($_POST['action'] == 'save_answers') {
+if ($_POST['action'] == 'save_is_active_job_seeker') {
     $data = array();
-    $data['is_active_seeking_job'] = ($_POST['is_active_seeking_job'] == '1') ? true : false;
-    
-    if ($data['is_active_seeking_job']) {
-        $data['seeking'] = sanitize($_POST['seeking']);
-        $data['expected_salary'] = sanitize($_POST['expected_salary']);
-        $data['expected_salary_end'] = sanitize($_POST['expected_salary_end']);
-        $data['can_travel_relocate'] = sanitize($_POST['can_travel_relocate']);
-        $data['reason_for_leaving'] = sanitize($_POST['reason_for_leaving']);
-        $data['current_position'] = sanitize($_POST['current_position']);
-        $data['current_salary'] = sanitize($_POST['current_salary']);
-        $data['current_salary_end'] = sanitize($_POST['current_salary_end']);
-        $data['notice_period'] = sanitize($_POST['notice_period']);
-    } else {
-        $data['seeking'] = 'NULL';
-        $data['expected_salary'] = 0;
-        $data['expected_salary_end'] = 0;
-        $data['can_travel_relocate'] = 'NULL';
-        $data['reason_for_leaving'] = 'NULL';
-        $data['current_position'] = 'NULL';
-        $data['current_salary'] = 0;
-        $data['current_salary_end'] = 0;
-        $data['notice_period'] = 'NULL';
-    }
+    $data['is_active_seeking_job'] = (strtoupper($_POST['choice']) == 'YES') ? true : false;
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'save_travel_relocate') {
+    $data = array();
+    $data['can_travel_relocate'] = (strtoupper($_POST['choice']) == 'YES') ? "Y" : "N";
+    
+    $member = new Member($_POST['id']);
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+
+if ($_POST['action'] == 'save_seeking') {
+    $data = array();
+    $data['seeking'] = $_POST['text'];
+    
+    $member = new Member($_POST['id']);
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'save_reason_for_leaving') {
+    $data = array();
+    $data['reason_for_leaving'] = $_POST['text'];
+    
+    $member = new Member($_POST['id']);
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'save_current_job_desc') {
+    $data = array();
+    $data['current_position'] = $_POST['text'];
+    
+    $member = new Member($_POST['id']);
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'save_notice_period') {
+    $data = array();
+    $data['notice_period'] = is_numeric($_POST['text']) ? $_POST['text'] : "0";
+    
+    $member = new Member($_POST['id']);
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'save_current_salary') {
+    $data = array();
+    $data['current_salary_currency'] = $_POST['currency'];
+    $data['current_salary'] = $_POST['start'];
+    $data['current_salary_end'] = $_POST['end'];
+    
+    $member = new Member($_POST['id']);
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'save_expected_salary') {
+    $data = array();
+    $data['expected_salary_currency'] = $_POST['currency'];
+    $data['expected_salary'] = $_POST['start'];
+    $data['expected_salary_end'] = $_POST['end'];
+    
+    $member = new Member($_POST['id']);
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'save_job_profile') {
+    $data = array();
+    $data['specialization'] = $_POST['specialization'];
+    $data['position_title'] = $_POST['position_title'];
+    $data['position_superior_title'] = $_POST['superior_title'];
+    $data['organization_size'] = $_POST['organization_size'];
+    $data['employer'] = $_POST['employer'];
+    $data['employer_description'] = $_POST['emp_desc'];
+    $data['employer_specialization'] = $_POST['emp_specialization'];
+    $data['work_from'] = $_POST['work_from'];
+    $data['work_to'] = $_POST['work_to'];
+    
+    $member = new Member($_POST['member']);
+    if ($_POST['id'] == 0) {
+        // new ---> add
+        if ($member->addJobProfile($data) === false) {
+            echo 'ko';
+            exit();
+        }
+    } else {
+        // existing ---> update
+        if ($member->saveJobProfile($_POST['id'], $data) === false) {
+            echo 'ko';
+            exit();
+        }
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'get_job_profile') {
+    $criteria = array(
+        'columns' => "*", 
+        'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr", 
+        'match' => "member_job_profiles.id = ". $_POST['id']
+    );
+    
+    $member = new Member();
+    $result = $member->find($criteria);
+    
+    $response = array('job_profile' => $result);
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
+if ($_POST['action'] == 'remove_job_profile') {
+    $member = new Member();
+    
+    if ($member->removeJobProfile($_POST['id']) === false) {
         echo 'ko';
         exit();
     }

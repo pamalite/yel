@@ -214,6 +214,7 @@ class Member implements Model {
         $group = '';
         $limit = '';
         $match = '';
+        $having = '';
         
         foreach ($_criteria as $key => $clause) {
             switch (strtoupper($key)) {
@@ -244,11 +245,14 @@ class Member implements Model {
                 case 'MATCH':
                     $match = "WHERE ". trim($clause);
                     break;
+                case 'HAVING':
+                    $having = "HAVING ". trim($clause);
+                    break;
             }
         }
         
         $query = "SELECT ". $columns. " FROM members ". $joins. 
-                  " ". $match. " ". $group. " ". $order. " ". $limit;
+                  " ". $match. " ". $group. " ". $having. " ". $order. " ". $limit;
         
         return $this->mysqli->query($query);
     }
