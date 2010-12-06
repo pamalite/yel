@@ -240,7 +240,7 @@ function close_notes_popup(_is_save) {
         }
         
         var params = 'id=' + id + '&action=' + $('notes_action').value;
-        params = params + '&text=' + text;
+        params = params + '&text=' + encodeURIComponent(text);
         
         var uri = root + "/members/home_action.php";
         var request = new Request({
@@ -276,7 +276,7 @@ function show_texts_popup(_title, _texts, _action) {
 
 function close_texts_popup(_is_save) {
     if (_is_save) {
-        var text = add_slashes($('texts').value);
+        var text = encodeURIComponent(add_slashes($('texts').value));
         
         if (isEmpty(text)) {
             alert('You need to enter some texts in order to save.' + "\n\n" + 'You can click the \'Cancel\' button to close this popup window.');

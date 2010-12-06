@@ -130,6 +130,7 @@ function validate_profile_form() {
 function show_profile() {
     $('member_profile').setStyle('display', 'block');
     $('member_resumes').setStyle('display', 'none');
+    $('member_career').setStyle('display', 'none');
     $('member_notes').setStyle('display', 'none');
     $('member_connections').setStyle('display', 'none');
     $('member_applications').setStyle('display', 'none');
@@ -138,6 +139,7 @@ function show_profile() {
     
     if (member_id != "0") {
         $('item_resumes').setStyle('background-color', '');
+        $('item_career').setStyle('background-color', '');
         $('item_notes').setStyle('background-color', '');
         $('item_connections').setStyle('background-color', '');
         $('item_applications').setStyle('background-color', '');
@@ -264,12 +266,14 @@ function reject_photo() {
 function show_resumes() {
     $('member_profile').setStyle('display', 'none');
     $('member_resumes').setStyle('display', 'block');
+    $('member_career').setStyle('display', 'none');
     $('member_notes').setStyle('display', 'none');
     $('member_connections').setStyle('display', 'none');
     $('member_applications').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
     $('item_resumes').setStyle('background-color', '#CCCCCC');
+    $('item_career').setStyle('background-color', '');
     $('item_notes').setStyle('background-color', '');
     $('item_connections').setStyle('background-color', '');
     $('item_applications').setStyle('background-color', '');
@@ -300,15 +304,77 @@ function close_upload_resume_popup(_is_upload) {
     }
 }
 
+function show_career() {
+    $('member_profile').setStyle('display', 'none');
+    $('member_resumes').setStyle('display', 'none');
+    $('member_career').setStyle('display', 'block');
+    $('member_notes').setStyle('display', 'none');
+    $('member_connections').setStyle('display', 'none');
+    $('member_applications').setStyle('display', 'none');
+    
+    $('item_profile').setStyle('background-color', '');
+    $('item_resumes').setStyle('background-color', '');
+    $('item_career').setStyle('background-color', '#CCCCCC');
+    $('item_notes').setStyle('background-color', '');
+    $('item_connections').setStyle('background-color', '');
+    $('item_applications').setStyle('background-color', '');
+}
+
+function save_career() {
+    var seeking = $('seeking').value.replace(/\n/g, "<br/>");
+    seeking = add_slashes(seeking);
+    
+    var reason_leaving = $('reason_for_leaving').value.replace(/\n/g, "<br/>");
+    reason_leaving = add_slashes(reason_leaving);
+    
+    var current_position = $('current_position').value.replace(/\n/g, "<br/>");
+    current_position = add_slashes(current_position);
+    
+    var params = 'id=' + member_id;
+    params = params + '&action=save_career';
+    params = params + '&is_seeking=' + $('is_active_seeking_job').options[$('is_active_seeking_job').selectedIndex].value;
+    params = params + '&can_travel=' + $('can_travel_relocate').options[$('can_travel_relocate').selectedIndex].value;
+    params = params + '&seeking=' + seeking;
+    params = params + '&reason_leaving=' + reason_leaving;
+    params = params + '&current_position=' + current_position;
+    params = params + '&notice_period=' + $('notice_period').value;
+    params = params + '&expected_currency=' + $('expected_salary_currency').options[$('expected_salary_currency').selectedIndex].value;
+    params = params + '&expected_salary=' + $('expected_salary').value;
+    params = params + '&expected_salary_end=' + $('expected_salary_end').value;
+    params = params + '&current_currency=' + $('current_salary_currency').options[$('current_salary_currency').selectedIndex].value;
+    params = params + '&current_salary=' + $('current_salary').value;
+    params = params + '&current_salary_end=' + $('current_salary_end').value;
+    
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while saving career profile.');
+                return false;
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Saving career profile...');
+        }
+    });
+    
+    request.send(params);
+}
+
 function show_notes() {
     $('member_profile').setStyle('display', 'none');
     $('member_resumes').setStyle('display', 'none');
+    $('member_career').setStyle('display', 'none');
     $('member_notes').setStyle('display', 'block');
     $('member_connections').setStyle('display', 'none');
     $('member_applications').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
     $('item_resumes').setStyle('background-color', '');
+    $('item_career').setStyle('background-color', '');
     $('item_notes').setStyle('background-color', '#CCCCCC');
     $('item_connections').setStyle('background-color', '');
     $('item_applications').setStyle('background-color', '');
@@ -365,12 +431,14 @@ function save_notes() {
 function show_connections() {
     $('member_profile').setStyle('display', 'none');
     $('member_resumes').setStyle('display', 'none');
+    $('member_career').setStyle('display', 'none');
     $('member_notes').setStyle('display', 'none');
     $('member_connections').setStyle('display', 'block');
     $('member_applications').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
     $('item_resumes').setStyle('background-color', '');
+    $('item_career').setStyle('background-color', '');
     $('item_notes').setStyle('background-color', '');
     $('item_connections').setStyle('background-color', '#CCCCCC');
     $('item_applications').setStyle('background-color', '');
@@ -671,12 +739,14 @@ function close_add_candidates_popup(_is_submit) {
 function show_applications() {
     $('member_profile').setStyle('display', 'none');
     $('member_resumes').setStyle('display', 'none');
+    $('member_career').setStyle('display', 'none');
     $('member_notes').setStyle('display', 'none');
     $('member_connections').setStyle('display', 'none');
     $('member_applications').setStyle('display', 'block');
     
     $('item_profile').setStyle('background-color', '');
     $('item_resumes').setStyle('background-color', '');
+    $('item_career').setStyle('background-color', '');
     $('item_notes').setStyle('background-color', '');
     $('item_connections').setStyle('background-color', '');
     $('item_applications').setStyle('background-color', '#CCCCCC');
@@ -1057,6 +1127,9 @@ function onDomReady() {
     switch (current_page) {
         case 'resumes':
             show_resumes()
+            break;
+        case 'career':
+            show_career();
             break;
         case 'notes':
             show_notes();

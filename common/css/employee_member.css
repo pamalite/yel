@@ -14,7 +14,7 @@ a.menu {
 }
 
 input, select, textarea {
-    font-size: 12pt;
+    font-size: 10pt;
 }
 
 .photo_image {
@@ -86,7 +86,7 @@ textarea {
     height: 90px;
 }
 
-#member_resumes, #member_notes, 
+#member_resumes, #member_career, 
 #member_applications, #member_connections {
     display: none;
 }
@@ -207,28 +207,36 @@ div.add_candidates_form {
     font-size: 10pt;
 }
 
-table.notes_form {
-    width: 75%;
+table.career_profile {
+    width: 100%;
     margin: auto;
 }
 
-table.notes_form td {
-    font-size: 12pt;
+table.career_profile td {
+    width: 50%;
+    vertical-align: top;
+}
+
+table.career_form {
+    width: 98%;
+    margin: auto;
+}
+
+table.career_form td {
     text-align: left;
     padding: 3px 3px 3px 3px;
 }
 
-table.notes_form td.buttons_bar {
+table.career_form td.buttons_bar {
     text-align: right;
     background-color: #CCCCCC;
 }
 
-table.notes_form td.label {
-    width: 35%;
-
+table.career_form td.label {
+    width: 25%;
 }
 
-table.notes_form td.title {
+table.career_form td.title {
     text-align: center;
     border: 1px solid #CCCCCC;
     font-weight: bold;

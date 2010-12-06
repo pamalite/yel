@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
 require_once dirname(__FILE__). "/../htmltable.php";
+require_once dirname(__FILE__). "/../../../config/job_profile.inc";
 
 class EmployeeMemberPage extends Page {
     private $employee = NULL;
@@ -79,6 +80,31 @@ class EmployeeMemberPage extends Page {
         }
         
         echo '</script>'. "\n";
+    }
+    
+    private function remove_br($_str) {
+        return str_replace('<br/>', "\n", $_str);
+    }
+    
+    private function generate_currencies($_id, $_selected='') {
+        $currencies = $GLOBALS['currencies'];
+        
+        echo '<select id="'. $_id. '" name="'. $_id. '">'. "\n";
+        
+        foreach ($currencies as $i=>$currency) {
+            if (empty($_selected) && $i == 0) {
+                echo '<option value="'. $currency. '" selected>'. $currency. '</option>'. "\n";
+                continue;
+            }
+             
+            if ($currency == $_selected) {
+                echo '<option value="'. $currency. '" selected>'. $currency. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $currency. '">'. $currency. '</option>'. "\n";
+            }
+        }
+        
+        echo '</select>';
     }
     
     private function generate_countries($_selected, $_name = 'country') {
@@ -332,6 +358,7 @@ class EmployeeMemberPage extends Page {
             if (!$this->is_new) {
             ?>
                 <li id="item_resumes" style="<?php echo ($this->current_page == 'resumes') ? $style : ''; ?>"><a class="menu" onClick="show_resumes(false);">Resumes</a></li>
+                <li id="item_career" style="<?php echo ($this->current_page == 'career') ? $style : ''; ?>"><a class="menu" onClick="show_career(false);">Career Profile</a></li>
                 <li id="item_notes" style="<?php echo ($this->current_page == 'notes') ? $style : ''; ?>"><a class="menu" onClick="show_notes(false);">Notes</a></li>
                 <li id="item_connections" style="<?php echo ($this->current_page == 'connections') ? $style : ''; ?>"><a class="menu" onClick="show_connections(false);">Connections</a></li>
                 <li id="item_applications" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_applications(false);">Applications</a></li>
@@ -579,85 +606,108 @@ class EmployeeMemberPage extends Page {
             </table>
         </div>
         
-        <div id="member_notes">
-            <form id="notes" method="post" onSubmit="return false;">
-                <table class="notes_form">
+        <div id="member_career">
+            <form id="career" method="post" onSubmit="return false;">
+                <table class="career_profile">
                     <tr>
-                        <td class="buttons_bar" colspan="2"><input type="button" onClick="save_notes();" value="Save &amp; Update Notes" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="is_active_seeking_job">Seeking for a Job:</label></td>
-                        <td class="field">
-                            <select id="is_active_seeking_job">
-                            <?php
-                                if ($profile['is_active_seeking_job'] == '1') {
-                            ?>
-                                <option value="1" selected>Yes</option>
-                                <option value="0">No</option>
-                            <?php
-                                } else {
-                            ?>
-                                <option value="1">Yes</option>
-                                <option value="0" selected>No</option>
-                            <?php
-                                }
-                            ?>
-                            </select>
+                        <td>
+                            <table class="career_form">
+                                <tr>
+                                    <td class="buttons_bar" colspan="2"><input type="button" onClick="save_career();" value="Save" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="is_active_seeking_job">Seeking for a Job:</label></td>
+                                    <td class="field">
+                                        <select id="is_active_seeking_job">
+                                        <?php
+                                            if ($profile['is_active_seeking_job'] == '1') {
+                                        ?>
+                                            <option value="1" selected>Yes</option>
+                                            <option value="0">No</option>
+                                        <?php
+                                            } else {
+                                        ?>
+                                            <option value="1">Yes</option>
+                                            <option value="0" selected>No</option>
+                                        <?php
+                                            }
+                                        ?>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="seeking">Goals &amp; Experiences:</label></td>
+                                    <td class="field">
+                                        <textarea id="seeking"><?php echo $this->remove_br( htmlspecialchars_decode(stripslashes($profile['seeking']))); ?></textarea></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="expected_salary">Expected Salary:</label></td>
+                                    <td class="field">
+                                        <?php 
+                                            $this->generate_currencies('expected_salary_currency', $profile['expected_salary_currency']); 
+                                        ?>$ &nbsp;
+                                        <input class="salary" type="text" id="expected_salary" value="<?php echo $profile['expected_salary'] ?>" /> 
+                                        - 
+                                        <input class="salary" type="text" id="expected_salary_end" value="<?php echo $profile['expected_salary_end'] ?>" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="can_travel_relocate">Willing to Travel or Relocate:</label></td>
+                                    <td class="field">
+                                        <select id="can_travel_relocate">
+                                        <?php
+                                            if ($profile['can_travel_relocate'] == 'Y') {
+                                        ?>
+                                            <option value="Y" selected>Yes</option>
+                                            <option value="N">No</option>
+                                        <?php
+                                            } else {
+                                        ?>
+                                            <option value="Y">Yes</option>
+                                            <option value="N" selected>No</option>
+                                        <?php
+                                            }
+                                        ?>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="reason_for_leaving">Reason for leaving:</label></td>
+                                    <td class="field"><textarea id="reason_for_leaving"><?php echo $this->remove_br(htmlspecialchars_decode(stripslashes($profile['reason_for_leaving']))); ?></textarea></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="current_position">Current position:</label></td>
+                                    <td class="field"><textarea id="current_position"><?php echo $this->remove_br(htmlspecialchars_decode(stripslashes($profile['current_position']))); ?></textarea></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="current_salary">Current Salary:</label></td>
+                                    <td class="field">
+                                        <?php 
+                                            $this->generate_currencies('current_salary_currency', $profile['current_salary_currency']); 
+                                        ?>$ &nbsp;<input class="salary" type="text" id="current_salary" value="<?php echo $profile['current_salary'] ?>" /> - <input class="salary" type="text" id="current_salary_end" value="<?php echo $profile['current_salary_end'] ?>" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="notice_period">Notice Period:</label></td>
+                                    <td class="field"><input class="salary" type="text" id="notice_period" value="<?php echo $profile['notice_period'] ?>" /> months</td>
+                                </tr>
+                                <!-- tr>
+                                    <td class="label"><label for="extra_notes">Extra Notes/Remarks:</label></td>
+                                    <td class="field"><textarea id="extra_notes"><?php echo htmlspecialchars_decode(stripslashes($profile['notes'])) ?></textarea></td>
+                                </tr -->
+                                <tr>
+                                    <td class="buttons_bar" colspan="2"><input type="button" onClick="save_career();" value="Save" /></td>
+                                </tr>
+                            </table>
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="seeking">Job Seeking:</label></td>
-                        <td class="field"><textarea id="seeking"><?php echo htmlspecialchars_decode(stripslashes($profile['seeking'])) ?></textarea></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="expected_salary">Expected Salary:</label></td>
-                        <td class="field"><?php echo $branch[0]['currency']; ?>$ &nbsp;<input class="salary" type="text" id="expected_salary" value="<?php echo $profile['expected_salary'] ?>" /> - <input class="salary" type="text" id="expected_salary_end" value="<?php echo $profile['expected_salary_end'] ?>" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="can_travel_relocate">Willing to Travel or Relocate:</label></td>
-                        <td class="field">
-                            <select id="can_travel_relocate">
-                            <?php
-                                if ($profile['can_travel_relocate'] == 'Y') {
-                            ?>
-                                <option value="Y" selected>Yes</option>
-                                <option value="N">No</option>
-                            <?php
-                                } else {
-                            ?>
-                                <option value="Y">Yes</option>
-                                <option value="N" selected>No</option>
-                            <?php
-                                }
-                            ?>
-                            </select>
+                        <td>
+                            <!-- job profiles -->
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="reason_for_leaving">Reason for leaving:</label></td>
-                        <td class="field"><textarea id="reason_for_leaving"><?php echo htmlspecialchars_decode(stripslashes($profile['reason_for_leaving'])) ?></textarea></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="current_position">Current position:</label></td>
-                        <td class="field"><textarea id="current_position"><?php echo htmlspecialchars_decode(stripslashes($profile['current_position'])) ?></textarea></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="current_salary">Current Salary:</label></td>
-                        <td class="field"><?php echo $branch[0]['currency']; ?>$ &nbsp;<input class="salary" type="text" id="current_salary" value="<?php echo $profile['current_salary'] ?>" /> - <input class="salary" type="text" id="current_salary_end" value="<?php echo $profile['current_salary_end'] ?>" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="notice_period">Notice Period:</label></td>
-                        <td class="field"><input class="salary" type="text" id="notice_period" value="<?php echo $profile['notice_period'] ?>" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="extra_notes">Extra Notes/Remarks:</label></td>
-                        <td class="field"><textarea id="extra_notes"><?php echo htmlspecialchars_decode(stripslashes($profile['notes'])) ?></textarea></td>
-                    </tr>
-                    <tr>
-                        <td class="buttons_bar" colspan="2"><input type="button" onClick="save_notes();" value="Save &amp; Update Notes" /></td>
                     </tr>
                 </table>
             </form>
+        </div>
+        
+        <div id="member_notes">
         </div>
         
         <div id="member_connections">
