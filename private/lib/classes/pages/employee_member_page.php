@@ -178,6 +178,28 @@ class EmployeeMemberPage extends Page {
         echo '</select>'. "\n";
     }
     
+    private function generate_employer_description($_id, $_selected) {
+        $descs = $GLOBALS['emp_descs'];
+        
+        echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+        if (empty($_selected) || is_null($_selected) || $_selected < 0) {
+            echo '<option value="0" selected>Please select one</option>'. "\n";    
+        } else {
+            echo '<option value="0">Please select One</option>'. "\n";
+        }
+        
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        foreach ($descs as $i=>$desc) {
+            if ($i != $_selected) {
+                echo '<option value="'. $i. '">'. $desc. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $i. '" selected>'. $desc. '</option>'. "\n";
+            }
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
     private function get_resumes() {
         $resume = new Resume();
         
@@ -297,6 +319,31 @@ class EmployeeMemberPage extends Page {
         return $jobs_str;
     }
     
+    private function get_job_profiles() {
+        $criteria = array(
+            'columns' => "member_job_profiles.id, member_job_profiles.position_title, 
+                          member_job_profiles.position_superior_title, 
+                          member_job_profiles.employer, member_job_profiles.employer_description, 
+                          industries.industry AS specialization, 
+                          employer_industries.industry AS employer_specialization, 
+                          DATE_FORMAT(member_job_profiles.work_from, '%b, %Y') AS formatted_work_from, 
+                          DATE_FORMAT(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
+            'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr, 
+                        industries ON industries.id = member_job_profiles.specialization, 
+                        industries AS employer_industries ON employer_industries.id = member_job_profiles.specialization",
+            'match' => "members.email_addr = '". $this->member->getId(). "'",
+            'having' => "member_job_profiles.id IS NOT NULL",
+            'order' => "work_from DESC"
+        );
+        
+        $result = $this->member->find($criteria);
+        if (is_null($result) || count($result) <= 0) {
+            return array();
+        }
+        
+        return $result;
+    }
+    
     public function show() {
         $this->begin();
         if ($this->is_new) {
@@ -314,6 +361,10 @@ class EmployeeMemberPage extends Page {
             // get profile
             $raw_data = $this->member->get();
             $profile = $raw_data[0];
+            
+            // get job profiles
+            $raw_data = $this->get_job_profiles();
+            $profile['job_profiles'] = $raw_data;
             
             // get resumes
             $profile['resumes'] = $this->get_resumes();
@@ -690,17 +741,56 @@ class EmployeeMemberPage extends Page {
                                     <td class="label"><label for="notice_period">Notice Period:</label></td>
                                     <td class="field"><input class="salary" type="text" id="notice_period" value="<?php echo $profile['notice_period'] ?>" /> months</td>
                                 </tr>
-                                <!-- tr>
-                                    <td class="label"><label for="extra_notes">Extra Notes/Remarks:</label></td>
-                                    <td class="field"><textarea id="extra_notes"><?php echo htmlspecialchars_decode(stripslashes($profile['notes'])) ?></textarea></td>
-                                </tr -->
                                 <tr>
                                     <td class="buttons_bar" colspan="2"><input type="button" onClick="save_career();" value="Save" /></td>
                                 </tr>
                             </table>
                         </td>
                         <td>
-                            <!-- job profiles -->
+                            <div class="buttons_bar"><input type="button" onClick="show_job_profile_popup('0');" value="Add" /></div>
+                            <div id="job_profiles">
+                            <?php
+                            $job_profiles = $profile['job_profiles'];
+                            if (empty($job_profiles) || count($job_profiles) <= 0 ||
+                                $job_profiles === false) {
+                            ?>
+                                <div class="empty_results">No job profiles found.</div>
+                            <?php
+                            } else {
+                                $job_profiles_table = new HTMLTable('job_profiles_table', 'job_profiles');
+
+                                $job_profiles_table->set(0, 0, '&nbsp;', '', 'header action');
+                                $job_profiles_table->set(0, 1, 'From', '', 'header');
+                                $job_profiles_table->set(0, 2, 'To', '', 'header');
+                                $job_profiles_table->set(0, 3, 'Employer', '', 'header');
+                                $job_profiles_table->set(0, 4, 'Position', '', 'header');
+                                $job_profiles_table->set(0, 5, '&nbsp;', '', 'header action');
+                            
+                                foreach ($job_profiles as $i => $job_profile) {
+                                    $job_profiles_table->set($i+1, 0, '<a class="no_link" onClick="delete_job_profile('. $job_profile['id']. ')">delete</a>', '', 'cell action');
+                                    $job_profiles_table->set($i+1, 1, $job_profile['formatted_work_from'], '', 'cell');
+                                    $work_to = $job_profile['formatted_work_to'];
+                                    if (is_null($work_to) || empty($work_to) || $work_to == '0000-00-00') {
+                                        $work_to = 'Present';
+                                    }
+                                    $job_profiles_table->set($i+1, 2, $work_to, '', 'cell');
+                                
+                                    $emp = htmlspecialchars_decode(stripslashes($job_profile['employer']));
+                                    $emp .= '<span class="mini_spec">'. $job_profile['employer_specialization']. '</span><br/>';
+                                    $emp .= '<span class="mini_emp_desc">'. $job_profile['employer_description']. '</span><br/>';
+                                    $job_profiles_table->set($i+1, 3, $emp, '', 'cell');
+                                
+                                    $pos = htmlspecialchars_decode(stripslashes($job_profile['position_title']));
+                                    $pos .= '<span class="mini_spec">'. $job_profile['specialization']. '</span><br/>';
+                                    $pos .= '<span class="mini_superior">'. $job_profile['position_superior_title']. '</span>';
+                                    $job_profiles_table->set($i+1, 4, $pos, '', 'cell');
+                                    $job_profiles_table->set($i+1, 5, '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">edit</a>', '', 'cell action');
+                                }
+                            
+                                echo $job_profiles_table->get_html();
+                            }
+                            ?>
+                            </div>
                         </td>
                     </tr>
                 </table>
@@ -708,6 +798,19 @@ class EmployeeMemberPage extends Page {
         </div>
         
         <div id="member_notes">
+            <form id="notes" method="post" onSubmit="return false;">
+                <table class="notes_form">
+                    <tr>
+                        <td class="title">Extra Notes/Remarks:</td>
+                    </tr>
+                    <tr>
+                        <td class="field"><textarea id="extra_notes"><?php echo htmlspecialchars_decode(stripslashes($profile['notes'])) ?></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="buttons_bar" colspan="2"><input type="button" onClick="save_notes();" value="Save" /></td>
+                    </tr>
+                </table>
+            </form>
         </div>
         
         <div id="member_connections">
@@ -1129,6 +1232,77 @@ class EmployeeMemberPage extends Page {
             </div>
             <div class="popup_window_buttons_bar">
                 <input type="button" value="Cancel" onClick="close_employer_remarks();" />
+            </div>
+        </div>
+        
+        <div id="job_profile_window" class="popup_window">
+            <div class="popup_window_title">Job Profile</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="job_profile_id" value="0" />
+                <div class="job_profile_form">
+                    <table class="job_profile_form">
+                        <tr>
+                            <td class="label"><label for="specialization">Specialization:</label></td>
+                            <td class="field">
+                                <?php $this->generate_industries('', 'specialization'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="position_title">Job Title:</label></td>
+                            <td class="field">
+                                <input class="field" type="text" id="position_title" name="position_title" />
+                                <br/>
+                                <span class="tips">eg: Director, Manager, GM, VP, etc.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="position_superior_title">Superior Title:</label></td>
+                            <td class="field">
+                                <input class="field" type="text" id="position_superior_title" name="position_superior_title" />
+                                <br/>
+                                <span class="tips">eg: Director, Manager, GM, VP, etc.</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="organization_size">Number of Direct Reports:</label></td>
+                            <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="work_from_month">Duration:</label></td>
+                            <td class="field">
+                                <?php echo generate_month_dropdown('work_from_month', ''); ?>
+                                <input type="text" class="year" maxlength="4" id="work_from_year" value="yyyy" /> 
+                                to 
+                                <span id="work_to_dropdown">
+                                    <?php echo generate_month_dropdown('work_to_month', ''); ?>
+                                    <input type="text" class="year" maxlength="4" id="work_to_year" value="yyyy" />
+                                </span>
+                                <input type="checkbox" id="work_to_present" onClick="toggle_work_to();" /> 
+                                <label for="work_to_present">Present</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="company">Employer:</label></td>
+                            <td class="field"><input class="field" type="text" id="company" name="company" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="emp_desc">Employer Description:</label></td>
+                            <td class="field">
+                                <?php $this->generate_employer_description('emp_desc', -1); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="emp_specialization">Employer Specialization:</label></td>
+                            <td class="field">
+                                <?php $this->generate_industries('', 'emp_specialization'); ?>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_job_profile_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_job_profile_popup(false);" />
             </div>
         </div>
         <?php

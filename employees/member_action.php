@@ -185,23 +185,6 @@ if ($_POST['action'] == 'get_jobs') {
 if ($_POST['action'] == 'save_notes') {
     $member = new Member($_POST['id']);
     
-    $data = array();
-    $data['is_active_seeking_job'] = $_POST['is_active_seeking_job'];
-    $data['seeking'] = addslashes($_POST['seeking']);
-    $data['expected_salary'] = $_POST['expected_salary'];
-    $data['expected_salary_end'] = $_POST['expected_salary_end'];
-    $data['can_travel_relocate'] = $_POST['can_travel_relocate'];
-    $data['reason_for_leaving'] = addslashes($_POST['reason_for_leaving']);
-    $data['current_position'] = addslashes($_POST['current_position']);
-    $data['current_salary'] = $_POST['current_salary'];
-    $data['current_salary_end'] = $_POST['current_salary_end'];
-    $data['notice_period'] = $_POST['notice_period'];
-    
-    if ($member->update($data) === false) {
-        echo 'ko';
-        exit();
-    }
-    
     if ($member->saveNotes($_POST['notes']) === false) {
         echo 'ko';
         exit();
@@ -667,6 +650,33 @@ if ($_POST['action'] == 'save_job_profile') {
     echo 'ok';
     exit();
 }
+
+if ($_POST['action'] == 'get_job_profiles') {
+    $criteria = array(
+        'columns' => "member_job_profiles.id, member_job_profiles.position_title, 
+                      member_job_profiles.position_superior_title, 
+                      member_job_profiles.employer, member_job_profiles.employer_description, 
+                      industries.industry AS specialization, 
+                      employer_industries.industry AS employer_specialization, 
+                      DATE_FORMAT(member_job_profiles.work_from, '%b, %Y') AS formatted_work_from, 
+                      DATE_FORMAT(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
+        'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr, 
+                    industries ON industries.id = member_job_profiles.specialization, 
+                    industries AS employer_industries ON employer_industries.id = member_job_profiles.specialization",
+        'match' => "members.email_addr = '". $_POST['id']. "'",
+        'having' => "member_job_profiles.id IS NOT NULL",
+        'order' => "work_from DESC"
+    );
+    
+    $member = new Member();
+    $result = $member->find($criteria);
+    
+    $response = array('job_profiles' => $result);
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
 
 if ($_POST['action'] == 'get_job_profile') {
     $criteria = array(

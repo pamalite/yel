@@ -86,8 +86,9 @@ textarea {
     height: 90px;
 }
 
-#member_resumes, #member_career, 
-#member_applications, #member_connections {
+#member_resumes, #member_career, #member_notes,
+#member_applications, #member_connections, 
+#job_profile_window {
     display: none;
 }
 
@@ -207,6 +208,11 @@ div.add_candidates_form {
     font-size: 10pt;
 }
 
+table.notes_form {
+    width: 65%;
+    margin: auto;
+}
+
 table.career_profile {
     width: 100%;
     margin: auto;
@@ -222,24 +228,52 @@ table.career_form {
     margin: auto;
 }
 
-table.career_form td {
+table.career_form td, 
+table.notes_form td {
     text-align: left;
     padding: 3px 3px 3px 3px;
 }
 
-table.career_form td.buttons_bar {
+table.career_form td.buttons_bar, 
+table.notes_form td.buttons_bar {
     text-align: right;
     background-color: #CCCCCC;
 }
 
-table.career_form td.label {
+table.career_form td.label, 
+table.notes_form td.label {
     width: 25%;
 }
 
-table.career_form td.title {
+table.career_form td.title, 
+table.notes_form td.title {
     text-align: center;
     border: 1px solid #CCCCCC;
     font-weight: bold;
+}
+
+#job_profiles_table {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+#job_profiles_table td.odd {
+    background-color: #EEEEEE;
+}
+
+#job_profiles_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+.mini_emp_desc, .mini_spec, 
+.mini_superior {
+    font-size: 9pt;
+    color: #666666;
+}
+
+.mini_spec {
+    font-style: italic;
 }
 
 .salary {
@@ -464,4 +498,37 @@ table.jobs_selection td.separator {
 
 #back_btn {
     display: none;
+}
+
+#job_profile_window div.job_profile_form {
+    width: 700px;
+}
+
+#job_profile_window table.job_profile_form {
+    width: 98%;
+    margin: auto;
+}
+
+#job_profile_window table td.label {
+    width: 30%;
+}
+
+#job_profile_window input.field, 
+#job_profile_window select.field {
+    width: 100%;
+    font-size: 12pt;
+}
+
+#job_profile_window select, 
+#job_profile_window input.year {
+    font-size: 12pt;
+}
+
+#job_profile_window input.year {
+    width: 50px;
+}
+
+.tips {
+    font-size: 9pt;
+    color: #666666;
 }

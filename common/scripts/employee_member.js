@@ -321,6 +321,17 @@ function show_career() {
 }
 
 function save_career() {
+    if (isNaN($('expected_salary').value) || isNaN($('expected_salary_end').value) ||
+        isNaN($('current_salary').value) || isNaN($('current_salary_end').value)) {
+        alert('Salary fields must be a number.' + "\n\nEnter 0 if no value required.");
+        return false;
+    }
+    
+    if (isNaN($('notice_period').value)) {
+        alert('Notice period must be a number.' + "\n\nEnter 0 if no value required.");
+        return false;
+    }
+    
     var seeking = $('seeking').value.replace(/\n/g, "<br/>");
     seeking = add_slashes(seeking);
     
@@ -381,30 +392,8 @@ function show_notes() {
 }
 
 function save_notes() {
-    if (isNaN($('expected_salary').value) || isNaN($('expected_salary_end').value) ||
-        isNaN($('current_salary').value) || isNaN($('current_salary_end').value)) {
-        alert('Salary fields must be a number.' + "\n\nEnter 0 if no value required.");
-        return false;
-    }
-    
-    if (isNaN($('notice_period').value)) {
-        alert('Notice period must be a number.' + "\n\nEnter 0 if no value required.");
-        return false;
-    }
-    
     var params = 'id=' + member_id;
     params = params + '&action=save_notes';
-    params = params + '&employee=' + user_id;
-    params = params + '&is_active_seeking_job=' + $('is_active_seeking_job').options[$('is_active_seeking_job').selectedIndex].value;
-    params = params + '&seeking=' + encodeURIComponent($('seeking').value);
-    params = params + '&expected_salary=' + $('expected_salary').value;
-    params = params + '&expected_salary_end=' + $('expected_salary_end').value;
-    params = params + '&can_travel_relocate=' + $('can_travel_relocate').options[$('can_travel_relocate').selectedIndex].value;
-    params = params + '&reason_for_leaving=' + encodeURIComponent($('reason_for_leaving').value);
-    params = params + '&current_position=' + encodeURIComponent($('current_position').value);
-    params = params + '&current_salary=' + $('current_salary').value;
-    params = params + '&current_salary_end=' + $('current_salary_end').value;
-    params = params + '&notice_period=' + $('notice_period').value;
     params = params + '&notes=' + encodeURIComponent($('extra_notes').value);
     
     var uri = root + "/employees/member_action.php";
@@ -1118,6 +1107,268 @@ function clear_pre_selected_jobs() {
     if (confirm('Are you sure to clear all pre-selected jobs?')) {
         $('pre_selected_jobs_list').set('html', '(None Selected)');
         $('selected_jobs').value = '';
+    }
+}
+
+function update_job_profiles() {
+    
+}
+
+function validate_job_profile() {
+    if ($('specialization').selectedIndex == 0) {
+        alert('You need to select a specialization.');
+        return false;
+    } 
+    
+    if (isEmpty($('position_title').value)) {
+        alert('Job Title cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('work_from_year').value) || $('work_from_month').selectedIndex == 0) {
+        alert('Duration (beginning) cannot be empty.');
+        return false;
+    } else {
+        if (isNaN($('work_from_year').value)) {
+            alert('Only numbers are accepted for year.');
+            return false;
+        }        
+    }
+    
+    if ($('work_to_present').checked == false) {
+        if (isEmpty($('work_to_year').value) || $('work_to_month').selectedIndex == 0) {
+            alert('Duration (ending) cannot be empty.');
+            return false;
+        } else {
+            if (isNaN($('work_from_year').value)) {
+                alert('Only numbers are accepted for year.');
+                return false;
+            }
+        }
+    }
+    
+    if (isEmpty($('company').value)) {
+        alert('Employer cannot be empty.');
+        return false;
+    }
+    
+    if ($('emp_desc').selectedIndex == 0) {
+        alert('You need to select your employer\'s description.');
+        return false;
+    }
+    
+    if ($('emp_specialization').selectedIndex == 0) {
+        alert('You need to select your employer\'s specialization.');
+        return false;
+    }
+    
+    if (isNaN($('organization_size').value)) {
+        alert('Only numbers are accepted for Number of Direct Reports.');
+        return false;
+    } 
+    
+    return true;
+}
+
+function toggle_work_to() {
+    $('work_to_month').selectedIndex = 0;
+    $('work_to_year').value = '';
+    
+    if ($('work_to_present').checked) {
+        $('work_to_dropdown').setStyle('display', 'none');
+    } else {
+        $('work_to_dropdown').setStyle('display', 'inline');
+    }
+}
+
+function show_job_profile_popup(_id) {
+    if (_id <= 0) {
+        // new
+        $('job_profile_id').value = 0;
+        $('specialization').selectedIndex = 0;
+        $('position_title').value = '';
+        $('position_superior_title').value = '';
+        $('organization_size').value = '';
+        $('work_from_month').selectedIndex = 0;
+        $('work_from_year').value = 'yyyy';
+        $('work_to_month').selectedIndex = 0;
+        $('work_to_year').value = 'yyyy';
+        $('company').value = '';
+        $('emp_desc').selectedIndex = 0;
+        $('emp_specialization').selectedIndex = 0;
+        
+        show_window('job_profile_window');
+        window.scrollTo(0, 0);
+    } else {
+        // load
+        var params = 'id=' + member_id + '&action=get_job_profile';
+        
+        var uri = root + "/employees/member_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error occured when loading job profile. Please try again later.');
+                    return;
+                }
+                
+                var specialization = xml.getElementsByTagName('specialization');
+                var position_title = xml.getElementsByTagName('position_title');
+                var position_superior = xml.getElementsByTagName('position_superior_title');
+                var org_size = xml.getElementsByTagName('organization_size');
+                var work_from = xml.getElementsByTagName('work_from');
+                var work_to = xml.getElementsByTagName('work_to');
+                var company = xml.getElementsByTagName('employer');
+                var emp_desc = xml.getElementsByTagName('employer_description');
+                var emp_specialization = xml.getElementsByTagName('employer_specialization');
+                
+                $('job_profile_id').value = _id;
+                $('position_title').value = position_title[0].childNodes[0].nodeValue;
+                $('position_superior_title').value = position_superior[0].childNodes[0].nodeValue;
+                $('organization_size').value = org_size[0].childNodes[0].nodeValue;
+                $('company').value = company[0].childNodes[0].nodeValue.replace('&amp;', '&');
+                
+                for (var i=0; i < $('specialization').options.length; i++) {
+                    if ($('specialization').options[i].value == specialization[0].childNodes[0].nodeValue) {
+                        $('specialization').selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                for (var i=0; i < $('emp_desc').options.length; i++) {
+                    if ($('emp_desc').options[i].value == emp_desc[0].childNodes[0].nodeValue) {
+                        $('emp_desc').selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                for (var i=0; i < $('emp_specialization').options.length; i++) {
+                    if ($('emp_specialization').options[i].value == emp_specialization[0].childNodes[0].nodeValue) {
+                        $('emp_specialization').selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                var work_from_items = work_from[0].childNodes[0].nodeValue.split('-');
+                var work_from_month = work_from_items[1];
+                var work_from_year = work_from_items[0];
+                
+                $('work_from_year').value = work_from_year;
+                for (var i=0; i < $('work_from_month').options.length; i++) {
+                    if ($('work_from_month').options[i].value == work_from_month) {
+                        $('work_from_month').selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                var work_to_items = null;
+                if (work_to[0].childNodes.length > 0) {
+                    work_to_items = work_to[0].childNodes[0].nodeValue.split('-');
+                }
+                
+                if (work_to_items == null) {
+                    $('work_to_month').selectedIndex = 0;
+                    $('work_to_year').value = '';
+                    $('work_to_dropdown').setStyle('display', 'none');
+                    $('work_to_present').checked = true;
+                } else {
+                    $('work_to_dropdown').setStyle('display', 'block');
+                    $('work_to_present').checked = false;
+                    
+                    var work_to_month = work_to_items[1];
+                    var work_to_year = work_to_items[0];
+                    
+                    $('work_to_year').value = work_to_year;
+                    for (var i=0; i < $('work_to_month').options.length; i++) {
+                        if ($('work_to_month').options[i].value == work_to_month) {
+                            $('work_to_month').selectedIndex = i;
+                            break;
+                        }
+                    }
+                } 
+                
+                show_window('job_profile_window');
+                window.scrollTo(0, 0);
+            }
+        });
+
+        request.send(params);
+    }
+}
+
+function close_job_profile_popup(_is_save) {
+    if (_is_save) {
+        if (!validate_job_profile()) {
+            return;
+        }
+        
+        var work_from = $('work_from_year').value + '-' + $('work_from_month').options[$('work_from_month').selectedIndex].value + '-00';
+
+        var work_to = 'NULL';
+        if ($('work_to_present').checked == false) {
+            work_to = $('work_to_year').value + '-' + $('work_to_month').options[$('work_to_month').selectedIndex].value + '-00';
+        }
+        
+        var params = 'id=' + $('job_profile_id').value + '&action=save_job_profile';
+        params = params + '&member=' + id;
+        params = params + '&specialization=' + $('specialization').value;
+        params = params + '&position_title=' + $('position_title').value;
+        params = params + '&superior_title=' + $('position_superior_title').value;
+        params = params + '&organization_size=' + $('organization_size').value;
+        params = params + '&work_from=' + work_from;
+        params = params + '&work_to=' + work_to;
+        params = params + '&employer=' + encodeURIComponent($('company').value);
+        params = params + '&emp_desc=' + $('emp_desc').value;
+        params = params + '&emp_specialization=' + $('emp_specialization').value;
+        
+        var uri = root + "/employees/member_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+
+                if (txt == 'ko') {
+                    alert('An error occured when saving job profile.' + "\n\n" + 'Please try again later.');
+                    return;
+                }
+                
+                close_window('job_profile_window');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('job_profile_window');
+    }
+}
+
+function delete_job_profile(_id) {
+    var msg = 'Are you sure to delete the selected job profile?';
+    
+    if (confirm(msg)) {
+        var params = 'id=' + _id + '&action=remove_job_profile';
+        
+        var uri = root + "/employees/member_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+
+                if (txt == 'ko') {
+                    alert('An error occured when deleting job profile.' + "\n\n" + 'Please try again later.');
+                    return;
+                }
+                
+                location.reload(true);
+            }
+        });
+
+        request.send(params);
     }
 }
 
