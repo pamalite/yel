@@ -258,6 +258,15 @@ table.notes_form td.title {
     border-collapse: collapse;
 }
 
+#job_profiles_table td.small_action {
+    width: 5%;
+    text-align: center;
+}
+
+#job_profiles_table td.date {
+    width: 25%;
+}
+
 #job_profiles_table td.odd {
     background-color: #EEEEEE;
 }

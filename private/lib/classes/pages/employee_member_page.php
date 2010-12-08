@@ -330,7 +330,7 @@ class EmployeeMemberPage extends Page {
                           DATE_FORMAT(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
             'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr, 
                         industries ON industries.id = member_job_profiles.specialization, 
-                        industries AS employer_industries ON employer_industries.id = member_job_profiles.specialization",
+                        industries AS employer_industries ON employer_industries.id = member_job_profiles.employer_specialization",
             'match' => "members.email_addr = '". $this->member->getId(). "'",
             'having' => "member_job_profiles.id IS NOT NULL",
             'order' => "work_from DESC"
@@ -339,6 +339,10 @@ class EmployeeMemberPage extends Page {
         $result = $this->member->find($criteria);
         if (is_null($result) || count($result) <= 0) {
             return array();
+        }
+        
+        foreach ($result as $i=>$row) {
+            $result[$i]['employer_description'] = $GLOBALS['emp_descs'][$row['employer_description']];
         }
         
         return $result;
@@ -759,32 +763,32 @@ class EmployeeMemberPage extends Page {
                             } else {
                                 $job_profiles_table = new HTMLTable('job_profiles_table', 'job_profiles');
 
-                                $job_profiles_table->set(0, 0, '&nbsp;', '', 'header action');
-                                $job_profiles_table->set(0, 1, 'From', '', 'header');
-                                $job_profiles_table->set(0, 2, 'To', '', 'header');
+                                $job_profiles_table->set(0, 0, '', '', 'header small_action');
+                                $job_profiles_table->set(0, 1, 'From', '', 'header date');
+                                $job_profiles_table->set(0, 2, 'To', '', 'header date');
                                 $job_profiles_table->set(0, 3, 'Employer', '', 'header');
                                 $job_profiles_table->set(0, 4, 'Position', '', 'header');
-                                $job_profiles_table->set(0, 5, '&nbsp;', '', 'header action');
+                                $job_profiles_table->set(0, 5, '', '', 'header small_action');
                             
                                 foreach ($job_profiles as $i => $job_profile) {
-                                    $job_profiles_table->set($i+1, 0, '<a class="no_link" onClick="delete_job_profile('. $job_profile['id']. ')">delete</a>', '', 'cell action');
-                                    $job_profiles_table->set($i+1, 1, $job_profile['formatted_work_from'], '', 'cell');
+                                    $job_profiles_table->set($i+1, 0, '<a class="no_link" onClick="delete_job_profile('. $job_profile['id']. ')">delete</a>', '', 'cell small_action');
+                                    $job_profiles_table->set($i+1, 1, $job_profile['formatted_work_from'], '', 'cell date');
                                     $work_to = $job_profile['formatted_work_to'];
                                     if (is_null($work_to) || empty($work_to) || $work_to == '0000-00-00') {
                                         $work_to = 'Present';
                                     }
-                                    $job_profiles_table->set($i+1, 2, $work_to, '', 'cell');
+                                    $job_profiles_table->set($i+1, 2, $work_to, '', 'cell date');
                                 
                                     $emp = htmlspecialchars_decode(stripslashes($job_profile['employer']));
-                                    $emp .= '<span class="mini_spec">'. $job_profile['employer_specialization']. '</span><br/>';
+                                    $emp .= '<br/><span class="mini_spec">'. $job_profile['employer_specialization']. '</span><br/>';
                                     $emp .= '<span class="mini_emp_desc">'. $job_profile['employer_description']. '</span><br/>';
                                     $job_profiles_table->set($i+1, 3, $emp, '', 'cell');
                                 
                                     $pos = htmlspecialchars_decode(stripslashes($job_profile['position_title']));
-                                    $pos .= '<span class="mini_spec">'. $job_profile['specialization']. '</span><br/>';
+                                    $pos .= '<br/><span class="mini_spec">'. $job_profile['specialization']. '</span><br/>';
                                     $pos .= '<span class="mini_superior">'. $job_profile['position_superior_title']. '</span>';
                                     $job_profiles_table->set($i+1, 4, $pos, '', 'cell');
-                                    $job_profiles_table->set($i+1, 5, '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">edit</a>', '', 'cell action');
+                                    $job_profiles_table->set($i+1, 5, '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">edit</a>', '', 'cell small_action');
                                 }
                             
                                 echo $job_profiles_table->get_html();

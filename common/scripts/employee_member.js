@@ -1111,7 +1111,78 @@ function clear_pre_selected_jobs() {
 }
 
 function update_job_profiles() {
+    var params = 'id=' + member_id + '&action=get_job_profiles';
     
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            set_status('');
+            
+            if (txt == 'ko') {
+                alert('An error occured when loading job profiles. Please try again later.');
+                return;
+            }
+            
+            if (txt == '0') {
+                $('job_profiles').set('html', '<div class="empty_results">No job profiles found.</div>');
+            } else {
+                var ids = xml.getElementsByTagName('id');
+                var specializations = xml.getElementsByTagName('specialization');
+                var position_titles = xml.getElementsByTagName('position_title');
+                var position_superiors = xml.getElementsByTagName('position_superior_title');
+                var org_sizes = xml.getElementsByTagName('organization_size');
+                var work_froms = xml.getElementsByTagName('formatted_work_from');
+                var work_tos = xml.getElementsByTagName('formatted_work_to');
+                var companies = xml.getElementsByTagName('employer');
+                var emp_descs = xml.getElementsByTagName('employer_description');
+                var emp_specializations = xml.getElementsByTagName('employer_specialization');
+                
+                var profiles_table = new FlexTable('job_profiles_table', 'job_profiles');
+
+                var header = new Row('');
+                header.set(0, new Cell('&nbsp;', '', 'header small_action'));
+                header.set(1, new Cell('From', '', 'header date'));
+                header.set(2, new Cell('To', '', 'header date'));
+                header.set(3, new Cell('Employer', '', 'header'));
+                header.set(4, new Cell('Position', '', 'header'));
+                header.set(5, new Cell('&nbsp;', '', 'header small_action'));
+                profiles_table.set(0, header);
+                
+                for (var i=0; i < ids.length; i++) {
+                    var row = new Row('');
+                    
+                    row.set(0, new Cell('<a class="no_link" onClick="delete_job_profile(\'' + ids[i].childNodes[0].nodeValue + '\');">delete</a>', '', 'cell small_action'));
+                    row.set(1, new Cell(work_froms[i].childNodes[0].nodeValue, '', 'cell date'));
+                    
+                    var work_to = 'Present';
+                    if (work_tos[i].childNodes.length > 0) {
+                        work_to = work_tos[i].childNodes[0].nodeValue;
+                    }
+                    row.set(2, new Cell(work_to, '', 'cell date'));
+                    
+                    var employer = companies[i].childNodes[0].nodeValue;
+                    employer = employer + '<br/><span class="mini_spec">' + emp_specializations[i].childNodes[0].nodeValue + '</span><br/>';
+                    employer = employer + '<span class="mini_emp_desc">' + emp_descs[i].childNodes[0].nodeValue + '</span>'
+                    row.set(3, new Cell(employer, '', 'cell'));
+                    
+                    var position = position_titles[i].childNodes[0].nodeValue;
+                    position = position + '<br/><span class="mini_spec">' + specializations[i].childNodes[0].nodeValue + '</span><br/>';
+                    position = position + '<span class="mini_superior">' + position_superiors[i].childNodes[0].nodeValue + '</span><br/>';
+                    row.set(4, new Cell(position, '', 'cell'));
+                    
+                    row.set(5, new Cell('<a class="no_link" onClick="show_job_profile_popup(' + ids[i].childNodes[0].nodeValue + ');">edit</a>', '', 'cell small_action'));
+                    
+                    profiles_table.set((parseInt(i)+1), row);
+                }
+                
+                $('job_profiles').set('html', profiles_table.get_html());
+            }
+        }
+    });
+
+    request.send(params);
 }
 
 function validate_job_profile() {
@@ -1201,7 +1272,7 @@ function show_job_profile_popup(_id) {
         window.scrollTo(0, 0);
     } else {
         // load
-        var params = 'id=' + member_id + '&action=get_job_profile';
+        var params = 'id=' + _id + '&action=get_job_profile';
         
         var uri = root + "/employees/member_action.php";
         var request = new Request({
@@ -1313,7 +1384,7 @@ function close_job_profile_popup(_is_save) {
         }
         
         var params = 'id=' + $('job_profile_id').value + '&action=save_job_profile';
-        params = params + '&member=' + id;
+        params = params + '&member=' + member_id;
         params = params + '&specialization=' + $('specialization').value;
         params = params + '&position_title=' + $('position_title').value;
         params = params + '&superior_title=' + $('position_superior_title').value;
@@ -1337,6 +1408,7 @@ function close_job_profile_popup(_is_save) {
                 }
                 
                 close_window('job_profile_window');
+                update_job_profiles();
             }
         });
 

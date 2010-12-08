@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
+require_once dirname(__FILE__). "/../private/config/job_profile.inc";
 
 session_start();
 
@@ -662,7 +663,7 @@ if ($_POST['action'] == 'get_job_profiles') {
                       DATE_FORMAT(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
         'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr, 
                     industries ON industries.id = member_job_profiles.specialization, 
-                    industries AS employer_industries ON employer_industries.id = member_job_profiles.specialization",
+                    industries AS employer_industries ON employer_industries.id = member_job_profiles.employer_specialization",
         'match' => "members.email_addr = '". $_POST['id']. "'",
         'having' => "member_job_profiles.id IS NOT NULL",
         'order' => "work_from DESC"
@@ -671,7 +672,23 @@ if ($_POST['action'] == 'get_job_profiles') {
     $member = new Member();
     $result = $member->find($criteria);
     
-    $response = array('job_profiles' => $result);
+    if (is_null($result) || empty($result) || count($result) <= 0) {
+        echo '0';
+        exit();
+    }
+    
+    if ($result === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    $emp_descs = $GLOBALS['emp_descs'];
+    foreach ($result as $i => $row) {
+        $result[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
+        $result[$i]['employer_description'] = $emp_descs[$row['employer_description']];
+    }
+    
+    $response = array('job_profiles' => array('job_profile' => $result));
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
     exit();
