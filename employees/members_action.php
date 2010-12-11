@@ -122,104 +122,7 @@ if ($_POST['action'] == 'get_jobs') {
     exit();
 }
 
-if ($_POST['action'] == 'get_members') {
-    $order_by = "members.joined_on desc";
-    $filter_by = "";
-    $page = 1;
-    
-    if (isset($_POST['order_by'])) {
-        $order_by = $_POST['order_by'];
-    }
-    
-    $match = "members.email_addr <> 'initial@yellowelevator.com' AND 
-              members.email_addr NOT LIKE 'team%@yellowelevator.com'";
-    $having = '';
-    if (isset($_POST['non_attached'])) {
-        $having = " HAVING num_attached_jobs <= 0";
-    } else {
-        $employers_str = "";
-        $jobs_str = "";
-        if (isset($_POST['jobs'])) {
-            $match .= " AND member_jobs.job IN (". trim($_POST['jobs']). ")";
-        } elseif (isset($_POST['employers'])) {
-            $employers = explode(',', $_POST['employers']);
-            foreach ($employers as $i=>$id) {
-                $employers[$i] = "'". trim($id). "'";
-            }
-            $employers_str = implode(',', $employers);
-            $match .= " AND jobs.employer IN (". $employers_str. ")";
-        }
-    }
-    
-    if (isset($_POST['page'])) {
-        $page = $_POST['page'];
-    }
-    
-    $criteria = array(
-        'columns' => "members.email_addr, members.phone_num, members.progress_notes, members.active, 
-                      IF(member_index.notes IS NULL OR member_index.notes = '', 0, 1) AS has_notes,  
-                      CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
-                      DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
-                      COUNT(DISTINCT resumes.id) AS num_yel_resumes, 
-                      COUNT(DISTINCT resumes_1.id) AS num_self_resumes, 
-                      COUNT(DISTINCT member_jobs.id) AS num_attached_jobs",
-        'joins' => "resumes AS resumes ON resumes.member = members.email_addr AND 
-                        resumes.is_yel_uploaded = TRUE, 
-                    resumes AS resumes_1 ON resumes_1.member = members.email_addr AND 
-                        resumes_1.is_yel_uploaded = FALSE, 
-                    member_index ON member_index.member = members.email_addr,
-                    member_jobs ON member_jobs.member = members.email_addr,
-                    jobs ON jobs.id = member_jobs.job,
-                    employers ON employers.id = jobs.employer", 
-        'match' => $match,
-        'group' => "members.email_addr". $having,
-        'order' => $order_by
-    );
-    
-    $member = new Member();
-    $result = $member->find($criteria);
-    
-    if (count($result) <= 0 || is_null($result)) {
-        echo '0';
-        exit();
-    }
-
-    if (!$result) {
-        echo 'ko';
-        exit();
-    }
-    
-    $total_pages = ceil(count($result) / $GLOBALS['default_results_per_page']);
-    if ($page > $total_pages) {
-        $page = $total_pages;
-    }
-    
-    $offset = 0;
-    if ($page > 1) {
-        $offset = ($page-1) * $GLOBALS['default_results_per_page'];
-        $offset = ($offset < 0) ? 0 : $offset;
-    }
-    
-    $criteria['limit'] = $offset. ", ". $GLOBALS['default_results_per_page'];
-    $result = $member->find($criteria);
-    
-    foreach($result as $i=>$row) {
-        $result[$i]['member_name'] = htmlspecialchars_decode(stripslashes($row['member_name']));
-        $result[$i]['progress_notes'] = htmlspecialchars_decode(stripslashes($row['progress_notes']));
-    }
-
-    $response = array(
-        'members' => array(
-            'total_pages' => $total_pages,
-            'a_member' => $result
-        )
-    );
-    header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array($response);
-    exit();
-}
-
-if ($_POST['action'] == 'get_applications') {
+if ($_POST['action'] == 'get_new_applicants') {
     $order_by = "referral_buffers.requested_on desc";
     $show_only = "referral_buffers.referrer_email LIKE '%'";
     $filter_by = "";
@@ -239,9 +142,7 @@ if ($_POST['action'] == 'get_applications') {
     
     $match = $show_only;
     
-    if (isset($_POST['non_attached'])) {
-        $match .= " AND referral_buffers.job IS NULL OR referral_buffers.job <= 0";
-    } else {
+    if (!isset($_POST['non_attached'])) {
         $employers_str = "";
         $jobs_str = "";
         if (isset($_POST['jobs'])) {
@@ -266,10 +167,13 @@ if ($_POST['action'] == 'get_applications') {
                       referral_buffers.referrer_email, referral_buffers.referrer_name, 
                       referral_buffers.referrer_phone, 
                       referral_buffers.existing_resume_id, referral_buffers.resume_file_hash, 
-                      IF(referral_buffers.notes IS NULL OR referral_buffers.notes = '', 0, 1) AS has_notes,
+                      referral_buffers.progress_notes, 
                       IF(members.email_addr IS NULL, 0, 1) AS is_member,
                       jobs.title AS job, jobs.employer,  
-                      DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on", 
+                      DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on, 
+                      (SELECT COUNT(buf.id) 
+                       FROM referral_buffers AS buf 
+                       WHERE buf.candidate_email = referral_buffers.candidate_email) AS num_jobs_attached", 
         'joins' => "members ON members.email_addr = referral_buffers.candidate_email, 
                     jobs ON jobs.id = referral_buffers.job, 
                     employers ON employers.id = jobs.employer",
@@ -306,16 +210,126 @@ if ($_POST['action'] == 'get_applications') {
     foreach($result as $i=>$row) {
         $result[$i]['referrer_name'] = htmlspecialchars_decode(stripslashes($row['referrer_name']));
         $result[$i]['candidate_name'] = htmlspecialchars_decode(stripslashes($row['candidate_name']));
+        $result[$i]['progress_notes'] = htmlspecialchars_decode(stripslashes($row['progress_notes']));
     }
     
     $response = array(
-        'applications' => array(
+        'new_applicants' => array(
             'total_pages' => $total_pages,
-            'application' => $result
+            'new_applicant' => $result
         )
     );
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
+if ($_POST['action'] == 'get_applicants') {
+    $order_by = "member_jobs.applied_on DESC";
+    $filter_by = "";
+    $page = 1;
+    
+    if (isset($_POST['order_by'])) {
+        $order_by = $_POST['order_by'];
+    }
+    
+    $match = "member_jobs.id IS NOT NULL AND 
+              members.email_addr <> 'initial@yellowelevator.com' AND 
+              members.email_addr NOT LIKE 'team%@yellowelevator.com'";
+    if (!isset($_POST['non_attached'])) {
+        $employers_str = "";
+        $jobs_str = "";
+        if (isset($_POST['jobs'])) {
+            $match .= " AND member_jobs.job IN (". trim($_POST['jobs']). ")";
+        } elseif (isset($_POST['employers'])) {
+            $employers = explode(',', $_POST['employers']);
+            foreach ($employers as $i=>$id) {
+                $employers[$i] = "'". trim($id). "'";
+            }
+            $employers_str = implode(',', $employers);
+            $match .= " AND jobs.employer IN (". $employers_str. ")";
+        }
+    }
+    
+    if (isset($_POST['page'])) {
+        $page = $_POST['page'];
+    }
+    
+    $criteria = array(
+        'columns' => "member_jobs.id AS member_job_id, members.email_addr, members.phone_num, 
+                      member_jobs.progress_notes,
+                      CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
+                      member_jobs.job AS job_id, jobs.title AS job_title, jobs.employer AS employer_id, 
+                      referrals.resume AS resume_id, resumes.name AS resume_name, 
+                      member_jobs.resume AS app_resume_id, resumes_1.name AS app_resume_name, 
+                      DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
+                      DATE_FORMAT(member_jobs.applied_on, '%e %b, %Y') AS formatted_applied_on, 
+                      DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_agreed_terms_on,
+                      DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on,
+                      DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
+                      (SELECT COUNT(id) 
+                       FROM resumes WHERE member = members.email_addr 
+                       AND is_yel_uploaded = TRUE) AS num_yel_resumes,
+                      (SELECT COUNT(id) 
+                       FROM resumes WHERE member = members.email_addr 
+                       AND is_yel_uploaded = FALSE) AS num_self_resumes,
+                      (SELECT COUNT(id) 
+                       FROM member_jobs WHERE member = members.email_addr) AS num_attached_jobs",
+        'joins' => "member_jobs ON member_jobs.member = members.email_addr, 
+                    jobs ON jobs.id = member_jobs.job, 
+                    referrals ON referrals.referee = member_jobs.member 
+                        AND referrals.job = member_jobs.job, 
+                    resumes ON resumes.id = referrals.resume, 
+                    resumes AS resumes_1 ON resumes_1.id = member_jobs.resume", 
+        'match' => $match,
+        'order' => $order_by
+    );
+    
+    $member = new Member();
+    $result = $member->find($criteria);
+    
+    if (count($result) <= 0 || is_null($result)) {
+        echo '0';
+        exit();
+    }
+
+    if (!$result) {
+        echo 'ko';
+        exit();
+    }
+    
+    $total_pages = ceil(count($result) / $GLOBALS['default_results_per_page']);
+    if ($page > $total_pages) {
+        $page = $total_pages;
+    }
+    
+    $offset = 0;
+    if ($page > 1) {
+        $offset = ($page-1) * $GLOBALS['default_results_per_page'];
+        $offset = ($offset < 0) ? 0 : $offset;
+    }
+    
+    $criteria['limit'] = $offset. ", ". $GLOBALS['default_results_per_page'];
+    $result = $member->find($criteria);
+    
+    foreach($result as $i=>$row) {
+        $result[$i]['member_name'] = htmlspecialchars_decode(stripslashes($row['member_name']));
+        $result[$i]['progress_notes'] = htmlspecialchars_decode(stripslashes($row['progress_notes']));
+    }
+
+    $response = array(
+        'applicants' => array(
+            'total_pages' => $total_pages,
+            'applicant' => $result
+        )
+    );
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
+}
+
+if ($_POST['action'] == 'get_members') {
+    echo 'ok';
     exit();
 }
 
@@ -431,16 +445,41 @@ if ($_POST['action'] == 'update_notes') {
 }
 
 if ($_POST['action'] == 'get_progress_notes') {
-    $member = new Member($_POST['id']);
-    echo htmlspecialchars_decode(stripslashes($member->getProgressNotes()));
+    $progress_notes = '';
+    if ($_POST['is_buffer'] == '1') {
+        $criteria = array(
+            'column' => "progress_notes",
+            'match' => "id = ". $_POST['id'],
+            'limit' => "1"
+        );
+        $buffer = new ReferralBuffer();
+        $result = $buffer->find($criteria);
+        $progress_notes = htmlspecialchars_decode(stripslashes($result[0]['progress_notes']));
+    } else {
+        $member = new Member();
+        $progress_notes = htmlspecialchars_decode(stripslashes($member->getProgressNotes($_POST['id'])));
+    }
+    
+    echo $progress_notes;
     exit();
 }
 
 if ($_POST['action'] == 'update_progress_notes') {
-    $member = new Member($_POST['id']);
-    if ($member->saveProgressNotes($_POST['notes']) === false) {
-        echo 'ko';
-        exit();
+    if ($_POST['is_buffer'] == '1') {
+        $data = array();
+        $data['progress_notes'] = $_POST['notes'];
+        
+        $buffer = new ReferralBuffer($_POST['id']);
+        if ($buffer->update($data) === false) {
+            echo 'ko';
+            exit();
+        }
+    } else {
+        $member = new Member();
+        if ($member->saveProgressNotes($_POST['id'], $_POST['notes']) === false) {
+            echo 'ko';
+            exit();
+        }
     }
     
     echo 'ok';
@@ -523,8 +562,8 @@ if ($_POST['action'] == 'sign_up') {
         }
         
         // 3.5 save the notes by appending them
-        $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
-        $member->saveNotes($existing_notes. "\n\n[(". $buffer_result[0]['job']. ") ". $job_result[0]['job_title']. "] ". $buffer_result[0]['notes']);
+        // $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
+        // $member->saveNotes($existing_notes. "\n\n[(". $buffer_result[0]['job']. ") ". $job_result[0]['job_title']. "] ". $buffer_result[0]['notes']);
 
         // 4. create connection
         $connection_is_success = true;
@@ -570,6 +609,7 @@ if ($_POST['action'] == 'sign_up') {
             $data = array();
             $data['applied_on'] = $buffer_result[0]['requested_on'];
             $data['job'] = $buffer_result[0]['job'];
+            $data['progress_notes'] = htmlspecialchars_decode(stripslashes($buffer_result[0]['progress_notes']));
             
             if ($referrer_email[1] != 'yellowelevator.com') {
                 $data['referrer'] = $referrer->getId();
@@ -635,7 +675,7 @@ if ($_POST['action'] == 'add_new_application') {
     $data['candidate_email'] = (empty($_POST['candidate_email']) ? "NULL" : $_POST['candidate_email']);;
     $data['candidate_name'] = (empty($_POST['candidate_name']) ? "NULL" : $_POST['candidate_name']);;
     $data['candidate_phone'] = (empty($_POST['candidate_phone']) ? "NULL" : $_POST['candidate_phone']);;
-    $data['notes'] = (empty($_POST['notes']) ? "NULL" : $_POST['notes']);;
+    $data['progress_notes'] = (empty($_POST['notes']) ? "NULL" : $_POST['notes']);;
     
     $jobs = explode(',', $_POST['jobs']);
     

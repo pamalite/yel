@@ -270,6 +270,16 @@ div.job_profiles {
     background-color: #FFFF00;
 }
 
+.mini_emp_desc, .mini_spec, 
+.mini_superior {
+    font-size: 9pt;
+    color: #666666;
+}
+
+.mini_spec {
+    font-style: italic;
+}
+
 .center {
     text-align: center;
 }

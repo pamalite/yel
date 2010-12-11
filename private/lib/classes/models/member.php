@@ -795,20 +795,28 @@ class Member implements Model {
         return $this->mysqli->query($query);
     }
     
-    public function getProgressNotes() {
-        $query = "SELECT progress_notes FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
+    public function getProgressNotes($_id) {
+        if (is_null($_id) || empty($_id)) {
+            return false;
+        }
+        
+        $query = "SELECT progress_notes FROM member_jobs WHERE id = ". $_id. " LIMIT 1";
         $result = $this->mysqli->query($query);
         return $result[0]['progress_notes'];
     }
     
-    public function saveProgressNotes($_notes) {
+    public function saveProgressNotes($_id, $_notes) {
+        if (is_null($_id) || empty($_id)) {
+            return false;
+        }
+        
         $simplified_notes = '';
         $simplified_notes = htmlspecialchars_decode($_notes);
         $simplified_notes = str_replace('<br/>', "\n", $simplified_notes);
         $simplified_notes = addslashes($simplified_notes);
         
-        $query = "UPDATE members SET progress_notes = '". $simplified_notes. "' 
-                  WHERE email_addr = '". $this->id. "'";
+        $query = "UPDATE member_jobs SET progress_notes = '". $simplified_notes. "' 
+                  WHERE id = ". $_id;
         return $this->mysqli->execute($query);
     }
     

@@ -27,7 +27,7 @@ function filter_applications() {
 }
 
 function go_back() {
-    location.replace('members.php?page=members');
+    location.replace('members.php?page=applicants');
 }
 
 function reset_password() {

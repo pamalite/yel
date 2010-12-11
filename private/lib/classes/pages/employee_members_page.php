@@ -52,58 +52,6 @@ class EmployeeMembersPage extends Page {
         return $job->find($criteria);
     }
     
-    private function get_members($_employee_branch_id) {
-        $results = array();
-        $criteria = array(
-            'columns' => "members.email_addr, members.phone_num, members.progress_notes, members.active,
-                          IF(member_index.notes IS NULL OR member_index.notes = '', 0, 1) AS has_notes,  
-                          CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
-                          DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
-                          COUNT(DISTINCT resumes.id) AS num_yel_resumes, 
-                          COUNT(DISTINCT resumes_1.id) AS num_self_resumes,
-                          COUNT(DISTINCT member_jobs.id) AS num_attached_jobs",
-            'joins' => "resumes AS resumes ON resumes.member = members.email_addr AND 
-                            resumes.is_yel_uploaded = TRUE,
-                        resumes AS resumes_1 ON resumes_1.member = members.email_addr AND
-                            resumes_1.is_yel_uploaded = FALSE, 
-                        member_index ON member_index.member = members.email_addr, 
-                        member_jobs ON member_jobs.member = members.email_addr",
-            'match' => "members.email_addr <> 'initial@yellowelevator.com' AND 
-                        members.email_addr NOT LIKE 'team%@yellowelevator.com'",
-            'group' => "members.email_addr", 
-            'order' => "members.joined_on DESC"
-        );
-        
-        $member = new Member();
-        $this->total_members = count($member->find($criteria));
-        $criteria['limit']= $GLOBALS['default_results_per_page'];
-        $results = $member->find($criteria);
-        return $results;
-    }
-    
-    private function get_applications() {
-        $criteria = array(
-            'columns' => "referral_buffers.id, referral_buffers.candidate_email, 
-                          referral_buffers.candidate_phone, referral_buffers.candidate_name, 
-                          referral_buffers.referrer_email, referral_buffers.referrer_name, 
-                          referral_buffers.referrer_phone, 
-                          referral_buffers.existing_resume_id, referral_buffers.resume_file_hash, 
-                          IF(referral_buffers.notes IS NULL OR referral_buffers.notes = '', 0, 1) AS has_notes,
-                          IF(members.email_addr IS NULL, 0, 1) AS is_member, 
-                          jobs.title AS job, employers.id AS employer, 
-                          DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on", 
-            'joins' => "members ON members.email_addr = referral_buffers.candidate_email, 
-                        jobs ON jobs.id = referral_buffers.job, 
-                        employers ON employers.id = jobs.employer",
-            'order' => "referral_buffers.requested_on DESC"
-        );
-        
-        $referral_buffer = new ReferralBuffer();
-        $this->total_applications = count($referral_buffer->find($criteria));
-        $criteria['limit']= $GLOBALS['default_results_per_page'];
-        return $referral_buffer->find($criteria);
-    }
-    
     public function show() {
         $this->begin();
         $this->top('Members');
@@ -111,8 +59,6 @@ class EmployeeMembersPage extends Page {
         
         $branch = $this->employee->getBranch();
         $sales_email_addr = 'team.'. strtolower($branch[0]['country']). '@yellowelevator.com';
-        $members = $this->get_members($branch[0]['id']);
-        $applications = $this->get_applications();
         $employers = $this->get_employers();
         
         ?>
@@ -120,9 +66,9 @@ class EmployeeMembersPage extends Page {
         <div class="menu">
             <?php $style = 'background-color: #CCCCCC;'; ?>
             <ul class="menu">
-                <li id="item_applications" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_applications();">Applicants</a></li>
-                <li id="item_members" style="<?php echo ($this->current_page == 'members') ? $style : ''; ?>"><a class="menu" onClick="show_members();">Members</a></li>
-                <li id="item_search" style="<?php echo ($this->current_page == 'search') ? $style : ''; ?>"><a class="menu" onClick="show_search_members();">Search</a></li>
+                <li id="item_new_applicants" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_new_applicants();">New Applicants</a></li>
+                <li id="item_applicants" style="<?php echo ($this->current_page == 'members') ? $style : ''; ?>"><a class="menu" onClick="show_applicants();">Applicants</a></li>
+                <li id="item_members" style="<?php echo ($this->current_page == 'search') ? $style : ''; ?>"><a class="menu" onClick="show_members();">Members</a></li>
             </ul>
         </div>
         <!-- end submenu -->
@@ -174,11 +120,10 @@ class EmployeeMembersPage extends Page {
                         </div>
                     </td>
                     <td class="filter_buttons">
-                        <input type="button" class="main_filter_button" value="Refresh" onClick="do_filter();" />
-                        <br/>
-                        <input type="button" class="main_filter_button" value="Reset" onClick="show_all();" />
-                        <input type="button" class="main_filter_button" value="Show Non-attached" onClick="show_non_attached();" />
+                        <input type="button" class="main_filter_button" value="Show" onClick="do_filter();" />
                         <hr />
+                        <input type="button" class="main_filter_button" value="Show All" onClick="show_non_attached();" />
+                        <br/>
                         <input type="button" class="main_filter_button" id="add_new_btn" value="Add New Applicant" onClick="show_new_application_popup();" disabled />
                     </td>
                 </tr>
@@ -191,35 +136,19 @@ class EmployeeMembersPage extends Page {
         </div>
         <!-- end main filter -->
         
-        <div id="applications">
-        <?php
-        if (is_null($applications) || count($applications) <= 0 || $applications === false) {
-        ?>
-            <div class="empty_results">No applications at this moment.</div>
+        <div id="new_applicants">
             <input type="hidden" id="total_applications" value="0" />
-        <?php
-        } else {
-        ?>
-            <input type="hidden" id="total_applications" value="<?php echo $this->total_applications; ?>" />
             <div class="buttons_bar">
                 <div class="pagination">
                     Page
-                    <select id="pages" onChange="update_applications();">
+                    <select id="pages" onChange="update_new_applicants();">
                         <option value="1" selected>1</option>
-                    <?php
-                        $total_pages = ceil($this->total_applications / $GLOBALS['default_results_per_page']);
-                        for ($i=1; $i < $total_pages; $i++) {
-                    ?>
-                        <option value="<?php echo ($i+1); ?>"><?php echo ($i+1); ?></option>
-                    <?php
-                        }
-                    ?>
                     </select>
-                    of <span id="total_pages"><?php echo $total_pages; ?></span>
+                    of <span id="total_pages">0</span>
                 </div>
                 <div class="sub_filter">
                     Show 
-                    <select id="applications_filter" onChange="filter_applications();">
+                    <select id="applications_filter" onChange="filter_new_applicants();" disabled>
                         <option value="" selected>All</option>
                         <option value="" disabled>&nbsp;</option>
                         <option value="self_applied">Self Applied</option>
@@ -227,210 +156,32 @@ class EmployeeMembersPage extends Page {
                     </select>
                 </div>
             </div>
-            <div id="div_applications">
-            <?php
-                $applications_table = new HTMLTable('applications_table', 'applications');
-                
-                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Created On</a>", '', 'header');
-                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header');
-                $applications_table->set(0, 2, "Notes", '', 'header');
-                $applications_table->set(0, 3, "Job", '', 'header');
-                $applications_table->set(0, 4, "Resume", '', 'header');
-                $applications_table->set(0, 5, 'Quick Actions', '', 'header action');
-                
-                foreach ($applications as $i=>$application) {
-                    $is_cannot_signup = false;
-                                    
-                    $applications_table->set($i+1, 0, $application['formatted_requested_on'], '', 'cell');
-                    
-                    $candidate_short_details = '<span style="font-weight: bold;">'. htmlspecialchars_decode(stripslashes($application['candidate_name'])). '</span>'. "\n";
-                    if (empty($application['candidate_phone']) || 
-                        is_null($application['candidate_phone'])) {
-                        $is_cannot_signup = true;
-                        $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> <a class="no_link small_contact_edit" onClick="edit_candidate_phone('. $application['id']. ');">Add Phone Number</a></div>'. "\n";
-                    } else {
-                        $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $application['candidate_phone']. ' <a class="no_link small_contact_edit" onClick="edit_candidate_phone('. $application['id']. ');">edit</a></div>'. "\n";
-                    }
-
-                    if (empty($application['candidate_email']) || is_null($application['candidate_email'])) {
-                        $is_cannot_signup = true;
-                        $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span> <a class="no_link small_contact_edit" onClick="edit_candidate_email('. $application['id']. ');">Add Email</a></div>'. "\n";
-                    } else {
-                        $candidate_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $application['candidate_email']. '">'. $application['candidate_email']. '</a> <a class="no_link small_contact_edit" onClick="edit_candidate_email('. $application['id']. ');">edit</a></div>'. "\n";
-                    }
-
-                    $referrer_short_details = '<div class="tiny_contact">Ref: ';
-                    if (substr($application['referrer_email'], 0, 5) == 'team.' && 
-                        substr($application['referrer_email'], 7) == '@yellowelevator.com') {
-                        $referrer_short_details .= 'Self Applied';
-                    } else {
-                        $referrer_short_details .= '<a class="no_link" onClick="show_referrer_popup('. $application['id']. ');">';
-                        $referrer_short_details .= htmlspecialchars_decode(stripslashes($application['referrer_name']));
-                        if (empty($application['referrer_phone']) || 
-                            is_null($application['referrer_phone']) || 
-                            empty($application['referrer_email']) || 
-                            is_null($application['referrer_email'])) {
-                            $is_cannot_signup = true;
-                            $referrer_short_details .= '&nbsp;(Incomplete!)'. "\n";
-                        }
-
-                        $referrer_short_details .= '</a>';
-                    }
-                    $referrer_short_details .= '</div>';
-                    $candidate_short_details .= '<br/>'. $referrer_short_details;
-                    $applications_table->set($i+1, 1, $candidate_short_details, '', 'cell');
-                    
-                    if ($application['has_notes'] == '1') {
-                        $applications_table->set($i+1, 2, '<a class="no_link" onClick="show_notes_popup(\''. $application['id']. '\');">Update</a>', '', 'cell');
-                    } else {
-                        $applications_table->set($i+1, 2, '<a  class="no_link" onClick="show_notes_popup(\''. $application['id']. '\');">Add</a>', '', 'cell');
-                    }
-                    
-                    $job = '['. $application['employer']. '] '. $application['job'];
-                    if ($job == '[] ') {
-                        $job = 'N/A';
-                    }
-                    $applications_table->set($i+1, 3, $job, '', 'cell');
-                    
-                    if (!is_null($application['existing_resume_id']) && 
-                        !empty($application['existing_resume_id'])) {
-                        $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['existing_resume_id']. '">View</a>', '', 'cell');
-                    } elseif (!is_null($application['resume_file_hash']) && 
-                              !empty($application['resume_file_hash'])) {
-                        $applications_table->set($i+1, 4, '<a href="resume.php?id='. $application['id']. '&hash='. $application['resume_file_hash']. '">View</a>', '', 'cell');
-                    } else {
-                        $applications_table->set($i+1, 4, 'N/A', '', 'cell');
-                    }
-                    
-                    $actions = '<input type="button" value="Delete" onClick="delete_application(\''. $application['id']. '\');" />';
-                    
-                    if (is_null($application['candidate_email']) || 
-                        empty($application['candidate_email'])) {
-                        $actions .= '<input type="button" value="Jobs" onClick="show_jobs_popup(false, \''. $application['candidate_name']. '\');" />';
-                    } else {
-                        $actions .= '<input type="button" value="Jobs" onClick="show_jobs_popup(true, \''. $application['candidate_email']. '\');" />';
-                    }
-                    
-                    if ($is_cannot_signup) {
-                        $actions .= '<input type="button" value="Sign Up" disabled />';
-                    } else {
-                        if ($application['is_member'] == '1') {
-                            $actions .= '<input type="button" value="Transfer" onClick="transfer_to_member(\''. $application['id']. '\');" />';
-                        } else {
-                            $actions .= '<input type="button" value="Sign Up" onClick="make_member_from(\''. $application['id']. '\');" />';
-                        }
-                    }
-                    $applications_table->set($i+1, 5, $actions, '', 'cell action');
-                }
-                
-                echo $applications_table->get_html();
-            ?>
+            <div id="div_new_applicants">
+                <div class="empty_results">No new applicants to show.</div>
             </div>
-        <?php
-        }
-        ?>
         </div>
         
-        <div id="members">
-        <?php
-        if (is_null($members) || count($members) <= 0 || $members === false) {
-        ?>
-            <div class="empty_results">No members found.</div>
-        <?php
-        } else {
-        ?>
+        <div id="applicants">
             <div class="buttons_bar">
                 <div class="pagination">
                     Page
-                    <select id="member_pages" onChange="update_members();">
+                    <select id="applicants_pages" onChange="update_applicants();">
                         <option value="1" selected>1</option>
-                    <?php
-                        $total_member_pages = ceil($this->total_members / $GLOBALS['default_results_per_page']);
-                        for ($i=1; $i < $total_member_pages; $i++) {
-                    ?>
-                        <option value="<?php echo ($i+1); ?>"><?php echo ($i+1); ?></option>
-                    <?php
-                        }
-                    ?>
                     </select>
-                    of <span id="total_member_pages"><?php echo $total_member_pages; ?></span>
+                    of <span id="total_applicants_pages">0</span>
                 </div>
-                <input class="button" type="button" id="add_new_member" name="add_new_member" value="Add New Member" onClick="add_new_member();" />
+                <!-- input class="button" type="button" id="add_new_member" name="add_new_member" value="Add New Member" onClick="add_new_member();" /-->
             </div>
-            <div id="div_members">
-            <?php
-                $members_table = new HTMLTable('members_table', 'members');
-
-                $members_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('members', 'members.joined_on');\">Joined On</a>", '', 'header');
-                $members_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('members', 'members.lastname');\">Member</a>", '', 'header');
-                $members_table->set(0, 2, "Notes", '', 'header');
-                $members_table->set(0, 3, "Resumes", '', 'header');
-                $members_table->set(0, 4, "Jobs", '', 'header');
-                $members_table->set(0, 5, "Progress", '', 'header');
-                $members_table->set(0, 6, 'Quick Actions', '', 'header action');
-
-                foreach ($members as $i=>$member) {
-                    $members_table->set($i+1, 0, $member['formatted_joined_on'], '', 'cell');
-
-                    $member_short_details = '<a class="member_link" href="member.php?member_email_addr='. $member['email_addr']. '">'. desanitize($member['member_name']). '</a>'. "\n";
-                    $member_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> '. $member['phone_num']. '</div>'. "\n";
-                    $member_short_details .= '<div class="small_contact"><span style="font-weight: bold;">Email: </span><a href="mailto:'. $member['email_addr']. '">'. $member['email_addr']. '</a></div>'. "\n";
-                    $member_short_details .= '<br/><a href="member.php?member_email_addr='. $member['email_addr']. '&page=referrers">View Referrers</a>'. "\n";
-                    $members_table->set($i+1, 1, $member_short_details, '', 'cell');
-                    
-                    if ($member['has_notes'] == '1') {
-                        $members_table->set($i+1, 2, '<a class="no_link" onClick="show_notes_popup(\''. $member['email_addr']. '\');">Update</a>', '', 'cell');
-                    } else {
-                        $members_table->set($i+1, 2, '<a class="no_link" onClick="show_notes_popup(\''. $member['email_addr']. '\');">Add</a>', '', 'cell');
-                    }
-                    
-                    $resume_details = '<a class="no_link" onClick="show_resumes_page(\''. addslashes($member['email_addr']). '\');">View/Refer</a><br/><br/>'. "\n";
-                    $resume_details .= '<span style="color: #666666;">YEL: '. $member['num_yel_resumes']. "</span><br/>\n";
-                    $resume_details .= '<span style="color: #666666;">Self: '. $member['num_self_resumes']. "</span><br/>\n";
-                    $members_table->set($i+1, 3, $resume_details, '', 'cell');
-                    
-                    $jobs_attached = '<span style="font-style: italic; color: #666666;">No jobs attached.</span>';
-                    if ($member['num_attached_jobs'] > 0) {
-                        $jobs_attached = '<a class="no_link" onClick="show_jobs_popup(false, \''. $member['email_addr']. '\', true);">'. $member['num_attached_jobs']. '</a>';
-                    }
-                    $members_table->set($i+1, 4, $jobs_attached, '', 'cell');
-                    
-                    $progress_note = '<a class="no_link" onClick="show_progress_popup(\''. $member['email_addr']. '\');">Add</a>';
-                    if (!is_null($member['progress_notes']) && !empty($member['progress_notes'])) {
-                        $progress_note = '<div class="progress_cell">'. str_replace("\n", '<br/>', $member['progress_notes']). '</div>';
-                        $progress_note .= '<br/><a class="no_link" onClick="show_progress_popup(\''. $member['email_addr']. '\');">Update</a>';
-                    }
-                    $members_table->set($i+1, 5, $progress_note, '', 'cell progress_cell');
-                    
-                    $actions = '';
-                    if ($member['active'] == 'Y') {
-                        $actions = '<input type="button" id="activate_button_'. $i. '" value="De-activate" onClick="activate_member(\''. $member['email_addr']. '\', \''. $i. '\');" />';
-                        $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" />';
-                    } else {
-                        $actions = '<input type="button" id="activate_button_'. $i. '" value="Activate" onClick="activate_member(\''. $member['email_addr']. '\', \''. $i. '\');" />';
-                        // $actions .= '<input type="button" id="password_reset_'. $i. '" value="Reset Password" onClick="reset_password(\''. $member['email_addr']. '\');" disabled />';
-                    }
-                    
-                    $members_table->set($i+1, 6, $actions, '', 'cell action');
-                }
-
-                echo $members_table->get_html();
-            ?>
-            </div>
-            
-            <div class="buttons_bar">
-                <input class="button" type="button" id="add_new_member" name="add_new_member" value="Add New Member" onClick="add_new_member();" />
+            <div id="div_applicants">
+                <div class="empty_results">No applicants to show.</div>
             </div>
             
             <form id="member_page_form" method="post" action="member.php">
                 <input type="hidden" id="member_email_addr" name="member_email_addr" value="" />
             </form>
-        <?php
-        }
-        ?>
         </div>
         
-        <div id="member_search">
+        <div id="members">
         </div>
         
         <!-- popup windows goes here -->
@@ -543,7 +294,8 @@ class EmployeeMembersPage extends Page {
         <div id="progress_notes_window" class="popup_window">
             <div class="popup_window_title">Progress Notes</div>
             <form onSubmit="return false;">
-                <input type="hidden" id="progress_email" value="" />
+                <input type="hidden" id="progress_id" value="" />
+                <input type="hidden" id="progress_is_buffer" value="1" />
                 <div class="notes_form">
                     <textarea id="progress_notes" class="notes"></textarea>
                 </div>

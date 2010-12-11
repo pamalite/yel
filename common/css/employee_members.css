@@ -9,43 +9,24 @@ a.menu {
     cursor: pointer;
 }
 
-#members, #member_search {
+#applicants, #members {
     display: none;
 }
 
-#members_table {
+#new_applicants_table {
     margin: auto;
     width: 100%;
     border-collapse: collapse;
 }
 
-#members_table td { 
-    vertical-align: baseline;
-}
-
-#applications_table {
+#applicants_table {
     margin: auto;
     width: 100%;
     border-collapse: collapse;
 }
 
-#applications_table td { 
-    /*vertical-align: middle;*/
-}
-
-#members_table td.action {
-    vertical-align: middle;
-}
-
-#members_table tr:hover  {
-    background-color: #FFFF00;
-}
-
-#applications_table td.action {
-    vertical-align: middle;
-}
-
-#applications_table tr:hover  {
+#new_applicants_table tr:hover, 
+#applicants_table tr:hover  {
     background-color: #FFFF00;
 }
 
@@ -103,6 +84,7 @@ td.vtop {
     background-color: #CCCCCC;
     text-align: right;
     padding: 3px 3px 3px 3px;
+    height: 20px;
 }
 
 .member_form {
@@ -220,7 +202,7 @@ div.other_jobs {
 
 div.main_filter {
     width: 100%;
-    height: 375px;
+    height: 180px;
     padding-top: 5px;
     background-color: #DDDDDD;
     border-collapse: collapse;
@@ -256,9 +238,8 @@ input.main_filter_button {
 
 select.employers, 
 select.jobs {
-    font-size: 10pt;
     width: 100%;
-    height: 345px;
+    height: 150px;
 }
 
 div.main_filter_warning {
@@ -310,4 +291,23 @@ div.pagination {
 
 #other_jobs_table tr:hover  {
     background-color: #FFFF00;
+}
+
+span.viewed {
+    font-weight: bold;
+    color: #0000FF;
+}
+
+span.employed {
+    font-weight: bold;
+    color: #0CA711;
+}
+
+span.rejected {
+    font-weight: bold;
+    color: #FF0000;
+}
+
+span.referred {
+    font-weight: bold;
 }

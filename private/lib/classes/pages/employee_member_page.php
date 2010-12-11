@@ -407,7 +407,7 @@ class EmployeeMemberPage extends Page {
         <div class="menu">
             <?php $style = 'background-color: #CCCCCC;'; ?>
             <ul class="menu">
-                <li id="item_back"><a class="menu" onClick="go_back();">&lt;&lt;</a></li>
+                <!-- li id="item_back"><a class="menu" onClick="go_back();">&lt;&lt;</a></li -->
                 <li id="item_profile" style="<?php echo ($this->current_page == 'profile') ? $style : ''; ?>"><a class="menu" onClick="show_profile();">Profile</a></li>
             <?php
             if (!$this->is_new) {

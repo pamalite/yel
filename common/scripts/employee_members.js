@@ -1,45 +1,46 @@
-var current_section = 'applicants';
-var order_by = 'members.joined_on';
-var order = 'desc';
-var members_filter = '';
-var applications_order_by = 'referral_buffers.requested_on';
-var applications_order = 'desc';
+var current_section = 'new_applicants';
+var new_applicants_order_by = 'referral_buffers.requested_on';
+var new_applicants_order = 'desc';
+var new_applicants_filter = '';
 var applications_filter = '';
-var candidates_filter = '';
+var applicants_order_by = 'member_jobs.applied_on';
+var applicants_order = 'desc';
+var applicants_filter = '';
 var filter_by_employer_only = true;
 var filter_only_non_attached = false;
 var filter_is_dirty = false;
 var applicants_page = 1;
-var members_page = 1;
+var new_applicants_page = 1;
 var sliding_filter_fx = '';
+var return_page = '';
 
-function ascending_or_descending() {
-    if (order == 'desc') {
-        order = 'asc';
+function new_applicants_ascending_or_descending() {
+    if (new_applicants_order == 'desc') {
+        new_applicants_order = 'asc';
     } else {
-        order = 'desc';
+        new_applicants_order = 'desc';
     }
 }
 
-function applications_ascending_or_descending() {
-    if (applications_order == 'desc') {
-        applications_order = 'asc';
+function applicants_ascending_or_descending() {
+    if (applicants_order == 'desc') {
+        applicants_order = 'asc';
     } else {
-        applications_order = 'desc';
+        applicants_order = 'desc';
     }
 }
 
 function sort_by(_table, _column) {
     switch (_table) {
-        case 'members':
-            order_by = _column;
-            ascending_or_descending();
-            update_members();
+        case 'applicants':
+            applicants_order_by = _column;
+            applicants_ascending_or_descending();
+            update_applicants();
             break;
-        case 'applications':
-            applications_order_by = _column;
-            applications_ascending_or_descending();
-            update_applications();
+        case 'new_applicants':
+            new_applicants_order_by = _column;
+            new_applicants_ascending_or_descending();
+            update_new_applicants();
             break;
     }
 }
@@ -143,25 +144,13 @@ function do_filter() {
     filter_is_dirty = true;
     
     if (current_section == 'applicants') {
-        filter_applications();
-    } else if (current_section == 'members') {
-        filter_members();
+        filter_applicants();
+    } else if (current_section == 'new_applicants') {
+        filter_new_applicants();
     }
 }
 
-function show_all() {
-    if (current_section == 'applicants') {
-        show_all_applications();
-    } else {
-        show_all_members();
-    }
-}
-
-function show_all_members() {
-    window.location = 'members.php?page=members';
-}
-
-function filter_members() {
+function filter_applicants() {
     filter_only_non_attached = false;
     filter_by_employer_only = true;
     if ($('jobs') != null) {
@@ -173,68 +162,70 @@ function filter_members() {
         }
     }
     
-    members_filter = '';
+    applicants_filter = '';
     if (filter_by_employer_only) {
         for (var i=0; i < $('employers').options.length; i++) {
             if ($('employers').options[i].selected) {
-                members_filter = members_filter + $('employers').options[i].value + ',';
+                applicants_filter = applicants_filter + $('employers').options[i].value + ',';
             }
         }
     } else {
         for (var i=0; i < $('jobs').options.length; i++) {
             if ($('jobs').options[i].selected) {
-                members_filter = members_filter + $('jobs').options[i].value + ',';
+                applicants_filter = applicants_filter + $('jobs').options[i].value + ',';
             }
         }
     }
     
-    if (!isEmpty(members_filter)) {
-        members_filter = members_filter.substr(0, members_filter.length-1);
+    if (!isEmpty(applicants_filter)) {
+        applicants_filter = applicants_filter.substr(0, applicants_filter.length-1);
     }
     
-    update_members();
+    update_applicants();
 }
 
-function show_members() {
-    current_section = 'members';
+function show_applicants() {
+    current_section = 'applicants';
+    return_page = 'applicants';
+    
     $('add_new_btn').setStyle('visibility', 'hidden');
     
-    $('applications').setStyle('display', 'none');
-    $('members').setStyle('display', 'block');
-    $('member_search').setStyle('display', 'none');
+    $('new_applicants').setStyle('display', 'none');
+    $('applicants').setStyle('display', 'block');
+    $('members').setStyle('display', 'none');
     
-    $('item_applications').setStyle('background-color', '');
-    $('item_members').setStyle('background-color', '#CCCCCC');
-    $('item_search').setStyle('background-color', '');
+    $('item_new_applicants').setStyle('background-color', '');
+    $('item_applicants').setStyle('background-color', '#CCCCCC');
+    $('item_members').setStyle('background-color', '');
     
     swap_filter_with_search(false);
     
     if (filter_is_dirty) {
         filter_is_dirty = false;
-        filter_members();
+        filter_applicants();
     }
 }
 
-function update_members() {
+function update_applicants() {
     var selected_page = 1;
-    var selected_page_index = $('member_pages').selectedIndex;
-    if ($('member_pages').options.length > 0) {
-        selected_page = $('member_pages').options[selected_page_index].value;
+    var selected_page_index = $('applicants_pages').selectedIndex;
+    if ($('applicants_pages').options.length > 0) {
+        selected_page = $('applicants_pages').options[selected_page_index].value;
     }
     
-    var params = 'id=' + user_id + '&order_by=' + order_by + ' ' + order;
-    params = params + '&action=get_members';
+    var params = 'id=' + user_id + '&order_by=' + applicants_order_by + ' ' + applicants_order;
+    params = params + '&action=get_applicants';
     params = params + '&page=' + selected_page;
     
     if (filter_only_non_attached) {
         params = params + '&non_attached=1';
     }
     
-    if (!isEmpty(members_filter)) {
+    if (!isEmpty(applicants_filter)) {
         if (filter_by_employer_only) {
-            params = params + '&employers=' + members_filter;
+            params = params + '&employers=' + applicants_filter;
         } else {
-            params = params + '&jobs=' + members_filter;
+            params = params + '&jobs=' + applicants_filter;
         }
     }
     
@@ -246,24 +237,20 @@ function update_members() {
             // set_status('<pre>' + txt + '</pre>');
             // return;
             if (txt == 'ko') {
-                alert('An error occured while loading members.');
+                alert('An error occured while loading applicants.');
                 return false;
             }
             
-            $('member_pages').length = 0;
-            $('total_member_pages').set('html', '0');
+            $('applicants_pages').length = 0;
+            $('total_applicants_pages').set('html', '0');
             
             if (txt == '0') {
                 set_status('');
-                $('div_members').set('html', '<div class="empty_results">No members at this moment.</div>');
+                $('div_applicants').set('html', '<div class="empty_results">No applicants to show.</div>');
             } else {
-                if ($('hide_show_lbl').get('html') == 'Hide Filter') {
-                    toggle_main_filter();
-                }
-                
                 var total_pages = xml.getElementsByTagName('total_pages');
                 
-                $('total_member_pages').set('html', total_pages[0].childNodes[0].nodeValue);
+                $('total_applicants_pages').set('html', total_pages[0].childNodes[0].nodeValue);
                 if (selected_page_index >= parseInt(total_pages[0].childNodes[0].nodeValue)) {
                     selected_page_index = parseInt(total_pages[0].childNodes[0].nodeValue)-1;
                 }
@@ -275,38 +262,49 @@ function update_members() {
                     } else {
                         an_option = new Option((i+1), (i+1));
                     }
-                    $('member_pages').options[$('member_pages').length] = an_option;
+                    $('applicants_pages').options[$('applicants_pages').length] = an_option;
                 }
                 
+                var ids = xml.getElementsByTagName('member_job_id');
                 var emails = xml.getElementsByTagName('email_addr');
                 var members = xml.getElementsByTagName('member_name');
                 var phone_nums = xml.getElementsByTagName('phone_num');
-                var has_notes = xml.getElementsByTagName('has_notes');
                 var progress_notes = xml.getElementsByTagName('progress_notes');
-                var joined_ons = xml.getElementsByTagName('formatted_joined_on');
+                var job_ids = xml.getElementsByTagName('job_id');
+                var employer_ids = xml.getElementsByTagName('employer_id');
+                var job_titles = xml.getElementsByTagName('job_title');
+                var resume_ids = xml.getElementsByTagName('resume_id');
+                var resumes = xml.getElementsByTagName('resume_name');
+                var applied_resume_ids = xml.getElementsByTagName('app_resume_id');
+                var applied_resumes = xml.getElementsByTagName('app_resume_name');
                 var yel_resumes = xml.getElementsByTagName('num_yel_resumes');
                 var self_resumes = xml.getElementsByTagName('num_self_resumes');
                 var applied_jobs = xml.getElementsByTagName('num_attached_jobs');
-                var is_actives = xml.getElementsByTagName('active');
+                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
+                var applied_ons = xml.getElementsByTagName('formatted_applied_on');
+                var agreed_terms_ons = xml.getElementsByTagName('formatted_employer_agreed_terms_on');
+                var employed_ons = xml.getElementsByTagName('formatted_employed_on');
+                var employer_rejected_ons = xml.getElementsByTagName('formatted_employer_rejected_on');
                 
-                var members_table = new FlexTable('members_table', 'members');
+                var applicants_table = new FlexTable('applicants_table', 'applicants');
 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.joined_on');\">Joined On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.lastname');\">Member</a>", '', 'header'));
-                header.set(2, new Cell('Notes', '', 'header'));
-                header.set(3, new Cell('Resumes', '', 'header'));
-                header.set(4, new Cell('Jobs', '', 'header'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'member_jobs.applied_on');\">Applied On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'members.lastname');\">Member</a>", '', 'header'));
+                header.set(2, new Cell('Job Applied', '', 'header'));
+                header.set(3, new Cell('Resume Referred', '', 'header'));
+                header.set(4, new Cell('Status', '', 'header'));
                 header.set(5, new Cell('Progress', '', 'header'));
-                header.set(6, new Cell('Quick Actions', '', 'header action'));
-                members_table.set(0, header);
+                applicants_table.set(0, header);
                 
                 for (var i=0; i < emails.length; i++) {
                     var row = new Row('');
                     
-                    row.set(0, new Cell(joined_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    // applied on
+                    row.set(0, new Cell(applied_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
-                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    // member details
+                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '" target="_new">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
                     
                     var phone_num = '';
                     if (phone_nums[i].childNodes.length > 0) {
@@ -315,27 +313,47 @@ function update_members() {
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + phone_num + '</div>' + "\n";
                     
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a href="mailto:' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
-                    short_desc = short_desc + '<br/><a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=referrers">View Referrers</a>' + "\n";
+                    short_desc = short_desc + '<br/><a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=referrers" target="_new">View Referrers</a>' + "\n";
                     row.set(1, new Cell(short_desc, '', 'cell'));
                     
-                    if (has_notes[i].childNodes[0].nodeValue == '1') {
-                        row.set(2, new Cell('<a class="no_link" onClick="show_notes_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Update</a>', '', 'cell'));
-                    } else {
-                        row.set(2, new Cell('<a class="no_link" onClick="show_notes_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Add</a>', '', 'cell'));
+                    // job applied
+                    var job_details = '[' + employer_ids[i].childNodes[0].nodeValue + '] ' + job_titles[i].childNodes[0].nodeValue + '<br/><br/>';
+                    if (parseInt(applied_jobs[i].childNodes[0].nodeValue) > 1) {
+                        job_details = job_details + '<a class="no_link" onClick="show_jobs_popup(false, \'' + emails[i].childNodes[0].nodeValue + '\', true);">View others</a>';
+                    }
+                    row.set(2, new Cell(job_details, '', 'cell'));
+                    
+                    // resume details
+                    var resume_details = '<a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">View applied</a><br/>';
+                    
+                    if (resume_ids[i].childNodes.length > 0) {
+                        resume_details = '<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View referred</a><br/>';
                     }
                     
-                    var resume_details = '<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">View/Refer</a><br/><br/>';
+                    resume_details = resume_details + '<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">View all/Refer</a><br/><br/>';
                     resume_details = resume_details + '<span style="color: #666666;">YEL: ' + yel_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
                     resume_details = resume_details + '<span style="color: #666666;">Self: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
                     row.set(3, new Cell(resume_details, '', 'cell'));
                     
-                    if (parseInt(applied_jobs[i].childNodes[0].nodeValue) > 0) {
-                        row.set(4, new Cell('<a class="no_link" onClick="show_jobs_popup(false, \'' + emails[i].childNodes[0].nodeValue + '\', true);">' + applied_jobs[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
-                    } else {
-                        row.set(4, new Cell('<span style="font-style: italic; color: #666666;">No jobs attached.</span>', '', 'cell'));
+                    // status
+                    var status = 'N/A';
+                    if (referred_ons[i].childNodes.length > 0) {
+                        status = '<span class="referred">Referred On:</span> ' + referred_ons[i].childNodes[0].nodeValue;
                     }
                     
-                    var progress = '<a class="no_link" onClick="show_progress_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Add</a>';
+                    if (agreed_terms_ons[i].childNodes.length > 0) {
+                        status = status + '<br/><span class="viewed">Viewed On:</span> ' + agreed_terms_ons[i].childNodes[0].nodeValue;
+                    }
+                    
+                    if (employed_ons[i].childNodes.length > 0) {
+                        status = status + '<br/><span class="employed">Employed On:</span> ' + employed_ons[i].childNodes[0].nodeValue;
+                    } else if (employer_rejected_ons[i].childNodes.length > 0) {
+                        status = status + '<br/><span class="rejected">Rejected On:</span> ' + employer_rejected_ons[i].childNodes[0].nodeValue;
+                    }
+                    row.set(4, new Cell(status, '', 'cell'));
+                    
+                    // progress
+                    var progress = '<a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\');">Add</a>';
                     if (progress_notes[i].childNodes.length > 0) {
                         var lines = progress_notes[i].childNodes[0].nodeValue.split("\n");
                         var notes_str = '';
@@ -343,28 +361,28 @@ function update_members() {
                             notes_str = notes_str + lines[l] + '<br/>';
                         }
                         progress = '<div class="progress_cell">' + notes_str  + '</div>';
-                        progress = progress + '<br/><a class="no_link" onClick="show_progress_popup(\'' + emails[i].childNodes[0].nodeValue + '\');">Update</a>';
+                        progress = progress + '<br/><a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\');">Update</a>';
                     }
                     row.set(5, new Cell(progress, '', 'cell progress_cell'));
                     
-                    var actions = '';
-                    if (is_actives[i].childNodes[0].nodeValue == 'Y') {
-                        actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                        actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
-                    } else {
-                        actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                    }
+                    // var actions = '';
+                    // if (is_actives[i].childNodes[0].nodeValue == 'Y') {
+                    //     actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
+                    //     actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
+                    // } else {
+                    //     actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
+                    // }                    
+                    // row.set(6, new Cell(actions, '', 'cell action'));
                     
-                    row.set(6, new Cell(actions, '', 'cell action'));
-                    members_table.set((parseInt(i)+1), row);
+                    applicants_table.set((parseInt(i)+1), row);
                 }
                 
-                $('div_members').set('html', members_table.get_html());
+                $('div_applicants').set('html', applicants_table.get_html());
                 set_status('');
             }
         },
         onRequest: function(instance) {
-            set_status('Loading members...');
+            set_status('Loading applicants...');
         }
     });
     
@@ -475,24 +493,20 @@ function add_new_member() {
     $('member_page_form').submit();
 }
 
-function show_all_applications() {
-    window.location = 'members.php';
-}
-
 function show_non_attached() {
-    applications_filter = '';
-    candidates_filter = '';
+    new_applicants_filter = '';
+    applicants_filter = '';
     members_filter = '';
     filter_only_non_attached = true;
     
     if (current_section == 'applicants') {
-        update_applications();
+        update_applicants();
     } else {
-        update_members();
+        update_new_applicants();
     }
 }
 
-function filter_applications() {
+function filter_new_applicants() {
     filter_only_non_attached = false;
     applications_filter = $('applications_filter').options[$('applications_filter').selectedIndex].value;
     
@@ -506,57 +520,59 @@ function filter_applications() {
         }
     }
     
-    candidates_filter = '';
+    new_applicants_filter = '';
     if (filter_by_employer_only) {
         for (var i=0; i < $('employers').options.length; i++) {
             if ($('employers').options[i].selected) {
-                candidates_filter = candidates_filter + $('employers').options[i].value + ',';
+                new_applicants_filter = new_applicants_filter + $('employers').options[i].value + ',';
             }
         }
     } else {
         for (var i=0; i < $('jobs').options.length; i++) {
             if ($('jobs').options[i].selected) {
-                candidates_filter = candidates_filter + $('jobs').options[i].value + ',';
+                new_applicants_filter = new_applicants_filter + $('jobs').options[i].value + ',';
             }
         }
     }
     
-    if (!isEmpty(candidates_filter)) {
-        candidates_filter = candidates_filter.substr(0, candidates_filter.length-1);
+    if (!isEmpty(new_applicants_filter)) {
+        new_applicants_filter = new_applicants_filter.substr(0, new_applicants_filter.length-1);
     }
     
-    update_applications();
+    update_new_applicants();
 }
 
-function show_applications() {
-    current_section = 'applicants';
+function show_new_applicants() {
+    current_section = 'new_applicants';
+    return_page = '';
+    
     $('add_new_btn').setStyle('visibility', 'visible');
     
-    $('applications').setStyle('display', 'block');
+    $('new_applicants').setStyle('display', 'block');
+    $('applicants').setStyle('display', 'none');
     $('members').setStyle('display', 'none');
-    $('member_search').setStyle('display', 'none');
     
-    $('item_applications').setStyle('background-color', '#CCCCCC');
+    $('item_new_applicants').setStyle('background-color', '#CCCCCC');
+    $('item_applicants').setStyle('background-color', '');
     $('item_members').setStyle('background-color', '');
-    $('item_search').setStyle('background-color', '');
     
     swap_filter_with_search(false);
     
     if (filter_is_dirty) {
         filter_is_dirty = false;
-        filter_applications();
+        filter_new_applicants();
     }
 }
 
-function update_applications() {
+function update_new_applicants() {
     var selected_page = 1;
     var selected_page_index = $('pages').selectedIndex;
     if ($('pages').options.length > 0) {
         selected_page = $('pages').options[selected_page_index].value;
     }
     
-    var params = 'id=' + user_id + '&order_by=' + applications_order_by + ' ' + applications_order;
-    params = params + '&action=get_applications';
+    var params = 'id=' + user_id + '&order_by=' + new_applicants_order_by + ' ' + new_applicants_order;
+    params = params + '&action=get_new_applicants';
     params = params + '&show_only=' + applications_filter;
     params = params + '&page=' + selected_page;
     
@@ -564,11 +580,11 @@ function update_applications() {
         params = params + '&non_attached=1';
     }
     
-    if (!isEmpty(candidates_filter)) {
+    if (!isEmpty(new_applicants_filter)) {
         if (filter_by_employer_only) {
-            params = params + '&employers=' + candidates_filter;
+            params = params + '&employers=' + new_applicants_filter;
         } else {
-            params = params + '&jobs=' + candidates_filter;
+            params = params + '&jobs=' + new_applicants_filter;
         }
     }
     
@@ -580,7 +596,7 @@ function update_applications() {
             //set_status('<pre>' + txt + '</pre>');
             //return;
             if (txt == 'ko') {
-                alert('An error occured while loading applications.');
+                alert('An error occured while loading new applicants.');
                 return false;
             }
             
@@ -589,11 +605,10 @@ function update_applications() {
             
             if (txt == '0') {
                 set_status('');
-                $('div_applications').set('html', '<div class="empty_results">No applications at this moment.</div>');
+                $('applications_filter').disabled = true;
+                $('div_new_applicants').set('html', '<div class="empty_results">No new applicants to show.</div>');
             } else {
-                if ($('hide_show_lbl').get('html') == 'Hide Filter') {
-                    toggle_main_filter();
-                }
+                $('applications_filter').disabled = false;
                 
                 var total_pages = xml.getElementsByTagName('total_pages');
                 
@@ -622,27 +637,31 @@ function update_applications() {
                 var resume_ids = xml.getElementsByTagName('existing_resume_id');
                 var resume_file_hashes = xml.getElementsByTagName('resume_file_hash');
                 var requested_ons = xml.getElementsByTagName('formatted_requested_on');
-                var has_notes = xml.getElementsByTagName('has_notes');
+                var progress_notes = xml.getElementsByTagName('progress_notes');
                 var jobs = xml.getElementsByTagName('job');
                 var employers = xml.getElementsByTagName('employer');
+                var applied_jobs = xml.getElementsByTagName('num_jobs_attached');
+                var is_members = xml.getElementsByTagName('is_member');
                 
-                var applications_table = new FlexTable('applications_table', 'applications');
+                var new_applicants_table = new FlexTable('new_applicants_table', 'new_applicants');
 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.requested_on');\">Created On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referral_buffers.candidate_name');\">Candidate</a>", '', 'header'));
-                header.set(2, new Cell('Notes', '', 'header'));
-                header.set(3, new Cell('Job', '', 'header'));
-                header.set(4, new Cell('Resume', '', 'header'));
-                header.set(5, new Cell('Quick Actions', '', 'header action'));
-                applications_table.set(0, header);
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_applicants', 'referral_buffers.requested_on');\">Created On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_applicants', 'referral_buffers.candidate_name');\">Applicant</a>", '', 'header'));
+                header.set(2, new Cell('Job Applied', '', 'header'));
+                header.set(3, new Cell('Resume', '', 'header'));
+                header.set(4, new Cell('Progress', '', 'header'));
+                header.set(5, new Cell('&nbsp;', '', 'header action'));
+                new_applicants_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
                     var is_cannot_signup = false;
                     var row = new Row('');
                     
+                    // requested on
                     row.set(0, new Cell(requested_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
+                    // applicant details
                     // referrer link
                     var referrer_short_details = '';
                     if (referrer_emails[i].childNodes.length > 0 && 
@@ -698,65 +717,81 @@ function update_applications() {
                     var candidate_details = short_desc + '<br />' + referrer_short_details;
                     row.set(1, new Cell(candidate_details, '', 'cell'));
                     
-                    var add_update_notes = 'Add';
-                    if (has_notes[i].childNodes[0].nodeValue == '1') {
-                        add_update_notes = 'Update';
-                    }
-                    row.set(2, new Cell('<a class="no_link" onClick="show_notes_popup(\'' + ids[i].childNodes[0].nodeValue +  '\');">' + add_update_notes + '</a>', '', 'cell'));
-                    
-                    
+                    // job applied
                     var job_desc = 'N/A';
                     if (jobs[i].childNodes.length > 0) {
                         job_desc = '[' + employers[i].childNodes[0].nodeValue + '] ' + jobs[i].childNodes[0].nodeValue;
                     }
-                    row.set(3, new Cell(job_desc, '', 'cell'));
                     
+                    if (parseInt(applied_jobs[i].childNodes[0].nodeValue) > 1) {
+                        if (candidate_emails[i].childNodes.length <= 0) {
+                            job_desc = job_desc + '<br/><br/><a class="no_link" onClick="show_jobs_popup(false, \'' + candidate_names[i].childNodes[0].nodeValue + '\');">View other jobs</a>'; 
+                        } else {
+                            job_desc = job_desc + '<br/><br/><a class="no_link" onClick="show_jobs_popup(true, \'' + candidate_emails[i].childNodes[0].nodeValue + '\');">View other jobs</a>'; 
+                        }
+                    }
+                    row.set(2, new Cell(job_desc, '', 'cell'));
+                    
+                    // resume
                     if (resume_ids[i].childNodes.length > 0) {
-                        row.set(4, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
+                        row.set(3, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
                     } else if (resume_file_hashes[i].childNodes.length > 0) {
-                        row.set(4, new Cell('<a href="resume.php?id=' + ids[i].childNodes[0].nodeValue + '&hash=' + resume_file_hashes[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
+                        row.set(3, new Cell('<a href="resume.php?id=' + ids[i].childNodes[0].nodeValue + '&hash=' + resume_file_hashes[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
                     } else {
-                        row.set(4, new Cell('N/A', '', 'cell'));
+                        row.set(3, new Cell('N/A', '', 'cell'));
                     }
                     
+                    // progress
+                    var progress = '<a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'1\');">Add</a>';
+                    if (progress_notes[i].childNodes.length > 0) {
+                        var lines = progress_notes[i].childNodes[0].nodeValue.split("\n");
+                        var notes_str = '';
+                        for (var l=0; l < lines.length; l++) {
+                            notes_str = notes_str + lines[l] + '<br/>';
+                        }
+                        progress = '<div class="progress_cell">' + notes_str  + '</div>';
+                        progress = progress + '<br/><a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'1\');">Update</a>';
+                    }
+                    row.set(4, new Cell(progress, '', 'cell progress_cell'));
+                    
+                    // actions
                     var actions = '';
                     actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
-                    
-                    if (candidate_emails[i].childNodes.length <= 0) {
-                        actions = actions + '<input type="button" value="Jobs" onClick="show_jobs_popup(false, \'' + candidate_names[i].childNodes[0].nodeValue + '\');" />';
-                    } else {
-                        actions = actions + '<input type="button" value="Jobs" onClick="show_jobs_popup(true, \'' + candidate_emails[i].childNodes[0].nodeValue + '\');" />';
-                    }
                     
                     if (is_cannot_signup) {
                         actions = actions + '<input type="button" value="Sign Up" disabled />';
                     } else {
-                        actions = actions + '<input type="button" value="Sign Up" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                        if (is_members[i].childNodes[0].nodeValue == '0') {
+                            actions = actions + '<input type="button" value="Sign Up" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                        } else {
+                            actions = actions + '<input type="button" value="Transfer" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                        }
                     }
                     row.set(5, new Cell(actions, '', 'cell action'));
-                    applications_table.set((parseInt(i)+1), row);
+                    
+                    new_applicants_table.set((parseInt(i)+1), row);
                 }
                 
-                $('div_applications').set('html', applications_table.get_html());
+                $('div_new_applicants').set('html', new_applicants_table.get_html());
                 set_status('');
             }
         },
         onRequest: function(instance) {
-            set_status('Loading applications...');
+            set_status('Loading new applicants...');
         }
     });
     
     request.send(params);
 }
 
-function show_search_members() {
-    $('applications').setStyle('display', 'none');
-    $('members').setStyle('display', 'none');
-    $('member_search').setStyle('display', 'block');
+function show_members() {
+    $('new_applicants').setStyle('display', 'none');
+    $('applicants').setStyle('display', 'none');
+    $('members').setStyle('display', 'block');
     
-    $('item_applications').setStyle('background-color', '');
-    $('item_members').setStyle('background-color', '');
-    $('item_search').setStyle('background-color', '#CCCCCC');
+    $('item_new_applicants').setStyle('background-color', '');
+    $('item_applicants').setStyle('background-color', '');
+    $('item_members').setStyle('background-color', '#CCCCCC');
     
     swap_filter_with_search(true);
 }
@@ -774,7 +809,7 @@ function show_resumes_page(_member_id) {
             }
         }
     }
-    location.replace('member.php?member_email_addr=' + _member_id + '&page=resumes&selected_jobs=' + selected_jobs);
+    window.open('member.php?member_email_addr=' + _member_id + '&page=resumes&selected_jobs=' + selected_jobs);
 }
 
 function delete_application(_app_id) {
@@ -795,7 +830,7 @@ function delete_application(_app_id) {
             }
             
             set_status('');
-            update_applications();
+            update_new_applicants();
         },
         onRequest: function(instance) {
             set_status('Deleting application...');
@@ -948,9 +983,9 @@ function close_notes_popup(_is_save) {
                 set_status('');
                 
                 if (isEmpty($('app_id').value)) {
-                    update_members();
+                    update_applicants();
                 } else {
-                    update_applications();
+                    update_new_applicants();
                 }
             },
             onRequest: function(instance) {
@@ -981,7 +1016,7 @@ function edit_candidate_phone(_id) {
                     return;
                 }
                 
-                update_applications();
+                update_new_applicants();
             },
             onRequest: function(instance) {
                 set_status('Saving phone number...');
@@ -1009,7 +1044,7 @@ function edit_candidate_email(_id) {
                     return;
                 }
                 
-                update_applications();
+                update_new_applicants();
             },
             onRequest: function(instance) {
                 set_status('Saving email address...');
@@ -1037,7 +1072,7 @@ function edit_referrer_phone(_id) {
                     return;
                 }
                 
-                update_applications();
+                update_new_applicants();
             },
             onRequest: function(instance) {
                 set_status('Saving phone number...');
@@ -1065,7 +1100,7 @@ function edit_referrer_email(_id) {
                     return;
                 }
                 
-                update_applications();
+                update_new_applicants();
             },
             onRequest: function(instance) {
                 set_status('Saving email address...');
@@ -1178,7 +1213,7 @@ function close_new_application_popup(_is_save) {
                     return;
                 }
                 
-                update_applications();
+                update_new_applicants();
             },
             onRequest: function(instance) {
                 set_status('Saving new application...');
@@ -1262,7 +1297,7 @@ function close_referrer_popup(_is_save) {
                 }
                 
                 close_window('referrer_window');
-                update_applications();
+                update_new_applicants();
             }
         });
 
@@ -1334,11 +1369,13 @@ function close_jobs_popup() {
     close_window('other_jobs_window');
 }
 
-function show_progress_popup(_id) {
-    $('progress_email').value = _id;
+function show_progress_popup(_id, _is_buffer) {
+    $('progress_id').value = _id;
+    $('progress_is_buffer').value = _is_buffer;
     
     var params = 'id=' + _id;
     params = params + '&action=get_progress_notes';
+    params = params + '&is_buffer=' + _is_buffer;
     
     var uri = root + "/employees/members_action.php";
     var request = new Request({
@@ -1363,11 +1400,12 @@ function show_progress_popup(_id) {
 
 function close_progress_popup(_is_save) {
     if (_is_save) {
-        params = 'id=' + $('progress_email').value;
+        params = 'id=' + $('progress_id').value;
         params = params + '&action=update_progress_notes';
+        params = params + '&is_buffer=' + $('progress_is_buffer').value;
         
         var notes = $('progress_notes').value.replace("\n", '<br/>');
-        params = params + '&notes=' + notes;
+        params = params + '&notes=' + encodeURIComponent(notes);
         
         var uri = root + "/employees/members_action.php";
         var request = new Request({
@@ -1377,7 +1415,11 @@ function close_progress_popup(_is_save) {
                 close_window('progress_notes_window');
                 set_status('');
                 
-                update_members();
+                if (return_page == '') {
+                    update_new_applicants();
+                } else {
+                    update_applicants();
+                }
             },
             onRequest: function(instance) {
                 set_status('Saving progress notes...');
@@ -1395,12 +1437,15 @@ function onDomReady() {
     initialize_page();
     
     switch (current_page) {
-       case 'members':
-           show_members();
-           break;
-       default:
-           show_applications();
-           break;
+        case 'members':
+            show_members();
+            break;
+        case 'applicants':
+            show_applicants();
+            break;
+        default:
+            show_new_applicants();
+            break;
    }
    
    sliding_filter_fx = new Fx.Slide('div_main_filter', {
