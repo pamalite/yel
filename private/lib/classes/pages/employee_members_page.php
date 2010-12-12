@@ -137,7 +137,7 @@ class EmployeeMembersPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top('Members');
+        $this->top('Candidates');
         $this->menu_employee('members');
         
         $branch = $this->employee->getBranch();
@@ -327,9 +327,9 @@ class EmployeeMembersPage extends Page {
                             </table>
                         </td>
                         <td class="search_buttons">
-                            <input type="button" class="search_button" value="Search" onClick="do_search();" />
+                            <input type="button" class="search_button" value="Search" onClick="update_members();" />
                             <hr />
-                            <input type="button" class="search_button" value="Show All" onClick="show_all_members();" />
+                            <input type="button" class="search_button" value="Show All" onClick="update_members('all');" />
                         </td>
                     </tr>
                 </table>
@@ -345,7 +345,7 @@ class EmployeeMembersPage extends Page {
                         </select>
                         of <span id="total_members_pages">0</span>
                     </div>
-                    <input class="button" type="button" id="add_new_member" name="add_new_member" value="Add New Member" onClick="add_new_member();">
+                    <input class="button" type="button" id="add_new_member" name="add_new_member" value="Add New Candidate" onClick="add_new_member();">
                 </div>
                 <div id="div_members">
                     <div class="empty_results">No members to show.</div>

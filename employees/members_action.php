@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
+require_once dirname(__FILE__). "/../private/lib/classes/member_search.php";
 
 session_start();
 
@@ -329,8 +330,58 @@ if ($_POST['action'] == 'get_applicants') {
 }
 
 if ($_POST['action'] == 'get_members') {
-    echo 'ok';
-    exit();
+    if ($_POST['action'] == 'get_members') {
+        $order_by = "members.lastname ASC";
+        $page = 1;
+
+        if (isset($_POST['order_by'])) {
+            $order_by = $_POST['order_by'];
+        }
+        
+        // TODO: process criteria
+        $criteria = array();
+        
+        $member_search = new MemberSearch();
+        $result = $member_search->search_using($criteria);
+
+        if (count($result) <= 0 || is_null($result)) {
+            echo '0';
+            exit();
+        }
+
+        if (!$result) {
+            echo 'ko';
+            exit();
+        }
+
+        $total_pages = ceil(count($result) / $GLOBALS['default_results_per_page']);
+        if ($page > $total_pages) {
+            $page = $total_pages;
+        }
+
+        $offset = 0;
+        if ($page > 1) {
+            $offset = ($page-1) * $GLOBALS['default_results_per_page'];
+            $offset = ($offset < 0) ? 0 : $offset;
+        }
+
+        $criteria['limit'] = $offset. ", ". $GLOBALS['default_results_per_page'];
+        $result = $member->find($criteria);
+
+        foreach($result as $i=>$row) {
+            $result[$i]['member_name'] = htmlspecialchars_decode(stripslashes($row['member_name']));
+        }
+
+        $response = array(
+            'members' => array(
+                'total_pages' => $total_pages,
+                'member' => $result
+            )
+        );
+        header('Content-type: text/xml');
+        echo $xml_dom->get_xml_from_array($response);
+        exit();
+    }
 }
 
 if ($_POST['action'] == 'deactivate') {

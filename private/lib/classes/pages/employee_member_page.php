@@ -351,9 +351,9 @@ class EmployeeMemberPage extends Page {
     public function show() {
         $this->begin();
         if ($this->is_new) {
-            $this->top('Member - New Member');
+            $this->top('Candidate - New Candidate');
         } else {
-            $this->top('Member - '. htmlspecialchars_decode(stripslashes($this->member->getFullName())));
+            $this->top('Candidate - '. htmlspecialchars_decode(stripslashes($this->member->getFullName())));
         }
         $this->menu_employee('members');
         

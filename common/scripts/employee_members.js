@@ -6,6 +6,9 @@ var applications_filter = '';
 var applicants_order_by = 'member_jobs.applied_on';
 var applicants_order = 'desc';
 var applicants_filter = '';
+var members_order_by = 'members.lastname';
+var members_order = 'asc';
+var members_filter = '';
 var filter_by_employer_only = true;
 var filter_only_non_attached = false;
 var filter_is_dirty = false;
@@ -31,6 +34,14 @@ function applicants_ascending_or_descending() {
     }
 }
 
+function members_ascending_or_descending() {
+    if (members_order == 'desc') {
+        members_order = 'asc';
+    } else {
+        members_order = 'desc';
+    }
+}
+
 function sort_by(_table, _column) {
     switch (_table) {
         case 'applicants':
@@ -42,6 +53,11 @@ function sort_by(_table, _column) {
             new_applicants_order_by = _column;
             new_applicants_ascending_or_descending();
             update_new_applicants();
+            break;
+        case 'members':
+            members_order_by = _column;
+            members_ascending_or_descending();
+            update_members();
             break;
     }
 }
@@ -399,8 +415,7 @@ function update_applicants() {
         }
     });
     
-    request.send(params);
-    
+    request.send(params);    
 }
 
 function reset_password(_id) {
@@ -807,6 +822,207 @@ function show_members() {
     $('item_members').setStyle('background-color', '#CCCCCC');
     
     swap_filter_with_search(true);
+}
+
+function update_members() {
+    var is_show_all = false;
+    var selected_page = 1;
+    var selected_page_index = $('members_pages').selectedIndex;
+    if ($('members_pages').options.length > 0) {
+        selected_page = $('members_pages').options[selected_page_index].value;
+    }
+    
+    if (arguments.length == 1) {
+        is_show_all = true;
+        selected_page = 1;
+    }
+    
+    var params = 'id=0&order_by=' + members_order_by + ' ' + members_order;
+    params = params + '&action=get_members';
+    params = params + '&page=' + selected_page;
+    
+    if (!is_show_all) {
+        params = params + '&email=' + $('search_email').value;
+        params = params + '&name=' + encodeURIComponent($('search_name').value);
+        params = params + '&position=' + encodeURIComponent($('search_position').value);
+        params = params + '&employer=' + encodeURIComponent($('search_employer').value);
+        params = params + '&total_work_years=' + $('search_total_years').value;
+        params = params + '&notice_period=' + $('search_notice_period').value;
+        params = params + '&exp_sal_currency=' + $('search_expected_salary_currency').options[$('search_expected_salary_currency').selectedIndex].value;
+        params = params + '&exp_sal_start=' + $('search_expected_salary_start').value;
+        params = params + '&exp_sal_end=' + $('search_expected_salary_end').value;
+        params = params + '&specialization=' + $('search_specialization').options[$('search_specialization').selectedIndex].value;
+        params = params + '&emp_specialization=' + $('search_emp_specialization').options[$('search_emp_specialization').selectedIndex].value;
+        params = params + '&emp_desc=' + $('search_emp_desc').options[$('search_emp_spec').selectedIndex].value;
+        params = params + '&seeking=' + encodeURIComponent($('search_seeking').value);
+    }
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            set_status('<pre>' + txt + '</pre>');
+            return;
+            if (txt == 'ko') {
+                alert('An error occured while loading members.');
+                return false;
+            }
+            
+            $('applicants_pages').length = 0;
+            $('total_applicants_pages').set('html', '0');
+            
+            if (txt == '0') {
+                set_status('');
+                $('div_applicants').set('html', '<div class="empty_results">No applicants to show.</div>');
+            } else {
+                var total_pages = xml.getElementsByTagName('total_pages');
+                
+                $('total_applicants_pages').set('html', total_pages[0].childNodes[0].nodeValue);
+                if (selected_page_index >= parseInt(total_pages[0].childNodes[0].nodeValue)) {
+                    selected_page_index = parseInt(total_pages[0].childNodes[0].nodeValue)-1;
+                }
+                
+                for (var i=0; i < parseInt(total_pages[0].childNodes[0].nodeValue); i++) {
+                    var an_option = '';
+                    if (i == selected_page_index) {
+                        an_option = new Option((i+1), (i+1), true, true);
+                    } else {
+                        an_option = new Option((i+1), (i+1));
+                    }
+                    $('applicants_pages').options[$('applicants_pages').length] = an_option;
+                }
+                
+                var ids = xml.getElementsByTagName('member_job_id');
+                var emails = xml.getElementsByTagName('email_addr');
+                var members = xml.getElementsByTagName('member_name');
+                var phone_nums = xml.getElementsByTagName('phone_num');
+                var progress_notes = xml.getElementsByTagName('progress_notes');
+                var job_ids = xml.getElementsByTagName('job_id');
+                var employer_ids = xml.getElementsByTagName('employer_id');
+                var job_titles = xml.getElementsByTagName('job_title');
+                var resume_ids = xml.getElementsByTagName('resume_id');
+                var resumes = xml.getElementsByTagName('resume_name');
+                var applied_resume_ids = xml.getElementsByTagName('app_resume_id');
+                var applied_resumes = xml.getElementsByTagName('app_resume_name');
+                var yel_resumes = xml.getElementsByTagName('num_yel_resumes');
+                var self_resumes = xml.getElementsByTagName('num_self_resumes');
+                var applied_jobs = xml.getElementsByTagName('num_attached_jobs');
+                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
+                var applied_ons = xml.getElementsByTagName('formatted_applied_on');
+                var agreed_terms_ons = xml.getElementsByTagName('formatted_employer_agreed_terms_on');
+                var employed_ons = xml.getElementsByTagName('formatted_employed_on');
+                var employer_rejected_ons = xml.getElementsByTagName('formatted_employer_rejected_on');
+                
+                var applicants_table = new FlexTable('applicants_table', 'applicants');
+
+                var header = new Row('');
+                header.set(0, new Cell('&nbsp;', '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'member_jobs.applied_on');\">Applied On</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'members.lastname');\">Member</a>", '', 'header'));
+                header.set(3, new Cell('Job Applied', '', 'header'));
+                header.set(4, new Cell('Resume', '', 'header'));
+                header.set(5, new Cell('Status', '', 'header'));
+                header.set(6, new Cell('Progress', '', 'header'));
+                applicants_table.set(0, header);
+                
+                for (var i=0; i < emails.length; i++) {
+                    var row = new Row('');
+                    
+                    // delete
+                    if (referred_ons[i].childNodes.length <= 0) {
+                        row.set(0, new Cell('<input type="button" value="delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\', false);" />', '', 'cell'));
+                    } else {
+                        row.set(0, new Cell('<input type="button" value="delete" disabled/>', '', 'cell'));
+                    }
+                    
+                    // applied on
+                    row.set(1, new Cell(applied_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    
+                    // member details
+                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_new">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    
+                    var phone_num = '';
+                    if (phone_nums[i].childNodes.length > 0) {
+                        phone_num = phone_nums[i].childNodes[0].nodeValue;
+                    }
+                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + phone_num + '</div>' + "\n";
+                    
+                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a href="mailto:' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
+                    short_desc = short_desc + '<br/><a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=referrers" target="_new">View Referrers</a>' + "\n";
+                    row.set(2, new Cell(short_desc, '', 'cell'));
+                    
+                    // job applied
+                    var job_details = '[' + employer_ids[i].childNodes[0].nodeValue + '] ' + job_titles[i].childNodes[0].nodeValue + '<br/><br/>';
+                    if (parseInt(applied_jobs[i].childNodes[0].nodeValue) > 1) {
+                        job_details = job_details + '<a class="no_link" onClick="show_jobs_popup(false, \'' + emails[i].childNodes[0].nodeValue + '\', true);">View others</a>';
+                    }
+                    row.set(3, new Cell(job_details, '', 'cell'));
+                    
+                    // resume details
+                    var resume_details = '<a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">Applied</a>';
+                    
+                    if (resume_ids[i].childNodes.length > 0) {
+                        resume_details = '<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">Submitted</a>';
+                    }
+                    
+                    resume_details = resume_details + '&nbsp;|&nbsp;<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">All/Refer</a><br/><br/>';
+                    resume_details = resume_details + '<span style="color: #666666;">YEL: ' + yel_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
+                    resume_details = resume_details + '<span style="color: #666666;">Self: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
+                    row.set(4, new Cell(resume_details, '', 'cell'));
+                    
+                    // status
+                    var status = 'N/A';
+                    if (referred_ons[i].childNodes.length > 0) {
+                        status = '<span class="referred">Referred On:</span> ' + referred_ons[i].childNodes[0].nodeValue;
+                    }
+                    
+                    if (agreed_terms_ons[i].childNodes.length > 0) {
+                        status = status + '<br/><span class="viewed">Viewed On:</span> ' + agreed_terms_ons[i].childNodes[0].nodeValue;
+                    }
+                    
+                    if (employed_ons[i].childNodes.length > 0) {
+                        status = status + '<br/><span class="employed">Employed On:</span> ' + employed_ons[i].childNodes[0].nodeValue;
+                    } else if (employer_rejected_ons[i].childNodes.length > 0) {
+                        status = status + '<br/><span class="rejected">Rejected On:</span> ' + employer_rejected_ons[i].childNodes[0].nodeValue;
+                    }
+                    row.set(5, new Cell(status, '', 'cell'));
+                    
+                    // progress
+                    var progress = '<a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\');">Add</a>';
+                    if (progress_notes[i].childNodes.length > 0) {
+                        var lines = progress_notes[i].childNodes[0].nodeValue.split("\n");
+                        var notes_str = '';
+                        for (var l=0; l < lines.length; l++) {
+                            notes_str = notes_str + lines[l] + '<br/>';
+                        }
+                        progress = '<div class="progress_cell">' + notes_str  + '</div>';
+                        progress = progress + '<br/><a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\');">Update</a>';
+                    }
+                    row.set(6, new Cell(progress, '', 'cell progress_cell'));
+                    
+                    // var actions = '';
+                    // if (is_actives[i].childNodes[0].nodeValue == 'Y') {
+                    //     actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
+                    //     actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
+                    // } else {
+                    //     actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
+                    // }                    
+                    // row.set(6, new Cell(actions, '', 'cell action'));
+                    
+                    applicants_table.set((parseInt(i)+1), row);
+                }
+                
+                $('div_applicants').set('html', applicants_table.get_html());
+                set_status('');
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Loading members...');
+        }
+    });
+    
+    request.send(params);
 }
 
 function show_resumes_page(_member_id) {

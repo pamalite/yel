@@ -175,7 +175,8 @@ class MemberSearch {
         // }
         
         $salaries = array();
-        $query_others = "";
+        $query_others = "(members.email_addr NOT LIKE 'team%@yellowelevator.com' AND 
+                          members.email_addr <> 'initial@yellowelevator.com')";
         if (!$is_bypassed) {
             // 2. salaries
             // expected
@@ -195,72 +196,68 @@ class MemberSearch {
             
             // 3. others
             if (!empty($this->email_addr)) {
-                $query_others = "members.email_addr = '". $this->email_addr. "'";
+                $query_others .= " AND members.email_addr = '". $this->email_addr. "'";
             }
 
             if (!empty($this->name)) {
-                if (!empty($query_others)) {
-                    $query_others .= " AND ";
-                }
-                
-                $query_others .= "(members.firstname LIKE '%". $this->name. "%' OR ";
+                $query_others .= " AND (members.firstname LIKE '%". $this->name. "%' OR ";
                 $query_others .= "members.lastname LIKE '%". $this->name. "%')";
             }
 
             if (!empty($this->position)) {
-                if (!empty($query_others)) {
-                    $query_others .= " AND ";
-                }
-                
-                $query_others .= "member_job_profiles.position_title LIKE '%". $this->position. "%'";
+                $query_others .= " AND member_job_profiles.position_title LIKE '%". $this->position. "%'";
             }
 
             if (!empty($this->employer)) {
-                if (!empty($query_others)) {
-                    $query_others .= " AND ";
-                } 
-                
-                $query_others .= "member_job_profiles.employer LIKE '%". $this->employer. "%'";
+                $query_others .= " AND member_job_profiles.employer LIKE '%". $this->employer. "%'";
             }
             
             if ($this->specialization > 0) {
-                if (!empty($query_others)) {
-                    $query_others .= " AND ";
-                } 
-                
-                $query_others .= "member_job_profiles.specialization = ". $this->specialization;
+                $sub_industries = Industry::getSubIndustriesOf($this->specialization);
+                if (empty($sub_industries) || is_null($sub_industries)) {
+                    $query_others .= " AND member_job_profiles.specialization = ". $this->specialization;
+                } else {
+                    $this->specialization .= ', ';
+                    foreach ($sub_industries as $i=>$sub_industry) {
+                        $this->specialization .= $sub_industry['id'];
+                        
+                        if ($i < count($sub_industries)-1) {
+                            $this->specialization .= ', ';
+                        }
+                    }
+                    
+                    $query_others .= " AND member_job_profiles.specialization IN (". $this->specialization. ")";
+                }
             }
             
             if ($this->emp_specialization > 0) {
-                if (!empty($query_others)) {
-                    $query_others .= " AND ";
-                } 
-                
-                $query_others .= "member_job_profiles.employer_specialization = ". $this->emp_specialization;
+                $sub_industries = Industry::getSubIndustriesOf($this->specialization);
+                if (empty($sub_industries) || is_null($sub_industries)) {
+                    $query_others .= " AND member_job_profiles.employer_specialization = ". $this->emp_specialization;
+                } else {
+                    $this->emp_specialization .= ', ';
+                    foreach ($sub_industries as $i=>$sub_industry) {
+                        $this->emp_specialization .= $sub_industry['id'];
+                        
+                        if ($i < count($sub_industries)-1) {
+                            $this->emp_specialization .= ', ';
+                        }
+                    }
+                    
+                    $query_others .= " AND member_job_profiles.employer_specialization IN (". $this->emp_specialization. ")";
+                }
             }
             
             if ($this->emp_desc > 0) {
-                if (!empty($query_others)) {
-                    $query_others .= " AND ";
-                } 
-                
-                $query_others .= "member_job_profiles.employer_description = ". $this->emp_desc;
+                $query_others .= " AND member_job_profiles.employer_description = ". $this->emp_desc;
             }
             
             if ($this->notice_period > 0) {
-                if (!empty($query_others)) {
-                    $query_others .= " AND ";
-                } 
-                
-                $query_others .= "members.notice_period >= ". $this->notice_period;
+                $query_others .= " AND members.notice_period >= ". $this->notice_period;
             }
             
             if ($this->total_work_years > 0) {
-                if (!empty($query_others)) {
-                    $query_others .= " AND ";
-                } 
-                
-                $query_others .= "members.total_work_years >= ". $this->total_work_years;
+                $query_others .= " AND members.total_work_years >= ". $this->total_work_years;
             }
         }
         
@@ -335,7 +332,7 @@ class MemberSearch {
                     members.total_work_years, members.is_active_seeking_job, 
                     members.can_travel_relocate, members.notice_period, 
                     members.expected_salary_currency, members.expected_salary, 
-                    members.expected_salary_end"
+                    members.expected_salary_end";
         
         if (array_key_exists('seeking', $match_against)) {
             $columns .= ", ". $match_against['seeking']['member']. " AS seeking_score";
@@ -359,14 +356,7 @@ class MemberSearch {
                   ". $joins. " 
                   WHERE ";
         if (!empty($match_against)) {
-            $sub_query_array = array();
-            foreach ($match_against as $table) {
-                if (isset($table['member'])) {
-                    $sub_query_array[] = $table['member'];
-                }
-            }
-            $query .= implode(" AND ", $sub_query_array);
-            $query .= " ";
+            $query .= $match_against['seeking']['member']. " ";
         }
 
         if (!empty($salaries)) {
@@ -522,25 +512,29 @@ class MemberSearch {
             $this->total_work_years = $_criterias['total_years'];
         }
         
-        if ($_criterias['expected_salary'] > 0) {
-            $this->expected_salary['currency'] = $_criterias['expected_currency'];
-            $this->expected_salary['start'] = $_criterias['expected_salary'];
-            $this->expected_salary['end'] = 0;
-            if (array_key_exists('expected_salary_end', $_criterias)) {
-                $this->expected_salary['end'] = $_criterias['expected_salary_end'];
+        if (array_key_exists('expected_salary', $_criterias)) {
+            if ($_criterias['expected_salary'] > 0) {
+                $this->expected_salary['currency'] = $_criterias['expected_currency'];
+                $this->expected_salary['start'] = $_criterias['expected_salary'];
+                $this->expected_salary['end'] = 0;
+                if (array_key_exists('expected_salary_end', $_criterias)) {
+                    $this->expected_salary['end'] = $_criterias['expected_salary_end'];
+                }
             }
-        }
+        } 
         
-        if (!empty($_criterias['seeking_keywords'])) {
-            $this->seeking_keywords['keywords'] = $this->remove_punctuations_from(sanitize(trim($_criterias['seeking_keywords'])));
-            
-            // if ($_criterias['seeking_is_boolean']) {
-            //     $this->seeking_keywords['is_boolean'] = true;
-            // }
-            // 
-            // if ($_criterias['seeking_is_use_all_words']) {
-            //     $this->seeking_keywords['is_use_all_words'] = true;
-            // }
+        if (array_key_exists('seeking_keywords', $_criterias)) {
+            if (!empty($_criterias['seeking_keywords'])) {
+                $this->seeking_keywords['keywords'] = $this->remove_punctuations_from(sanitize(trim($_criterias['seeking_keywords'])));
+
+                // if ($_criterias['seeking_is_boolean']) {
+                //     $this->seeking_keywords['is_boolean'] = true;
+                // }
+                // 
+                // if ($_criterias['seeking_is_use_all_words']) {
+                //     $this->seeking_keywords['is_use_all_words'] = true;
+                // }
+            }
         }
         
         if (array_key_exists('filter', $_criterias)) {
