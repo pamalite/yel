@@ -12,6 +12,7 @@ var filter_is_dirty = false;
 var applicants_page = 1;
 var new_applicants_page = 1;
 var sliding_filter_fx = '';
+var sliding_search_fx = '';
 var return_page = '';
 
 function new_applicants_ascending_or_descending() {
@@ -47,6 +48,10 @@ function sort_by(_table, _column) {
 
 function toggle_main_filter() {
     sliding_filter_fx.toggle();
+}
+
+function toggle_search() {
+    sliding_search_fx.toggle();
 }
 
 function swap_filter_with_search(_is_search) {
@@ -312,7 +317,7 @@ function update_applicants() {
                     row.set(1, new Cell(applied_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     // member details
-                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '" target="_new">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_new">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
                     
                     var phone_num = '';
                     if (phone_nums[i].childNodes.length > 0) {
@@ -1467,6 +1472,10 @@ function onDomReady() {
    }
    
    sliding_filter_fx = new Fx.Slide('div_main_filter', {
+       mode: 'vertical'
+   });
+   
+   sliding_search_fx = new Fx.Slide('div_search', {
        mode: 'vertical'
    });
 }

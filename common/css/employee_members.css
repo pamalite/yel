@@ -200,6 +200,7 @@ div.other_jobs {
     text-align: center;
 }
 
+div.search, 
 div.main_filter {
     width: 100%;
     height: 180px;
@@ -208,12 +209,18 @@ div.main_filter {
     border-collapse: collapse;
 }
 
+div.search {
+    height: auto;
+}
+
+#search_table, 
 #main_filter_table {
     margin: auto;
     width: 100%;
 }
 
-#main_filter_table td.filter_jobs_button {
+#main_filter_table td.filter_jobs_button, 
+#search_table td.search_button {
     width: 50px;
     text-align: center;
 }
@@ -227,12 +234,18 @@ div.main_filter {
     border: 1px dashed #888888;
 }
 
-#main_filter_table td.filter_buttons {
+#main_filter_table td.filter_buttons, 
+#search_table td.search_buttons {
     vertical-align: top;
     text-align: center;
 }
 
-input.main_filter_button {
+#search_table td.search_form {
+    width: 85%;
+}
+
+input.main_filter_button, 
+input.search_button {
     width: 85%;
 }
 
@@ -258,6 +271,7 @@ div.main_filter_warning {
     display: none;
 }
 
+div.search_tip,
 div.main_filter_tip {
     font-size: 9pt;
     text-align: left;
@@ -266,6 +280,7 @@ div.main_filter_tip {
     float: left;
 }
 
+div.search_toggle, 
 div.main_filter_toggle {
     margin-top: 5px;
     padding-right: 15px;
@@ -310,4 +325,31 @@ span.rejected {
 
 span.referred {
     font-weight: bold;
+}
+
+#search_form_table {
+    width: 100%;
+    margin: auto;
+}
+
+#search_form_table td.label {
+    width: 17%;
+    text-align: right;
+}
+
+#search_form_table td input.field {
+    width: 98%;
+}
+
+#search_form_table td input.years {
+    width: 25px;
+}
+
+#search_form_table td input.salary {
+    width: 150px;
+}
+
+#search_form_table td textarea.field {
+    width: 98%;
+    height: 100px;
 }

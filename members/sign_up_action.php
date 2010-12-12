@@ -119,7 +119,7 @@ if ($_POST['action'] == 'add_job_profile') {
     $data['total_work_years'] = $_POST['total_work_years'];
     $data['seeking'] = sanitize($_POST['seeking']);
     
-    if ($member->update($data, true) === false) {
+    if ($member->update($data) === false) {
         echo 'ko - error_update';
         exit();
     }

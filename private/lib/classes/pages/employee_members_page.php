@@ -1,6 +1,7 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
 require_once dirname(__FILE__). "/../htmltable.php";
+require_once dirname(__FILE__). "/../../../config/job_profile.inc";
 
 class EmployeeMembersPage extends Page {
     private $employee = NULL;
@@ -52,6 +53,88 @@ class EmployeeMembersPage extends Page {
         return $job->find($criteria);
     }
     
+    private function generate_currencies($_id, $_selected='') {
+        $currencies = $GLOBALS['currencies'];
+        
+        echo '<select id="'. $_id. '" name="'. $_id. '">'. "\n";
+        echo '<option value="0" selected>Any Currency</option>'. "\n";
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        
+        foreach ($currencies as $i=>$currency) {
+            echo '<option value="'. $currency. '">'. $currency. '</option>'. "\n";
+        }
+        
+        echo '</select>';
+    }
+    
+    private function generate_industries($_selected, $_name = 'industry') {
+        $industries = array();
+        $main_industries = Industry::getMain();
+        $i = 0;
+        foreach ($main_industries as $main) {
+            $industries[$i]['id'] = $main['id'];
+            $industries[$i]['name'] = $main['industry'];
+            $industries[$i]['is_main'] = true;
+            $subs = Industry::getSubIndustriesOf($main['id']);
+            foreach ($subs as $sub) {
+                $i++;
+
+                $industries[$i]['id'] = $sub['id'];
+                $industries[$i]['name'] = $sub['industry'];
+                $industries[$i]['is_main'] = false;
+            }
+            $i++;
+        }
+        
+        echo '<select class="field" id="'. $_name. '" name="'. $_name. '">'. "\n";
+        
+        if (empty($_selected) || is_null($_selected)) {
+            echo '<option value="0" selected>Any Specialization</option>'. "\n";
+            echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        }
+        
+        foreach ($industries as $industry) {
+            $selected = '';
+            if ($industry['id'] == $_selected) {
+                $selected = 'selected';
+            }
+            
+            if ($industry['is_main']) {
+                echo '<option value="'. $industry['id']. '" class="main_industry" '. $selected. '>';
+                echo $industry['name'];
+            } else {
+                echo '<option value="'. $industry['id']. '"'. $selected. '>';
+                echo '&nbsp;&nbsp;&nbsp;&nbsp;'. $industry['name'];
+            }
+
+            echo '</option>'. "\n";
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
+    private function generate_employer_description($_id, $_selected) {
+        $descs = $GLOBALS['emp_descs'];
+        
+        echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+        if (empty($_selected) || is_null($_selected) || $_selected < 0) {
+            echo '<option value="0" selected>Any description</option>'. "\n";    
+        } else {
+            echo '<option value="0">Any description</option>'. "\n";
+        }
+        
+        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        foreach ($descs as $i=>$desc) {
+            if ($i != $_selected) {
+                echo '<option value="'. $i. '">'. $desc. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $i. '" selected>'. $desc. '</option>'. "\n";
+            }
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
     public function show() {
         $this->begin();
         $this->top('Members');
@@ -68,7 +151,7 @@ class EmployeeMembersPage extends Page {
             <ul class="menu">
                 <li id="item_new_applicants" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_new_applicants();">New Applicants</a></li>
                 <li id="item_applicants" style="<?php echo ($this->current_page == 'members') ? $style : ''; ?>"><a class="menu" onClick="show_applicants();">Applicants</a></li>
-                <li id="item_members" style="<?php echo ($this->current_page == 'search') ? $style : ''; ?>"><a class="menu" onClick="show_members();">Members</a></li>
+                <li id="item_members" style="<?php echo ($this->current_page == 'search') ? $style : ''; ?>"><a class="menu" onClick="show_members();">Candidates</a></li>
             </ul>
         </div>
         <!-- end submenu -->
@@ -175,14 +258,104 @@ class EmployeeMembersPage extends Page {
             <div id="div_applicants">
                 <div class="empty_results">No applicants to show.</div>
             </div>
-            
-            <form id="member_page_form" method="post" action="member.php">
-                <input type="hidden" id="member_email_addr" name="member_email_addr" value="" />
-            </form>
         </div>
         
         <div id="members">
+            <!-- search form -->
+            <div id="div_search_toggle" class="search_toggle">
+                <a class="no_link" onClick="toggle_search();">
+                    <span id="hide_show_lbl">Toggle Search</span>
+                </a>
+            </div>
+            <div id="div_search" class="search">
+                <table id="search_table">
+                    <tr>
+                        <td class="search_form">
+                            <table id="search_form_table">
+                                <tr>
+                                    <td class="label"><label for="search_email">E-mail: </label></td>
+                                    <td class="field"><input type="text" class="field" id="search_email" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="search_name">Name:</label></td>
+                                    <td class="field"><input type="text" class="field" id="search_name" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="search_position">Position:</label></td>
+                                    <td class="field"><input type="text" class="field" id="search_position" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="search_specialization">Specialization:</label></td>
+                                    <td class="field"><?php $this->generate_industries(array(), 'search_specialization'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="search_employer">Company:</label></td>
+                                    <td class="field"><input type="text" class="field" id="search_employer" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="search_emp_desc">Company Description:</label></td>
+                                    <td class="field"><?php $this->generate_employer_description('search_emp_desc', -1); ?></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="search_emp_specialization">Company Specialization:</label></td>
+                                    <td class="field"><?php $this->generate_industries(array(), 'search_emp_specialization'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="search_total_years">Total Work Years:</label></td>
+                                    <td class="field"><input type="text" class="field years" id="search_total_years" maxlength="2" /> years</td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="search_notice_period">Notice Period:</label></td>
+                                    <td class="field"><input type="text" class="field years" id="search_notice_period" maxlength="2" /> months</td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="search_expected_salary_start">Expected Salary:</label></td>
+                                    <td class="field">
+                                        <?php $this->generate_currencies('search_expected_salary_currency'); ?>
+                                        <input type="text" class="field salary" id="search_expected_salary_start" />
+                                        to 
+                                        <input type="text" class="field salary" id="search_expected_salary_end" />
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="label"><label for="search_seeking">Goals &amp; Experiences:</label></td>
+                                    <td class="field">
+                                        <textarea class="field" id="search_seeking"></textarea>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="search_buttons">
+                            <input type="button" class="search_button" value="Search" onClick="do_search();" />
+                            <hr />
+                            <input type="button" class="search_button" value="Show All" onClick="show_all_members();" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- end search form -->
+            
+            <div id="members_list">
+                <div class="buttons_bar">
+                    <div class="pagination">
+                        Page
+                        <select id="members_pages" onChange="update_members();">
+                            <option value="1" selected>1</option>
+                        </select>
+                        of <span id="total_members_pages">0</span>
+                    </div>
+                    <input class="button" type="button" id="add_new_member" name="add_new_member" value="Add New Member" onClick="add_new_member();">
+                </div>
+                <div id="div_members">
+                    <div class="empty_results">No members to show.</div>
+                </div>
+            </div>
         </div>
+        
+        <form id="member_page_form" method="post" target="_new" action="member.php">
+            <input type="hidden" id="member_email_addr" name="member_email_addr" value="" />
+        </form>
         
         <!-- popup windows goes here -->
         <div id="notes_window" class="popup_window">

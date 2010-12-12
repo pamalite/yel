@@ -137,6 +137,34 @@ class Member implements Model {
         }
         
         if ($this->mysqli->execute($query)) {
+            // index the member
+            if (array_key_exists('seeking', $data)) {
+                $query = "INSERT INTO member_index SET 
+                          member = '". $this->id. "', 
+                          seeking = '". $data['seeking']. "'";
+                if ($this->mysqli->execute($query) === false) {
+                    return false;
+                }
+            }
+            
+            if (array_key_exists('notes', $data)) {
+                $query = "INSERT INTO member_index SET 
+                          member = '". $this->id. "', 
+                          notes = '". $data['notes']. "'";
+                if ($this->mysqli->execute($query) === false) {
+                    return false;
+                }
+            }
+            
+            if (array_key_exists('reason_for_leaving', $data)) {
+                $query = "INSERT INTO member_index SET 
+                          member = '". $this->id. "', 
+                          reason_for_leaving = '". $data['reason_for_leaving']. "'";
+                if ($this->mysqli->execute($query) === false) {
+                    return false;
+                }
+            }
+            
             return true;
         }
         
@@ -185,6 +213,34 @@ class Member implements Model {
     
         $query .= "WHERE `email_addr` = '". $this->id. "'";
         if ($this->mysqli->execute($query)) {
+            // index the member
+            if (array_key_exists('seeking', $data)) {
+                $query = "UPDATE member_index SET 
+                          seeking = '". $data['seeking']. "' 
+                          WHERE member = '". $this->id. "'";
+                if ($this->mysqli->execute($query) === false) {
+                    return false;
+                }
+            }
+            
+            if (array_key_exists('notes', $data)) {
+                $query = "UPDATE member_index SET 
+                          notes = '". $data['notes']. "' 
+                          WHERE member = '". $this->id. "'";
+                if ($this->mysqli->execute($query) === false) {
+                    return false;
+                }
+            }
+            
+            if (array_key_exists('reason_for_leaving', $data)) {
+                $query = "UPDATE member_index SET 
+                          reason_for_leaving = '". $data['reason_for_leaving']. "' 
+                          WHERE member = '". $this->id. "'";
+                if ($this->mysqli->execute($query) === false) {
+                    return false;
+                }
+            }
+            
             if ($password_updated && !$this->by_admin) {
                 return $this->resetSessionWithNewPassword($data['password']);
             }
