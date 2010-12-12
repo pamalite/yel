@@ -289,19 +289,27 @@ function update_applicants() {
                 var applicants_table = new FlexTable('applicants_table', 'applicants');
 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'member_jobs.applied_on');\">Applied On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'members.lastname');\">Member</a>", '', 'header'));
-                header.set(2, new Cell('Job Applied', '', 'header'));
-                header.set(3, new Cell('Resume Referred', '', 'header'));
-                header.set(4, new Cell('Status', '', 'header'));
-                header.set(5, new Cell('Progress', '', 'header'));
+                header.set(0, new Cell('&nbsp;', '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'member_jobs.applied_on');\">Applied On</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'members.lastname');\">Member</a>", '', 'header'));
+                header.set(3, new Cell('Job Applied', '', 'header'));
+                header.set(4, new Cell('Resume', '', 'header'));
+                header.set(5, new Cell('Status', '', 'header'));
+                header.set(6, new Cell('Progress', '', 'header'));
                 applicants_table.set(0, header);
                 
                 for (var i=0; i < emails.length; i++) {
                     var row = new Row('');
                     
+                    // delete
+                    if (referred_ons[i].childNodes.length <= 0) {
+                        row.set(0, new Cell('<input type="button" value="delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\', false);" />', '', 'cell'));
+                    } else {
+                        row.set(0, new Cell('<input type="button" value="delete" disabled/>', '', 'cell'));
+                    }
+                    
                     // applied on
-                    row.set(0, new Cell(applied_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(1, new Cell(applied_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     // member details
                     var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '" target="_new">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
@@ -314,26 +322,26 @@ function update_applicants() {
                     
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a href="mailto:' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
                     short_desc = short_desc + '<br/><a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=referrers" target="_new">View Referrers</a>' + "\n";
-                    row.set(1, new Cell(short_desc, '', 'cell'));
+                    row.set(2, new Cell(short_desc, '', 'cell'));
                     
                     // job applied
                     var job_details = '[' + employer_ids[i].childNodes[0].nodeValue + '] ' + job_titles[i].childNodes[0].nodeValue + '<br/><br/>';
                     if (parseInt(applied_jobs[i].childNodes[0].nodeValue) > 1) {
                         job_details = job_details + '<a class="no_link" onClick="show_jobs_popup(false, \'' + emails[i].childNodes[0].nodeValue + '\', true);">View others</a>';
                     }
-                    row.set(2, new Cell(job_details, '', 'cell'));
+                    row.set(3, new Cell(job_details, '', 'cell'));
                     
                     // resume details
-                    var resume_details = '<a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">View applied</a><br/>';
+                    var resume_details = '<a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">Applied</a>';
                     
                     if (resume_ids[i].childNodes.length > 0) {
-                        resume_details = '<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View referred</a><br/>';
+                        resume_details = '<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">Submitted</a>';
                     }
                     
-                    resume_details = resume_details + '<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">View all/Refer</a><br/><br/>';
+                    resume_details = resume_details + '&nbsp;|&nbsp;<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">All/Refer</a><br/><br/>';
                     resume_details = resume_details + '<span style="color: #666666;">YEL: ' + yel_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
                     resume_details = resume_details + '<span style="color: #666666;">Self: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
-                    row.set(3, new Cell(resume_details, '', 'cell'));
+                    row.set(4, new Cell(resume_details, '', 'cell'));
                     
                     // status
                     var status = 'N/A';
@@ -350,7 +358,7 @@ function update_applicants() {
                     } else if (employer_rejected_ons[i].childNodes.length > 0) {
                         status = status + '<br/><span class="rejected">Rejected On:</span> ' + employer_rejected_ons[i].childNodes[0].nodeValue;
                     }
-                    row.set(4, new Cell(status, '', 'cell'));
+                    row.set(5, new Cell(status, '', 'cell'));
                     
                     // progress
                     var progress = '<a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\');">Add</a>';
@@ -363,7 +371,7 @@ function update_applicants() {
                         progress = '<div class="progress_cell">' + notes_str  + '</div>';
                         progress = progress + '<br/><a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\');">Update</a>';
                     }
-                    row.set(5, new Cell(progress, '', 'cell progress_cell'));
+                    row.set(6, new Cell(progress, '', 'cell progress_cell'));
                     
                     // var actions = '';
                     // if (is_actives[i].childNodes[0].nodeValue == 'Y') {
@@ -756,7 +764,7 @@ function update_new_applicants() {
                     
                     // actions
                     var actions = '';
-                    actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                    actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\', true);" />';
                     
                     if (is_cannot_signup) {
                         actions = actions + '<input type="button" value="Sign Up" disabled />';
@@ -812,7 +820,7 @@ function show_resumes_page(_member_id) {
     window.open('member.php?member_email_addr=' + _member_id + '&page=resumes&selected_jobs=' + selected_jobs);
 }
 
-function delete_application(_app_id) {
+function delete_application(_app_id, _is_buffer) {
     if (!confirm('You sure to delete the selected application?')) {
         return;
     }
@@ -820,17 +828,27 @@ function delete_application(_app_id) {
     var params = 'id=' + _app_id;
     params = params + '&action=delete_application';
     
+    if (_is_buffer) {
+        params = params + '&is_buffer=1';
+    }
+    
     var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            set_status('');
+            
             if (txt == 'ko') {
                 alert('Cannot delete the application.');
             }
             
-            set_status('');
-            update_new_applicants();
+            if (_is_buffer) {
+                update_new_applicants();
+            } else {
+                update_applicants();
+            }
+            
         },
         onRequest: function(instance) {
             set_status('Deleting application...');

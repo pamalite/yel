@@ -487,10 +487,18 @@ if ($_POST['action'] == 'update_progress_notes') {
 }
 
 if ($_POST['action'] == 'delete_application') {
-    $referral_buffer = new ReferralBuffer($_POST['id']);
-    if ($referral_buffer->delete() === false) {
-        echo 'ko';
-        exit();
+    if (isset($_POST['is_buffer'])) {
+        $referral_buffer = new ReferralBuffer($_POST['id']);
+        if ($referral_buffer->delete() === false) {
+            echo 'ko';
+            exit();
+        }
+    } else {
+        $member = new Member();
+        if ($member->removeJobProfile($_POST['id']) === false) {
+            echo 'ko';
+            exit();
+        }
     }
     
     echo 'ok';
