@@ -842,6 +842,7 @@ function update_members() {
     params = params + '&page=' + selected_page;
     
     if (!is_show_all) {
+        params = params + '&show_all=0';
         params = params + '&email=' + $('search_email').value;
         params = params + '&name=' + encodeURIComponent($('search_name').value);
         params = params + '&position=' + encodeURIComponent($('search_position').value);
@@ -853,8 +854,10 @@ function update_members() {
         params = params + '&exp_sal_end=' + $('search_expected_salary_end').value;
         params = params + '&specialization=' + $('search_specialization').options[$('search_specialization').selectedIndex].value;
         params = params + '&emp_specialization=' + $('search_emp_specialization').options[$('search_emp_specialization').selectedIndex].value;
-        params = params + '&emp_desc=' + $('search_emp_desc').options[$('search_emp_spec').selectedIndex].value;
+        params = params + '&emp_desc=' + $('search_emp_desc').options[$('search_emp_desc').selectedIndex].value;
         params = params + '&seeking=' + encodeURIComponent($('search_seeking').value);
+    } else {
+        params = params + '&show_all=1';
     }
     
     var uri = root + "/employees/members_action.php";
@@ -862,8 +865,10 @@ function update_members() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            set_status('<pre>' + txt + '</pre>');
-            return;
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            
             if (txt == 'ko') {
                 alert('An error occured while loading members.');
                 return false;

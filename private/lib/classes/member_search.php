@@ -188,7 +188,7 @@ class MemberSearch {
                 }
                 
                 if (!empty($this->expected_salary['currency'])) {
-                    $salaries['expected'] .= "members.expected_salary_currency = ". $this->expected_salary['currency'];
+                    $salaries['expected'] .= " AND members.expected_salary_currency = '". $this->expected_salary['currency']. "'";
                 }
                 
                 $salaries['expected'] = "(". $salaries['expected']. ")";
@@ -249,7 +249,7 @@ class MemberSearch {
             }
             
             if ($this->emp_desc > 0) {
-                $query_others .= " AND member_job_profiles.employer_description = ". $this->emp_desc;
+                $query_others .= " AND member_job_profiles.employer_description = '". $this->emp_desc. "'";
             }
             
             if ($this->notice_period > 0) {
@@ -509,16 +509,16 @@ class MemberSearch {
         }
         
         if (array_key_exists('total_work_years', $_criterias)) {
-            $this->total_work_years = $_criterias['total_years'];
+            $this->total_work_years = $_criterias['total_work_years'];
         }
         
         if (array_key_exists('expected_salary', $_criterias)) {
             if ($_criterias['expected_salary'] > 0) {
-                $this->expected_salary['currency'] = $_criterias['expected_currency'];
-                $this->expected_salary['start'] = $_criterias['expected_salary'];
+                $this->expected_salary['currency'] = $_criterias['expected_salary']['currency'];
+                $this->expected_salary['start'] = $_criterias['expected_salary']['start'];
                 $this->expected_salary['end'] = 0;
-                if (array_key_exists('expected_salary_end', $_criterias)) {
-                    $this->expected_salary['end'] = $_criterias['expected_salary_end'];
+                if (array_key_exists('end', $_criterias['expected_salary'])) {
+                    $this->expected_salary['end'] = $_criterias['expected_salary']['end'];
                 }
             }
         } 
@@ -554,6 +554,7 @@ class MemberSearch {
         }
         
         $this->query = $this->make_query();
+        
         $result = $this->mysqli->query($this->query);
         if (!is_null($result) && !empty($result)) {
             $this->total = count($result);

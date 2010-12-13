@@ -330,58 +330,111 @@ if ($_POST['action'] == 'get_applicants') {
 }
 
 if ($_POST['action'] == 'get_members') {
-    if ($_POST['action'] == 'get_members') {
-        $order_by = "members.lastname ASC";
-        $page = 1;
+    $order_by = "members.lastname ASC";
+    $page = 1;
 
-        if (isset($_POST['order_by'])) {
-            $order_by = $_POST['order_by'];
+    if (isset($_POST['order_by'])) {
+        $order_by = $_POST['order_by'];
+    }
+    
+    // TODO: process criteria
+    $criteria = array();
+    if ($_POST['show_all'] == '0') {
+        if (!empty($_POST['email'])) {
+            $criteria['email'] = $_POST['email'];
         }
         
-        // TODO: process criteria
-        $criteria = array();
+        if (!empty($_POST['name'])) {
+            $criteria['name'] = $_POST['name'];
+        }
         
-        $member_search = new MemberSearch();
-        $result = $member_search->search_using($criteria);
-
-        if (count($result) <= 0 || is_null($result)) {
-            echo '0';
-            exit();
+        if (!empty($_POST['position'])) {
+            $criteria['position'] = $_POST['position'];
         }
-
-        if (!$result) {
-            echo 'ko';
-            exit();
+        
+        if (!empty($_POST['employer'])) {
+            $criteria['employer'] = $_POST['employer'];
         }
-
-        $total_pages = ceil(count($result) / $GLOBALS['default_results_per_page']);
-        if ($page > $total_pages) {
-            $page = $total_pages;
+        
+        if (!empty($_POST['total_work_years']) && $_POST['total_work_years'] >= 1) {
+            $criteria['total_work_years'] = $_POST['total_work_years'];
         }
-
-        $offset = 0;
-        if ($page > 1) {
-            $offset = ($page-1) * $GLOBALS['default_results_per_page'];
-            $offset = ($offset < 0) ? 0 : $offset;
+        
+        if (!empty($_POST['notice_period']) && $_POST['notice_period'] >= 1) {
+            $criteria['notice_period'] = $_POST['notice_period'];
         }
-
-        $criteria['limit'] = $offset. ", ". $GLOBALS['default_results_per_page'];
-        $result = $member->find($criteria);
-
-        foreach($result as $i=>$row) {
-            $result[$i]['member_name'] = htmlspecialchars_decode(stripslashes($row['member_name']));
+        
+        if (!empty($_POST['specialization']) && $_POST['specialization'] >= 1) {
+            $criteria['specialization'] = $_POST['specialization'];
         }
-
-        $response = array(
-            'members' => array(
-                'total_pages' => $total_pages,
-                'member' => $result
-            )
-        );
-        header('Content-type: text/xml');
-        echo $xml_dom->get_xml_from_array($response);
+        
+        if (!empty($_POST['emp_desc']) && $_POST['emp_desc'] >= 1) {
+            $criteria['emp_desc'] = $_POST['emp_desc'];
+        }
+        
+        if (!empty($_POST['emp_specialization']) && $_POST['emp_specialization'] >= 1) {
+            $criteria['emp_spec'] = $_POST['emp_spec'];
+        }
+        
+        if (!empty($_POST['exp_sal_start']) && $_POST['exp_sal_start'] >= 1) {
+            $criteria['expected_salary']['start'] = $_POST['exp_sal_start'];
+            
+            if ($_POST['exp_sal_currency'] != '0') {
+                $criteria['expected_salary']['currency'] = $_POST['exp_sal_currency'];
+            } else {
+                $criteria['expected_salary']['currency'] = '';
+            }
+            
+            if (!empty($_POST['exp_sal_end']) && $_POST['exp_sal_end'] >= 1) {
+                $criteria['expected_salary']['end'] = $_POST['exp_sal_end'];
+            }
+        }
+        
+        if (!empty($_POST['seeking'])) {
+            $criteria['seeking_keywords'] = $_POST['seeking'];
+        }
+    }
+    
+    $member_search = new MemberSearch();
+    $result = $member_search->search_using($criteria);
+    
+    if (count($result) <= 0 || is_null($result)) {
+        echo '0';
         exit();
     }
+
+    if (!$result) {
+        echo 'ko';
+        exit();
+    }
+
+    $total_pages = ceil(count($result) / $GLOBALS['default_results_per_page']);
+    if ($page > $total_pages) {
+        $page = $total_pages;
+    }
+
+    $offset = 0;
+    if ($page > 1) {
+        $offset = ($page-1) * $GLOBALS['default_results_per_page'];
+        $offset = ($offset < 0) ? 0 : $offset;
+    }
+
+    $criteria['limit'] = $offset. ", ". $GLOBALS['default_results_per_page'];
+    $result = $member->find($criteria);
+
+    foreach($result as $i=>$row) {
+        $result[$i]['member_name'] = htmlspecialchars_decode(stripslashes($row['member_name']));
+    }
+
+    $response = array(
+        'members' => array(
+            'total_pages' => $total_pages,
+            'member' => $result
+        )
+    );
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array($response);
+    exit();
 }
 
 if ($_POST['action'] == 'deactivate') {
