@@ -334,9 +334,9 @@ class MemberSearch {
                     members.expected_salary_currency, members.expected_salary, 
                     members.expected_salary_end";
         
-        if (array_key_exists('seeking', $match_against)) {
-            $columns .= ", ". $match_against['seeking']['member']. " AS seeking_score";
-        }
+        // if (array_key_exists('seeking', $match_against)) {
+        //     $columns .= ", ". $match_against['seeking']['member']. " AS seeking_score";
+        // }
         
         $joins = "";
         if (!empty($this->position) || !empty($this->employer) || 
@@ -447,9 +447,9 @@ class MemberSearch {
         // }
         
         // 7. setup query order, limit and offset
-        if (substr(trim($this->order_by), 0, 5) == 'score') {
-            return $query;
-        }
+        // if (substr(trim($this->order_by), 0, 5) == 'score') {
+        //     return $query;
+        // }
         
         $query .= " ORDER BY ". $this->order_by;
         

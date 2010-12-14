@@ -330,14 +330,10 @@ if ($_POST['action'] == 'get_applicants') {
 }
 
 if ($_POST['action'] == 'get_members') {
+    $member_search = new MemberSearch();
     $order_by = "members.lastname ASC";
     $page = 1;
-
-    if (isset($_POST['order_by'])) {
-        $order_by = $_POST['order_by'];
-    }
     
-    // TODO: process criteria
     $criteria = array();
     if ($_POST['show_all'] == '0') {
         if (!empty($_POST['email'])) {
@@ -395,7 +391,24 @@ if ($_POST['action'] == 'get_members') {
         }
     }
     
-    $member_search = new MemberSearch();
+    if (isset($_POST['order_by'])) {
+        $order_by = $_POST['order_by'];
+    }
+    
+    $criteria['order_by'] = $order_by;
+    $criteria['limit'] = $GLOBALS['default_results_per_page'];
+    
+    if (isset($_POST['page'])) {
+        $page = $_POST['page'];
+    }
+    
+    $offset = 0;
+    if ($page > 1) {
+        $offset = ($page-1) * $GLOBALS['default_results_per_page'];
+        $offset = ($offset < 0) ? 0 : $offset;
+    }
+    $criteria['offset'] = $offset;
+    
     $result = $member_search->search_using($criteria);
     
     if (count($result) <= 0 || is_null($result)) {
@@ -407,28 +420,22 @@ if ($_POST['action'] == 'get_members') {
         echo 'ko';
         exit();
     }
-
-    $total_pages = ceil(count($result) / $GLOBALS['default_results_per_page']);
-    if ($page > $total_pages) {
-        $page = $total_pages;
-    }
-
-    $offset = 0;
-    if ($page > 1) {
-        $offset = ($page-1) * $GLOBALS['default_results_per_page'];
-        $offset = ($offset < 0) ? 0 : $offset;
-    }
-
-    $criteria['limit'] = $offset. ", ". $GLOBALS['default_results_per_page'];
-    $result = $member->find($criteria);
-
+    
     foreach($result as $i=>$row) {
         $result[$i]['member_name'] = htmlspecialchars_decode(stripslashes($row['member_name']));
+        $result[$i]['expected_salary'] = number_format($row['expected_salary'], 2, '.', ',');
+        
+        if (!empty($row['expected_salary_end']) && !is_null($row['expected_salary_end']) &&
+            $row['expected_salary_end'] > 0) {
+            $result[$i]['expected_salary_end'] = number_format($row['expected_salary_end'], 2, '.', ',');
+        } else {
+            $result[$i]['expected_salary'] = '';
+        }
     }
 
     $response = array(
         'members' => array(
-            'total_pages' => $total_pages,
+            'total_pages' => ceil($member_search->total_results() / $criteria['limit']),
             'member' => $result
         )
     );

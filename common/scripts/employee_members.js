@@ -394,15 +394,6 @@ function update_applicants() {
                     }
                     row.set(6, new Cell(progress, '', 'cell progress_cell'));
                     
-                    // var actions = '';
-                    // if (is_actives[i].childNodes[0].nodeValue == 'Y') {
-                    //     actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                    //     actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
-                    // } else {
-                    //     actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                    // }                    
-                    // row.set(6, new Cell(actions, '', 'cell action'));
-                    
                     applicants_table.set((parseInt(i)+1), row);
                 }
                 
@@ -874,16 +865,16 @@ function update_members() {
                 return false;
             }
             
-            $('applicants_pages').length = 0;
-            $('total_applicants_pages').set('html', '0');
+            $('members_pages').length = 0;
+            $('total_members_pages').set('html', '0');
             
             if (txt == '0') {
                 set_status('');
-                $('div_applicants').set('html', '<div class="empty_results">No applicants to show.</div>');
+                $('div_members').set('html', '<div class="empty_results">No members to show.</div>');
             } else {
                 var total_pages = xml.getElementsByTagName('total_pages');
                 
-                $('total_applicants_pages').set('html', total_pages[0].childNodes[0].nodeValue);
+                $('total_members_pages').set('html', total_pages[0].childNodes[0].nodeValue);
                 if (selected_page_index >= parseInt(total_pages[0].childNodes[0].nodeValue)) {
                     selected_page_index = parseInt(total_pages[0].childNodes[0].nodeValue)-1;
                 }
@@ -895,54 +886,46 @@ function update_members() {
                     } else {
                         an_option = new Option((i+1), (i+1));
                     }
-                    $('applicants_pages').options[$('applicants_pages').length] = an_option;
+                    $('members_pages').options[$('members_pages').length] = an_option;
                 }
                 
-                var ids = xml.getElementsByTagName('member_job_id');
                 var emails = xml.getElementsByTagName('email_addr');
                 var members = xml.getElementsByTagName('member_name');
                 var phone_nums = xml.getElementsByTagName('phone_num');
-                var progress_notes = xml.getElementsByTagName('progress_notes');
-                var job_ids = xml.getElementsByTagName('job_id');
-                var employer_ids = xml.getElementsByTagName('employer_id');
-                var job_titles = xml.getElementsByTagName('job_title');
-                var resume_ids = xml.getElementsByTagName('resume_id');
-                var resumes = xml.getElementsByTagName('resume_name');
-                var applied_resume_ids = xml.getElementsByTagName('app_resume_id');
-                var applied_resumes = xml.getElementsByTagName('app_resume_name');
-                var yel_resumes = xml.getElementsByTagName('num_yel_resumes');
-                var self_resumes = xml.getElementsByTagName('num_self_resumes');
-                var applied_jobs = xml.getElementsByTagName('num_attached_jobs');
-                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
-                var applied_ons = xml.getElementsByTagName('formatted_applied_on');
-                var agreed_terms_ons = xml.getElementsByTagName('formatted_employer_agreed_terms_on');
-                var employed_ons = xml.getElementsByTagName('formatted_employed_on');
-                var employer_rejected_ons = xml.getElementsByTagName('formatted_employer_rejected_on');
+                var is_actives = xml.getElementsByTagName('active');
+                var joined_ons = xml.getElementsByTagName('formatted_joined_on');
+                var total_years = xml.getElementsByTagName('total_work_years');
+                var is_seeking_jobs = xml.getElementsByTagName('is_active_seeking_job');
+                var can_travels = xml.getElementsByTagName('can_travel_relocate');
+                var notice_periods = xml.getElementsByTagName('notice_period');
+                var exp_sal_currencies = xml.getElementsByTagName('expected_salary_currency');
+                var exp_sal_starts = xml.getElementsByTagName('expected_salary');
+                var exp_sal_ends = xml.getElementsByTagName('expected_salary_end');
                 
-                var applicants_table = new FlexTable('applicants_table', 'applicants');
+                var members_table = new FlexTable('members_table', 'members');
 
                 var header = new Row('');
                 header.set(0, new Cell('&nbsp;', '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'member_jobs.applied_on');\">Applied On</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'members.lastname');\">Member</a>", '', 'header'));
-                header.set(3, new Cell('Job Applied', '', 'header'));
-                header.set(4, new Cell('Resume', '', 'header'));
-                header.set(5, new Cell('Status', '', 'header'));
-                header.set(6, new Cell('Progress', '', 'header'));
-                applicants_table.set(0, header);
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.joined_on');\">Joined On</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.lastname');\">Member</a>", '', 'header'));
+                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.total_work_years');\">Total Work Years</a>", '', 'header'));
+                header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.notice_period');\">Notice Period (Months)</a>", '', 'header'));
+                header.set(5, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.expected_salary');\">Expected Salary</a>", '', 'header'));
+                header.set(6, new Cell('&nbsp;', '', 'header action'));
+                members_table.set(0, header);
                 
                 for (var i=0; i < emails.length; i++) {
                     var row = new Row('');
                     
-                    // delete
-                    if (referred_ons[i].childNodes.length <= 0) {
-                        row.set(0, new Cell('<input type="button" value="delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\', false);" />', '', 'cell'));
+                    // active seeking job?
+                    if (is_seeking_jobs[i].childNodes[0].nodeValue == 'Y') {
+                        row.set(0, new Cell('<img src="../common/images/icons/expired.png" />', '', 'cell cell_indicator'));
                     } else {
-                        row.set(0, new Cell('<input type="button" value="delete" disabled/>', '', 'cell'));
+                        row.set(0, new Cell('&nbsp;', '', 'cell cell_indicator'));
                     }
                     
-                    // applied on
-                    row.set(1, new Cell(applied_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    // joined on
+                    row.set(1, new Cell(joined_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     // member details
                     var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_new">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
@@ -954,72 +937,71 @@ function update_members() {
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + phone_num + '</div>' + "\n";
                     
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a href="mailto:' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
-                    short_desc = short_desc + '<br/><a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=referrers" target="_new">View Referrers</a>' + "\n";
                     row.set(2, new Cell(short_desc, '', 'cell'));
                     
-                    // job applied
-                    var job_details = '[' + employer_ids[i].childNodes[0].nodeValue + '] ' + job_titles[i].childNodes[0].nodeValue + '<br/><br/>';
-                    if (parseInt(applied_jobs[i].childNodes[0].nodeValue) > 1) {
-                        job_details = job_details + '<a class="no_link" onClick="show_jobs_popup(false, \'' + emails[i].childNodes[0].nodeValue + '\', true);">View others</a>';
+                    // total work years
+                    var total_work_years = 'N/A';
+                    if (total_years[i].childNodes.length > 0) {
+                        total_work_years = total_years[i].childNodes[0].nodeValue;
                     }
-                    row.set(3, new Cell(job_details, '', 'cell'));
+                    row.set(3, new Cell(total_work_years, '', 'cell'));
                     
-                    // resume details
-                    var resume_details = '<a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">Applied</a>';
-                    
-                    if (resume_ids[i].childNodes.length > 0) {
-                        resume_details = '<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">Submitted</a>';
+                    // notice period
+                    var notice_period = 'N/A';
+                    if (notice_periods[i].childNodes.length > 0) {
+                        notice_period = notice_periods[i].childNodes[0].nodeValue;
                     }
+                    row.set(4, new Cell(notice_period, '', 'cell'));
                     
-                    resume_details = resume_details + '&nbsp;|&nbsp;<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">All/Refer</a><br/><br/>';
-                    resume_details = resume_details + '<span style="color: #666666;">YEL: ' + yel_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
-                    resume_details = resume_details + '<span style="color: #666666;">Self: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
-                    row.set(4, new Cell(resume_details, '', 'cell'));
-                    
-                    // status
-                    var status = 'N/A';
-                    if (referred_ons[i].childNodes.length > 0) {
-                        status = '<span class="referred">Referred On:</span> ' + referred_ons[i].childNodes[0].nodeValue;
+                    // salary
+                    var sal_currency = '???';
+                    if (exp_sal_currencies[i].childNodes.length > 0) {
+                        sal_currency = exp_sal_currencies[i].childNodes[0].nodeValue;
                     }
                     
-                    if (agreed_terms_ons[i].childNodes.length > 0) {
-                        status = status + '<br/><span class="viewed">Viewed On:</span> ' + agreed_terms_ons[i].childNodes[0].nodeValue;
-                    }
-                    
-                    if (employed_ons[i].childNodes.length > 0) {
-                        status = status + '<br/><span class="employed">Employed On:</span> ' + employed_ons[i].childNodes[0].nodeValue;
-                    } else if (employer_rejected_ons[i].childNodes.length > 0) {
-                        status = status + '<br/><span class="rejected">Rejected On:</span> ' + employer_rejected_ons[i].childNodes[0].nodeValue;
-                    }
-                    row.set(5, new Cell(status, '', 'cell'));
-                    
-                    // progress
-                    var progress = '<a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\');">Add</a>';
-                    if (progress_notes[i].childNodes.length > 0) {
-                        var lines = progress_notes[i].childNodes[0].nodeValue.split("\n");
-                        var notes_str = '';
-                        for (var l=0; l < lines.length; l++) {
-                            notes_str = notes_str + lines[l] + '<br/>';
+                    var sal_start = '';
+                    if (exp_sal_starts[i].childNodes.length > 0) {
+                        var salary = parseFloat(exp_sal_starts[i].childNodes[0].nodeValue);
+                        if (salary > 0.00) {
+                            sal_start = exp_sal_starts[i].childNodes[0].nodeValue;
                         }
-                        progress = '<div class="progress_cell">' + notes_str  + '</div>';
-                        progress = progress + '<br/><a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\');">Update</a>';
+                    } 
+                    
+                    var sal_end = '';
+                    if (exp_sal_ends[i].childNodes.length > 0) {
+                        var salary = parseFloat(exp_sal_ends[i].childNodes[0].nodeValue);
+                        if (salary > 0.00) {
+                            sal_end = exp_sal_ends[i].childNodes[0].nodeValue;
+                        }
                     }
-                    row.set(6, new Cell(progress, '', 'cell progress_cell'));
                     
-                    // var actions = '';
-                    // if (is_actives[i].childNodes[0].nodeValue == 'Y') {
-                    //     actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                    //     actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
-                    // } else {
-                    //     actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                    // }                    
-                    // row.set(6, new Cell(actions, '', 'cell action'));
+                    var salary_str = 'N/A';
+                    if (!isEmpty(sal_start)) {
+                        salary_str = sal_currency + '$ ' + sal_start;
+                    }
                     
-                    applicants_table.set((parseInt(i)+1), row);
+                    if (isEmpty(sal_end) && !isEmpty(sal_start)) {
+                        salary_str = 'from ' + salary_str;
+                    } else if (!isEmpty(sal_end) && !isEmpty(sal_start)) {
+                        salary_str = salary_str + ' to ' + sal_end;
+                    }
+                    row.set(5, new Cell(salary_str, '', 'cell'));
+                    
+                    var actions = '';
+                    if (is_actives[i].childNodes[0].nodeValue == 'Y') {
+                        actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
+                        actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
+                    } else {
+                        actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
+                    }                    
+                    row.set(6, new Cell(actions, '', 'cell action'));
+                    
+                    members_table.set((parseInt(i)+1), row);
                 }
                 
-                $('div_applicants').set('html', applicants_table.get_html());
-                set_status('');
+                $('div_members').set('html', members_table.get_html());
+                
+                sliding_search_fx.slideOut();
             }
         },
         onRequest: function(instance) {

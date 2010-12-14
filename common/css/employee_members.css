@@ -13,20 +13,17 @@ a.menu {
     display: none;
 }
 
-#new_applicants_table {
-    margin: auto;
-    width: 100%;
-    border-collapse: collapse;
-}
-
-#applicants_table {
+#new_applicants_table, 
+#applicants_table, 
+#members_table {
     margin: auto;
     width: 100%;
     border-collapse: collapse;
 }
 
 #new_applicants_table tr:hover, 
-#applicants_table tr:hover  {
+#applicants_table tr:hover, 
+#members_table tr:hover  {
     background-color: #FFFF00;
 }
 
@@ -44,12 +41,18 @@ a.menu {
 }
 
 .action {
-    width: 20%;
+    width: auto;
     text-align: center;
 }
 
 .cell:hover {
     background-color: #BBFCA1;
+}
+
+.cell_indicator {
+    width: 20px;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .small_contact {
