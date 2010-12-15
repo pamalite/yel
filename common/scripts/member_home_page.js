@@ -132,6 +132,12 @@ function toggle_the_rest_of_form(_is_active) {
     if (_is_active) {
         $('seeking_field').setStyle('display', 'block');
         $('seeking_edit').setStyle('display', 'block');
+        $('pref_job_loc_1_field').setStyle('display', 'block');
+        $('pref_job_loc_1_edit').setStyle('display', 'block');
+        $('pref_job_loc_2_field').setStyle('display', 'block');
+        $('pref_job_loc_2_edit').setStyle('display', 'block');
+        $('seeking_field').setStyle('display', 'block');
+        $('seeking_edit').setStyle('display', 'block');
         $('expected_salary_field').setStyle('display', 'block');
         $('expected_salary_edit').setStyle('display', 'block');
         $('travel_field').setStyle('display', 'block');
@@ -147,6 +153,10 @@ function toggle_the_rest_of_form(_is_active) {
     } else {
         $('seeking_field').setStyle('display', 'none');
         $('seeking_edit').setStyle('display', 'none');
+        $('pref_job_loc_1_field').setStyle('display', 'none');
+        $('pref_job_loc_1_edit').setStyle('display', 'none');
+        $('pref_job_loc_2_field').setStyle('display', 'none');
+        $('pref_job_loc_2_edit').setStyle('display', 'none');
         $('expected_salary_field').setStyle('display', 'none');
         $('expected_salary_edit').setStyle('display', 'none');
         $('travel_field').setStyle('display', 'none');
@@ -204,7 +214,7 @@ function close_choices_popup(_is_save) {
                     return;
                 }
                 
-                if ($('choices_action') == 'save_is_active_job_seeker') {
+                if ($('choices_action').value == 'save_is_active_job_seeker') {
                     // toggle the rest            
                     toggle_the_rest_of_form((choice.toUpperCase() == 'YES'));
                 }
@@ -377,6 +387,57 @@ function close_ranges_popup(_is_save) {
         close_window('ranges_window');
     }
 }
+
+function show_countries_popup(_title, _selected, _action) {
+    $('countries_title').set('html', _title);
+    $('countries_action').value = _action;
+    
+    var countries = $('pref_job_loc').options;
+    for (var i=0; i < countries.length; i++) {
+        if (countries[i].value == _selected) {
+            $('pref_job_loc').selectedIndex = i;
+            break;
+        }
+    }
+    
+    show_window('countries_window');
+    window.scrollTo(0, 0);
+}
+
+function close_countries_popup(_is_save) {
+    if (_is_save) {
+        var action = $('countries_action').value;
+        
+        var pref = '1'
+        if (action.substr(action.length-2) == '_2') {
+            pref = '2'
+        }
+        
+        var params = 'id=' + id + '&action=save_job_loc_pref&pref=' + pref;
+        params = params + '&country=' + $('pref_job_loc').options[$('pref_job_loc').selectedIndex].value;
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error occured when saving. Please try again later.');
+                    return;
+                }
+                
+                location.reload(true);
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('countries_window');
+    }
+}
+
 
 function validate_job_profile() {
     if ($('specialization').selectedIndex == 0) {

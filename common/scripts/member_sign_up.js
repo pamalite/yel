@@ -238,6 +238,8 @@ function save_job_profile() {
     params = params + '&emp_desc=' + $('emp_desc').value;
     params = params + '&emp_specialization=' + $('emp_specialization').value;
     params = params + '&total_work_years=' + $('total_work_years').value;
+    params = params + '&pref_job_loc_1=' + $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].value;
+    params = params + '&pref_job_loc_2=' + $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].value;
     params = params + '&seeking=' + $('seeking').value.replace("\n", '<br/>');
     
     var uri = root + "/members/sign_up_action.php";

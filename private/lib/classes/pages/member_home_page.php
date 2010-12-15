@@ -71,11 +71,16 @@ class MemberHomePage extends Page {
     
     private function get_answers() {
         $criteria = array(
-            'columns' => "is_active_seeking_job, seeking, expected_salary_currency, expected_salary, 
-                          expected_salary_end, can_travel_relocate, reason_for_leaving, 
-                          current_position, current_salary_currency, current_salary, current_salary_end, 
-                          notice_period", 
-            'match' => "email_addr = '". $this->member->getId(). "'", 
+            'columns' => "members.is_active_seeking_job, members.seeking, 
+                          members.expected_salary_currency, members.expected_salary, 
+                          members.expected_salary_end, members.can_travel_relocate, 
+                          members.reason_for_leaving, members.current_position, 
+                          members.current_salary_currency, members.current_salary, 
+                          members.current_salary_end, members.notice_period, 
+                          countries.country AS pref_job_loc_1, countries_1.country AS pref_job_loc_2", 
+            'joins' => "countries ON countries.country_code = members.preferred_job_location_1, 
+                        countries AS countries_1 ON countries_1.country_code = members.preferred_job_location_2",
+            'match' => "members.email_addr = '". $this->member->getId(). "'", 
             'limit' => "1"
         );
         
@@ -123,6 +128,32 @@ class MemberHomePage extends Page {
         }
         
         return $result;
+    }
+    
+    private function generate_countries($_selected, $_name = 'country') {
+        $criteria = array(
+            'columns' => "country_code, country", 
+            'order' => "country"
+        );
+        $countries = Country::find($criteria);
+        
+        echo '<select class="field" id="'. $_name. '" name="'. $_name. '">'. "\n";
+        if (empty($_selected) || is_null($_selected) || $_selected == '0') {
+            echo '<option value="0" selected>Please select a county.</option>'. "\n";    
+        } else {
+            echo '<option value="0">Please select a country.</option>'. "\n";
+        }
+        
+        echo '<option value="0">&nbsp;</option>';
+        foreach ($countries as $country) {
+            if ($country['country_code'] != $_selected) {
+                echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $country['country_code']. '" selected>'. $country['country']. '</option>'. "\n";
+            }
+        }
+        
+        echo '</select>'. "\n";
     }
     
     private function generate_industries($_id, $_selecteds, $_is_multi=false) {
@@ -360,8 +391,55 @@ class MemberHomePage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field odd">Perhaps you can travel, or relocate, if the new job requires it?</td>
+                                    <td class="field odd" rowspan="2">Job Location Preferences?</td>
                                     <td class="odd">
+                                        1. 
+                                        <span id="pref_job_loc_1_field">
+                                        <?php 
+                                        if ($is_active) {
+                                            echo $answers['pref_job_loc_1'];
+                                        }
+                                        ?>
+                                        </span>
+                                    </td>
+                                    <td class="action">
+                                        <span id="pref_job_loc_1_edit">
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <a class="no_link edit" onClick="show_countries_popup('Job Preference 1', '<?php echo $answers['pref_job_loc_1']; ?>', 'save_pref_job_loc_1');">edit</a>
+                                        <?php
+                                        }
+                                        ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="odd">
+                                        2. 
+                                        <span id="pref_job_loc_2_field">
+                                        <?php 
+                                        if ($is_active) {
+                                            echo $answers['pref_job_loc_2'];
+                                        }
+                                        ?>
+                                        </span>
+                                    </td>
+                                    <td class="action">
+                                        <span id="pref_job_loc_2_edit">
+                                        <?php
+                                        if ($is_active) {
+                                        ?>
+                                            <a class="no_link edit" onClick="show_countries_popup('Job Preference 2', '<?php echo $answers['pref_job_loc_2']; ?>', 'save_pref_job_loc_2');">edit</a>
+                                        <?php
+                                        }
+                                        ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="field">Perhaps you can travel, or relocate, if the new job requires it?</td>
+                                    <td>
                                         <span id="travel_field">
                                         <?php
                                         if ($is_active) {
@@ -382,8 +460,8 @@ class MemberHomePage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field">Briefly, why do you want to leave your current job?</td>
-                                    <td>
+                                    <td class="field odd">Briefly, why do you want to leave your current job?</td>
+                                    <td class="odd">
                                         <span id="leaving_field">
                                         <?php
                                         if ($is_active) {
@@ -405,8 +483,8 @@ class MemberHomePage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field odd">Briefly, what is your current position, and what do you do?</td>
-                                    <td class="odd">
+                                    <td class="field">Briefly, what is your current position, and what do you do?</td>
+                                    <td>
                                         <span id="current_job_field">
                                         <?php
                                         if ($is_active) {
@@ -428,8 +506,8 @@ class MemberHomePage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field">What is your current salary range?</td>
-                                    <td>
+                                    <td class="field odd">What is your current salary range?</td>
+                                    <td class="odd">
                                         <span id="current_salary_field">
                                         <?php 
                                         if ($is_active) {
@@ -452,8 +530,8 @@ class MemberHomePage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field odd">What is your notice period?</td>
-                                    <td class="odd">
+                                    <td class="field">What is your notice period?</td>
+                                    <td>
                                         <span id="notice_period_field">
                                         <?php
                                         if ($is_active) {
@@ -620,6 +698,21 @@ class MemberHomePage extends Page {
             <div class="popup_window_buttons_bar">
                 <input type="button" value="Save" onClick="close_choices_popup(true);" />
                 <input type="button" value="Cancel" onClick="close_choices_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="countries_window" class="popup_window">
+            <div id="countries_title" class="popup_window_title">Job Location Preference</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="id" value="" />
+                <input type="hidden" id="countries_action" value="" />
+                <div class="countries_form">
+                    <?php echo $this->generate_countries('', 'pref_job_loc'); ?>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_countries_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_countries_popup(false);" />
             </div>
         </div>
         

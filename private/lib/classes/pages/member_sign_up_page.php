@@ -44,9 +44,10 @@ class MemberSignUpPage extends Page {
         if (empty($_selected) || is_null($_selected) || $_selected == '0') {
             echo '<option value="0" selected>Please select a county.</option>'. "\n";    
         } else {
-            echo '<option value="0">Please select an country.</option>'. "\n";
+            echo '<option value="0">Please select a country.</option>'. "\n";
         }
         
+        echo '<option value="0">&nbsp;</option>';
         foreach ($countries as $country) {
             if ($country['country_code'] != $_selected) {
                 echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
@@ -284,12 +285,21 @@ class MemberSignUpPage extends Page {
                     </tr>
                     <tr>
                         <td class="section_title" colspan="2">
-                            Career Goals &amp; Experiences
+                            Career Goals &amp; Experiences, and Job Preference
                         </td>
                     </tr>
                     <tr>
                         <td class="label"><label for="total_work_years">Total Years of Work Experience:</label></td>
                         <td class="field"><input class="field" type="text" id="total_work_years" name="total_work_years" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="pref_job_loc_1">Job Location Preferences:</label></td>
+                        <td class="field">
+                            Preference 1: 
+                            <?php $this->generate_countries('', 'pref_job_loc_1'); ?>
+                            Preference 2:
+                            <?php $this->generate_countries('', 'pref_job_loc_2'); ?>
+                        </td>
                     </tr>
                     <tr>
                         <td class="label"><label for="seeking">Goals &amp; Experiences:</label></td>

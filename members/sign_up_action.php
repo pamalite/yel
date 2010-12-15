@@ -117,7 +117,15 @@ if ($_POST['action'] == 'add_job_profile') {
     
     $data = array();
     $data['total_work_years'] = $_POST['total_work_years'];
-    $data['seeking'] = sanitize($_POST['seeking']);
+    $data['seeking'] = $_POST['seeking'];
+    
+    if ($_POST['pref_job_loc_1'] > 0) {
+        $data['preferred_job_location_1'] = $_POST['pref_job_loc_1'];
+    }
+    
+    if ($_POST['pref_job_loc_2'] > 0) {
+        $data['preferred_job_location_2'] = $_POST['pref_job_loc_2'];
+    }
     
     if ($member->update($data) === false) {
         echo 'ko - error_update';

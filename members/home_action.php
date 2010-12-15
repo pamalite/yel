@@ -147,6 +147,20 @@ if ($_POST['action'] == 'save_expected_salary') {
     exit();
 }
 
+if ($_POST['action'] == 'save_job_loc_pref') {
+    $data = array();
+    $data['preferred_job_location_'. $_POST['pref']] = $_POST['country'];
+    
+    $member = new Member($_POST['id']);
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
 if ($_POST['action'] == 'save_job_profile') {
     $data = array();
     $data['specialization'] = $_POST['specialization'];

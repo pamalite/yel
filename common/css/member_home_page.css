@@ -178,7 +178,8 @@ textarea {
 }
 
 #notes_window, #texts_window, #ranges_window, 
-#choices_window, #job_profile_window {
+#choices_window, #job_profile_window, 
+#countries_window {
     display: none;
 }
 
