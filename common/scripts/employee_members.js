@@ -905,30 +905,32 @@ function update_members() {
                 var members_table = new FlexTable('members_table', 'members');
 
                 var header = new Row('');
-                header.set(0, new Cell('&nbsp;', '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.joined_on');\">Joined On</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.lastname');\">Member</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.total_work_years');\">Total Work Years</a>", '', 'header'));
-                header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.notice_period');\">Notice Period (Months)</a>", '', 'header'));
-                header.set(5, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.expected_salary');\">Expected Salary</a>", '', 'header'));
-                header.set(6, new Cell('&nbsp;', '', 'header action'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.joined_on');\">Joined On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.lastname');\">Member</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.total_work_years');\">Total Work Years</a>", '', 'header'));
+                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.notice_period');\">Notice Period (Months)</a>", '', 'header'));
+                header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.expected_salary');\">Expected Salary</a>", '', 'header'));
+                header.set(5, new Cell('&nbsp;', '', 'header action'));
                 members_table.set(0, header);
                 
                 for (var i=0; i < emails.length; i++) {
                     var row = new Row('');
                     
                     // active seeking job?
-                    if (is_seeking_jobs[i].childNodes[0].nodeValue == 'Y') {
-                        row.set(0, new Cell('<img src="../common/images/icons/expired.png" />', '', 'cell cell_indicator'));
-                    } else {
-                        row.set(0, new Cell('&nbsp;', '', 'cell cell_indicator'));
+                    var is_active_seeking = true;
+                    if (is_seeking_jobs[i].childNodes[0].nodeValue == '0') {
+                        is_active_seeking = false;
                     }
                     
                     // joined on
-                    row.set(1, new Cell(joined_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(0, new Cell(joined_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     // member details
                     var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_new">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    
+                    if (!is_active_seeking) {
+                        short_desc = '<span style="color: #ff0000; font-weight: bold;">[!]</span> ' + short_desc;
+                    }
                     
                     var phone_num = '';
                     if (phone_nums[i].childNodes.length > 0) {
