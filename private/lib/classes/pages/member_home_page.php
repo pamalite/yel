@@ -391,7 +391,7 @@ class MemberHomePage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="field odd" rowspan="2">Job Location Preferences?</td>
+                                    <td class="field odd" rowspan="2">Preferred Job Location?</td>
                                     <td class="odd">
                                         1. 
                                         <span id="pref_job_loc_1_field">
@@ -407,7 +407,7 @@ class MemberHomePage extends Page {
                                         <?php
                                         if ($is_active) {
                                         ?>
-                                            <a class="no_link edit" onClick="show_countries_popup('Job Preference 1', '<?php echo $answers['pref_job_loc_1']; ?>', 'save_pref_job_loc_1');">edit</a>
+                                            <a class="no_link edit" onClick="show_countries_popup('Job Location Preference 1', '<?php echo $answers['pref_job_loc_1']; ?>', 'save_pref_job_loc_1');">edit</a>
                                         <?php
                                         }
                                         ?>
@@ -430,7 +430,7 @@ class MemberHomePage extends Page {
                                         <?php
                                         if ($is_active) {
                                         ?>
-                                            <a class="no_link edit" onClick="show_countries_popup('Job Preference 2', '<?php echo $answers['pref_job_loc_2']; ?>', 'save_pref_job_loc_2');">edit</a>
+                                            <a class="no_link edit" onClick="show_countries_popup('Job Location Preference 2', '<?php echo $answers['pref_job_loc_2']; ?>', 'save_pref_job_loc_2');">edit</a>
                                         <?php
                                         }
                                         ?>

@@ -356,6 +356,18 @@ function save_career() {
     params = params + '&current_salary=' + $('current_salary').value;
     params = params + '&current_salary_end=' + $('current_salary_end').value;
     
+    var pref_country_1 = $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].value;
+    if (pref_country_1 == '0') {
+        pref_country_1 = '';
+    }
+    params = params + '&pref_job_loc_1=' + pref_country_1;
+    
+    var pref_country_2 = $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].value;
+    if (pref_country_2 == '0') {
+        pref_country_2 = '';
+    }
+    params = params + '&pref_job_loc_2=' + pref_country_2;
+    
     var uri = root + "/employees/member_action.php";
     var request = new Request({
         url: uri,

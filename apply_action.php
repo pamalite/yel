@@ -159,12 +159,12 @@ $message = str_replace('%job_title%', $job->getTitle(), $message);
 
 $subject = "New Application for ". $job->getTitle(). " position";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-// mail($branch_email, $subject, $message, $headers);
+mail($branch_email, $subject, $message, $headers);
 
-$handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
-fwrite($handle, 'Subject: '. $subject. "\n\n");
-fwrite($handle, $message);
-fclose($handle);
+// $handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
+// fwrite($handle, 'Subject: '. $subject. "\n\n");
+// fwrite($handle, $message);
+// fclose($handle);
 
 redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?success=1');
 exit();

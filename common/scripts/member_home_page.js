@@ -413,8 +413,13 @@ function close_countries_popup(_is_save) {
             pref = '2'
         }
         
+        var pref_country = $('pref_job_loc').options[$('pref_job_loc').selectedIndex].value;
+        if (pref_country == '0') {
+            pref_country = '';
+        }
+        
         var params = 'id=' + id + '&action=save_job_loc_pref&pref=' + pref;
-        params = params + '&country=' + $('pref_job_loc').options[$('pref_job_loc').selectedIndex].value;
+        params = params + '&country=' + pref_country;
         
         var uri = root + "/members/home_action.php";
         var request = new Request({

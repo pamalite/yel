@@ -237,7 +237,7 @@ class MemberProfilePage extends Page {
                     </tr>
                     
                     <!-- expertise -->
-                    <tr>
+                    <!-- tr>
                         <td class="title" colspan="2">Top 3 Specializations</td>
                     </tr>
                     <tr>
@@ -245,7 +245,7 @@ class MemberProfilePage extends Page {
                             <div class="note">Please choose your top 3 industrial sector. We collect these information is to better understand the needs of our members.</div>
                             <?php $this->generate_industries('industry'); ?>
                         </td>
-                    </tr>
+                    </tr -->
                     <!-- expertise -->
                     
                     <tr>

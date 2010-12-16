@@ -76,12 +76,12 @@ if ($_POST['action'] == 'save_profile') {
         $message = str_replace('%root%', $GLOBALS['root'], $message);
         $subject = "Welcome To Yellow Elevator!";
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-        // mail($_POST['email_addr'], $subject, $message, $headers);
+        mail($_POST['email_addr'], $subject, $message, $headers);
         
-        $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $message);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
     }
     
     echo 'ok';
@@ -610,6 +610,8 @@ if ($_POST['action'] == 'save_career') {
     $data['current_salary_currency'] = $_POST['current_currency'];
     $data['current_salary'] = $_POST['current_salary'];
     $data['current_salary_end'] = $_POST['current_salary_end'];
+    $data['preferred_job_location_1'] = (empty($_POST['pref_job_loc_1'])) ? 'NULL' : $_POST['pref_job_loc_1'];
+    $data['preferred_job_location_2'] = (empty($_POST['pref_job_loc_2'])) ? 'NULL' : $_POST['pref_job_loc_2'];
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {

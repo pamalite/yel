@@ -100,12 +100,12 @@ if ($_POST['action'] == 'activate') {
     $message = str_replace('%temporary_password%', $new_password, $message);
     $subject = "Employer Password Reset";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    // mail($employer->getEmailAddress(), $subject, $message, $headers);
+    mail($employer->getEmailAddress(), $subject, $message, $headers);
     
-    $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);
+    // $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     echo 'ok';
     exit();
@@ -132,12 +132,12 @@ if ($_POST['action'] == 'reset_password') {
     $message = str_replace('%temporary_password%', $new_password, $message);
     $subject = "Employer Password Reset";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    // mail($employer->getEmailAddress(), $subject, $message, $headers);
+    mail($employer->getEmailAddress(), $subject, $message, $headers);
     
-    $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);
+    // $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     echo 'ok';
     exit();

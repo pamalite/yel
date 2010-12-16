@@ -61,12 +61,12 @@ if ($_POST['action'] == 'reset_password') {
         $subject = "Member Password Reset";
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         
-        // mail($member->getId(), $subject, $message, $headers);
+        mail($member->getId(), $subject, $message, $headers);
         
-        $handle = fopen('/tmp/email_to_'. $member->getId(). '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $message);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_'. $member->getId(). '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
         
         echo 'ok';
         exit();

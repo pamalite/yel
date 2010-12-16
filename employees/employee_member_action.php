@@ -74,12 +74,12 @@ if ($_POST['action'] == 'save_profile') {
         $message = str_replace('%root%', $GLOBALS['root'], $message);
         $subject = "Welcome To Yellow Elevator!";
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-        // mail($_POST['email_addr'], $subject, $message, $headers);
+        mail($_POST['email_addr'], $subject, $message, $headers);
         
-        $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $message);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
     }
     
     echo 'ok';

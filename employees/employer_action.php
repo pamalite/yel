@@ -151,12 +151,12 @@ function send_invoice(&$_employer, $_paid_postings, $_subscription_period) {
         $body .= 'Content-Disposition: attachment'. "\n";
         $body .= $attachment. "\n";
         $body .= '--yel_mail_sep_'. $invoice. "--\n\n";
-        // mail($_employer->getEmailAddress(), $subject, $body, $headers);
+        mail($_employer->getEmailAddress(), $subject, $body, $headers);
     
-        $handle = fopen('/tmp/email_to_'. $_employer->getEmailAddress(). '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $body);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_'. $_employer->getEmailAddress(). '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $body);
+        // fclose($handle);
     
         unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
     }
@@ -329,12 +329,12 @@ if ($_POST['action'] == 'reset_password') {
     $message = str_replace('%temporary_password%', $new_password, $message);
     $subject = "Employer Password Reset";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    // mail($employer->getEmailAddress(), $subject, $message, $headers);
+    mail($employer->getEmailAddress(), $subject, $message, $headers);
     
-    $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);
+    // $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     echo 'ok';
     exit();
@@ -413,12 +413,12 @@ if ($_POST['action'] == 'save_profile') {
         $message = str_replace('%root%', $GLOBALS['root'], $message);
         $subject = "Welcome To Yellow Elevator!";
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-        // mail($_POST['email_addr'], $subject, $message, $headers);
+        mail($_POST['email_addr'], $subject, $message, $headers);
         
-        $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $message);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
     }
     
     echo 'ok';

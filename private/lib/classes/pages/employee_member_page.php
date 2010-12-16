@@ -707,6 +707,16 @@ class EmployeeMemberPage extends Page {
                                     </td>
                                 </tr>
                                 <tr>
+                                    <td class="label"><label for="pref_job_loc_1">Preferred Job Locations:</label></td>
+                                    <td class="field">
+                                        <?php 
+                                            $this->generate_countries($profile['preferred_job_location_1'], 'pref_job_loc_1');
+                                            echo '<br/>';
+                                            $this->generate_countries($profile['preferred_job_location_2'], 'pref_job_loc_2'); 
+                                        ?>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td class="label"><label for="can_travel_relocate">Willing to Travel or Relocate:</label></td>
                                     <td class="field">
                                         <select id="can_travel_relocate">

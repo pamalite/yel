@@ -94,24 +94,24 @@ function save_profile() {
         params = params + '&password=' + password;
     }
     
-    var count = 0;
-    var industry = '';
-    for (var i=0; i < $('industry').options.length; i++) {
-        if ($('industry').options[i].selected) {
-            industry = industry + $('industry').options[i].value;
-            
-            if (count < 2) {
-                industry = industry + ',';
-            }
-            
-            count++;
-        }
-        
-        if (count >= 3) {
-            break;
-        }
-    }
-    params = params + '&industries=' + industry;
+    // var count = 0;
+    // var industry = '';
+    // for (var i=0; i < $('industry').options.length; i++) {
+    //     if ($('industry').options[i].selected) {
+    //         industry = industry + $('industry').options[i].value;
+    //         
+    //         if (count < 2) {
+    //             industry = industry + ',';
+    //         }
+    //         
+    //         count++;
+    //     }
+    //     
+    //     if (count >= 3) {
+    //         break;
+    //     }
+    // }
+    // params = params + '&industries=' + industry;
     
     var uri = root + "/members/profile_action.php";
     var request = new Request({
