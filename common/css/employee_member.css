@@ -424,6 +424,17 @@ div.resume_info {
     padding: 5px 5px 5px 5px;
 }
 
+div.resume_desc {
+    padding-bottom: 5px;
+}
+
+div.pre_selected_jobs {
+    padding-bottom: 5px;
+}
+
+div.referrer {
+    padding-bottom: 5px;
+}
 table.pre_selected_jobs_table {
     width: 100%;
     border-collapse: collapse;
@@ -439,6 +450,7 @@ table.pre_selected_jobs_table td.label {
 }
 
 #pre_selected_jobs_list {
+    border: 1px solid #CCCCCC;
     height: 75px;
     width: 100%;
     overflow: auto;

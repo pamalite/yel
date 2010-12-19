@@ -952,6 +952,14 @@ function close_employer_remarks() {
 function show_apply_job_popup(_resume_id, _resume_file_name) {
     $('resume_id').value = _resume_id;
     $('resume_file_name').set('html', _resume_file_name);
+    
+    var jobs = $('selected_jobs').value.split(',');
+    if (jobs.length <= 4) {
+        $('pre_selected_jobs_list').setStyle('height', 'auto');
+    } else {
+        $('pre_selected_jobs_list').setStyle('height', '75px');
+    }
+    
     show_window('apply_job_window');
     window.scrollTo(0, 0);
     filter_jobs();

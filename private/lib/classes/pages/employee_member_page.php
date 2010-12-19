@@ -1021,53 +1021,34 @@ class EmployeeMemberPage extends Page {
         <div id="apply_job_window" class="popup_window">
             <div class="popup_window_title">Apply Job</div>
             <div id="div_resume_info" class="resume_info">
-                <span style="font-weight: bold;">Resume selected:</span>
-                <span id="resume_file_name"></span><br/>
-                <table class="pre_selected_jobs_table">
-                    <tr>
-                        <td class="label">
-                            <span style="font-weight: bold;">Pre-selected Jobs:</span><br/>
-                            <span style="font-size: 9pt;">
-                                <a class="no_link" onClick="clear_pre_selected_jobs();">
-                                    (clear)
-                                </a>
-                            </span>
-                        </td>
-                        <td>
-                            <div id="pre_selected_jobs_list">
-                                <?php echo $this->get_pre_selected_jobs(); ?>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-                <span style="font-weight: bold;">Referrer: </span>
-                <?php
-                    $referrers = $this->get_referrers();
-                    if (empty($referrers) || $referrers === false) {
-                ?>
-                    [No referrers.]
-                    <input type="hidden" id="apply_job_referrer" value="<?php echo 'team.'. strtolower($branch[0]['country']); ?>@yellowelevator.com" />
-                <?php
-                    } else {
-                ?>
-                    <select id="apply_job_referrer">
-                        <option value="">Select a Referrer</option>
-                        <option value="" disabled>&nbsp;</option>
-                <?php
-                        foreach ($referrers as $referrer) {
-                ?>
-                        <option value="<?php echo $referrer['id']; ?>"><?php echo htmlspecialchars_decode(stripslashes($referrer['member_name'])). ' ('. $referrer['id']. ')'; ?></option>
-                <?php
-                        }
-                ?>
-                    </select>
-                <?php
-                    }
-                ?>
+                <div class="resume_desc">
+                    <span style="font-weight: bold;">Resume selected:</span>
+                    <span id="resume_file_name"></span>
+                </div>
+                <div class="pre_selected_jobs">
+                    <table class="pre_selected_jobs_table">
+                        <tr>
+                            <td class="label">
+                                <span style="font-weight: bold;">Pre-selected Jobs:</span><br/>
+                                <span style="font-size: 9pt;">
+                                    <a class="no_link" onClick="clear_pre_selected_jobs();">
+                                        (clear)
+                                    </a>
+                                </span>
+                            </td>
+                            <td>
+                                <div id="pre_selected_jobs_list">
+                                    <?php echo $this->get_pre_selected_jobs(); ?>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
             <form id="apply_job_form" onSubmit="return false;">
                 <input type="hidden" id="resume_id" name="resume_id" value="0" />
                 <input type="hidden" id="selected_jobs" value="<?php echo implode(',', $this->selected_jobs); ?>" />
+                <span style="font-weight: bold;">Additional Jobs:</span>
                 <div id="div_apply_job_form" class="apply_job_form">
                     <table class="jobs_selection">
                         <tr>
@@ -1107,6 +1088,32 @@ class EmployeeMemberPage extends Page {
                             </td>
                         </tr>
                     </table>
+                </div>
+                <div class="referrer">
+                    <span style="font-weight: bold;">Referrer: </span>
+                    <?php
+                        $referrers = $this->get_referrers();
+                        if (empty($referrers) || $referrers === false) {
+                    ?>
+                        [No referrers.]
+                        <input type="hidden" id="apply_job_referrer" value="<?php echo 'team.'. strtolower($branch[0]['country']); ?>@yellowelevator.com" />
+                    <?php
+                        } else {
+                    ?>
+                        <select id="apply_job_referrer">
+                            <option value="">Select a Referrer</option>
+                            <option value="" disabled>&nbsp;</option>
+                    <?php
+                            foreach ($referrers as $referrer) {
+                    ?>
+                            <option value="<?php echo $referrer['id']; ?>"><?php echo htmlspecialchars_decode(stripslashes($referrer['member_name'])). ' ('. $referrer['id']. ')'; ?></option>
+                    <?php
+                            }
+                    ?>
+                        </select>
+                    <?php
+                        }
+                    ?>
                 </div>
                 <div class="popup_window_buttons_bar">
                     <input type="button" id="apply_btn" value="Apply" onClick="close_apply_job_popup(true);" />
