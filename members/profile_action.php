@@ -40,7 +40,8 @@ if ($_POST['action'] == 'save_profile') {
 
     $data['address'] = $_POST['address'];
     $data['state'] = $_POST['state'];
-
+    $data['updated_on'] = date('Y-m-d');
+    
     if (!$member->update($data)) {
         echo 'ko';
         exit();

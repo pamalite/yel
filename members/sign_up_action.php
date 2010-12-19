@@ -49,6 +49,7 @@ if ($_POST['action'] == 'sign_up') {
     $data['forget_password_answer'] = $_POST['forget_password_answer'];
     $data['phone_num'] = $_POST['phone_num'];
     $data['joined_on'] = $joined_on;
+    $data['updated_on'] = $joined_on;
     $data['active'] = 'N';
     $data['checked_profile'] = 'Y';
     

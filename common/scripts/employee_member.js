@@ -349,6 +349,7 @@ function save_career() {
     params = params + '&reason_leaving=' + reason_leaving;
     params = params + '&current_position=' + current_position;
     params = params + '&notice_period=' + $('notice_period').value;
+    params = params + '&total_years=' + $('total_years').value;
     params = params + '&expected_currency=' + $('expected_salary_currency').options[$('expected_salary_currency').selectedIndex].value;
     params = params + '&expected_salary=' + $('expected_salary').value;
     params = params + '&expected_salary_end=' + $('expected_salary_end').value;

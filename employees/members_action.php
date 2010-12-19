@@ -410,27 +410,67 @@ if ($_POST['action'] == 'get_members') {
     $criteria['offset'] = $offset;
     
     $result = $member_search->search_using($criteria);
-    
-    if (count($result) <= 0 || is_null($result)) {
+    if (is_null($result) || count($result) <= 0) {
         echo '0';
         exit();
     }
 
-    if (!$result) {
+    if ($result === false) {
         echo 'ko';
         exit();
     }
     
+    // get the job_profiles
+    $members_str = '';
+    foreach ($result as $i=>$row) {
+        $members_str .= "'". $row['email_addr']. "'";
+        
+        if ($i < count($result)-1) {
+            $members_str .= ", ";
+        }
+    }
+    
+    $sub_criteria = array(
+        'columns' => "member_job_profiles.member, member_job_profiles.position_title, 
+                      member_job_profiles.employer, 
+                      date_format(member_job_profiles.work_from, '%b, %Y') AS formatted_work_from, 
+                      date_format(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
+        'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr", 
+        'match' => "member_job_profiles.member IS NOT NULL AND 
+                    members.email_addr IN (". $members_str. ")", 
+        'order' => "member_job_profiles.member, member_job_profiles.work_from DESC"
+    );
+    
+    $member = new Member();
+    $sub_result = $member->find($sub_criteria);
+    if (count($sub_result) > 0 && !is_null($sub_result)) {
+        $current_member = '';
+        foreach ($sub_result as $i=>$sub_row) {
+            if ($current_member != $sub_row['member']) {
+                $current_member = $sub_row['member'];
+                foreach ($result as $j=>$row) {
+                    if ($row['email_addr'] == $sub_row['member']) {
+                        $result[$j]['position_title'] = htmlspecialchars_decode(stripslashes($sub_row['position_title']));
+                        $result[$j]['employer'] = htmlspecialchars_decode(stripslashes($sub_row['employer']));
+                        $result[$j]['formatted_work_from'] = $sub_row['formatted_work_from'];
+                        $result[$j]['formatted_work_to'] = $sub_row['formatted_work_to'];
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
     foreach($result as $i=>$row) {
         $result[$i]['member_name'] = htmlspecialchars_decode(stripslashes($row['member_name']));
-        $result[$i]['expected_salary'] = number_format($row['expected_salary'], 2, '.', ',');
-        
-        if (!empty($row['expected_salary_end']) && !is_null($row['expected_salary_end']) &&
-            $row['expected_salary_end'] > 0) {
-            $result[$i]['expected_salary_end'] = number_format($row['expected_salary_end'], 2, '.', ',');
-        } else {
-            $result[$i]['expected_salary'] = '';
-        }
+        // $result[$i]['expected_salary'] = number_format($row['expected_salary'], 2, '.', ',');
+        // 
+        // if (!empty($row['expected_salary_end']) && !is_null($row['expected_salary_end']) &&
+        //     $row['expected_salary_end'] > 0) {
+        //     $result[$i]['expected_salary_end'] = number_format($row['expected_salary_end'], 2, '.', ',');
+        // } else {
+        //     $result[$i]['expected_salary'] = '';
+        // }
     }
 
     $response = array(
@@ -915,6 +955,42 @@ if ($_POST['action'] == 'get_other_jobs') {
     
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array(array('applications' => array('application' => $result)));
+    exit();
+}
+
+if ($_POST['action'] == 'apply_jobs') {
+    $member = new Member($_POST['id']);
+    
+    $data = array();
+    $data['applied_on'] = today();
+    
+    $jobs = explode(',', $_POST['jobs']);
+    $failed_jobs = array();
+    foreach ($jobs as $job) {
+        $data['job'] = trim($job);
+        
+        if ($member->addJobApplied($data) === false) {
+            $failed_jobs[] = $data['job'];
+        }
+    }
+    
+    if (!empty($failed_jobs)) {
+        $jobs_str = implode(',', $failed_jobs);
+        
+        $job = new Job();
+        $criteria = array(
+            'columns' => "jobs.title, employers.name AS employer, 
+                          DATE_FORMAT(jobs.expire_on, '%e %b, %Y) AS expire_on", 
+            'joins' => "employers ON employers.id = jobs.employer", 
+            'match' => "jobs.id IN (". $jobs_stri. ")"
+        );
+        
+        header('Content-type: text/xml');
+        echo $xml_dom->get_xml_from_array(array('jobs' => array('job' => $result)));
+        exit();
+    }
+    
+    echo 'ok';
     exit();
 }
 ?>

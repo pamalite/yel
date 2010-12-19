@@ -17,6 +17,7 @@ var new_applicants_page = 1;
 var sliding_filter_fx = '';
 var sliding_search_fx = '';
 var return_page = '';
+var jobs_list = new ListBox('jobs_selector', 'jobs_list', true);
 
 function new_applicants_ascending_or_descending() {
     if (new_applicants_order == 'desc') {
@@ -60,6 +61,86 @@ function sort_by(_table, _column) {
             update_members();
             break;
     }
+}
+
+function filter_jobs() {
+    if ($('apply_employers') == null) {
+        $('jobs_selector').set('html', '<span class="no_employers">No opened jobs found.</span>');
+        $('job_description').set('html', '');
+        $('apply_btn').disabled = true;
+        return;
+    }
+    
+    $('apply_btn').disabled = false;
+    var employer = $('apply_employers').options[$('apply_employers').selectedIndex].value;
+    var params = 'id=' + employer + '&action=get_filtered_jobs';
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error occured while retrieving jobs.');
+                return;
+            }
+            
+            if (txt == '0') {
+                $('jobs_selector').set('html', '<span class="no_employers">No opened jobs found.</span>');
+                $('job_description').set('html', '');
+                return;
+            }
+            
+            jobs_list.clear();
+            $('counter_lbl').set('html', '0');
+            var ids = xml.getElementsByTagName('id');
+            var titles = xml.getElementsByTagName('title');
+            var industries = xml.getElementsByTagName('industry');
+            var expirys = xml.getElementsByTagName('formatted_expire_on');
+            
+            for (var i=0; i < ids.length; i++) {
+                var item = '<span class="job_item">' + titles[i].childNodes[0].nodeValue + '</span><br/><span class="job_industry_item">' + industries[i].childNodes[0].nodeValue + '</span><br/><span class="job_expiry_item">Expire On: ' + expirys[i].childNodes[0].nodeValue + '</span>';
+                jobs_list.add_item(item, ids[i].childNodes[0].nodeValue);
+            }
+            
+            jobs_list.show();
+        }
+    });
+    
+    request.send(params);
+}
+
+function get_job_description() {
+    var counter = parseInt($('counter_lbl').get('html'));
+    if (jobs_list.items.length <= 0 || isEmpty(jobs_list.selected_value)) {
+        counter = counter - 1;
+        $('counter_lbl').set('html', counter);
+        return;
+    }
+    
+    counter = counter + 1;
+    $('counter_lbl').set('html', counter);
+    var params = 'id=' + jobs_list.selected_value + '&action=get_job_desc';
+    var uri = root + "/employees/member_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == 'ko') {
+                alert('An error occured while retrieving job description.');
+                return;
+            }
+            
+            if (txt == '0') {
+                $('jobs_selector').set('html', '<span class="no_employers">No opened jobs found.</span>');
+                $('job_description').set('html', '');
+                return;
+            }
+            
+            $('job_description').set('html', txt);
+        }
+    });
+    
+    request.send(params);
 }
 
 function toggle_main_filter() {
@@ -312,7 +393,7 @@ function update_applicants() {
                 var header = new Row('');
                 header.set(0, new Cell('&nbsp;', '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'member_jobs.applied_on');\">Applied On</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'members.lastname');\">Member</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'members.lastname');\">Applicant</a>", '', 'header'));
                 header.set(3, new Cell('Job Applied', '', 'header'));
                 header.set(4, new Cell('Resume', '', 'header'));
                 header.set(5, new Cell('Status', '', 'header'));
@@ -333,7 +414,7 @@ function update_applicants() {
                     row.set(1, new Cell(applied_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     // member details
-                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_new">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_blank">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
                     
                     var phone_num = '';
                     if (phone_nums[i].childNodes.length > 0) {
@@ -342,7 +423,7 @@ function update_applicants() {
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + phone_num + '</div>' + "\n";
                     
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a href="mailto:' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
-                    short_desc = short_desc + '<br/><a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=referrers" target="_new">View Referrers</a>' + "\n";
+                    short_desc = short_desc + '<br/><a href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=referrers" target="_blank">View Referrers</a>' + "\n";
                     row.set(2, new Cell(short_desc, '', 'cell'));
                     
                     // job applied
@@ -353,21 +434,24 @@ function update_applicants() {
                     row.set(3, new Cell(job_details, '', 'cell'));
                     
                     // resume details
-                    var resume_details = '<a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">Applied</a>';
+                    var resume_details = 'No Resume';
+                    if (applied_resume_ids[i].childNodes.length > 0) {
+                        resume_details = '<a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">By Candidate</a>';
+                    }
                     
                     if (resume_ids[i].childNodes.length > 0) {
                         resume_details = '<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">Submitted</a>';
                     }
                     
-                    resume_details = resume_details + '&nbsp;|&nbsp;<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">All/Refer</a><br/><br/>';
-                    resume_details = resume_details + '<span style="color: #666666;">YEL: ' + yel_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
-                    resume_details = resume_details + '<span style="color: #666666;">Self: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
+                    resume_details = resume_details + '&nbsp;|&nbsp;<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">All/Submit</a><br/><br/>';
+                    resume_details = resume_details + '<span style="color: #666666;">YE: ' + yel_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
+                    resume_details = resume_details + '<span style="color: #666666;">Candidate: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
                     row.set(4, new Cell(resume_details, '', 'cell'));
                     
                     // status
                     var status = 'N/A';
                     if (referred_ons[i].childNodes.length > 0) {
-                        status = '<span class="referred">Referred On:</span> ' + referred_ons[i].childNodes[0].nodeValue;
+                        status = '<span class="referred">Submitted On:</span> ' + referred_ons[i].childNodes[0].nodeValue;
                     }
                     
                     if (agreed_terms_ons[i].childNodes.length > 0) {
@@ -666,7 +750,7 @@ function update_new_applicants() {
 
                 var header = new Row('');
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_applicants', 'referral_buffers.requested_on');\">Created On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_applicants', 'referral_buffers.candidate_name');\">Applicant</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_applicants', 'referral_buffers.candidate_name');\">Potential Applicant</a>", '', 'header'));
                 header.set(2, new Cell('Job Applied', '', 'header'));
                 header.set(3, new Cell('Resume', '', 'header'));
                 header.set(4, new Cell('Progress', '', 'header'));
@@ -849,6 +933,7 @@ function update_members() {
         params = params + '&seeking=' + encodeURIComponent($('search_seeking').value);
     } else {
         params = params + '&show_all=1';
+        $('candidates_search_form').reset();
     }
     
     var uri = root + "/employees/members_action.php";
@@ -870,7 +955,7 @@ function update_members() {
             
             if (txt == '0') {
                 set_status('');
-                $('div_members').set('html', '<div class="empty_results">No members to show.</div>');
+                $('div_members').set('html', '<div class="empty_results">No members to found with the search criteria.<br/>Please try again.</div>');
             } else {
                 var total_pages = xml.getElementsByTagName('total_pages');
                 
@@ -893,24 +978,22 @@ function update_members() {
                 var members = xml.getElementsByTagName('member_name');
                 var phone_nums = xml.getElementsByTagName('phone_num');
                 var is_actives = xml.getElementsByTagName('active');
-                var joined_ons = xml.getElementsByTagName('formatted_joined_on');
-                var total_years = xml.getElementsByTagName('total_work_years');
+                var updated_ons = xml.getElementsByTagName('formatted_updated_on');
                 var is_seeking_jobs = xml.getElementsByTagName('is_active_seeking_job');
-                var can_travels = xml.getElementsByTagName('can_travel_relocate');
-                var notice_periods = xml.getElementsByTagName('notice_period');
-                var exp_sal_currencies = xml.getElementsByTagName('expected_salary_currency');
-                var exp_sal_starts = xml.getElementsByTagName('expected_salary');
-                var exp_sal_ends = xml.getElementsByTagName('expected_salary_end');
+                var positions = xml.getElementsByTagName('position_title');
+                var employers = xml.getElementsByTagName('employer');
+                var work_froms = xml.getElementsByTagName('formatted_work_from');
+                var work_tos = xml.getElementsByTagName('formatted_work_to');
+                var applied_jobs = xml.getElementsByTagName('num_jobs_applied');
                 
                 var members_table = new FlexTable('members_table', 'members');
 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.joined_on');\">Joined On</a>", '', 'header'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.updated_on');\">Updated On</a>", '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.lastname');\">Member</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.total_work_years');\">Total Work Years</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.notice_period');\">Notice Period (Months)</a>", '', 'header'));
-                header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.expected_salary');\">Expected Salary</a>", '', 'header'));
-                header.set(5, new Cell('&nbsp;', '', 'header action'));
+                header.set(2, new Cell('Current/Latest Position', '', 'header'));
+                header.set(3, new Cell('&nbsp;', '', 'header'));
+                header.set(4, new Cell('&nbsp;', '', 'header action'));
                 members_table.set(0, header);
                 
                 for (var i=0; i < emails.length; i++) {
@@ -922,11 +1005,11 @@ function update_members() {
                         is_active_seeking = false;
                     }
                     
-                    // joined on
-                    row.set(0, new Cell(joined_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    // updated on
+                    row.set(0, new Cell(updated_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     // member details
-                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_new">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_blank">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
                     
                     if (!is_active_seeking) {
                         short_desc = '<span style="color: #ff0000; font-weight: bold;">[!]</span> ' + short_desc;
@@ -939,56 +1022,32 @@ function update_members() {
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + phone_num + '</div>' + "\n";
                     
                     short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a href="mailto:' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
-                    row.set(2, new Cell(short_desc, '', 'cell'));
+                    row.set(1, new Cell(short_desc, '', 'cell'));
                     
-                    // total work years
-                    var total_work_years = 'N/A';
-                    if (total_years[i].childNodes.length > 0) {
-                        total_work_years = total_years[i].childNodes[0].nodeValue;
-                    }
-                    row.set(3, new Cell(total_work_years, '', 'cell'));
-                    
-                    // notice period
-                    var notice_period = 'N/A';
-                    if (notice_periods[i].childNodes.length > 0) {
-                        notice_period = notice_periods[i].childNodes[0].nodeValue;
-                    }
-                    row.set(4, new Cell(notice_period, '', 'cell'));
-                    
-                    // salary
-                    var sal_currency = '???';
-                    if (exp_sal_currencies[i].childNodes.length > 0) {
-                        sal_currency = exp_sal_currencies[i].childNodes[0].nodeValue;
-                    }
-                    
-                    var sal_start = '';
-                    if (exp_sal_starts[i].childNodes.length > 0) {
-                        var salary = parseFloat(exp_sal_starts[i].childNodes[0].nodeValue);
-                        if (salary > 0.00) {
-                            sal_start = exp_sal_starts[i].childNodes[0].nodeValue;
-                        }
-                    } 
-                    
-                    var sal_end = '';
-                    if (exp_sal_ends[i].childNodes.length > 0) {
-                        var salary = parseFloat(exp_sal_ends[i].childNodes[0].nodeValue);
-                        if (salary > 0.00) {
-                            sal_end = exp_sal_ends[i].childNodes[0].nodeValue;
+                    // current/latest position details
+                    var pos_desc = 'N/A';
+                    if (positions[i].childNodes.length > 0) {
+                        pos_desc = '<span class="latest_title">' + positions[i].childNodes[0].nodeValue + '</span><br/>';
+                        pos_desc = pos_desc + '<span class="latest_employer">' + employers[i].childNodes[0].nodeValue + '</span><br/><br/>';
+                        pos_desc = pos_desc + '<div class="latest_period">' + work_froms[i].childNodes[0].nodeValue + ' to ';
+                        
+                        if (work_tos[i].childNodes.length > 0) {
+                            pos_desc = pos_desc + work_tos[i].childNodes[0].nodeValue;
+                        } else {
+                            pos_desc = pos_desc + 'present';
                         }
                     }
-                    
-                    var salary_str = 'N/A';
-                    if (!isEmpty(sal_start)) {
-                        salary_str = sal_currency + '$ ' + sal_start;
+                    row.set(2, new Cell(pos_desc, '', 'cell'));
+
+                    // apply job
+                    var job_count = '0 applied';
+                    if (applied_jobs[i].childNodes[0].nodeValue > 0) {
+                        job_count = applied_jobs[i].childNodes[0].nodeValue + ' applied';
                     }
+                    job_count = '<span class="job_count">' + job_count + '</span>'
+                    row.set(3, new Cell('<input type="button" value="Apply Jobs" onClick="show_apply_jobs_popup(\'' + emails[i].childNodes[0].nodeValue + '\');" /><br/>' + job_count, '', 'cell action'));
                     
-                    if (isEmpty(sal_end) && !isEmpty(sal_start)) {
-                        salary_str = 'from ' + salary_str;
-                    } else if (!isEmpty(sal_end) && !isEmpty(sal_start)) {
-                        salary_str = salary_str + ' to ' + sal_end;
-                    }
-                    row.set(5, new Cell(salary_str, '', 'cell'));
-                    
+                    // admin shortcuts
                     var actions = '';
                     if (is_actives[i].childNodes[0].nodeValue == 'Y') {
                         actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
@@ -996,7 +1055,7 @@ function update_members() {
                     } else {
                         actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
                     }                    
-                    row.set(6, new Cell(actions, '', 'cell action'));
+                    row.set(4, new Cell(actions, '', 'cell action'));
                     
                     members_table.set((parseInt(i)+1), row);
                 }
@@ -1099,7 +1158,7 @@ function make_member_from(_app_id) {
                 return;
             }
             
-            location.replace('member.php?member_email_addr=' + txt);
+            location.replace('members.php?pages=applicants');
         },
         onRequest: function(instance) {
             set_status('Signing up applicant...');
@@ -1142,7 +1201,7 @@ function transfer_to_member(_app_id) {
                 return;
             }
             
-            location.replace('member.php?member_email_addr=' + txt);
+            location.replace('members.php?pages=applicants');
         },
         onRequest: function(instance) {
             set_status('Transferring applicant...');
@@ -1660,6 +1719,81 @@ function close_progress_popup(_is_save) {
     }
 }
 
+function show_apply_jobs_popup(_id) {
+    $('apply_member_email').value = _id;
+    show_window('apply_job_window');
+    window.scrollTo(0, 0);
+    filter_jobs();
+}
+
+function close_apply_jobs_popup(_is_apply_job) {
+    if (_is_apply_job) {
+        var selected_jobs = jobs_list.get_selected_values();
+        
+        if (selected_jobs.length <= 0 && isEmpty($('selected_jobs').value)) {
+            alert('Please select at least one job.');
+            return;
+        }
+        
+        if (!confirm('Confirm to apply the selected jobs for candidate?')) {
+            return;
+        }
+        
+        var params = 'id=' + $('apply_member_email').value;
+        params = params + '&action=apply_jobs';
+        params = params + '&employee=' + user_id;
+        
+        var selected_job_str = '';
+        if (selected_jobs.length > 0) {
+            for (var i=0; i < selected_jobs.length; i++) {
+                var item_value = selected_jobs[i].split('|');
+                selected_job_str = selected_job_str + item_value[item_value.length-1];
+
+                if (i < selected_jobs.length-1) {
+                    selected_job_str = selected_job_str + ',';
+                }
+            }
+        }
+        params = params + '&jobs=' + selected_job_str;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('An error occured while applying job.');
+                    return;
+                }
+                
+                if (txt.indexOf('failed_jobs') > -1) {
+                    var job_titles = xml.getElementsByTagName('title');
+                    var employers = xml.getElementsByTagName('employer');
+                    var expire_ons = xml.getElementsByTagName('expire_on');
+                    
+                    var error_msg = 'The following jobs failed to apply:' + "\n\n";
+                    for (var i=0; i < job_titles.length; i++) {
+                        error_msg = error_msg + '- ' + job_titles[i].childNodes[0].nodeValue + ' (' + employers[i].childNodes[0].nodeValue + ') [exp: ' + expire_ons[i].childNodes[0].nodeValue + ']' + "\n";
+                    }
+                    
+                    alert(error_msg);
+                    return;
+                }
+                
+                set_status('');
+                close_window('apply_job_window');
+                location.replace('members.php?page=applicants');
+            },
+            onRequest: function(instance) {
+                set_status('Applying job...');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('apply_job_window');
+    }
+}
 
 function onDomReady() {
     initialize_page();
@@ -1675,6 +1809,8 @@ function onDomReady() {
             show_new_applicants();
             break;
    }
+   
+   $('jobs_selector').addEvent('click', get_job_description);
    
    sliding_filter_fx = new Fx.Slide('div_main_filter', {
        mode: 'vertical'

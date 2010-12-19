@@ -328,21 +328,21 @@ class MemberSearch {
         
         $columns = "members.email_addr, members.phone_num, members.active, 
                     CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
-                    DATE_FORMAT(members.joined_on, '%e %b, %Y') AS formatted_joined_on, 
-                    members.total_work_years, members.is_active_seeking_job, 
-                    members.can_travel_relocate, members.notice_period, 
-                    members.expected_salary_currency, members.expected_salary, 
-                    members.expected_salary_end";
+                    DATE_FORMAT(members.updated_on, '%e %b, %Y') AS formatted_updated_on, 
+                    members.is_active_seeking_job, COUNT(DISTINCT member_jobs.id) AS num_jobs_applied,
+                    NULL AS position_title, NULL AS employer, 
+                    NULL AS formatted_work_from, NULL AS formatted_work_to ";
         
         // if (array_key_exists('seeking', $match_against)) {
         //     $columns .= ", ". $match_against['seeking']['member']. " AS seeking_score";
         // }
         
-        $joins = "";
+        $joins = "LEFT JOIN member_jobs ON member_jobs.member = members.email_addr";
+        
         if (!empty($this->position) || !empty($this->employer) || 
             $this->specialization > 0 || $this->emp_specialization > 0 || 
             $this->emp_desc > 0) {
-            $joins = "LEFT JOIN member_job_profiles ON member_job_profiles.member = members.email_addr";
+            $joins .= "LEFT JOIN member_job_profiles ON member_job_profiles.member = members.email_addr";
         }
         
         if (array_key_exists('seeking', $match_against)) {
@@ -351,7 +351,7 @@ class MemberSearch {
         
         // 5. setup query
         $query = "";
-        $query = "SELECT ". $columns. " 
+        $query = "SELECT DISTINCT ". $columns. " 
                   FROM members 
                   ". $joins. " 
                   WHERE ";
@@ -451,6 +451,7 @@ class MemberSearch {
         //     return $query;
         // }
         
+        $query .= " GROUP BY members.email_addr";
         $query .= " ORDER BY ". $this->order_by;
         
         $limit = "";
@@ -563,8 +564,8 @@ class MemberSearch {
         // paginate
         $total_pages = ceil($this->total / $this->limit);
         if ($total_pages <= 0) {
-            echo $this->query;
-            return 0;
+            //echo $this->query;
+            return array();
         }
         
         $start = microtime();

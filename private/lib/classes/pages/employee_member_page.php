@@ -756,6 +756,10 @@ class EmployeeMemberPage extends Page {
                                     <td class="field"><input class="salary" type="text" id="notice_period" value="<?php echo $profile['notice_period'] ?>" /> months</td>
                                 </tr>
                                 <tr>
+                                    <td class="label"><label for="total_years">Total Years of Working Experience:</label></td>
+                                    <td class="field"><input class="salary" type="text" id="total_years" value="<?php echo $profile['total_work_years'] ?>" /> years</td>
+                                </tr>
+                                <tr>
                                     <td class="buttons_bar" colspan="2"><input type="button" onClick="save_career();" value="Save" /></td>
                                 </tr>
                             </table>

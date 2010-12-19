@@ -19,6 +19,7 @@ if ($_POST['action'] == 'save_census_answers') {
     $data['hrm_gender'] = desanitize($_POST['gender']);
     $data['hrm_ethnicity'] = desanitize($_POST['ethnicity']);
     $data['hrm_birthdate'] = desanitize($_POST['birthdate']);
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
@@ -33,6 +34,7 @@ if ($_POST['action'] == 'save_census_answers') {
 if ($_POST['action'] == 'save_is_active_job_seeker') {
     $data = array();
     $data['is_active_seeking_job'] = (strtoupper($_POST['choice']) == 'YES') ? true : false;
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
@@ -47,6 +49,7 @@ if ($_POST['action'] == 'save_is_active_job_seeker') {
 if ($_POST['action'] == 'save_travel_relocate') {
     $data = array();
     $data['can_travel_relocate'] = (strtoupper($_POST['choice']) == 'YES') ? "Y" : "N";
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
@@ -62,6 +65,7 @@ if ($_POST['action'] == 'save_travel_relocate') {
 if ($_POST['action'] == 'save_seeking') {
     $data = array();
     $data['seeking'] = $_POST['text'];
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
@@ -76,6 +80,7 @@ if ($_POST['action'] == 'save_seeking') {
 if ($_POST['action'] == 'save_reason_for_leaving') {
     $data = array();
     $data['reason_for_leaving'] = $_POST['text'];
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
@@ -90,6 +95,7 @@ if ($_POST['action'] == 'save_reason_for_leaving') {
 if ($_POST['action'] == 'save_current_job_desc') {
     $data = array();
     $data['current_position'] = $_POST['text'];
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
@@ -104,6 +110,7 @@ if ($_POST['action'] == 'save_current_job_desc') {
 if ($_POST['action'] == 'save_notice_period') {
     $data = array();
     $data['notice_period'] = is_numeric($_POST['text']) ? $_POST['text'] : "0";
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
@@ -120,6 +127,7 @@ if ($_POST['action'] == 'save_current_salary') {
     $data['current_salary_currency'] = $_POST['currency'];
     $data['current_salary'] = $_POST['start'];
     $data['current_salary_end'] = $_POST['end'];
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
@@ -150,6 +158,7 @@ if ($_POST['action'] == 'save_expected_salary') {
 if ($_POST['action'] == 'save_job_loc_pref') {
     $data = array();
     $data['preferred_job_location_'. $_POST['pref']] = $_POST['country'];
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {
@@ -186,6 +195,13 @@ if ($_POST['action'] == 'save_job_profile') {
             echo 'ko';
             exit();
         }
+    }
+    
+    $data = array();
+    $data['updated_on'] = date('Y-m-d');
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
     }
     
     echo 'ok';

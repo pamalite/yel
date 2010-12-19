@@ -37,6 +37,7 @@ if ($_POST['action'] == 'save_profile') {
     $data['hrm_gender'] = $_POST['hrm_gender'];
     $data['hrm_ethnicity'] = $_POST['hrm_ethnicity'];
     $data['hrm_birthdate'] = $_POST['hrm_birthdate'];
+    $data['updated_on'] = $today;
     
     $member = NULL;
     if ($mode == 'update') {
@@ -604,6 +605,7 @@ if ($_POST['action'] == 'save_career') {
     $data['reason_for_leaving'] = $_POST['reason_leaving'];
     $data['current_position'] = $_POST['current_position'];
     $data['notice_period'] = $_POST['notice_period'];
+    $data['total_work_years'] = $_POST['total_years'];
     $data['expected_salary_currency'] = $_POST['expected_currency'];
     $data['expected_salary'] = $_POST['expected_salary'];
     $data['expected_salary_end'] = $_POST['expected_salary_end'];
@@ -612,6 +614,7 @@ if ($_POST['action'] == 'save_career') {
     $data['current_salary_end'] = $_POST['current_salary_end'];
     $data['preferred_job_location_1'] = (empty($_POST['pref_job_loc_1'])) ? 'NULL' : $_POST['pref_job_loc_1'];
     $data['preferred_job_location_2'] = (empty($_POST['pref_job_loc_2'])) ? 'NULL' : $_POST['pref_job_loc_2'];
+    $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
     if ($member->update($data) === false) {

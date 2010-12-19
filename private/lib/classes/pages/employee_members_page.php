@@ -24,6 +24,7 @@ class EmployeeMembersPage extends Page {
     public function insert_employee_members_css() {
         $this->insert_css();
         
+        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/list_box.css">'. "\n";
         echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_members.css">'. "\n";
     }
     
@@ -31,6 +32,7 @@ class EmployeeMembersPage extends Page {
         $this->insert_scripts();
         
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/list_box.js"></script>'. "\n";
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_members.js"></script>'. "\n";
     }
     
@@ -149,7 +151,7 @@ class EmployeeMembersPage extends Page {
         <div class="menu">
             <?php $style = 'background-color: #CCCCCC;'; ?>
             <ul class="menu">
-                <li id="item_new_applicants" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_new_applicants();">New Applicants</a></li>
+                <li id="item_new_applicants" style="<?php echo ($this->current_page == 'applications') ? $style : ''; ?>"><a class="menu" onClick="show_new_applicants();">Potential Applicants</a></li>
                 <li id="item_applicants" style="<?php echo ($this->current_page == 'members') ? $style : ''; ?>"><a class="menu" onClick="show_applicants();">Applicants</a></li>
                 <li id="item_members" style="<?php echo ($this->current_page == 'search') ? $style : ''; ?>"><a class="menu" onClick="show_members();">Candidates</a></li>
             </ul>
@@ -268,71 +270,73 @@ class EmployeeMembersPage extends Page {
                 </a>
             </div>
             <div id="div_search" class="search">
-                <table id="search_table">
-                    <tr>
-                        <td class="search_form">
-                            <table id="search_form_table">
-                                <tr>
-                                    <td class="label"><label for="search_email">E-mail: </label></td>
-                                    <td class="field"><input type="text" class="field" id="search_email" /></td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="search_name">Name:</label></td>
-                                    <td class="field"><input type="text" class="field" id="search_name" /></td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="search_position">Position:</label></td>
-                                    <td class="field"><input type="text" class="field" id="search_position" /></td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="search_specialization">Specialization:</label></td>
-                                    <td class="field"><?php $this->generate_industries(array(), 'search_specialization'); ?></td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="search_employer">Company:</label></td>
-                                    <td class="field"><input type="text" class="field" id="search_employer" /></td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="search_emp_desc">Company Description:</label></td>
-                                    <td class="field"><?php $this->generate_employer_description('search_emp_desc', -1); ?></td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="search_emp_specialization">Company Specialization:</label></td>
-                                    <td class="field"><?php $this->generate_industries(array(), 'search_emp_specialization'); ?></td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="search_total_years">Total Work Years:</label></td>
-                                    <td class="field"><input type="text" class="field years" id="search_total_years" maxlength="2" /> years</td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="search_notice_period">Notice Period:</label></td>
-                                    <td class="field"><input type="text" class="field years" id="search_notice_period" maxlength="2" /> months</td>
-                                </tr>
-                                <tr>
-                                    <td class="label"><label for="search_expected_salary_start">Expected Salary:</label></td>
-                                    <td class="field">
-                                        <?php $this->generate_currencies('search_expected_salary_currency'); ?>
-                                        <input type="text" class="field salary" id="search_expected_salary_start" />
-                                        to 
-                                        <input type="text" class="field salary" id="search_expected_salary_end" />
-                                    </td>
-                                </tr>
+                <form id="candidates_search_form">
+                    <table id="search_table">
+                        <tr>
+                            <td class="search_form">
+                                <table id="search_form_table">
+                                    <tr>
+                                        <td class="label"><label for="search_email">E-mail: </label></td>
+                                        <td class="field"><input type="text" class="field" id="search_email" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label"><label for="search_name">Name:</label></td>
+                                        <td class="field"><input type="text" class="field" id="search_name" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label"><label for="search_position">Position:</label></td>
+                                        <td class="field"><input type="text" class="field" id="search_position" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label"><label for="search_specialization">Specialization:</label></td>
+                                        <td class="field"><?php $this->generate_industries(array(), 'search_specialization'); ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label"><label for="search_employer">Company:</label></td>
+                                        <td class="field"><input type="text" class="field" id="search_employer" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label"><label for="search_emp_desc">Company Description:</label></td>
+                                        <td class="field"><?php $this->generate_employer_description('search_emp_desc', -1); ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label"><label for="search_emp_specialization">Company Specialization:</label></td>
+                                        <td class="field"><?php $this->generate_industries(array(), 'search_emp_specialization'); ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label"><label for="search_total_years">Total Work Years:</label></td>
+                                        <td class="field"><input type="text" class="field years" id="search_total_years" maxlength="2" /> years</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label"><label for="search_notice_period">Notice Period:</label></td>
+                                        <td class="field"><input type="text" class="field years" id="search_notice_period" maxlength="2" /> months</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label"><label for="search_expected_salary_start">Expected Salary:</label></td>
+                                        <td class="field">
+                                            <?php $this->generate_currencies('search_expected_salary_currency'); ?>
+                                            <input type="text" class="field salary" id="search_expected_salary_start" />
+                                            to 
+                                            <input type="text" class="field salary" id="search_expected_salary_end" />
+                                        </td>
+                                    </tr>
                                 
-                                <tr>
-                                    <td class="label"><label for="search_seeking">Goals &amp; Experiences:</label></td>
-                                    <td class="field">
-                                        <textarea class="field" id="search_seeking"></textarea>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td class="search_buttons">
-                            <input type="button" class="search_button" value="Search" onClick="update_members();" />
-                            <hr />
-                            <input type="button" class="search_button" value="Show All" onClick="update_members('all');" />
-                        </td>
-                    </tr>
-                </table>
+                                    <tr>
+                                        <td class="label"><label for="search_seeking">Goals &amp; Experiences:</label></td>
+                                        <td class="field">
+                                            <textarea class="field" id="search_seeking"></textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td class="search_buttons">
+                                <input type="button" class="search_button" value="Search" onClick="update_members();" />
+                                <hr />
+                                <input type="button" class="search_button" value="Show All" onClick="update_members('all');" />
+                            </td>
+                        </tr>
+                    </table>
+                </form>
             </div>
             <!-- end search form -->
             
@@ -478,6 +482,58 @@ class EmployeeMembersPage extends Page {
                 <input type="button" value="Cancel" onClick="close_progress_popup(false);" />
             </div>
         </div>
+        
+        <div id="apply_job_window" class="popup_window">
+            <div class="popup_window_title">Apply Job</div>
+            <form id="apply_job_form" onSubmit="return false;">
+                <input type="hidden" id="apply_member_email" value="" />
+                <div id="div_apply_job_form" class="apply_job_form">
+                    <table class="jobs_selection">
+                        <tr>
+                            <td class="jobs_list">
+                            <?php
+                                $employers = $this->get_employers();
+                                if (!empty($employers) && $employers !== false) {
+                            ?>
+                                <select id="apply_employers" class="field" onChange="filter_jobs();">
+                            <?php
+                                    foreach($employers as $employer) {
+                            ?>
+                                    <option value="<?php echo $employer['id']; ?>"><?php echo $employer['employer']; ?></option>
+                            <?php
+                                    }
+                            ?>
+                                </select>
+                            <?php
+                                } else {
+                            ?>
+                                <span class="no_employers">[No employers with opened jobs found.]</span>
+                            <?php
+                                }
+                            ?>
+                                <div id="jobs_selector">
+                                    Select an employer in the dropdown list above.
+                                </div>
+                                <div id="selected_job_counter">
+                                    <span id="counter_lbl">0</span> jobs selected.
+                                </div>
+                            </td>
+                            <td class="separator"></td>
+                            <td>
+                                <div id="job_description">
+                                    Select a job in the jobs list.
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="popup_window_buttons_bar">
+                    <input type="button" id="apply_btn" value="Apply" onClick="close_apply_jobs_popup(true);" />
+                    <input type="button" value="Cancel" onClick="close_apply_jobs_popup(false);" />
+                </div>
+            </form>
+        </div>
+        
         <?php
     }
 }
