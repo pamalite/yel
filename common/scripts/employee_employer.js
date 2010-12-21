@@ -79,7 +79,7 @@ function validate_profile_form() {
     
     // is new employer?
     if (employer_id == '0') {
-        if (is_valid_user_id($('user_id').value)) {
+        if (!is_valid_user_id($('user_id').value)) {
             alert('User ID is invalid.');
             return false;
         }
