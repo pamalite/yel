@@ -374,12 +374,14 @@ class Employer implements Model {
     public function extendSubscription($_period) {
         if ($_period > 0) {
             $result = $this->getSubscriptionsDetails();
-            $query = '';
+            $query = "";
             
-            if ($result[0]['expired'] < 0) {
+            if (is_null($result[0]['expired']) || empty($result[0]['expired']) || 
+                $result[0]['expired'] < 0) {
                 // extend from today
                 $query = "UPDATE employers SET 
-                          subscription_expire_on = DATE_ADD(NOW(), INTERVAL ". $_period. " MONTH) 
+                          subscription_expire_on = DATE_ADD(NOW(), INTERVAL ". $_period. " MONTH), 
+                          subscription_suspended = FALSE 
                           WHERE id = '". $this->id. "'";
             } else {
                 // extend from the expiry
