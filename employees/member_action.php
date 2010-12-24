@@ -543,13 +543,13 @@ if ($_POST['action'] == 'apply_job') {
     $body .= 'Content-Disposition: attachment'. "\n";
     $body .= $attachment. "\n";
     $body .= '--yel_mail_sep_'. $attached_filename. "--\n\n";
-    // $send = mail($employer->getEmailAddress(), $subject, $body, $headers);
+    $send = mail($employer->getEmailAddress(), $subject, $body, $headers);
     
-    $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
-    fwrite($handle, 'To: '. $employer->getEmailAddress(). "\n\n");
-    fwrite($handle, 'Header: '. $headers. "\n\n");
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $body);
+    // $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+    // fwrite($handle, 'To: '. $employer->getEmailAddress(). "\n\n");
+    // fwrite($handle, 'Header: '. $headers. "\n\n");
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $body);
     
     if ($send === false) {
         fwrite($handle, 'not send due to errors');
