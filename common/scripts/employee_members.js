@@ -347,7 +347,7 @@ function update_applicants() {
     if (!isEmpty(resume_id)) {
         params = params + '&resume_id=' + resume_id;
     }
-    alert(params);
+    
     var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
