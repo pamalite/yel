@@ -16,31 +16,14 @@ if (!isset($_POST['action'])) {
 }
 
 if ($_POST['action'] == 'get_applications') {
-    $order_by = 'referrals.referred_on desc';
+    $order_by = 'applied_on desc';
 
     if (isset($_POST['order_by'])) {
         $order_by = $_POST['order_by'];
     }
     
     $member = new Member($_POST['id']);
-    $referral = new Referral();
-    
-    $criteria = array(
-        'columns' => "referrals.id, referrals.job AS job_id, jobs.alternate_employer, 
-                      employers.name AS employer, jobs.title AS job, 
-                      resumes.file_name AS `resume`, referrals.`resume` AS resume_id, 
-                      referrals.employer_agreed_terms_on, referrals.employed_on, 
-                      DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
-                      DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
-                      DATE_FORMAT(referrals.referee_confirmed_hired_on, '%e %b, %Y') AS formatted_confirmed_on", 
-        'joins' => "resumes ON resumes.id = referrals.`resume`, 
-                    jobs ON jobs.id = referrals.job, 
-                    employers ON employers.id = jobs.employer", 
-        'match' => "referrals.referee = '". $member->getId(). "'",
-        'order' => $order_by
-    );
-    
-    $result = $referral->find($criteria);
+    $result = $member->getAllAppliedJobs($order_by);
     foreach ($result as $i=>$row) {
         if (!is_null($row['alternate_employer']) && !empty($row['alternate_employer'])) {
             $result[$i]['employer'] = $row['alternate_employer'];

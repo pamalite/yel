@@ -304,59 +304,13 @@ if ($_POST['action'] == 'add_referee') {
 }
 
 if ($_POST['action'] == 'get_applications') {
-    $match = "referrals.referee = '". $_POST['id']. "'";
-    if (!empty($_POST['filter'])) {
-        $match .= "AND ";
-        switch ($_POST['filter']) {
-            case 'employed':
-                $match .= "(referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00') AND 
-                           (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 
-                           (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00')";
-                break;
-            case 'rejected':
-                $match .= "(referrals.employer_rejected_on IS NOT NULL AND referrals.employer_rejected_on <> '0000-00-00')";
-                break;
-            case 'removed':
-                $match .= "(referrals.employer_removed_on IS NOT NULL AND referrals.employer_removed_on <> '0000-00-00')";
-                break;
-            case 'viewed':
-                $match .= "(referrals.employer_agreed_terms_on IS NOT NULL AND referrals.employer_agreed_terms_on <> '0000-00-00') AND 
-                           (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00') AND 
-                           (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 
-                           (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00')";
-                break;
-            case 'not_viewed':
-                $match .= "(referrals.employer_agreed_terms_on IS NULL OR referrals.employer_agreed_terms_on = '0000-00-00') AND 
-                           (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00') AND 
-                           (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 
-                           (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00')";
-                break;
-        }
+    $order_by = "applied_on DESC";
+    if (!empty($_POST['order_by'])) {
+        $order_by = $_POST['order_by'];
     }
     
-    $criteria = array(
-        'columns' => "referrals.id, referrals.member AS referrer, 
-                      jobs.title AS job, jobs.id AS job_id, 
-                      employers.name AS employer, employers.id AS employer_id, 
-                      referrals.resume AS resume_id, resumes.file_name, 
-                      CONCAT(members.lastname, ', ', members.firstname) AS referrer_name, 
-                      DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
-                      DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_agreed_terms_on, 
-                      DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
-                      DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
-                      DATE_FORMAT(referrals.employer_removed_on, '%e %b, %Y') AS formatted_employer_removed_on, 
-                      IF(referrals.testimony IS NULL OR referrals.testimony = '', '0', '1') AS has_testimony, 
-                      IF(referrals.employer_remarks IS NULL OR referrals.employer_remarks = '', '0', '1') AS has_employer_remarks", 
-        'joins' => "members ON members.email_addr = referrals.member, 
-                    jobs ON jobs.id = referrals.job, 
-                    employers ON employers.id = jobs.employer, 
-                    resumes ON resumes.id = referrals.resume", 
-        'match' => $match,
-        'order' => $_POST['order_by']
-    );
-    
-    $referral = new Referral();
-    $result = $referral->find($criteria);
+    $member = new Member($_POST['id']);
+    $result = $member->getAllAppliedJobs($order_by);
     
     if (empty($result) || count($result) <= 0) {
         echo '0';
@@ -523,6 +477,11 @@ if ($_POST['action'] == 'apply_job') {
     $job = new Job();
     $result = $job->find($criteria);
     
+    $has_many_jobs = false;
+    if (count($jobs) > 1) {
+        $has_many_jobs = true;
+    }
+    
     $employer = new Employer($result[0]['employer_id']);
     
     $mail_lines = file('../private/mail/employer_new_job_application.txt');
@@ -559,7 +518,12 @@ if ($_POST['action'] == 'apply_job') {
     $attachment = chunk_split(base64_encode(file_get_contents($GLOBALS['resume_dir']. '/'. $resume_file_raw)));
     
     // 3. make mail with attachment
-    $subject = 'New Applicant from YellowElevator';
+    $subject = '';
+    if ($has_many_jobs) {
+        $subject = 'Multiple Jobs Applications - Resume #'. $_POST['resume'];
+    } else {
+        $subject = trim(substr($job_list, 2)). ' - Resume #'. $_POST['resume'];
+    }
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     $headers .= 'Cc: '. $yel_email. "\n";
     $headers .= 'MIME-Version: 1.0'. "\n";
@@ -579,19 +543,19 @@ if ($_POST['action'] == 'apply_job') {
     $body .= 'Content-Disposition: attachment'. "\n";
     $body .= $attachment. "\n";
     $body .= '--yel_mail_sep_'. $attached_filename. "--\n\n";
-    $send = mail($employer->getEmailAddress(), $subject, $body, $headers);
+    // $send = mail($employer->getEmailAddress(), $subject, $body, $headers);
     
-    // $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
-    // fwrite($handle, 'To: '. $employer->getEmailAddress(). "\n\n");
-    // fwrite($handle, 'Header: '. $headers. "\n\n");
-    // fwrite($handle, 'Subject: '. $subject. "\n\n");
-    // fwrite($handle, $body);
-    // 
-    // if ($send === false) {
-    //     fwrite($handle, 'not send due to errors');
-    // }
-    // 
-    // fclose($handle);
+    $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+    fwrite($handle, 'To: '. $employer->getEmailAddress(). "\n\n");
+    fwrite($handle, 'Header: '. $headers. "\n\n");
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $body);
+    
+    if ($send === false) {
+        fwrite($handle, 'not send due to errors');
+    }
+    
+    fclose($handle);
     
     echo 'ok';
     exit();
@@ -652,6 +616,10 @@ if ($_POST['action'] == 'save_job_profile') {
             exit();
         }
     }
+    
+    $data = array();
+    $data['updated_on'] = date('Y-m-d');
+    $member->update($data);
     
     echo 'ok';
     exit();

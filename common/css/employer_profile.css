@@ -12,6 +12,7 @@
 .label {;
     vertical-align: top;
     font-weight: bold;
+    text-align: right;
 }
 
 .title {

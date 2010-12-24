@@ -182,6 +182,7 @@ function save_profile() {
     params = params + '&name=' + $('name').value;
     params = params + '&contact_person=' + $('contact_person').value;
     params = params + '&phone_num=' + $('phone_num').value;
+    params = params + '&fax_num=' + $('fax_num').value;
     params = params + '&address=' + $('address').value;
     params = params + '&state=' + $('state').value;
     params = params + '&zip=' + $('zip').value;

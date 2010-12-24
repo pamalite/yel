@@ -18,6 +18,7 @@ var sliding_filter_fx = '';
 var sliding_search_fx = '';
 var return_page = '';
 var jobs_list = new ListBox('jobs_selector', 'jobs_list', true);
+var resume_id = '';
 
 function new_applicants_ascending_or_descending() {
     if (new_applicants_order == 'desc') {
@@ -242,6 +243,17 @@ function toggle_add_button() {
     }
 }
 
+function trace_resume() {
+    resume_id = prompt('Enter the resume #:');
+    
+    if (isEmpty(resume_id) || isNaN(resume_id)) {
+        alert('Cannot trace resume. Input is invalid.');
+        return;
+    } 
+    
+    update_applicants();
+}
+
 function do_filter() {
     filter_is_dirty = true;
     
@@ -290,7 +302,8 @@ function show_applicants() {
     current_section = 'applicants';
     return_page = 'applicants';
     
-    $('add_new_btn').setStyle('visibility', 'hidden');
+    $('add_new_btn').setStyle('display', 'none');
+    $('search_resume_btn').setStyle('display', 'inline');
     
     $('new_applicants').setStyle('display', 'none');
     $('applicants').setStyle('display', 'block');
@@ -331,6 +344,10 @@ function update_applicants() {
         }
     }
     
+    if (!isEmpty(resume_id)) {
+        params = params + '&resume_id=' + resume_id;
+    }
+    alert(params);
     var uri = root + "/employees/members_action.php";
     var request = new Request({
         url: uri,
@@ -338,6 +355,8 @@ function update_applicants() {
         onSuccess: function(txt, xml) {
             // set_status('<pre>' + txt + '</pre>');
             // return;
+            resume_id = '';
+            
             if (txt == 'ko') {
                 alert('An error occured while loading applicants.');
                 return false;
@@ -649,7 +668,8 @@ function show_new_applicants() {
     current_section = 'new_applicants';
     return_page = '';
     
-    $('add_new_btn').setStyle('visibility', 'visible');
+    $('add_new_btn').setStyle('display', 'inline');
+    $('search_resume_btn').setStyle('display', 'none');
     
     $('new_applicants').setStyle('display', 'block');
     $('applicants').setStyle('display', 'none');
@@ -1006,7 +1026,11 @@ function update_members() {
                     }
                     
                     // updated on
-                    row.set(0, new Cell(updated_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    var updated_on = 'New Entry';
+                    if (updated_ons[i].childNodes.length > 0) {
+                        updated_on = updated_ons[i].childNodes[0].nodeValue;
+                    }
+                    row.set(0, new Cell(updated_on, '', 'cell'));
                     
                     // member details
                     var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_blank">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";

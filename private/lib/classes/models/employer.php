@@ -263,6 +263,17 @@ class Employer implements Model {
         return false;
     }
     
+    public function isNew() {
+        $query = "SELECT is_new FROM employers WHERE id = '". $this->id. "' LIMIT 1";
+        if ($result = $this->mysqli->query($query)) {
+            if ($result[0]['is_new'] == '1') {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     public function isRegistered($_sha1) {
         if ($this->seed_id == 0) {
             return false;

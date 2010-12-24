@@ -355,6 +355,7 @@ if ($_POST['action'] == 'save_profile') {
     $data['license_num'] = $_POST['license_num'];
     $data['name'] = $_POST['name'];
     $data['phone_num'] = $_POST['phone_num'];
+    $data['fax_num'] = $_POST['fax_num'];
     $data['email_addr'] = $_POST['email_addr'];
     $data['contact_person'] = $_POST['contact_person'];
     $data['address'] = $_POST['address'];

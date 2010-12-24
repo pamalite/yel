@@ -960,5 +960,52 @@ class Member implements Model {
         $query = "DELETE FROM member_job_profiles WHERE id = ". $_id;
         return $this->mysqli->execute($query);
     }
+    
+    public function getAllAppliedJobs($_order = "") {
+        $order_by = "";
+        if (empty($_order)) {
+            $order_by = "ORDER BY applied_on DESC";
+        } else {
+            $order_by = "ORDER BY ". $_order;
+        }
+        
+        $query = "SELECT 'ref' AS tab, referrals.id, referrals.job AS job_id, jobs.alternate_employer, 
+                  employers.name AS employer, jobs.title AS job, 
+                  resumes.file_name AS `resume`, referrals.`resume` AS resume_id, 
+                  referrals.employer_agreed_terms_on, referrals.employed_on, 
+                  referrals.referred_on AS applied_on,
+                  DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
+                  DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_viewed_on,
+                  DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
+                  DATE_FORMAT(referrals.referee_confirmed_hired_on, '%e %b, %Y') AS formatted_confirmed_on 
+                  FROM referrals 
+                  LEFT JOIN jobs ON jobs.id = referrals.job 
+                  LEFT JOIN employers ON employers.id = jobs.employer 
+                  LEFT JOIN resumes ON resumes.id = referrals.`resume` 
+                  WHERE referrals.referee = '". $this->id. "' 
+                  UNION 
+                  SELECT 'buf', referral_buffers.id, referral_buffers.job, NULL, 
+                  employers.name AS employer, jobs.title AS job, 
+                  referral_buffers.resume_file_name, referral_buffers.resume_file_hash, NULL, NULL, 
+                  referral_buffers.requested_on, 
+                  DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y'),
+                  NULL, NULL, NULL 
+                  FROM referral_buffers 
+                  LEFT JOIN jobs ON jobs.id = referral_buffers.job 
+                  LEFT JOIN employers ON employers.id = jobs.employer 
+                  WHERE referral_buffers.candidate_email = '". $this->id. "' 
+                  UNION 
+                  SELECT 'job', member_jobs.id, member_jobs.job, NULL, 
+                  employers.name AS employer, jobs.title AS job, 
+                  NULL, member_jobs.`resume`, NULL, NULL, 
+                  member_jobs.applied_on, 
+                  DATE_FORMAT(member_jobs.applied_on, '%e %b, %Y'),
+                  NULL, NULL, NULL 
+                  FROM member_jobs 
+                  LEFT JOIN jobs ON jobs.id = member_jobs.job 
+                  LEFT JOIN employers ON employers.id = jobs.employer
+                  WHERE member_jobs.member = '". $this->id. "'". $order_by;
+        return $this->mysqli->query($query);
+    }
 }
 ?>

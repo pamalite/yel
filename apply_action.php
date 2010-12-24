@@ -20,6 +20,10 @@ if (isset($_SESSION['yel']['member']['id']) &&
     !empty($_SESSION['yel']['member']['id'])) {
     $member = new Member($_SESSION['yel']['member']['id']);
     $country_code = strtolower($member->getCountry());
+    
+    if (is_null($country_code) || empty($country_code) || $country_code === false) {
+        $country_code = 'my';
+    }
 }
 $branch_email = 'team.'. $country_code. '@yellowelevator.com';
 

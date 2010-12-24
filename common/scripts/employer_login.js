@@ -33,9 +33,16 @@ function login() {
             }
             
             var status = xml.getElementsByTagName('status');
+            var is_new = xml.getElementsByTagName('is_new');
             
             if (status[0].childNodes[0].nodeValue == 'ok') {
-                location.replace(root + '/employers/resumes.php');
+                if (is_new[0].childNodes[0].nodeValue == '1') {
+                    alert('First time login detected!' + "\n\nSince this is the first time you logged in, please change the password to prevent security breach.");
+                    location.replace(root + '/employers/profile.php');
+                } else {
+                    location.replace(root + '/employers/resumes.php');
+                }
+                
             }
         },
         onRequest: function(instance) {

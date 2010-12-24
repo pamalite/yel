@@ -400,7 +400,8 @@ class EmployeeMemberPage extends Page {
         
         $potential_referrers = $this->get_potential_referrers();
         $potential_candidates = $this->get_potential_candidates();
-        $applications = $this->get_applications();
+        //$applications = $this->get_applications();
+        $applications = $this->member->getAllAppliedJobs();
         
         ?>
         <!-- submenu -->
@@ -662,6 +663,9 @@ class EmployeeMemberPage extends Page {
         </div>
         
         <div id="member_career">
+            <div class="updated_on">
+                Updated on: <?php echo (is_null($profile['updated_on'])) ? 'New Entry' : $profile['updated_on']; ?>
+            </div>
             <form id="career" method="post" onSubmit="return false;">
                 <table class="career_profile">
                     <tr>
@@ -916,7 +920,7 @@ class EmployeeMemberPage extends Page {
         </div>
         
         <div id="member_applications">
-            <table class="buttons">
+            <!-- table class="buttons">
                 <tr>
                     <td class="right">
                         Filter: 
@@ -931,7 +935,7 @@ class EmployeeMemberPage extends Page {
                         </select>
                     </td>
                 </tr>
-            </table>
+            </table -->
             <div id="applications">
         <?php
             if (empty($applications)) {
@@ -941,49 +945,35 @@ class EmployeeMemberPage extends Page {
             } else {
                 $applications_table = new HTMLTable('applications_table', 'applications');
 
-                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'employers.name');\">Employers</a>", '', 'header');
-                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header');
-                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'members.lastname');\">Referrer</a>", '', 'header');
-                $applications_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header');
-                $applications_table->set(0, 4, 'Status', '', 'header');
-                $applications_table->set(0, 5, "Testimony", '', 'header');
-                $applications_table->set(0, 6, "Resume Submitted", '', 'header');
+                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'employer');\">Employers</a>", '', 'header');
+                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs');\">Job</a>", '', 'header');
+                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'applied_on');\">Applied On</a>", '', 'header');
+                $applications_table->set(0, 3, 'Status', '', 'header');
+                $applications_table->set(0, 4, "Resume Submitted", '', 'header');
 
                 foreach ($applications as $i=>$application) {
-                    $applications_table->set($i+1, 0, '<a href="employer.php?id='. $application['employer_id']. '">'. $application['employer']. '</a>', '', 'cell');
+                    $applications_table->set($i+1, 0, $application['employer'], '', 'cell');
                     $applications_table->set($i+1, 1, '<a class="no_link" onClick="show_job_desc('. $application['job_id']. ');">'. $application['job']. '</a>', '', 'cell');
-                    $applications_table->set($i+1, 2, '<a href="member.php?member_email_addr='. $application['referrer']. '">'. $application['referrer_name']. '</a>', '', 'cell');
-                    $applications_table->set($i+1, 3, $application['formatted_referred_on'], '', 'cell');
+                    $applications_table->set($i+1, 2, $application['formatted_referred_on'], '', 'cell');
                     
-                    $status = '<span class="not_viewed_yet">Not Viewed Yet</a>';
-                    if (!is_null($application['formatted_employer_agreed_terms_on'])) {
-                        $status = '<span class="viewed">Viewed on:</span> '. $application['formatted_employer_agreed_terms_on'];
+                    $status = '<span class="not_viewed_yet">Not submitted</span>';
+                    if ($application['tab'] == 'ref') {
+                        $status = '<span class="not_viewed_yet">Employer Not Viewed Yet</span>';
+                        if (!is_null($application['formatted_viewed_on'])) {
+                            $status = '<span class="viewed">Viewed on:</span> '. $application['formatted_viewed_on'];
+                        }
+
+                        if (!is_null($application['formatted_employed_on'])) {
+                            $status .= '<br/><span class="employed">Employed on:</span> '. $application['formatted_employed_on'];
+                        }
+                        
+                        if (!is_null($application['formatted_confirmed_on'])) {
+                            $status .= '<br/><span class="confirmed">Confirmed on:</span> '. $application['formatted_confirmed_on'];
+                        }
                     }
+                    $applications_table->set($i+1, 3, $status, '', 'cell testimony');
                     
-                    if (!is_null($application['formatted_employed_on'])) {
-                        $status = '<span class="employed">Employed on:</span> '. $application['formatted_employed_on'];
-                    }
-                    
-                    if (!is_null($application['formatted_employer_rejected_on'])) {
-                        $status = '<span class="rejected">Rejected on:</span> '. $application['formatted_employer_rejected_on'];
-                    }
-                    
-                    if (!is_null($application['formatted_employer_removed_on'])) {
-                        $status = '<span class="removed">Deleted on:</span> '. $application['formatted_employer_deleted_on'];
-                    }
-                    
-                    if ($application['has_employer_remarks'] == '1') {
-                        $status .= '<br/><a class="no_link" onClick="show_employer_remarks('. $application['id']. ');">Employer Remarks</a>';
-                    }
-                    $applications_table->set($i+1, 4, $status, '', 'cell testimony');
-                    
-                    $testimony = 'None Provided';
-                    if ($application['has_testimony'] == '1') {
-                        $testimony = '<a class="no_link" onClick="show_testimony('. $application['id']. ');">Show</a>';
-                    }
-                    $applications_table->set($i+1, 5, $testimony, '', 'cell testimony');
-                    
-                    $applications_table->set($i+1, 6, '<a href="resume_download.php?id='. $application['resume_id']. '">'. $application['file_name']. '</a>', '', 'cell testimony');
+                    $applications_table->set($i+1, 4, $application['resume'], '', 'cell');
                 }
 
                 echo $applications_table->get_html();

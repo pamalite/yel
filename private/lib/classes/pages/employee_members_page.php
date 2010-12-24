@@ -209,6 +209,7 @@ class EmployeeMembersPage extends Page {
                         <hr />
                         <input type="button" class="main_filter_button" value="Show All" onClick="show_non_attached();" />
                         <br/>
+                        <input type="button" class="main_filter_button" id="search_resume_btn" value="Trace Resume" onClick="trace_resume();"/>
                         <input type="button" class="main_filter_button" id="add_new_btn" value="Add New Applicant" onClick="show_new_application_popup();" disabled />
                     </td>
                 </tr>

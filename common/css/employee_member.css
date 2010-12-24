@@ -391,6 +391,11 @@ span.employed {
     color: #0CA711;
 }
 
+span.confirmed {
+    font-weight: bold;
+    color: #666666;
+}
+
 span.rejected {
     font-weight: bold;
     color: #FF0000;
@@ -552,4 +557,10 @@ table.jobs_selection td.separator {
 .tips {
     font-size: 9pt;
     color: #666666;
+}
+
+.updated_on {
+    font-style: italic;
+    margin-left: 10px;
+    padding-bottom: 5px;
 }

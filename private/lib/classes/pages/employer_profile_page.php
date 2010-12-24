@@ -49,6 +49,7 @@ class EmployerProfilePage extends Page {
         </div>
         
         <div class="profile">
+            <form onSubmit="return">
             <table class="profile_form">
                 <tr>
                     <td class="label">Company/Business Registration No.:</td>
@@ -61,6 +62,17 @@ class EmployerProfilePage extends Page {
                     <td class="label">User ID:</td>
                     <td class="field">
                         <?php echo $profile[0]['id']; ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="password">Password:</label></td>
+                    <td class="field"><input type="password" id="password" value="" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="password2">Password Again:</label></td>
+                    <td class="field">
+                        <input type="password" id="password2" value="" />
+                        <input type="button" value="Save Password" onClick="save_password();" />
                     </td>
                 </tr>
                 <tr>
@@ -111,6 +123,7 @@ class EmployerProfilePage extends Page {
                     <td class="field"><?php echo $profile[0]['about']; ?></td>
                 </tr>
             </table>
+            </form>
         </div>
         <?php
     }

@@ -269,6 +269,10 @@ class EmployeeEmployerPage extends Page {
                         <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile['phone_num'] ?>"  /></td>
                     </tr>
                     <tr>
+                        <td class="label"><label for="fax_num">Fax Number:</label></td>
+                        <td class="field"><input class="field" type="text" id="fax_num" name="fax_num" value="<?php echo $profile['fax_num'] ?>"  /></td>
+                    </tr>
+                    <tr>
                         <td class="label"><label for="address">Mailing Address:</label></td>
                         <td class="field"><textarea id="address" name="address" ><?php echo htmlspecialchars_decode(stripslashes($profile['address'])) ?></textarea></td>
                     </tr>

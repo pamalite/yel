@@ -1,4 +1,4 @@
-var order_by = 'referrals.referred_on';
+var order_by = 'applied_on';
 var order = 'desc';
 
 function ascending_or_descending() {
@@ -64,6 +64,7 @@ function show_applications() {
             if (txt == '0') {
                $('div_applications').set('html', '<div class="empty_results">No jobs applied.</div>');
             } else {
+                var tabs = xml.getElementsByTagName('tab');
                 var ids = xml.getElementsByTagName('id');
                 var job_ids = xml.getElementsByTagName('job_id');
                 var resume_ids = xml.getElementsByTagName('resume_id');
@@ -78,12 +79,11 @@ function show_applications() {
                 var applications_table = new FlexTable('applications_table', 'applications');
                 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'employers.name');\">Employer</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'resumes.file_name');\">Resume Submitted</a>", '', 'header'));
-                header.set(4, new Cell("Status", '', 'header'));
-                header.set(5, new Cell("&nbsp;", '', 'header actions'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'applied_on');\">Applied On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'job');\">Job</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'employer');\">Employer</a>", '', 'header'));
+                header.set(3, new Cell("Resume Submitted", '', 'header'));
+                header.set(4, new Cell("&nbsp;", '', 'header actions'));
                 applications_table.set(0, header);
                 
                 applications = new Array();
@@ -93,14 +93,22 @@ function show_applications() {
                     row.set(0, new Cell(referred_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     row.set(1, new Cell('<a href="../job/' + job_ids[i].childNodes[0].nodeValue + '">' + jobs[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
                     row.set(2, new Cell(employers[i].childNodes[0].nodeValue, '', 'cell'));
-                    row.set(3, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">' + resumes[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
-                    row.set(4, new Cell(statuses[i].childNodes[0].nodeValue, '', 'cell'));
                     
-                    var button = '<input type="button" value="Confirm" onClick="confirm_employment(' + ids[i].childNodes[0].nodeValue + ', \'' + add_slashes(employers[i].childNodes[0].nodeValue) + '\', \'' + add_slashes(jobs[i].childNodes[0].nodeValue) + '\')" />';
-                    if (confirmed_hired_ons[i].childNodes.length > 0) {
-                        button = '<span style="color: #666666; font-size: 9pt;">Employed on ' + employed_ons[i].childNodes[0].nodeValue + '<br/>Confirmed on ' + confirmed_hired_ons[i].childNodes[0].nodeValue + '</span>';
+                    var resume_submitted = '';
+                    if (resumes[i].childNodes.length > 0) {
+                        resume_submitted = resumes[i].childNodes[0].nodeValue;
                     }
-                    row.set(5, new Cell(button, '', 'cell actions'));
+                    row.set(3, new Cell(resume_submitted, '', 'cell'));
+                    
+                    var button = 'Processing...';
+                    if (tabs[i].childNodes[0].nodeValue == 'ref') {
+                        button = '<input type="button" value="Confirm Employed" onClick="confirm_employment(' + ids[i].childNodes[0].nodeValue + ', \'' + add_slashes(employers[i].childNodes[0].nodeValue) + '\', \'' + add_slashes(jobs[i].childNodes[0].nodeValue) + '\')" />';
+                        if (confirmed_hired_ons[i].childNodes.length > 0) {
+                            button = '<span style="color: #666666; font-size: 9pt;">Employed on ' + employed_ons[i].childNodes[0].nodeValue + '<br/>Confirmed on ' + confirmed_hired_ons[i].childNodes[0].nodeValue + '</span>';
+                        }
+                    }
+                    
+                    row.set(4, new Cell(button, '', 'cell actions'));
                     
                     applications_table.set((parseInt(i)+1), row);
                 }

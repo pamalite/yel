@@ -32,33 +32,12 @@ class MemberJobApplicationsPage extends Page {
         echo '</script>'. "\n";
     }
     
-    private function get_applications() {
-        $referral = new Referral();
-        
-        $criteria = array(
-            'columns' => "referrals.id, referrals.job AS job_id, jobs.alternate_employer, 
-                          employers.name AS employer, jobs.title AS job, 
-                          resumes.file_name AS `resume`, referrals.`resume` AS resume_id, 
-                          referrals.employer_agreed_terms_on, referrals.employed_on, 
-                          DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
-                          DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on,
-                          DATE_FORMAT(referrals.referee_confirmed_hired_on, '%e %b, %Y') AS formatted_confirmed_on", 
-            'joins' => "resumes ON resumes.id = referrals.`resume`, 
-                        jobs ON jobs.id = referrals.job, 
-                        employers ON employers.id = jobs.employer", 
-            'match' => "referrals.referee = '". $this->member->getId(). "'",
-            'order' => "referrals.referred_on DESC"
-        );
-        
-        return $referral->find($criteria);
-    }
-    
     public function show() {
         $this->begin();
         $this->top_search("Job Applications");
         $this->menu('member', 'job_applications');
         
-        $applications = $this->get_applications();
+        $applications = $this->member->getAllAppliedJobs();
         
         ?>
         <div id="div_status" class="status">
@@ -74,12 +53,11 @@ class MemberJobApplicationsPage extends Page {
             } else {
                 $applications_table = new HTMLTable('applications_table', 'applications');
                 
-                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'referrals.referred_on');\">Applied On</a>", '', 'header');
-                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'jobs.title');\">Job</a>", '', 'header');
-                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'employers.name');\">Employer</a>", '', 'header');
-                $applications_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'resumes.file_name');\">Resume Submitted</a>", '', 'header');
-                $applications_table->set(0, 4, "Status", '', 'header');
-                $applications_table->set(0, 5, "&nbsp;", '', 'header actions');
+                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'applied_on');\">Applied On</a>", '', 'header');
+                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'job');\">Job</a>", '', 'header');
+                $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'employer');\">Employer</a>", '', 'header');
+                $applications_table->set(0, 3, "Resume Submitted", '', 'header');
+                $applications_table->set(0, 4, "&nbsp;", '', 'header actions');
 
                 foreach ($applications as $i=>$application) {
                     $applications_table->set($i+1, 0, $application['formatted_referred_on'], '', 'cell');
@@ -92,27 +70,17 @@ class MemberJobApplicationsPage extends Page {
                     }
                     $applications_table->set($i+1, 2, $employer, '', 'cell');
                     
-                    $applications_table->set($i+1, 3, '<a href="resume.php?id='. $application['resume_id']. '">'. $application['resume']. '</a>', '', 'cell');
+                    $applications_table->set($i+1, 3, $application['resume'], '', 'cell');
                     
-                    $status = '<span style="font-weight: bold; color: #000000;">New</span>';
-                    if (!is_null($application['employer_agreed_terms_on']) && 
-                        $application['employer_agreed_terms_on'] != '0000-00-00 00:00:00') {
-                        $status = '<span style="font-weight: bold; color: #0000FF;">Viewed</span>';
+                    $button = 'Processing...';
+                    if ($application['tab'] == 'ref') {
+                        $button = '<input type="button" value="Confirm Employed" onClick="confirm_employment('. $application['id']. ', \''. addslashes($application['employer']). '\', \''. addslashes($application['job']). '\')" />';
+                        if (!is_null($application['formatted_confirmed_on']) && 
+                            !empty($application['formatted_confirmed_on'])) {
+                            $button = '<span style="color: #666666; font-size: 9pt;">Employed on '. $application['formatted_employed_on']. '<br/>Confirmed on '. $application['formatted_confirmed_on']. ' </span>';
+                        }
                     }
-                    
-                    if (!is_null($application['employed_on']) && 
-                        $application['employed_on'] != '0000-00-00 00:00:00') {
-                        $status = '<span style="font-weight: bold; color: #00FF00;">Employed</span>';
-                    }
-                    
-                    $applications_table->set($i+1, 4, $status, '', 'cell');
-                    
-                    $button = '<input type="button" value="Confirm" onClick="confirm_employment('. $application['id']. ', \''. addslashes($application['employer']). '\', \''. addslashes($application['job']). '\')" />';
-                    if (!is_null($application['formatted_confirmed_on']) && 
-                        !empty($application['formatted_confirmed_on'])) {
-                        $button = '<span style="color: #666666; font-size: 9pt;">Employed on '. $application['formatted_employed_on']. '<br/>Confirmed on '. $application['formatted_confirmed_on']. ' </span>';
-                    }
-                    $applications_table->set($i+1, 5, $button, '', 'cell actions');
+                    $applications_table->set($i+1, 4, $button, '', 'cell actions');
                 }
 
                 echo $applications_table->get_html();

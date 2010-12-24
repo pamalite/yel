@@ -53,7 +53,14 @@ if (!$employer->setSessionWith($hash)) {
     //redirect_to('../errors/failed_login.php?dir=employers');
 }
 
+// is new?
 $response['login'] = array('status' => 'ok');
+if ($employer->isNew()) {
+    $response['login']['is_new'] = '1';
+} else {
+    $response['login']['is_new'] = '0';
+}
+
 echo $xml_dom->get_xml_from_array($response);
 //redirect_to('home.php');
 ?>

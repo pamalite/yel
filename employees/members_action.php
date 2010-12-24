@@ -252,6 +252,10 @@ if ($_POST['action'] == 'get_applicants') {
         }
     }
     
+    if (isset($_POST['resume_id'])) {
+        $match .= " AND (member_jobs.`resume` = ". $_POST['resume_id']. " OR referrals.`resume` = ". $_POST['resume_id']. ")";
+    }
+    
     if (isset($_POST['page'])) {
         $page = $_POST['page'];
     }
