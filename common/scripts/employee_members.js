@@ -453,18 +453,22 @@ function update_applicants() {
                     row.set(3, new Cell(job_details, '', 'cell'));
                     
                     // resume details
-                    var resume_details = 'No Resume';
+                    var resume_details = '<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">View All / Submit</a>';
+                    
+                    var applied_or_submitted = '';
                     if (applied_resume_ids[i].childNodes.length > 0) {
-                        resume_details = '<a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">By Candidate</a>';
+                        applied_or_submitted = '<br/><br/><span style="color: #666666;">From Candidate: </span><a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">View</a>';
                     }
                     
                     if (resume_ids[i].childNodes.length > 0) {
-                        resume_details = '<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">Submitted</a>';
+                        if (!isEmpty(applied_or_submitted)) {
+                            applied_or_submitted = applied_or_submitted + '<br/>';
+                        } 
+                        
+                        applied_or_submitted = applied_or_submitted + '<span style="color: #666666;">Furnished by YE: </span><a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">#' + resume_ids[i].childNodes[0].nodeValue + '</a>';
                     }
                     
-                    resume_details = resume_details + '&nbsp;|&nbsp;<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">All/Submit</a><br/><br/>';
-                    resume_details = resume_details + '<span style="color: #666666;">YE: ' + yel_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
-                    resume_details = resume_details + '<span style="color: #666666;">Candidate: ' + self_resumes[i].childNodes[0].nodeValue + "</span><br/>\n";
+                    resume_details = resume_details + applied_or_submitted + "\n";
                     row.set(4, new Cell(resume_details, '', 'cell'));
                     
                     // status
