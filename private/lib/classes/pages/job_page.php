@@ -39,6 +39,7 @@ class JobPage extends Page {
         
         echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/list_box.css">'. "\n";
         echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/job.css">'. "\n";
+        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/job_desc.css">'. "\n";
     }
     
     public function insert_job_scripts() {
@@ -184,6 +185,10 @@ class JobPage extends Page {
         }
         
         $job = $this->get_job_info();
+        
+        // format tags to HTML
+        $job['description'] = format_job_description($job['description']);
+        
         $error_message = '';
         if (count($job) <= 0 || is_null($job)) {
             $error_message = 'The job that you are looking for cannot be found.';

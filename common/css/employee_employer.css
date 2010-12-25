@@ -186,3 +186,18 @@ table.subscription_form td div {
 .job_description {
     height: 550px;
 }
+
+#preview_window {
+    display: none;
+    width: 640px;
+}
+
+#preview_window #preview_area {
+    width: 98%;
+    height: 480px;
+    overflow: auto;
+    border: 1px solid #CCCCCC;
+    padding-left: 3px;
+    padding-right: 3px;
+    margin: 3px 3px 3px 3px;
+}

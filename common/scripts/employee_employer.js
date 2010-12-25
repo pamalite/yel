@@ -899,6 +899,33 @@ function save_job() {
     request.send(params);
 }
 
+function show_preview_window() {
+    if ($('job.description').value == '') {
+        alert('Description cannot be empty.');
+        return;
+    }
+    
+    params = 'id=0&action=preview_job_desc';
+    params = params + '&desc=' + encodeURIComponent($('job.description').value);
+    
+    var uri = root + "/employees/employer_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            $('preview_area').set('html', txt);
+            show_window('preview_window');
+            window.scrollTo(0, 0);
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_preview_window() {
+    close_window('preview_window');
+}
+
 function onDomReady() {
     initialize_page();
     

@@ -253,4 +253,32 @@ function log_activity($_message, $_file_name) {
     }
 }
 
+function format_job_description($_description) {
+    $formatted_description = '';
+    
+    // clean up
+    $formatted_description = stripslashes($_description);
+    
+    // convert square tags to html tags
+    $formatted_description = str_replace(array('[/b]', '[/i]', '[/u]', '[/hl]'), '</span>', $formatted_description);
+    $formatted_description = str_replace('[b]', '<span class="bold">', $formatted_description);
+    $formatted_description = str_replace('[i]', '<span class="italic">', $formatted_description);
+    $formatted_description = str_replace('[u]', '<span class="underline">', $formatted_description);
+    $formatted_description = str_replace('[hl]', '<span class="highlight">', $formatted_description);
+    $formatted_description = str_replace('[list]', '<ul>', $formatted_description);
+    $formatted_description = str_replace('[/list]', '</ul>', $formatted_description);
+    $formatted_description = str_replace('[nlist]', '<ol>', $formatted_description);
+    $formatted_description = str_replace('[/nlist]', '</ol>', $formatted_description);
+    $formatted_description = str_replace('[item]', '<li>', $formatted_description);
+    $formatted_description = str_replace('[/item]', '</li>', $formatted_description);
+    
+    // clean up extra newlines
+    $formatted_description = str_replace('</li><br/>', '</li>', $formatted_description);
+    $formatted_description = str_replace('<ul><br/>', '<ul>', $formatted_description);
+    $formatted_description = str_replace('<ol><br/>', '<ol>', $formatted_description);
+    $formatted_description = str_replace('</ul><br/>', '</ul>', $formatted_description);
+    $formatted_description = str_replace('</ol><br/>', '</ol>', $formatted_description);
+    
+    return $formatted_description;
+}
 ?>

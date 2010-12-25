@@ -33,6 +33,7 @@ class EmployeeEmployerPage extends Page {
         $this->insert_css();
         
         echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_employer.css">'. "\n";
+        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/job_desc.css">'. "\n";
     }
     
     public function insert_employee_employer_scripts() {
@@ -513,6 +514,7 @@ class EmployeeEmployerPage extends Page {
                 </table>
                 <div class="buttons_bar">
                     <input class="button" type="button" value="Cancel" onClick="show_jobs();" />
+                    <input class="button" type="button" value="Preview" onClick="show_preview_window();" />
                     <input class="button" type="button" value="Publish" onClick="save_job();" />
                 </div>
             </form>
@@ -555,6 +557,13 @@ class EmployeeEmployerPage extends Page {
             </div>
         </div>
         
+        <div id="preview_window" class="popup_window">
+            <div class="popup_window_title">Job Description Preview</div>
+            <div id="preview_area"></div>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Close" onClick="close_preview_window();" />
+            </div>
+        </div>
         <?php
     }
 }

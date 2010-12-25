@@ -610,7 +610,7 @@ if ($_POST['action'] == 'get_job') {
     
     $result[0]['title'] = htmlspecialchars_decode(stripslashes($result[0]['title']));
     $result[0]['description'] = htmlspecialchars_decode(stripslashes($result[0]['description']));
-    $result[0]['description'] = str_replace('<br/>', "\n", $result[0]['description']);
+    $result[0]['description'] = str_replace("<br/>", "\r", $result[0]['description']);
     
     $criteria = array(
         'columns' => "job_index.state",
@@ -768,6 +768,12 @@ if ($_POST['action'] == 'extend_job') {
     }
     
     echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'preview_job_desc') {
+    $_POST['desc'] = str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['desc']);
+    echo format_job_description($_POST['desc']);
     exit();
 }
 ?>
