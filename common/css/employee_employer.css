@@ -201,3 +201,7 @@ table.subscription_form td div {
     padding-right: 3px;
     margin: 3px 3px 3px 3px;
 }
+
+div.toolbar {
+    background-color: #CCCCCC;
+}

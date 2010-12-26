@@ -958,10 +958,18 @@ function insert(_format) {
             }
             break;
         case 'list':
-            formatted_text = '[list]' + formatted_text + '[/list]';
+            if (start_pos == end_pos) {
+                formatted_text = '[list]' + "\n" + '[item][/item]' + "\n" + '[/list]';
+            } else {
+                formatted_text = '[list]' + formatted_text + '[/list]';
+            }
             break;
         case 'nlist':
-            formatted_text = '[nlist]' + formatted_text + '[/nlist]';
+            if (start_pos == end_pos) {
+                formatted_text = '[nlist]' + "\n" + '[item][/item]' + "\n" + '[/nlist]';
+            } else {
+                formatted_text = '[nlist]' + formatted_text + '[/nlist]';
+            }
             break;
     }
     desc.value = texts_before + formatted_text + texts_after;

@@ -514,6 +514,7 @@ class EmployeeEmployerPage extends Page {
                                 <input type="button" value="Bold" onClick="insert('bold');" />
                                 <input type="button" value="Italic" onClick="insert('italic');" />
                                 <input type="button" value="Underline" onClick="insert('underline');" />
+                                <input type="button" value="Highlight" onClick="insert('highlight');" />
                                 <input type="button" value="List" onClick="insert('list');" />
                                 <input type="button" value="Numbered List" onClick="insert('nlist');" />
                                 <input type="button" value="List Item" onClick="insert('item');" />
