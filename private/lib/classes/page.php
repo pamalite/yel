@@ -11,8 +11,10 @@ class Page {
     public function insert_scripts() {
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/webtoolkit.md5.js"></script>'. "\n";
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/webtoolkit.sha1.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/mootools-1.2-core.js"></script>'. "\n"; // 1.2.3-core
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/mootools-1.2-more.js"></script>'. "\n"; // 1.2.3.1-more
+        // echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/mootools-1.2-core.js"></script>'. "\n"; // 1.2.3-core
+        // echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/mootools-1.2-more.js"></script>'. "\n"; // 1.2.3.1-more
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/mootools-core.js"></script>'. "\n";
+        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/mootools-more.js"></script>'. "\n";
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/common.js"></script>'. "\n";
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/Observer.js"></script>';
         echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/Autocompleter.js"></script>';

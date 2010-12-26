@@ -296,19 +296,19 @@ function onDomReady() {
     initialize_page();
     set_mouse_events();
     
-    $('industry').addEvent('change', function() {
-        var count = 0;
-        for (var i=0; i < $('industry').options.length; i++) {
-            if ($('industry').options[i].selected) {
-                count++;
-            }
-            
-            if (count > 3) {
-                $('industry').options[i].selected = false;
-                break;
-            }
-        }
-    });
+    // $('industry').addEvent('change', function() {
+    //     var count = 0;
+    //     for (var i=0; i < $('industry').options.length; i++) {
+    //         if ($('industry').options[i].selected) {
+    //             count++;
+    //         }
+    //         
+    //         if (count > 3) {
+    //             $('industry').options[i].selected = false;
+    //             break;
+    //         }
+    //     }
+    // });
     
     $('li_profile').addEvent('click', function() {
         set_status('');
