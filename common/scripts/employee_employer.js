@@ -926,6 +926,53 @@ function close_preview_window() {
     close_window('preview_window');
 }
 
+function insert(_format) {
+    var desc = $('job.description');
+    desc.focus();
+    
+    var start_pos = desc.getSelectionStart();
+    var end_pos = desc.getSelectionEnd();
+    var texts_before = desc.value.substr(0, start_pos);
+    var texts_after = desc.value.substr(end_pos);
+    
+    var is_stay_selected = true;
+    var formatted_text = desc.getSelectedText();
+    switch (_format) {
+        case 'bold':
+            formatted_text = '[b]' + formatted_text + '[/b]';
+            break;
+        case 'italic':
+            formatted_text = '[i]' + formatted_text + '[/i]';
+            break;
+        case 'underline':
+            formatted_text = '[u]' + formatted_text + '[/u]';
+            break;
+        case 'highlight':
+            formatted_text = '[hl]' + formatted_text + '[/hl]';
+            break;
+        case 'item':
+            formatted_text = '[item]' + formatted_text + '[/item]';
+            
+            if (start_pos == end_pos) {
+                is_stay_selected = false;
+            }
+            break;
+        case 'list':
+            formatted_text = '[list]' + formatted_text + '[/list]';
+            break;
+        case 'nlist':
+            formatted_text = '[nlist]' + formatted_text + '[/nlist]';
+            break;
+    }
+    desc.value = texts_before + formatted_text + texts_after;
+    
+    if (!is_stay_selected) {
+        desc.setCaretPosition(start_pos + formatted_text.length);
+    } else {
+        desc.selectRange(start_pos, start_pos + formatted_text.length);
+    }
+}
+
 function onDomReady() {
     initialize_page();
     

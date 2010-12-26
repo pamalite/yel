@@ -509,7 +509,17 @@ class EmployeeEmployerPage extends Page {
                         <td class="label center" colspan="2"><label for="job.description">Description:</label></td>
                     </tr>
                     <tr>
-                        <td class="field center" colspan="2"><textarea id="job.description" name="description" class="job_description"></textarea></td>
+                        <td class="field center" colspan="2">
+                            <div class="toolbar">
+                                <input type="button" value="Bold" onClick="insert('bold');" />
+                                <input type="button" value="Italic" onClick="insert('italic');" />
+                                <input type="button" value="Underline" onClick="insert('underline');" />
+                                <input type="button" value="List" onClick="insert('list');" />
+                                <input type="button" value="Numbered List" onClick="insert('nlist');" />
+                                <input type="button" value="List Item" onClick="insert('item');" />
+                            </div>
+                            <textarea id="job.description" name="description" class="job_description"></textarea>
+                        </td>
                     </tr>
                 </table>
                 <div class="buttons_bar">
