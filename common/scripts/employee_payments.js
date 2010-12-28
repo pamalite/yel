@@ -280,7 +280,7 @@ function show_payment_popup(_invoice_id, _padded_id) {
     $('lbl_invoice').set('html', _padded_id);
     $('invoice_id').value = _invoice_id;
     show_window('paid_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_payment_popup(_is_confirmed) {
@@ -383,7 +383,7 @@ function show_resend_popup(_invoice_id, _padded_id) {
     });
     
     request.send(params);
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_resend_popup(_is_resend) {

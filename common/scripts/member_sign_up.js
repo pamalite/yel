@@ -192,7 +192,7 @@ function sign_up() {
                 $('div_job_profile').setStyle('display', 'block');
                 $('member_email_addr').value = $('email_addr').value;
                 update_overtexts();
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
                 return;
             }
             

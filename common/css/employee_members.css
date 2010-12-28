@@ -448,3 +448,8 @@ table.jobs_selection td.separator {
 .job_expiry_item {
     font-size: 7pt;
 }
+
+span.tiny {
+    font-size: 9pt;
+    color: #666666;
+}

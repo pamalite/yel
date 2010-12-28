@@ -139,7 +139,7 @@ function show_jobs() {
                 }
                 
                 $('results').set('html', html);
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
                 
                 if ($('page') != null) {
                     $('page').blur();

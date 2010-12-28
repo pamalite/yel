@@ -88,7 +88,7 @@ function show_job_description(_job_id) {
             $('job.expired_on').set('html', expire_on[0].childNodes[0].nodeValue);
             
             set_status('');
-            window.scrollTo(0, 250);
+            // window.scrollTo(0, 250);
         },
         onRequest: function(instance) {
             set_status('Loading job...');

@@ -120,7 +120,7 @@ function save_profile() {
         onSuccess: function(txt, xml) {
             if (txt == 'ok') {
                 set_status('Your profile was successfully saved and updated.');
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
             } else {
                 alert('Sorry! We are not able to save and update your profile at the moment. Please try again later.');
             }
@@ -153,7 +153,7 @@ function save_highlights() {
         onSuccess: function(txt, xml) {
             if (txt == 'ok') {
                 set_status('Your profile was successfully saved and updated.');
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
             } else {
                 alert('Sorry! We are not able to save and update your profile at the moment. Please try again later.');
             }
@@ -179,7 +179,7 @@ function save_bank() {
         onSuccess: function(txt, xml) {
             if (txt == 'ok') {
                 set_status('Your profile was successfully saved and updated.');
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
             } else {
                 alert('Sorry! We are not able to save and update your profile at the moment. Please try again later.');
             }
@@ -227,7 +227,7 @@ function close_unsubscribe_popup(_is_unsubscribe) {
 
 function show_unsubscribe_popup() {
     show_window('unsubscribe_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_upload_photo_popup(_is_upload) {

@@ -304,7 +304,7 @@ function show_award_popup(_referral_id) {
             $('lbl_reward').set('html', amount);
             
             show_window('award_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         },
         onRequest: function(instance) {
             set_status('Loading paid rewards...');

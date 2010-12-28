@@ -234,7 +234,7 @@ function show_testimony(_referral_id) {
             $('testimony').set('html', txt);
             set_status('');
             show_window('testimony_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         },
         onRequest: function(instance) {
             set_status('Loading testimony...');
@@ -265,7 +265,7 @@ function show_job_desc(_job_id) {
             $('job_desc').set('html', txt);
             set_status('');
             show_window('job_desc_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         },
         onRequest: function(instance) {
             set_status('Loading job desccription...');
@@ -296,7 +296,7 @@ function show_employer_remarks(_referral_id) {
             $('employer_remarks').set('html', txt);
             set_status('');
             show_window('employer_remarks_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         },
         onRequest: function(instance) {
             set_status('Loading employer remarks...');

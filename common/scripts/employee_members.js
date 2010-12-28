@@ -453,7 +453,14 @@ function update_applicants() {
                     row.set(3, new Cell(job_details, '', 'cell'));
                     
                     // resume details
-                    var resume_details = '<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">View All / Submit</a>';
+                    var yels = parseInt(yel_resumes[i].childNodes[0].nodeValue);
+                    var selfs = parseInt(self_resumes[i].childNodes[0].nodeValue);
+                    var total = yels + selfs;
+                    
+                    var resume_details = '<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">View ' + total + ' / Submit</a>';
+                    if (total <= 0) {
+                        resume_details = '<a class="no_link" onClick="show_resumes_page(\'' + add_slashes(emails[i].childNodes[0].nodeValue) + '\')">Upload Now</a>';
+                    }
                     
                     var applied_or_submitted = '';
                     if (applied_resume_ids[i].childNodes.length > 0) {
@@ -463,12 +470,15 @@ function update_applicants() {
                     if (resume_ids[i].childNodes.length > 0) {
                         if (!isEmpty(applied_or_submitted)) {
                             applied_or_submitted = applied_or_submitted + '<br/>';
-                        } 
+                        } else {
+                            applied_or_submitted = applied_or_submitted + '<br/><br/>';
+                        }
                         
-                        applied_or_submitted = applied_or_submitted + '<span style="color: #666666;">Furnished by YE: </span><a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">#' + resume_ids[i].childNodes[0].nodeValue + '</a>';
+                        applied_or_submitted = applied_or_submitted + '<span style="color: #666666;">Submitted by YE: </span><a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">#' + resume_ids[i].childNodes[0].nodeValue + '</a>';
                     }
-                    
                     resume_details = resume_details + applied_or_submitted + "\n";
+                    
+                    resume_details = resume_details + '<br/><br/><span class="tiny">Self: ' + selfs + ' | YE: ' + yels + "</span>\n"; 
                     row.set(4, new Cell(resume_details, '', 'cell'));
                     
                     // status
@@ -1263,7 +1273,7 @@ function show_notes_popup(_app_id) {
             $('notes').value = txt;
             set_status('');
             show_window('notes_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
             $('notes').focus();
         },
         onRequest: function(instance) {
@@ -1458,7 +1468,7 @@ function show_new_application_popup() {
     $('new_applicant_jobs').value = jobs;
     
     show_window('new_application_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_new_application_popup(_is_save) {
@@ -1576,7 +1586,7 @@ function show_referrer_popup(_id) {
             }
             
             show_window('referrer_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         }
     });
 
@@ -1673,7 +1683,7 @@ function show_jobs_popup(_use_email, _match) {
             $('div_other_jobs').set('html', jobs_table.get_html());
             
             show_window('other_jobs_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         }
     });
 
@@ -1702,7 +1712,6 @@ function show_progress_popup(_id, _is_buffer) {
             $('progress_notes').value = txt;
             set_status('');
             show_window('progress_notes_window');
-            window.scrollTo(0, 0);
             $('notes').focus();
         },
         onRequest: function(instance) {
@@ -1750,7 +1759,7 @@ function close_progress_popup(_is_save) {
 function show_apply_jobs_popup(_id) {
     $('apply_member_email').value = _id;
     show_window('apply_job_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
     filter_jobs();
 }
 

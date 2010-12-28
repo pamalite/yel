@@ -88,7 +88,7 @@ function show_upload_resume_popup(_resume_id) {
     $('resume_id').value = _resume_id;
     $('upload_field').setStyle('display', 'block');
     show_window('upload_resume_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function onDomReady() {

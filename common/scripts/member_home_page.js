@@ -194,7 +194,7 @@ function show_choices_popup(_title, _choices_str, _selected, _action) {
     $('choices_dropdown').set('html', html);
     
     show_window('choices_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_choices_popup(_is_save) {
@@ -236,7 +236,7 @@ function show_notes_popup(_title, _texts, _action) {
     $('notes').value = _texts.replace(/<br\/>/g, "\n");
     
     show_window('notes_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_notes_popup(_is_save) {
@@ -281,7 +281,7 @@ function show_texts_popup(_title, _texts, _action) {
     $('texts').value = _texts;
     
     show_window('texts_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_texts_popup(_is_save) {
@@ -333,7 +333,7 @@ function show_ranges_popup(_title, _start, _end, _currency, _action) {
     }
     
     show_window('ranges_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_ranges_popup(_is_save) {
@@ -401,7 +401,7 @@ function show_countries_popup(_title, _selected, _action) {
     }
     
     show_window('countries_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_countries_popup(_is_save) {
@@ -528,7 +528,7 @@ function show_job_profile_popup(_id) {
         $('emp_specialization').selectedIndex = 0;
         
         show_window('job_profile_window');
-        window.scrollTo(0, 0);
+        // window.scrollTo(0, 0);
     } else {
         // load
         var params = 'id=' + _id + '&action=get_job_profile';
@@ -621,7 +621,7 @@ function show_job_profile_popup(_id) {
                 } 
                 
                 show_window('job_profile_window');
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
             }
         });
 

@@ -524,7 +524,8 @@ if ($_POST['action'] == 'apply_job') {
     } else {
         $subject = trim(substr($job_list, 2)). ' - Resume #'. $_POST['resume'];
     }
-    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    //$headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    $headers = 'From: '. $employee->getEmailAddress(). "\n";
     $headers .= 'Cc: '. $yel_email. "\n";
     $headers .= 'MIME-Version: 1.0'. "\n";
     $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $attached_filename. '";'. "\n\n";

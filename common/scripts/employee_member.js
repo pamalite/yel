@@ -287,7 +287,7 @@ function show_upload_resume_popup(_resume_id) {
     $('resume_id').value = _resume_id;
     $('upload_field').setStyle('display', 'block');
     show_window('upload_resume_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_upload_resume_popup(_is_upload) {
@@ -620,7 +620,7 @@ function remove_referee(_referee_email) {
 
 function show_add_referrers_popup() {
     show_window('add_referrers_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_add_referrers_popup(_is_submit) {
@@ -681,7 +681,7 @@ function close_add_referrers_popup(_is_submit) {
 
 function show_add_candidates_popup() {
     show_window('add_candidates_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function close_add_candidates_popup(_is_submit) {
@@ -862,7 +862,7 @@ function show_testimony(_referral_id) {
             $('testimony').set('html', txt);
             set_status('');
             show_window('testimony_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         },
         onRequest: function(instance) {
             set_status('Loading testimony...');
@@ -893,7 +893,7 @@ function show_job_desc(_job_id) {
             $('job_desc').set('html', txt);
             set_status('');
             show_window('job_desc_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         },
         onRequest: function(instance) {
             set_status('Loading job desccription...');
@@ -924,7 +924,7 @@ function show_employer_remarks(_referral_id) {
             $('employer_remarks').set('html', txt);
             set_status('');
             show_window('employer_remarks_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         },
         onRequest: function(instance) {
             set_status('Loading employer remarks...');
@@ -950,7 +950,7 @@ function show_apply_job_popup(_resume_id, _resume_file_name) {
     }
     
     show_window('apply_job_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
     filter_jobs();
 }
 
@@ -1279,7 +1279,7 @@ function show_job_profile_popup(_id) {
         $('emp_specialization').selectedIndex = 0;
         
         show_window('job_profile_window');
-        window.scrollTo(0, 0);
+        // window.scrollTo(0, 0);
     } else {
         // load
         var params = 'id=' + _id + '&action=get_job_profile';
@@ -1372,7 +1372,7 @@ function show_job_profile_popup(_id) {
                 } 
                 
                 show_window('job_profile_window');
-                window.scrollTo(0, 0);
+                // window.scrollTo(0, 0);
             }
         });
 

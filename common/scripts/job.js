@@ -50,7 +50,7 @@ function close_refer_popup(_proceed_refer) {
 
 function show_refer_popup() {
     show_window('refer_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function toggle_resume_upload() {
@@ -102,7 +102,7 @@ function close_apply_popup(_proceed_refer) {
 
 function show_apply_popup() {
     show_window('apply_window');
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
 }
 
 function onDomReady() {

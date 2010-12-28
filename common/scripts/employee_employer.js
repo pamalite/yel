@@ -915,7 +915,7 @@ function show_preview_window() {
         onSuccess: function(txt, xml) {
             $('preview_area').set('html', txt);
             show_window('preview_window');
-            window.scrollTo(0, 0);
+            // window.scrollTo(0, 0);
         }
     });
     
