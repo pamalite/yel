@@ -974,7 +974,10 @@ function close_apply_job_popup(_is_apply_job) {
         
         var selected_job_str = $('selected_jobs').value;
         if (selected_jobs.length > 0) {
-            selected_job_str = selected_job_str + ',';
+            if (!isEmpty(selected_job_str)) {
+                selected_job_str = selected_job_str + ',';
+            }
+            
             for (var i=0; i < selected_jobs.length; i++) {
                 var item_value = selected_jobs[i].split('|');
                 selected_job_str = selected_job_str + item_value[item_value.length-1];

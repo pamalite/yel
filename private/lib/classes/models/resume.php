@@ -415,16 +415,16 @@ class Resume implements Model{
     
     public function copyFrom($_original_file, $_file_text) {
         $query = "SELECT COUNT(*) AS is_exists FROM resume_index 
-                  WHERE resume = ". $this->id. " AND member = '". $this->member_id. "'";
+                  WHERE `resume` = ". $this->id. " AND member = '". $this->member_id. "'";
         $result = $this->mysqli->query($query);
         if ($result[0]['is_exists'] == '0') {
             $query = "INSERT INTO resume_index SET 
-                      resume = ". $this->id. ", 
+                      `resume` = ". $this->id. ", 
                       member = '". $this->member_id. "', 
-                      file_text = '". $_file_text. "'";
+                      file_text = '". addslashes($_file_text). "'";
         } else {
-            $query = "UPDATE resume_index SET file_text = '". $_file_text. "' 
-                      WHERE resume = ". $this->id. " AND 
+            $query = "UPDATE resume_index SET file_text = '". addslashes($_file_text). "' 
+                      WHERE `resume` = ". $this->id. " AND 
                       member = '". $this->member_id. "'";
         }
         

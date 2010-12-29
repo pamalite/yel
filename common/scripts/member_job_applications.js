@@ -69,6 +69,7 @@ function show_applications() {
                 var job_ids = xml.getElementsByTagName('job_id');
                 var resume_ids = xml.getElementsByTagName('resume_id');
                 var resumes = xml.getElementsByTagName('resume');
+                var buffered_stored_resumes = xml.getElementsByTagName('buffered_stored_resume_file');
                 var jobs = xml.getElementsByTagName('job');
                 var employers = xml.getElementsByTagName('employer');
                 var referred_ons = xml.getElementsByTagName('formatted_referred_on');
@@ -95,8 +96,20 @@ function show_applications() {
                     row.set(2, new Cell(employers[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     var resume_submitted = '';
-                    if (resumes[i].childNodes.length > 0) {
-                        resume_submitted = resumes[i].childNodes[0].nodeValue;
+                    if (tabs[i].childNodes[0].nodeValue == 'buf') {
+                        if (resume_ids[i].childNodes.length > 0 && 
+                            resumes[i].childNodes.length <= 0) {
+                            // use pre submitted resume
+                            resume_submitted = buffered_stored_resumes[i].childNodes[0].nodeValue;
+                        } else if (resume_ids[i].childNodes.length <= 0 && 
+                                   resumes[i].childNodes.length > 0) {
+                            // use just uploaded resume
+                            resume_submitted = resumes[i].childNodes[0].nodeValue;
+                        }
+                    } else {
+                        if (resumes[i].childNodes.length > 0) {
+                            resume_submitted = resumes[i].childNodes[0].nodeValue;
+                        }
                     }
                     row.set(3, new Cell(resume_submitted, '', 'cell'));
                     

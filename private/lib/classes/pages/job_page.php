@@ -432,7 +432,8 @@ class JobPage extends Page {
                         <?php
                                 $criteria = array(
                                     'columns' => 'id, file_name', 
-                                    'match' => "member = '". $this->member->getId(). "'"
+                                    'match' => "member = '". $this->member->getId(). "' AND 
+                                                is_yel_uploaded = FALSE"
                                 );
 
                                 $resume = new Resume();

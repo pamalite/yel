@@ -70,7 +70,21 @@ class MemberJobApplicationsPage extends Page {
                     }
                     $applications_table->set($i+1, 2, $employer, '', 'cell');
                     
-                    $applications_table->set($i+1, 3, $application['resume'], '', 'cell');
+                    $resume = '';
+                    if ($application['tab'] == 'buf') {
+                        if (!is_null($application['resume_id']) &&
+                            is_null($application['resume'])) {
+                            // use pre uploaded resume
+                            $resume = $application['buffered_stored_resume_file'];
+                        } elseif (is_null($application['resume_id']) &&
+                                  !is_null($application['resume'])) {
+                            // use just uploaded resume
+                            $resume = $application['resume'];
+                        }
+                    } else {
+                        $resume = $application['resume'];
+                    }
+                    $applications_table->set($i+1, 3, $resume, '', 'cell');
                     
                     $button = 'Processing...';
                     if ($application['tab'] == 'ref') {

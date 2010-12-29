@@ -739,7 +739,8 @@ if ($_POST['action'] == 'sign_up') {
         $resume_successfully_moved = false;
         if (!is_null($buffer_result[0]['existing_resume_id']) || 
             is_null($buffer_result[0]['resume_file_hash'])) {
-            // either the resume is already exists or no resume provided
+            // used pre-uploaded resumes
+            $resume = new Resume($buffer_result[0]['candidate_email'], $buffer_result[0]['existing_resume_id']);
             $resume_successfully_moved = true;
         } else {
             $resume = new Resume($buffer_result[0]['candidate_email']);

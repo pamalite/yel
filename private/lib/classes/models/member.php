@@ -972,6 +972,7 @@ class Member implements Model {
         $query = "SELECT 'ref' AS tab, referrals.id, referrals.job AS job_id, jobs.alternate_employer, 
                   employers.name AS employer, jobs.title AS job, 
                   resumes.file_name AS `resume`, referrals.`resume` AS resume_id, 
+                  resumes.file_hash AS resume_hash, NULL AS buffered_stored_resume_file, 
                   referrals.employer_agreed_terms_on, referrals.employed_on, 
                   referrals.referred_on AS applied_on,
                   DATE_FORMAT(referrals.referred_on, '%e %b, %Y') AS formatted_referred_on, 
@@ -986,24 +987,29 @@ class Member implements Model {
                   UNION 
                   SELECT 'buf', referral_buffers.id, referral_buffers.job, NULL, 
                   employers.name AS employer, jobs.title AS job, 
-                  referral_buffers.resume_file_name, referral_buffers.resume_file_hash, NULL, NULL, 
+                  referral_buffers.resume_file_name, referral_buffers.existing_resume_id, 
+                  referral_buffers.resume_file_hash, resumes.file_name, 
+                  NULL, NULL, 
                   referral_buffers.requested_on, 
                   DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y'),
                   NULL, NULL, NULL 
                   FROM referral_buffers 
                   LEFT JOIN jobs ON jobs.id = referral_buffers.job 
                   LEFT JOIN employers ON employers.id = jobs.employer 
+                  LEFT JOIN resumes ON resumes.id = referral_buffers.existing_resume_id 
                   WHERE referral_buffers.candidate_email = '". $this->id. "' 
                   UNION 
                   SELECT 'job', member_jobs.id, member_jobs.job, NULL, 
                   employers.name AS employer, jobs.title AS job, 
-                  NULL, member_jobs.`resume`, NULL, NULL, 
+                  resumes.file_name, member_jobs.`resume`, resumes.file_hash, NULL, 
+                  NULL, NULL, 
                   member_jobs.applied_on, 
                   DATE_FORMAT(member_jobs.applied_on, '%e %b, %Y'),
                   NULL, NULL, NULL 
                   FROM member_jobs 
                   LEFT JOIN jobs ON jobs.id = member_jobs.job 
-                  LEFT JOIN employers ON employers.id = jobs.employer
+                  LEFT JOIN employers ON employers.id = jobs.employer 
+                  LEFT JOIN resumes ON resumes.id = member_jobs.`resume`
                   WHERE member_jobs.member = '". $this->id. "'". $order_by;
         return $this->mysqli->query($query);
     }

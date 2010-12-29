@@ -901,7 +901,7 @@ function update_new_applicants() {
                         if (is_members[i].childNodes[0].nodeValue == '0') {
                             actions = actions + '<input type="button" value="Sign Up" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
                         } else {
-                            actions = actions + '<input type="button" value="Transfer" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                            actions = actions + '<input type="button" value="Transfer" onClick="transfer_to_member(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
                         }
                     }
                     row.set(5, new Cell(actions, '', 'cell action'));
@@ -1196,7 +1196,8 @@ function make_member_from(_app_id) {
                 return;
             }
             
-            location.replace('members.php?pages=applicants');
+            //location.replace('members.php?pages=applicants');
+            show_applicants();
         },
         onRequest: function(instance) {
             set_status('Signing up applicant...');
@@ -1239,7 +1240,8 @@ function transfer_to_member(_app_id) {
                 return;
             }
             
-            location.replace('members.php?pages=applicants');
+            // location.replace('members.php?pages=applicants');
+            show_applicants();
         },
         onRequest: function(instance) {
             set_status('Transferring applicant...');
