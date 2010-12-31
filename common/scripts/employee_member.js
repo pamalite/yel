@@ -963,6 +963,21 @@ function close_apply_job_popup(_is_apply_job) {
             return;
         }
         
+        var hr_contacts = '';
+        if (!isEmpty($('hr_contact').value)) {
+            var contacts = $('hr_contact').value.split(',');
+            for (var i=0; i < contacts.length; i++) {
+                contacts[i] = trim(contacts[i]);
+                if (isEmail(contacts[i])) {
+                    if (isEmpty(hr_contacts)) {
+                        hr_contacts = contacts[i];
+                    } else {
+                        hr_contacts = hr_contacts + ',' + contacts[i];
+                    }
+                }
+            }
+        }
+        
         if (!confirm('Confirm to apply the selected jobs for candidate?')) {
             return;
         }
@@ -970,6 +985,7 @@ function close_apply_job_popup(_is_apply_job) {
         var params = 'id=' + member_id;
         params = params + '&action=apply_job';
         params = params + '&employee=' + user_id;
+        params = params + '&hr_contacts=' + hr_contacts;
         params = params + '&resume=' + $('resume_id').value;
         
         var selected_job_str = $('selected_jobs').value;

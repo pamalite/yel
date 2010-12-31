@@ -244,7 +244,11 @@ function toggle_add_button() {
 }
 
 function trace_resume() {
-    resume_id = prompt('Enter the resume #:');
+    var resume_id = prompt('Enter the resume #:');
+    
+    if (resume_id == null) {
+        return;
+    }
     
     if (isEmpty(resume_id) || isNaN(resume_id)) {
         alert('Cannot trace resume. Input is invalid.');
@@ -387,6 +391,7 @@ function update_applicants() {
                 }
                 
                 var ids = xml.getElementsByTagName('member_job_id');
+                var ref_ids = xml.getElementsByTagName('ref_id');
                 var emails = xml.getElementsByTagName('email_addr');
                 var members = xml.getElementsByTagName('member_name');
                 var phone_nums = xml.getElementsByTagName('phone_num');
@@ -426,7 +431,12 @@ function update_applicants() {
                     if (referred_ons[i].childNodes.length <= 0) {
                         row.set(0, new Cell('<input type="button" value="delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\', false);" />', '', 'cell'));
                     } else {
-                        row.set(0, new Cell('<input type="button" value="delete" disabled/>', '', 'cell'));
+                        if (referred_ons[i].childNodes.length > 0 && 
+                            employed_ons[i].childNodes.length <= 0) {
+                            row.set(0, new Cell('<input type="button" value="Employed" onClick="show_employment_popup(\'' + ref_ids[i].childNodes[0].nodeValue + '\');" />', '', 'cell'));
+                        } else {
+                            row.set(0, new Cell('<input type="button" value="Employed" disabled />', '', 'cell'));
+                        }
                     }
                     
                     // applied on
@@ -478,7 +488,7 @@ function update_applicants() {
                     }
                     resume_details = resume_details + applied_or_submitted + "\n";
                     
-                    resume_details = resume_details + '<br/><br/><span class="tiny">Self: ' + selfs + ' | YE: ' + yels + "</span>\n"; 
+                    resume_details = resume_details + '<br/><br/><span class="tiny">Candidate: ' + selfs + ' | YE: ' + yels + "</span>\n"; 
                     row.set(4, new Cell(resume_details, '', 'cell'));
                     
                     // status
@@ -775,6 +785,7 @@ function update_new_applicants() {
                 var resume_file_hashes = xml.getElementsByTagName('resume_file_hash');
                 var requested_ons = xml.getElementsByTagName('formatted_requested_on');
                 var progress_notes = xml.getElementsByTagName('progress_notes');
+                var referrer_remarks = xml.getElementsByTagName('referrer_remarks');
                 var jobs = xml.getElementsByTagName('job');
                 var employers = xml.getElementsByTagName('employer');
                 var applied_jobs = xml.getElementsByTagName('num_jobs_attached');
@@ -894,6 +905,12 @@ function update_new_applicants() {
                     // actions
                     var actions = '';
                     actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\', true);" />';
+                    
+                    if (referrer_remarks[i].childNodes.length > 0) {
+                        if (referrer_remarks[i].childNodes[0].nodeValue != 'Current Position:<br/><br/><br/>Current Employer:<br/><br/><br/>Other Remarks:<br/>') {
+                            actions = actions + '<input type="button" value="Remarks" onClick="show_referrer_remarks_popup(\'' + ids[i].childNodes[0].nodeValue + '\'); " />';
+                        }
+                    }
                     
                     if (is_cannot_signup) {
                         actions = actions + '<input type="button" value="Sign Up" disabled />';
@@ -1833,6 +1850,94 @@ function close_apply_jobs_popup(_is_apply_job) {
         close_window('apply_job_window');
     }
 }
+
+function show_employment_popup(_referral_id) {
+    $('employment_referral_id').value = _referral_id;
+    
+    var params = 'id=' + _referral_id + '&action=get_referral_details';
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            var title = xml.getElementsByTagName('title');
+            var employer = xml.getElementsByTagName('employer');
+            var referee = xml.getElementsByTagName('referee');
+            var currency = xml.getElementsByTagName('currency');
+            
+            $('window_employment_title').set('html', 'Employment Confirmation of ' + referee[0].childNodes[0].nodeValue + ' for [' + employer[0].childNodes[0].nodeValue + '] ' + title[0].childNodes[0].nodeValue);
+            $('employment_currency').set('html', currency[0].childNodes[0].nodeValue);
+            
+            show_window('employment_window');
+        }
+    });
+    request.send(params);
+}
+
+function close_employment_popup(_to_confirm) {
+    if (_to_confirm) {
+        var is_confirmed = confirm('Are you sure all the employment details provided are correct?');
+        if (!is_confirmed) {
+            return;
+        }
+        
+        var params = 'id=' + $('employment_referral_id').value + '&action=confirm_employed';
+        params = params + '&employed_on=' + $('employment_year_label').get('html') + '-' + $('employment_month').options[$('employment_month').selectedIndex].value + '-' + $('employment_day').options[$('employment_day').selectedIndex].value;
+        params = params + '&work_commence_on=' + $('work_year_label').get('html') + '-' + $('work_month').options[$('work_month').selectedIndex].value + '-' + $('work_day').options[$('work_day').selectedIndex].value;
+        params = params + '&salary=' + $('salary').value;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == '-1') {
+                    alert('Employer account is not ready.');
+                    return;
+                }
+                
+                if (txt == 'ko') {
+                    alert('An error occured while confirming employment!');
+                    return;
+                }
+                
+                close_window('employment_window');
+                update_applicants();
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('employment_window');
+    }
+}
+
+function show_referrer_remarks_popup(_app_id) {
+    var params = 'id=' + _app_id;
+    params = params + '&action=get_referrer_remarks';
+    
+    var uri = root + "/employees/members_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            $('remarks').set('html', txt);
+            set_status('');
+            show_window('referrer_remarks_window');
+        },
+        onRequest: function(instance) {
+            set_status('Loading remarks...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function close_referrer_remarks_popup() {
+    close_window('referrer_remarks_window');
+}
+
 
 function onDomReady() {
     initialize_page();

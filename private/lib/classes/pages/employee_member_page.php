@@ -1012,6 +1012,10 @@ class EmployeeMemberPage extends Page {
             <div class="popup_window_title">Apply Job</div>
             <div id="div_resume_info" class="resume_info">
                 <div class="resume_desc">
+                    <span style="font-weight: bold;"><label for="hr_contact">HR Contact:</label></span>
+                    <span><input type="text" class="field hr_contact" id="hr_contact" value="" /></span>
+                </div>
+                <div class="resume_desc">
                     <span style="font-weight: bold;">Resume selected:</span>
                     <span id="resume_file_name"></span>
                 </div>

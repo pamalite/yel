@@ -94,7 +94,8 @@ td.vtop {
     display: none;
 }
 
-#notes_window, #progress_notes_window {
+#notes_window, #progress_notes_window, 
+#referrer_remarks_window {
     width: 650px;
     display: none;
 }
@@ -110,6 +111,15 @@ textarea.notes, textarea.progress_notes {
     width: 98%;
     height: 550px;
     font-size: 12pt;
+}
+
+div.remarks {
+    border: 1px solid #CCCCCC;
+    margin: 5px 5px 5px 5px;
+    padding: 3px 3px 3px 3px;
+    width: 97%;
+    height: 400px;
+    overflow: auto;
 }
 
 #conflicts_window, 
@@ -452,4 +462,9 @@ table.jobs_selection td.separator {
 span.tiny {
     font-size: 9pt;
     color: #666666;
+}
+
+#employment_window {
+    display: none;
+    width: auto;
 }

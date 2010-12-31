@@ -99,6 +99,11 @@ function sql_date_format($_date) {
     return $result[0]['formatted_date'];
 }
 
+function format_date($_datestamp) {
+    $dates = explode('-', $_datestamp);
+    return date('j M, Y', mktime(0, 0, 0, $dates[1], $dates[2], $dates[0]));
+}
+
 function redirect_to($_location) {
     header('Location: '. $_location);
     exit();

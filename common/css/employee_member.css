@@ -564,3 +564,7 @@ table.jobs_selection td.separator {
     margin-left: 10px;
     padding-bottom: 5px;
 }
+
+input.hr_contact {
+    width: 87%;
+}

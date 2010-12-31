@@ -106,7 +106,6 @@ function show_resumes_of(_job_id, _job_title) {
         method: 'post',
         onSuccess: function(txt, xml) {
             set_status('');
-            //return;
             if (txt == 'ko') {
                 alert('An error occurred while loading resumes.');
                 return false;
@@ -416,7 +415,7 @@ function close_remarks_popup(_needs_saving) {
     }
     
     close_window('remarks_window');
-    candidates[$('candidate_idx').value].employer_remarks = $('txt_remarks').value;
+    candidates[$('remarks_candidate_idx').value].employer_remarks = $('txt_remarks').value;
 }
 
 function show_remarks_popup(_referral_id, _candidate_idx) {

@@ -456,6 +456,46 @@ if ($_POST['action'] == 'apply_job') {
         exit();
     }
     
+    // put new non-applied jobs into member_jobs too
+    // 1. get the job IDs not in member_jobs
+    //    1.1 Get the job IDs in member_jobs using the IN() clause
+    //    1.2 Diff the $job_ids with the $result. This will give a list of IDs not in member_jobs
+    //    1.3 If the diff yields empty, that means all jobs are already in member_jobs, so skip. 
+    // 2. Add the complements into member_jobs for tracking purposes, if there is any.
+    $criteria = array(
+        'columns' => "DISTNCT member_jobs.job", 
+        'joins' => "member_jobs ON member_jobs.member = members.email_addr", 
+        'match' => "members.email_addr = '". $referee. "' AND 
+                    member_jobs.job IN (". implode(',', $job_ids). ")"
+    );
+    $member_obj = new Member();
+    $result = $member_obj->find($criteria);
+    
+    $existing_jobs = array();
+    $complements = array();
+    if (is_null($result) && empty($result)) {
+        $complements = $job_ids;
+    } else {
+        foreach ($result as $row) {
+            $existing_jobs[] = $row['job'];
+        }
+        $complements = array_merge(array_diff($job_ids, $existing_jobs));
+    }
+    
+    if (!empty($complements)) {
+        // got jobs not in member_jobs, so need to add them
+        $member_obj = new Member($referee);
+        $data = array();
+        $data['referrer'] = $member;
+        $data['applied_on'] = $timestamp;
+        $data['resume'] = $resume;
+        $data['job'] = 0;
+        foreach ($complements as $job_id) {
+            $data['job'] = $job_id;
+            $member_obj->addJobApplied($data);
+        }
+    }
+    
     // send email to employer and CC to team.XX@yellowelevator.com
     // 1. setup the mail message contents
     $jobs = array();
@@ -544,10 +584,20 @@ if ($_POST['action'] == 'apply_job') {
     $body .= 'Content-Disposition: attachment'. "\n";
     $body .= $attachment. "\n";
     $body .= '--yel_mail_sep_'. $attached_filename. "--\n\n";
-    $send = mail($employer->getEmailAddress(), $subject, $body, $headers);
+    
+    $employer_emails = $employer->getEmailAddress();
+    if (!empty($_POST['hr_contacts'])) {
+        $hr_contacts = explode(',', $_POST['hr_contacts']);
+        foreach ($hr_contacts as $i => $hr_contact) {
+            $hr_contacts[$i] = trim($hr_contact);
+        }
+        
+        $employer_emails .= ', '. implode(',', $hr_contacts);
+    }
+    $send = mail($employer_emails, $subject, $body, $headers);
     
     // $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
-    // fwrite($handle, 'To: '. $employer->getEmailAddress(). "\n\n");
+    // fwrite($handle, 'To: '. $employer_emails. "\n\n");
     // fwrite($handle, 'Header: '. $headers. "\n\n");
     // fwrite($handle, 'Subject: '. $subject. "\n\n");
     // fwrite($handle, $body);

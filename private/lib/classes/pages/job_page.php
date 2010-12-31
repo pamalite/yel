@@ -355,10 +355,6 @@ class JobPage extends Page {
                             <?php
                             }
                             ?>
-                            </table>
-                        </td>
-                        <td class="candidate">
-                            <table class="candidate">
                                 <tr>
                                     <td colspan="2" class="title">Candidate's Contact Details &amp; Resume</td>
                                 </tr>
@@ -377,6 +373,25 @@ class JobPage extends Page {
                                 <tr>
                                     <td class="label"><label for="candidate_resume">Resume:</label></td>
                                     <td><input type="file" class="field" name="candidate_resume" id="candidate_resume" value="" /></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="candidate">
+                            <table class="candidate">
+                                <tr>
+                                    <td colspan="2" class="title">Candidate's Extra Info (Optional)</td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="candidate_current_pos">Current Position:</label></td>
+                                    <td><input type="text" class="field" name="candidate_current_pos" id="candidate_current_pos" value="" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="candidate_current_emp">Current Employer:</label></td>
+                                    <td><input type="text" class="field" name="candidate_current_emp" id="candidate_current_emp" value="" /></td>
+                                </tr>
+                                <tr>
+                                    <td class="label"><label for="candidate_remarks">Other Remarks:</label></td>
+                                    <td><textarea class="field" name="candidate_remarks" id="candidate_remarks"></textarea></td>
                                 </tr>
                             </table>
                         </td>

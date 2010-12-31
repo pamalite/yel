@@ -535,6 +535,63 @@ class EmployeeMembersPage extends Page {
             </form>
         </div>
         
+        <div id="employment_window" class="popup_window">
+            <div id="window_employment_title" class="popup_window_title"></div>
+            <div class="employment_form">
+                <table class="employment_form_table">
+                    <tr>
+                        <td class="label">Employed On:</td>
+                        <td class="field">
+                        <?php
+                            $today = date('Y-m-d');
+                            $date_components = explode('-', $today);
+                            $year = $date_components[0];
+                            $month = $date_components[1];
+                            $day = $date_components[2];
+                            
+                            echo generate_dropdown('employment_day', '', 1, 31, $day, 2, 'Day');
+                            echo generate_month_dropdown('employment_month', '', $month);
+                            echo '<span id="employment_year_label">'. $year. '</span>'. "\n";
+                        ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">Work Commencement:</td>
+                        <td class="field">
+                        <?php
+                            $today = date('Y-m-d');
+                            $date_components = explode('-', $today);
+                            $year = $date_components[0];
+                            $month = $date_components[1];
+                            $day = $date_components[2];
+                            
+                            echo generate_dropdown('work_day', '', 1, 31, $day, 2, 'Day');
+                            echo generate_month_dropdown('work_month', '', $month);
+                            echo '<span id="work_year_label">'. $year. '</span>'. "\n";
+                        ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">Annual Salary:</td>
+                        <td class="field"><span id="employment_currency">???</span>$&nbsp;<input type="text" class="salary_field" id="salary" name="salary" value="1.00" /></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="popup_window_buttons_bar">
+                <input type="hidden" id="employment_referral_id" value="0" />
+                <input type="button" value="Confirm &amp; Close" onClick="close_employment_popup(true);" />
+                <input type="button" value="Close" onClick="close_employment_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="referrer_remarks_window" class="popup_window">
+            <div class="popup_window_title">Referrer Remarks</div>
+            <div id="remarks" class="remarks"></div>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Close" onClick="close_referrer_remarks_popup();" />
+            </div>
+        </div>
+        
         <?php
     }
 }

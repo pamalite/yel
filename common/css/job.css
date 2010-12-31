@@ -91,6 +91,11 @@
     width: 800px;
 }
 
+#refer_window textarea.field {
+    width: 98%;
+    height: 195px;
+}
+
 #apply_window {
     width: 550px;
 }
@@ -103,7 +108,7 @@
 .refer_form td, 
 .apply_form td {
     padding: 3px 3px 3px 3px;
-    vertical-align: baseline;
+    vertical-align: top;
 }
 
 .refer_form td.referrer {

@@ -3,6 +3,10 @@ require_once dirname(__FILE__). '/private/lib/utilities.php';
 
 session_start();
 
+if (!isset($_POST['job_id'])) {
+    redirect_to('welcome.php');
+}
+
 // 1. initialize the parameters
 $referrer = array();
 $referrer['email_addr'] = sanitize($_POST['referrer_email']);
@@ -28,6 +32,7 @@ $data['candidate_email'] = $candidate['email_addr'];
 $data['candidate_phone'] = $candidate['phone_num'];
 $data['candidate_name'] = $candidate['name'];
 $data['job'] = $job->getId();
+$data['referrer_remarks'] = '<b>Current Position:</b><br/>'. $_POST['candidate_current_pos']. '<br/><br/><b>Current Employer:</b><br/>'. $_POST['candidate_current_emp']. '<br/><br/><b>Other Remarks:</b><br/>'. str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['candidate_remarks']);
 
 $referral_buffer = new ReferralBuffer();
 $buffer_id = $referral_buffer->create($data);

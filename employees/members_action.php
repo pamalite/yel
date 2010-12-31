@@ -1,6 +1,8 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
 require_once dirname(__FILE__). "/../private/lib/classes/member_search.php";
+require_once dirname(__FILE__). "/../employers/credit_note.php";
+require_once dirname(__FILE__). "/../employers/general_invoice.php";
 
 session_start();
 
@@ -168,7 +170,7 @@ if ($_POST['action'] == 'get_new_applicants') {
                       referral_buffers.referrer_email, referral_buffers.referrer_name, 
                       referral_buffers.referrer_phone, 
                       referral_buffers.existing_resume_id, referral_buffers.resume_file_hash, 
-                      referral_buffers.progress_notes, 
+                      referral_buffers.progress_notes, referral_buffers.referrer_remarks, 
                       IF(members.email_addr IS NULL, 0, 1) AS is_member,
                       jobs.title AS job, jobs.employer,  
                       DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on, 
@@ -212,6 +214,7 @@ if ($_POST['action'] == 'get_new_applicants') {
         $result[$i]['referrer_name'] = htmlspecialchars_decode(stripslashes($row['referrer_name']));
         $result[$i]['candidate_name'] = htmlspecialchars_decode(stripslashes($row['candidate_name']));
         $result[$i]['progress_notes'] = htmlspecialchars_decode(stripslashes($row['progress_notes']));
+        $result[$i]['referrer_remarks'] = trim(htmlspecialchars_decode(stripslashes($row['referrer_remarks'])));
     }
     
     $response = array(
@@ -262,7 +265,7 @@ if ($_POST['action'] == 'get_applicants') {
     
     $criteria = array(
         'columns' => "member_jobs.id AS member_job_id, members.email_addr, members.phone_num, 
-                      member_jobs.progress_notes,
+                      member_jobs.progress_notes, referrals.id AS ref_id, 
                       CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
                       member_jobs.job AS job_id, jobs.title AS job_title, jobs.employer AS employer_id, 
                       referrals.resume AS resume_id, resumes.name AS resume_name, 
@@ -615,7 +618,11 @@ if ($_POST['action'] == 'get_progress_notes') {
         $progress_notes = htmlspecialchars_decode(stripslashes($member->getProgressNotes($_POST['id'])));
     }
     
-    echo $progress_notes;
+    if (empty($progress_notes)) {
+        echo "--- ". date('Y-m-d H:i:s'). " ---\n";
+    } else {
+        echo $progress_notes. "\n\n--- ". date('Y-m-d H:i:s'). " ---\n";
+    }
     exit();
 }
 
@@ -987,7 +994,7 @@ if ($_POST['action'] == 'apply_jobs') {
             'columns' => "jobs.title, employers.name AS employer, 
                           DATE_FORMAT(jobs.expire_on, '%e %b, %Y) AS expire_on", 
             'joins' => "employers ON employers.id = jobs.employer", 
-            'match' => "jobs.id IN (". $jobs_stri. ")"
+            'match' => "jobs.id IN (". $jobs_str. ")"
         );
         
         header('Content-type: text/xml');
@@ -996,6 +1003,471 @@ if ($_POST['action'] == 'apply_jobs') {
     }
     
     echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'get_referral_details') {
+    $criteria = array(
+        'columns' => "jobs.title, jobs.employer, currencies.symbol, 
+                      CONCAT(members.lastname, ', ', members.firstname) AS referee", 
+        'joins' => "jobs ON jobs.id = referrals.job, 
+                    members ON members.email_addr = referrals.referee, 
+                    currencies ON currencies.country_code = jobs.country",
+        'match' => "referrals.id = ". $_POST['id'], 
+        'limit' => "1"
+    );
+    
+    $referral = new Referral();
+    $result = $referral->find($criteria);
+    
+    $employer = new Employer($result[0]['employer']);
+    $branch = $employer->getAssociatedBranch();
+    
+    $response = array(
+        'title' => $result[0]['title'],
+        'employer' => $result[0]['employer'],
+        'referee' => $result[0]['referee'], 
+        'currency' => Currency::getSymbolFromCountryCode($branch[0]['country'])
+    );
+    
+    header('Content-type: text/xml');
+    echo $xml_dom->get_xml_from_array(array('referral' => $response));
+    exit();
+}
+
+if ($_POST['action'] == 'confirm_employed') {
+    $work_commence_on = $_POST['work_commence_on'];
+    $is_replacement = false;
+    $is_free_replacement = false;
+    $previous_referral = '0';
+    $previous_invoice = '0';
+    
+    // 1. Update the referral to employed
+    $referral = new Referral($_POST['id']);
+    
+    $criteria = array(
+        'columns' => "jobs.id AS job_id, jobs.title, jobs.employer, 
+                      referrals.member, referrals.referee", 
+        'joins' => "jobs ON jobs.id = referrals.job", 
+        'match' => "referrals.id = ". $_POST['id'], 
+        'limit' => "1"
+    );
+    
+    $result = $referral->find($criteria);
+    $employer = new Employer($result[0]['employer']);
+    $candidate = new Member($result[0]['referee']);
+    $member = new Member($result[0]['member']);
+    $job = array(
+        'id' => $result[0]['job_id'],
+        'title' => htmlspecialchars_decode(stripslashes($result[0]['title']))
+    );
+    
+    $salary = $_POST['salary'];
+    $irc_id = ($member->isIRC()) ? $member->getId() : NULL;
+    $total_reward = $referral->calculateRewardFrom($salary, $irc_id);
+    $total_token_reward = $total_reward * 0.30;
+    $total_reward_to_referrer = $total_reward - $total_token_reward;
+    
+    $data = array();
+    $data['employed_on'] = $_POST['employed_on'];
+    $data['work_commence_on'] = $work_commence_on;
+    $data['salary_per_annum'] = $salary;
+    $data['total_reward'] = $total_reward_to_referrer;
+    $data['total_token_reward'] = $total_token_reward;
+    $data['guarantee_expire_on'] = $referral->getGuaranteeExpiryDateWith($salary, $work_commence_on);
+    
+    // 1.1 Check whether the reward is 0.00 or NULL. If it is, then the employer account is not ready. 
+    if ($data['total_reward'] <= 0.00 || 
+        $data['guarantee_expire_on'] == '0000-00-00 00:00:00' || 
+        is_null($data['guarantee_expire_on'])) {
+        echo '-1';
+        exit();
+    }
+    
+    if ($referral->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    // 2. Generate an Reference Invoice
+    // 2.1 Check whether this job is a replacement for a previous failed referral. 
+    $criteria = array(
+        'columns' => 'id',
+        'match' => "job = ". $job['id']. " AND 
+                    (replacement_authorized_on IS NOT NULL AND replacement_authorized_on <> '0000-00-00 00:00:00') AND 
+                    (replaced_on IS NULL OR replaced_on = '0000-00-00 00:00:00') AND 
+                    replaced_referral IS NULL", 
+        'limit' => '1'
+    );
+    $result = $referral->find($criteria);
+    
+    if (count($result) > 0 && !is_null($result)) {
+        $is_replacement = true;
+        $previous_referral = $result[0]['id'];
+    }
+    
+    // 2.2 Get all the fees, discounts and extras and calculate accordingly.
+    $fees = $employer->getFees();
+    $payment_terms_days = $employer->getPaymentTermsInDays();
+    
+    $subtotal = $discount = $extra_charges = 0.00;
+    foreach($fees as $fee) {
+        if ($salary >= $fee['salary_start'] && 
+            ($salary <= $fee['salary_end'] || $fee['salary_end'] == 0)) {
+            $discount = -($salary * ($fee['discount'] / 100.00));
+            $subtotal = ($salary * ($fee['service_fee'] / 100.00));
+            break;
+        }
+    }
+    $new_total_fee = $subtotal + $discount;
+    
+    // 2.2.1 If this is a replacement, re-calculate accordingly by taking the previously invoiced amount.
+    $credit_amount = 0;
+    if ($is_replacement) {
+        // 2.2.1a If it is a replacement, get the previously invoiced amount.
+        $criteria = array(
+            'columns' => 'invoices.id, SUM(invoice_items.amount) AS amount_payable', 
+            'joins' => 'invoice_items ON invoice_items.invoice = invoices.id', 
+            'match' => "invoices.type ='R' AND 
+                        invoice_items.item = ". $previous_referral, 
+            'group' => 'invoices.id'
+        );
+        $result = Invoice::find($query);
+        $amount_payable = $result[0]['amount_payable'];
+        $previous_invoice = $result[0]['id'];
+        
+        // 2.2.1b Get the difference.
+        $amount_difference = $new_total_fee - $amount_payable;
+        
+        // 2.2.1c If the difference in fees is more than zero, then use the amount difference. 
+        if (round($amount_difference, 2) <= 0) {
+            $subtotal = $discount = $extra_charges = 0.00;
+            $is_free_replacement = true;
+            $credit_amount = abs($amount_difference);
+        } else {
+            $discount = $extra_charges = 0.00;
+            $subtotal = $amount_difference;
+        }
+    }
+    
+    // 2.3 Generate the invoice
+    $issued_on = date('j M, Y');
+    $data = array();
+    $data['issued_on'] = now();
+    $data['type'] = 'R';
+    $data['employer'] = $employer->getId();
+    $data['payable_by'] = sql_date_add($data['issued_on'], $payment_terms_days, 'day');
+    
+    if ($is_free_replacement) {
+        $data['paid_on'] = $data['issued_on'];
+        $data['paid_through'] = 'CSH';
+        $data['paid_id'] = 'FREE_REPLACEMENT';
+    }
+    
+    $invoice = Invoice::create($data);
+    if (!$invoice) {
+        echo 'ko';
+        exit();
+    }
+    
+    $referral_desc = 'Reference fee for ['. $job['id']. '] '. $job['title'];
+    if ($is_free_replacement) {
+        $referral_desc = 'Free replacement for Invoice: '. pad($previous_invoice, 11, '0');
+    } 
+    
+    if ($is_replacement && !$is_free_replacement) {
+        $referral_desc = 'Replacement fee for Invoice: '. pad($previous_invoice, 11, '0');
+    }
+    
+    $item_added = Invoice::addItem($invoice, $subtotal, $referral->getId(), $referral_desc);
+    if (!$item_added) {
+        echo "ko";
+        exit();
+    }
+    
+    if (!$is_free_replacement) {
+        $item_added = Invoice::addItem($invoice, $discount, $referral->getId(), 'Discount');
+        if (!$item_added) {
+            echo "ko";
+            exit();
+        }
+
+        $item_added = Invoice::addItem($invoice, $extra_charges, $referral->getId(), 'Extra charges');
+        if (!$item_added) {
+            echo "ko";
+            exit();
+        }
+        
+        // generate and send invoice
+        $filename = generate_random_string_of(8). '.'. generate_random_string_of(8);
+        $branch = $employer->getAssociatedBranch();
+        $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
+        $currency = $branch[0]['currency'];
+
+        $items = Invoice::getItems($invoice);
+        $amount_payable = 0.00;
+        foreach($items as $i=>$item) {
+            $amount_payable += $item['amount'];
+            $items[$i]['amount'] = number_format($item['amount'], 2, '.', ', ');
+        }
+        $amount_payable = number_format($amount_payable, 2, '.', ', ');
+        $invoice_or_receipt = 'Invoice';
+        
+        $pdf = new GeneralInvoice();
+        $pdf->AliasNbPages();
+        $pdf->SetAuthor('Yellow Elevator. This invoice was automatically generated. Signature is not required.');
+        $pdf->SetTitle($GLOBALS['COMPANYNAME']. ' - Invoice '. pad($invoice, 11, '0'));
+        $pdf->SetInvoiceType('R', $invoice_or_receipt);
+        $pdf->SetCurrency($currency);
+        $pdf->SetBranch($branch);
+        $pdf->AddPage();
+        $pdf->SetFont('Arial', '', 10);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetFillColor(54, 54, 54);
+        $pdf->Cell(60, 5, "Invoice Number",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, "Issuance Date",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, "Payable By",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, "Amount Payable (". $currency. ")",1,0,'C',1);
+        $pdf->Ln(6);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(60, 5, pad($invoice, 11, '0'),1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, $issued_on, 1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, format_date($data['payable_by']),1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, $amount_payable,1,0,'C');
+        $pdf->Ln(6);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->Cell(60, 5, "User ID",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, "Employer Name",1,0,'C',1);
+        $pdf->Ln(6);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(60, 5, $employer->getId(),1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, $employer->getName(),1,0,'C');
+        $pdf->Ln(10);
+        
+        $table_header = array("No.", "Item", "Amount (". $currency. ")");
+        $pdf->FancyTable($table_header, $items, $amount_payable);
+        
+        $pdf->Ln(13);
+        $pdf->SetFont('','I');
+        $pdf->Cell(0, 0, "This invoice was automatically generated. Signature is not required.", 0, 0, 'C');
+        $pdf->Ln(6);
+        $pdf->Cell(0, 5, "Payment Notice",'LTR',0,'C');
+        $pdf->Ln();
+        $pdf->Cell(0, 5, "- Payment shall be made payable to ". $branch[0]['branch']. ".", 'LR', 0, 'C');
+        $pdf->Ln();
+        $pdf->Cell(0, 5, "- To facilitate the processing of the payment, please write down the invoice number(s) on your cheque(s)/payment slip(s)", 'LBR', 0, 'C');
+        $pdf->Ln(10);
+        $pdf->Cell(0, 0, "E. & O. E.", 0, 0, 'C');
+        
+        $pdf->Close();
+        $pdf->Output($GLOBALS['data_path']. '/general_invoices/'. $filename. '.pdf', 'F');
+        
+        $attachment = chunk_split(base64_encode(file_get_contents($GLOBALS['data_path']. '/general_invoices/'. $filename. '.pdf')));
+
+        $subject = "Notice of Invoice ". pad($invoice, 11, '0');
+        $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+        $headers .= 'Bcc: '. $sales. "\n";
+        $headers .= 'MIME-Version: 1.0'. "\n";
+        $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $filename. '";'. "\n\n";
+
+        $body = '--yel_mail_sep_'. $filename. "\n";
+        $body .= 'Content-Type: multipart/alternative; boundary="yel_mail_sep_alt_'. $filename. '"'. "\n";
+        $body .= '--yel_mail_sep_alt_'. $filename. "\n";
+        $body .= 'Content-Type: text/plain; charset="iso-8859-1"'. "\n";
+        $body .= 'Content-Transfer-Encoding: 7bit"'. "\n";
+        
+        $mail_lines = file('../private/mail/employer_general_invoice.txt');
+        $message = '';
+        foreach ($mail_lines as $line) {
+            $message .= $line;
+        }
+
+        $message = str_replace('%company%', $employer->getName(), $message);
+        $message = str_replace('%invoice%', pad($invoice, 11, '0'), $message);
+        $message = str_replace('%issued_on%', $issued_on, $message);
+        $message = str_replace('%payable_by%', format_date($data['payable_by']), $message);
+        $message = str_replace('%amount%', $amount_payable, $message);
+        $message = str_replace('%currency%', $currency, $message);
+        
+        $body .= $message. "\n";
+        $body .= '--yel_mail_sep_alt_'. $filename. "--\n\n";
+        $body .= '--yel_mail_sep_'. $filename. "\n";
+        $body .= 'Content-Type: application/pdf; name="yel_invoice_'. pad($invoice, 11, '0'). '.pdf"'. "\n";
+        $body .= 'Content-Transfer-Encoding: base64'. "\n";
+        $body .= 'Content-Disposition: attachment'. "\n";
+        $body .= $attachment. "\n";
+        $body .= '--yel_mail_sep_'. $filename. "--\n\n";
+        mail($employer->getEmailAddress(), $subject, $body, $headers);
+        
+        // $handle = fopen('/tmp/email_to_'. $employer->getEmailAddress(). '.txt', 'w');
+        // fwrite($handle, 'To: '. $employer->getEmailAddress(). "\n\n");
+        // fwrite($handle, 'Header: '. $headers. "\n\n");
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $body);
+        
+        unlink($GLOBALS['data_path']. '/general_invoice/'. $filename. '.pdf');
+    } else {
+        if ($credit_amount > 0) {
+            $credit_note_desc = 'Refund of balance for Invoice: '. pad($previous_invoice, 11, '0');
+            $filename = generate_random_string_of(8). '.'. generate_random_string_of(8);
+            $expire_on = sql_date_add($issued_on, 30, 'day');
+            
+            Invoice::accompanyCreditNoteWith($previous_invoice, $invoice, $issued_on, $credit_amount);
+            
+            $branch = $employer->getAssociatedBranch();
+            $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
+            $branch[0]['address'] = str_replace(array("\r\n", "\r"), "\n", $branch[0]['address']);
+            $branch['address_lines'] = explode("\n", $branch[0]['address']);
+            $currency = Currency::getSymbolFromCountryCode($branch[0]['country']);
+            
+            $pdf = new CreditNote();
+            $pdf->AliasNbPages();
+            $pdf->SetAuthor('Yellow Elevator. This credit note was automatically generated. Signature is not required.');
+            $pdf->SetTitle($GLOBALS['COMPANYNAME']. ' - Credit Note '. pad($invoice, 11, '0'));
+            $pdf->SetRefundAmount($credit_amount);
+            $pdf->SetDescription($credit_note_desc);
+            $pdf->SetCurrency($currency);
+            $pdf->SetBranch($branch);
+            $pdf->AddPage();
+            $pdf->SetFont('Arial', '', 10);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->SetFillColor(54, 54, 54);
+            $pdf->Cell(60, 5, "Credit Note Number",1,0,'C',1);
+            $pdf->Cell(1);
+            $pdf->Cell(33, 5, "Issuance Date",1,0,'C',1);
+            $pdf->Cell(1);
+            $pdf->Cell(33, 5, "Creditable By",1,0,'C',1);
+            $pdf->Cell(1);
+            $pdf->Cell(0, 5, "Amount Creditable (". $currency. ")",1,0,'C',1);
+            $pdf->Ln(6);
+            $pdf->SetTextColor(0, 0, 0);
+            $pdf->Cell(60, 5, pad($invoice, 11, '0'),1,0,'C');
+            $pdf->Cell(1);
+            $pdf->Cell(33, 5, $issued_on,1,0,'C');
+            $pdf->Cell(1);
+            $pdf->Cell(33, 5, $expire_on,1,0,'C');
+            $pdf->Cell(1);
+            $pdf->Cell(0, 5, number_format($credit_amount, 2, '.', ','),1,0,'C');
+            $pdf->Ln(6);
+            $pdf->SetTextColor(255, 255, 255);
+            $pdf->Cell(60, 5, "User ID",1,0,'C',1);
+            $pdf->Cell(1);
+            $pdf->Cell(0, 5, "Employer Name",1,0,'C',1);
+            $pdf->Ln(6);
+            $pdf->SetTextColor(0, 0, 0);
+            $pdf->Cell(60, 5, $employer->getId(),1,0,'C');
+            $pdf->Cell(1);
+            $pdf->Cell(0, 5, $employer->getName(),1,0,'C');
+            $pdf->Ln(10);
+            
+            $table_header = array("No.", "Item", "Amount (". $currency. ")");
+            $pdf->FancyTable($table_header);
+            
+            $pdf->Ln(13);
+            $pdf->SetFont('','I');
+            $pdf->Cell(0, 0, "This credit note was automatically generated. Signature is not required.", 0, 0, 'C');
+            $pdf->Ln(6);
+            $pdf->Cell(0, 5, "Refund Notice",'LTR',0,'C');
+            $pdf->Ln();
+            $pdf->Cell(0, 5, "- Refund will be made payable to ". $employer->getName(). ". ", 'LR', 0, 'C');
+            $pdf->Ln();
+            $pdf->Cell(0, 5, "- To facilitate the refund process, please inform us of any discrepancies.", 'LBR', 0, 'C');
+            $pdf->Ln(10);
+            $pdf->Cell(0, 0, "E. & O. E.", 0, 0, 'C');
+            $pdf->Close();
+            $pdf->Output($GLOBALS['data_path']. '/credit_notes/'. $filename. '.pdf', 'F');
+            
+            $attachment = chunk_split(base64_encode(file_get_contents($GLOBALS['data_path']. '/credit_notes/'. $filename. '.pdf')));
+
+            $subject = "Balance Refund Notice of Invoice ". pad($previous_invoice, 11, '0');
+            $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+            $headers .= 'Bcc: '. $sales. "\n";
+            $headers .= 'MIME-Version: 1.0'. "\n";
+            $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $filename. '";'. "\n\n";
+
+            $body = '--yel_mail_sep_'. $filename. "\n";
+            $body .= 'Content-Type: multipart/alternative; boundary="yel_mail_sep_alt_'. $filename. '"'. "\n";
+            $body .= '--yel_mail_sep_alt_'. $filename. "\n";
+            $body .= 'Content-Type: text/plain; charset="iso-8859-1"'. "\n";
+            $body .= 'Content-Transfer-Encoding: 7bit"'. "\n";
+            
+            $mail_lines = file('../private/mail/employer_credit_note.txt');
+            $message = '';
+            foreach ($mail_lines as $line) {
+                $message .= $line;
+            }
+
+            $message = str_replace('%company%', $employer->getName(), $message);
+            $message = str_replace('%previous_invoice%', pad($previous_invoice, 11, '0'), $message);
+            $message = str_replace('%new_invoice%', pad($invoice, 11, '0'), $message);
+            $message = str_replace('%job_title%', $job_title, $message);
+            
+            $body .= $message. "\n";
+            $body .= '--yel_mail_sep_alt_'. $filename. "--\n\n";
+            $body .= '--yel_mail_sep_'. $filename. "\n";
+            $body .= 'Content-Type: application/pdf; name="yel_credit_note_'. pad($invoice, 11, '0'). '.pdf"'. "\n";
+            $body .= 'Content-Transfer-Encoding: base64'. "\n";
+            $body .= 'Content-Disposition: attachment'. "\n";
+            $body .= $attachment. "\n";
+            $body .= '--yel_mail_sep_'. $filename. "--\n\n";
+            mail($employer->getEmailAddress(), $subject, $body, $headers);
+
+            unlink($GLOBALS['data_path']. '/credit_notes/'. $filename. '.pdf');
+        }
+    }
+    
+    // 2.4 If it is a replacement, update both referrals to disable future replacements.
+    if ($is_replacement) {
+        $mysqli = Database::connect();
+        $queries = "UPDATE referrals SET 
+                    replaced_on = '". now(). "', 
+                    replaced_referral = ". $referral->getId(). " 
+                    WHERE id = ". $previous_referral. "; 
+                    UPDATE referrals SET 
+                    guarantee_expire_on = '". $work_commence_on. "', 
+                    replacement_authorized_on = NULL, 
+                    replaced_on = '". now(). "', 
+                    replaced_referral = ". $referral->getId(). " 
+                    WHERE id = ". $referral->getId();
+        if (!$mysqli->transact($queries)) {
+            echo 'ko';
+            exit();
+        }
+    }
+    
+    // 3. Send a notification
+    $mail_lines = file('../private/mail/member_reward.txt');
+    $message = '';
+    foreach ($mail_lines as $line) {
+        $message .= $line;
+    }
+
+    $message = str_replace('%member_name%', $member->getFullName(), $message);
+    $message = str_replace('%referee_name%', $candidate->getFullName(), $message);
+    $message = str_replace('%employer%', $employer->getName(), $message);
+    $message = str_replace('%job_title%', $job['title'], $message);
+    $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+    $message = str_replace('%root%', $GLOBALS['root'], $message);
+    $subject = desanitize($candidate->getFullName()). " was successfully employed!";
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    mail($member->getId(), $subject, $message, $headers);
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'get_referrer_remarks') {
+    $referral_buffer = new ReferralBuffer($_POST['id']);
+    $record = $referral_buffer->get();
+    echo trim(htmlspecialchars_decode(stripslashes($record[0]['referrer_remarks'])));
     exit();
 }
 ?>
