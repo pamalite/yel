@@ -542,6 +542,12 @@ if ($_POST['action'] == 'apply_job') {
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     
+    if (!empty($_POST['message'])) {
+        $message = str_replace('%message%', $_POST['message'], $message);
+    } else {
+        $message = str_replace('%message%', '[No message]', $message);
+    }
+    
     // 2. get the selected resume file
     $criteria = array(
         "columns" => "file_name, file_hash, file_size, file_type", 
@@ -601,12 +607,12 @@ if ($_POST['action'] == 'apply_job') {
     // fwrite($handle, 'Header: '. $headers. "\n\n");
     // fwrite($handle, 'Subject: '. $subject. "\n\n");
     // fwrite($handle, $body);
-    
-    if ($send === false) {
-        fwrite($handle, 'not send due to errors');
-    }
-    
-    fclose($handle);
+    // 
+    // if ($send === false) {
+    //     fwrite($handle, 'not send due to errors');
+    // }
+    // 
+    // fclose($handle);
     
     echo 'ok';
     exit();

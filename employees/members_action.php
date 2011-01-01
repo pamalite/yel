@@ -176,7 +176,8 @@ if ($_POST['action'] == 'get_new_applicants') {
                       DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on, 
                       (SELECT COUNT(buf.id) 
                        FROM referral_buffers AS buf 
-                       WHERE buf.candidate_email = referral_buffers.candidate_email) AS num_jobs_attached", 
+                       WHERE buf.candidate_email = referral_buffers.candidate_email) AS num_jobs_attached, 
+                      referral_buffers.current_employer, referral_buffers.current_position", 
         'joins' => "members ON members.email_addr = referral_buffers.candidate_email, 
                     jobs ON jobs.id = referral_buffers.job, 
                     employers ON employers.id = jobs.employer",
@@ -215,6 +216,8 @@ if ($_POST['action'] == 'get_new_applicants') {
         $result[$i]['candidate_name'] = htmlspecialchars_decode(stripslashes($row['candidate_name']));
         $result[$i]['progress_notes'] = htmlspecialchars_decode(stripslashes($row['progress_notes']));
         $result[$i]['referrer_remarks'] = trim(htmlspecialchars_decode(stripslashes($row['referrer_remarks'])));
+        $result[$i]['current_employer'] = htmlspecialchars_decode(stripslashes($row['current_employer']));
+        $result[$i]['current_position'] = htmlspecialchars_decode(stripslashes($row['current_position']));
     }
     
     $response = array(
@@ -843,9 +846,11 @@ if ($_POST['action'] == 'add_new_application') {
         $data['referrer_phone'] = (empty($_POST['referrer_phone']) ? "NULL" : $_POST['referrer_phone']);;
     }
     
-    $data['candidate_email'] = (empty($_POST['candidate_email']) ? "NULL" : $_POST['candidate_email']);;
-    $data['candidate_name'] = (empty($_POST['candidate_name']) ? "NULL" : $_POST['candidate_name']);;
-    $data['candidate_phone'] = (empty($_POST['candidate_phone']) ? "NULL" : $_POST['candidate_phone']);;
+    $data['candidate_email'] = (empty($_POST['candidate_email']) ? "NULL" : $_POST['candidate_email']);
+    $data['candidate_name'] = (empty($_POST['candidate_name']) ? "NULL" : $_POST['candidate_name']);
+    $data['candidate_phone'] = (empty($_POST['candidate_phone']) ? "NULL" : $_POST['candidate_phone']);
+    $data['current_position'] = (empty($_POST['current_pos']) ? "NULL" : $_POST['current_pos']);
+    $data['current_employer'] = (empty($_POST['current_emp']) ? "NULL" : $_POST['current_emp']);
     $data['progress_notes'] = (empty($_POST['notes']) ? "NULL" : $_POST['notes']);;
     
     $jobs = explode(',', $_POST['jobs']);

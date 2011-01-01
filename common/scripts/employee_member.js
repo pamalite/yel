@@ -939,6 +939,7 @@ function close_employer_remarks() {
 }
 
 function show_apply_job_popup(_resume_id, _resume_file_name) {
+    $('message').value = '';
     $('resume_id').value = _resume_id;
     $('resume_file_name').set('html', _resume_file_name);
     
@@ -950,7 +951,7 @@ function show_apply_job_popup(_resume_id, _resume_file_name) {
     }
     
     show_window('apply_job_window');
-    // window.scrollTo(0, 0);
+    
     filter_jobs();
 }
 
@@ -1012,6 +1013,8 @@ function close_apply_job_popup(_is_apply_job) {
             referrer = $('apply_job_referrer').value;
         }
         params = params + '&referrer=' + referrer;
+        
+        params = params + '&message=' + encodeURIComponent($('message').value);
         
         var uri = root + "/employees/member_action.php";
         var request = new Request({
@@ -1471,6 +1474,67 @@ function delete_job_profile(_id) {
 
         request.send(params);
     }
+}
+
+function show_copy_friendly_popup() {
+    var summary = '<b>Seeking for a job:</b> ' + $('is_active_seeking_job').options[$('is_active_seeking_job').selectedIndex].text + '<br/><br/>';
+    
+    var seeking = '';
+    var lines = $('seeking').value.split("\n");
+    for (var i=0; i < lines.length; i++) {
+        seeking = seeking + lines[i];
+        
+        if (i < lines.length-1) {
+            seeking = seeking + '<br/>';
+        }
+    }
+    summary = summary + '<b>Goals &amp; Experiences:</b><br/> ' + seeking + '<br/><br/>';
+    
+    var expected_salary = $('expected_salary_currency').options[$('expected_salary_currency').selectedIndex].text + '$&nbsp;';
+    expected_salary = expected_salary + $('expected_salary').value + ' - ';
+    expected_salary = expected_salary + $('expected_salary_end').value;
+    summary = summary + '<b>Expected Salary:</b> ' + expected_salary + '<br/><br/>';
+    
+    summary = summary + '<b>Preferred job locations:</b> ' + $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].text + ', ' + $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].text + '<br/><br/>';
+    
+    summary = summary + '<b>Willing to travel or relocate:</b> ' + $('can_travel_relocate').options[$('can_travel_relocate').selectedIndex].text + '<br/><br/>';
+    
+    var reason_for_leaving = '';
+    lines = $('reason_for_leaving').value.split("\n");
+    for (var i=0; i < lines.length; i++) {
+        reason_for_leaving = reason_for_leaving + lines[i];
+        
+        if (i < lines.length-1) {
+            reason_for_leaving = reason_for_leaving + '<br/>';
+        }
+    }
+    summary = summary + '<b>Reason for leaving:</b><br/> ' + reason_for_leaving + '<br/><br/>';
+    
+    var current_position = '';
+    lines = $('current_position').value.split("\n");
+    for (var i=0; i < lines.length; i++) {
+        current_position = current_position + lines[i];
+        
+        if (i < lines.length-1) {
+            current_position = current_position + '<br/>';
+        }
+    }
+    summary = summary + '<b>Reason for leaving:</b><br/> ' + current_position + '<br/><br/>';
+    
+    var current_salary = $('current_salary_currency').options[$('current_salary_currency').selectedIndex].text + '$&nbsp;';
+    current_salary = current_salary + $('current_salary').value + ' - ';
+    current_salary = current_salary + $('current_salary_end').value;
+    summary = summary + '<b>Current Salary:</b> ' + current_salary + '<br/><br/>';
+    
+    summary = summary + '<b>Notice period:</b> ' + $('notice_period').value + '<br/><br/>';
+    summary = summary + '<b>Total years of work experience:</b> ' + $('total_years').value + '<br/><br/>';
+    
+    $('summary').set('html', summary);
+    show_window('copy_friendly_window');
+}
+
+function close_copy_friendly_popup() {
+    close_window('copy_friendly_window');
 }
 
 function onDomReady() {

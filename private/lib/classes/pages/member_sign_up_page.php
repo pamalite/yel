@@ -172,6 +172,10 @@ class MemberSignUpPage extends Page {
                         </td>
                     </tr>
                     <tr>
+                        <td class="label"><label for="phone_num">Telephone Number:</label></td>
+                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" alt="123-1234 5678" /></td>
+                    </tr>
+                    <tr>
                         <td class="label"><label for="email_addr">E-mail Address:</label></td>
                         <td class="field">
                             <input class="field" type="text" id="email_addr" name="email_addr" alt="jane.doe@acme.com" />
@@ -194,10 +198,6 @@ class MemberSignUpPage extends Page {
                     <tr>
                         <td class="label"><label for="forget_password_answer">Password hint answer:</label></td>
                         <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="phone_num">Telephone Number:</label></td>
-                        <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" alt="123-1234 5678" /></td>
                     </tr>
                     <tr>
                         <td colspan="2">
@@ -231,12 +231,12 @@ class MemberSignUpPage extends Page {
                             Current Job Profile
                         </td>
                     </tr>
-                    <tr>
+                    <!-- tr>
                         <td class="label"><label for="specialization">Specialization:</label></td>
                         <td class="field">
                             <?php $this->generate_industries('specialization', array()); ?>
                         </td>
-                    </tr>
+                    </tr -->
                     <tr>
                         <td class="label"><label for="position_title">Job Title:</label></td>
                         <td class="field">
@@ -244,17 +244,17 @@ class MemberSignUpPage extends Page {
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="position_superior_title">Superior Title:</label></td>
+                        <td class="label"><label for="position_superior_title">Reporting to:</label></td>
                         <td class="field">
                             <input class="field" type="text" id="position_superior_title" name="position_superior_title" alt="eg: Director, Manager, GM, VP, etc." />
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="organization_size">Number of Direct Reports:</label></td>
+                        <td class="label"><label for="organization_size">Number of people reporting to you:</label></td>
                         <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="work_from_month">Duration:</label></td>
+                        <td class="label"><label for="work_from_month">Duration at Current Company:</label></td>
                         <td class="field">
                             <?php echo generate_month_dropdown('work_from_month', ''); ?>
                             <input type="text" class="year" maxlength="4" id="work_from_year" alt="yyyy" />
@@ -268,17 +268,17 @@ class MemberSignUpPage extends Page {
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="company">Employer:</label></td>
+                        <td class="label"><label for="company">Current Company:</label></td>
                         <td class="field"><input class="field" type="text" id="company" name="company" /></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="emp_desc">Employer Description:</label></td>
+                        <td class="label"><label for="emp_desc">Company Description:</label></td>
                         <td class="field">
                             <?php $this->generate_employer_description('emp_desc', -1); ?>
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="emp_specialization">Employer Specialization:</label></td>
+                        <td class="label"><label for="emp_specialization">Industry:</label></td>
                         <td class="field">
                             <?php $this->generate_industries('emp_specialization', array()); ?>
                         </td>
@@ -292,7 +292,7 @@ class MemberSignUpPage extends Page {
                         <td class="label"><label for="total_work_years">Total Years of Work Experience:</label></td>
                         <td class="field"><input class="field" type="text" id="total_work_years" name="total_work_years" /></td>
                     </tr>
-                    <tr>
+                    <!-- tr>
                         <td class="label"><label for="pref_job_loc_1">Job Location Preferences:</label></td>
                         <td class="field">
                             Preference 1: 
@@ -300,7 +300,7 @@ class MemberSignUpPage extends Page {
                             Preference 2:
                             <?php $this->generate_countries('', 'pref_job_loc_2'); ?>
                         </td>
-                    </tr>
+                    </tr -->
                     <tr>
                         <td class="label"><label for="seeking">Goals &amp; Experiences:</label></td>
                         <td class="field">

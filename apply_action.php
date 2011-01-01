@@ -8,6 +8,8 @@ $candidate = array();
 $candidate['email_addr'] = sanitize($_POST['apply_email']);
 $candidate['phone_num'] = sanitize($_POST['apply_phone']);
 $candidate['name'] = sanitize(stripslashes($_POST['apply_name']));
+$candidate['current_position'] = sanitize(stripslashes($_POST['apply_current_pos']));
+$candidate['current_employer'] = sanitize(stripslashes($_POST['apply_current_emp']));
 
 $job_id = $_POST['job_id'];
 $job = new Job($job_id);
@@ -35,6 +37,8 @@ $data['referrer_name'] = 'NULL';
 $data['candidate_email'] = $candidate['email_addr'];
 $data['candidate_phone'] = $candidate['phone_num'];
 $data['candidate_name'] = $candidate['name'];
+$data['current_position'] = $candidate['current_position'];
+$data['current_employer'] = $candidate['current_employer'];
 $data['job'] = $job->getId();
 
 $referral_buffer = new ReferralBuffer();

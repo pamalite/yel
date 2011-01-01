@@ -177,6 +177,27 @@ class JobPage extends Page {
         }
     }
     
+    private function get_member_career() {
+        $career = array('current_position' => '', 'current_employer' => '');
+        
+        if (!is_null($this->member)) {
+            $criteria = array(
+                'columns' => "member_job_profiles.position_title, member_job_profiles.employer", 
+                'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr", 
+                'match' => "members.email_addr = '". $this->member->getId(). "'", 
+                'order' => "member_job_profiles.work_from DESC", 
+                'limit' => "1"
+            );
+            
+            $result = $this->member->find($criteria);
+            
+            $career['current_position'] = htmlspecialchars_decode(stripslashes($result[0]['position_title']));
+            $career['current_employer'] = htmlspecialchars_decode(stripslashes($result[0]['employer']));
+        }
+        
+        return $career;
+    }
+    
     public function show($_from_search = false) {
         $this->begin();
         $this->top_search("Job Details");
@@ -185,6 +206,7 @@ class JobPage extends Page {
         }
         
         $job = $this->get_job_info();
+        $career = $this->get_member_career();
         
         // format tags to HTML
         $job['description'] = format_job_description($job['description']);
@@ -270,7 +292,7 @@ class JobPage extends Page {
                                 <a class="no_link" onClick="show_refer_popup();">Refer Now</a>
                             </div>
                             <div class="action_item">
-                                <a class="no_link" onClick="show_apply_popup();">Apply Now</a>
+                                <a class="no_link" onClick="show_apply_popup();">Explore This Opportunity</a>
                             </div>
                             <?php
                             if ($_from_search) {
@@ -435,6 +457,14 @@ class JobPage extends Page {
                         </td>
                     </tr>
                     <tr>
+                        <td class="label"><label for="apply_current_pos">Current Position:</label></td>
+                        <td><input type="text" class="field" name="apply_current_pos" id="apply_current_pos" value="<?php echo $career['current_position']; ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_current_emp">Current Company:</label></td>
+                        <td><input type="text" class="field" name="apply_current_emp" id="apply_current_emp" value="<?php echo $career['current_employer']; ?>" /></td>
+                    </tr>
+                    <tr>
                         <td class="label"><label for="apply_resume">Resume:</label></td>
                         <td>
                             Choose: 
@@ -489,6 +519,14 @@ class JobPage extends Page {
                         <td><input type="text" class="field" name="apply_name" id="apply_name" value="" /></td>
                     </tr>
                     <tr>
+                        <td class="label"><label for="apply_current_pos">Current Position:</label></td>
+                        <td><input type="text" class="field" name="apply_current_pos" id="apply_current_pos" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_current_emp">Current Company:</label></td>
+                        <td><input type="text" class="field" name="apply_current_emp" id="apply_current_emp" value="" /></td>
+                    </tr>
+                    <tr>
                         <td class="label"><label for="apply_resume">Resume:</label></td>
                         <td><input type="file" name="apply_resume" id="apply_resume" value="" /></td>
                     </tr>
@@ -502,7 +540,7 @@ class JobPage extends Page {
                 ?>
                 </table>                
                 <div class="popup_window_buttons_bar">
-                    <input type="submit" value="Apply Now" />
+                    <input type="submit" value="Explore Now" />
                     <input type="button" value="Cancel" onClick="close_apply_popup(false);" />
                 </div>
             </form>

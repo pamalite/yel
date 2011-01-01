@@ -78,6 +78,16 @@ function close_apply_popup(_proceed_refer) {
             return false;
         }
         
+        if (isEmpty($('apply_current_pos').value)) {
+            alert('You need to provide your current position.');
+            return false;
+        }
+        
+        if (isEmpty($('apply_current_emp').value)) {
+            alert('You need to provide your current company.');
+            return false;
+        }
+        
         if ($('apply_resume').disabled) {
             if ($('existing_resume').selectedIndex == 0) {
                 alert('You need to supply us a resume for screening.');

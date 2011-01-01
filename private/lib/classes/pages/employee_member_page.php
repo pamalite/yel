@@ -672,7 +672,10 @@ class EmployeeMemberPage extends Page {
                         <td>
                             <table class="career_form">
                                 <tr>
-                                    <td class="buttons_bar" colspan="2"><input type="button" onClick="save_career();" value="Save" /></td>
+                                    <td class="buttons_bar" colspan="2">
+                                        <a class="no_link" onClick="show_copy_friendly_popup();">Show Copy Friendly</a>&nbsp;
+                                        <input type="button" onClick="save_career();" value="Save" />
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="label"><label for="is_active_seeking_job">Seeking for a Job:</label></td>
@@ -764,7 +767,10 @@ class EmployeeMemberPage extends Page {
                                     <td class="field"><input class="salary" type="text" id="total_years" value="<?php echo $profile['total_work_years'] ?>" /> years</td>
                                 </tr>
                                 <tr>
-                                    <td class="buttons_bar" colspan="2"><input type="button" onClick="save_career();" value="Save" /></td>
+                                    <td class="buttons_bar" colspan="2">
+                                        <a class="no_link" onClick="show_copy_friendly_popup();">Show Copy Friendly</a>&nbsp;
+                                        <input type="button" onClick="save_career();" value="Save" />
+                                    </td>
                                 </tr>
                             </table>
                         </td>
@@ -1110,10 +1116,21 @@ class EmployeeMemberPage extends Page {
                     ?>
                 </div>
                 <div class="popup_window_buttons_bar">
+                    <a class="no_link" onClick="show_window('message_window'); $('message').focus();">Add Message</a>&nbsp;
                     <input type="button" id="apply_btn" value="Apply" onClick="close_apply_job_popup(true);" />
                     <input type="button" value="Cancel" onClick="close_apply_job_popup(false);" />
                 </div>
             </form>
+        </div>
+        
+        <div id="message_window" class="popup_window">
+            <div class="popup_window_title">Additional Message to Employer</div>
+            <div class="message_form">
+                <textarea class="message" id="message"></textarea>
+            </div>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="OK" onClick="close_window('message_window');" />
+            </div>
         </div>
         
         <div id="add_referrers_window" class="popup_window">
@@ -1324,6 +1341,15 @@ class EmployeeMemberPage extends Page {
                 <input type="button" value="Cancel" onClick="close_job_profile_popup(false);" />
             </div>
         </div>
+        
+        <div id="copy_friendly_window" class="popup_window">
+            <div class="popup_window_title">Career Summary</div>
+            <div class="career_summary" id="summary"></div>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Close" onClick="close_copy_friendly_popup();" />
+            </div>
+        </div>
+        
         <?php
     }
 }

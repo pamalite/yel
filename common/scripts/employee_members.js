@@ -790,6 +790,8 @@ function update_new_applicants() {
                 var employers = xml.getElementsByTagName('employer');
                 var applied_jobs = xml.getElementsByTagName('num_jobs_attached');
                 var is_members = xml.getElementsByTagName('is_member');
+                var current_pos = xml.getElementsByTagName('current_position');
+                var current_emps = xml.getElementsByTagName('current_employer');
                 
                 var new_applicants_table = new FlexTable('new_applicants_table', 'new_applicants');
 
@@ -861,6 +863,20 @@ function update_new_applicants() {
                     } else {
                         short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span><a href="mailto:' + candidate_email + '"> ' + candidate_email + '</a> <a class="no_link small_contact_edit" onClick="edit_candidate_email(' + ids[i].childNodes[0].nodeValue + ');">edit</a></div>' + "\n";
                     }
+                    
+                    var mini_career_profile = '';
+                    if (current_pos[i].childNodes.length > 0) {
+                        mini_career_profile = '<div class="small_contact"><span style="font-weight: bold;">Current Position:</span>' + current_pos[i].childNodes[0].nodeValue + '</div>';
+                    } else {
+                        mini_career_profile = '<div class="small_contact"><span style="font-weight: bold;">Current Position:</span> N/A</div>';
+                    }
+                    
+                    if (current_emps[i].childNodes.length > 0) {
+                        mini_career_profile = mini_career_profile + '<div class="small_contact"><span style="font-weight: bold;">Current Employer:</span>' + current_emps[i].childNodes[0].nodeValue + '</div>';
+                    } else {
+                        mini_career_profile = mini_career_profile + '<div class="small_contact"><span style="font-weight: bold;">Current Employer:</span> N/A</div>';
+                    }
+                    short_desc = short_desc + mini_career_profile;
                     
                     var candidate_details = short_desc + '<br />' + referrer_short_details;
                     row.set(1, new Cell(candidate_details, '', 'cell'));
@@ -1531,6 +1547,8 @@ function close_new_application_popup(_is_save) {
         params = params + '&candidate_name=' + $('candidate_name').value;
         params = params + '&candidate_phone=' + $('candidate_phone').value;
         params = params + '&candidate_email=' + $('candidate_email_addr').value;
+        params = params + '&current_pos=' + encodeURIComponent($('candidate_current_pos').value);
+        params = params + '&current_emp=' + encodeURIComponent($('candidate_current_emp').value);
         params = params + '&jobs=' + $('new_applicant_jobs').value;
         
         if (!referrer_is_yel) {

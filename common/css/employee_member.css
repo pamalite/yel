@@ -88,7 +88,8 @@ textarea {
 
 #member_resumes, #member_career, #member_notes,
 #member_applications, #member_connections, 
-#job_profile_window {
+#job_profile_window, #message_window, 
+#copy_friendly_window {
     display: none;
 }
 
@@ -567,4 +568,21 @@ table.jobs_selection td.separator {
 
 input.hr_contact {
     width: 87%;
+}
+
+#message_window {
+    width: 500px;
+}
+
+#message_window textarea.message {
+    width: 98%;
+    height: 150px;
+    margin: auto;
+}
+
+#copy_friendly_window div.career_summary {
+    width: 600px;
+    height: 400px;
+    margin: 5px 5px 5px 5px;
+    overflow: auto;
 }

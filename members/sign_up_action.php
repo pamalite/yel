@@ -101,7 +101,7 @@ if ($_POST['action'] == 'add_job_profile') {
     $member = new Member($_POST['email_addr']);
     
     $data = array();
-    $data['specialization'] = $_POST['specialization'];
+    // $data['specialization'] = $_POST['specialization'];
     $data['position_title'] = $_POST['position_title'];
     $data['position_superior_title'] = $_POST['position_superior_title'];
     $data['organization_size'] = $_POST['organization_size'];
@@ -120,13 +120,13 @@ if ($_POST['action'] == 'add_job_profile') {
     $data['total_work_years'] = $_POST['total_work_years'];
     $data['seeking'] = $_POST['seeking'];
     
-    if ($_POST['pref_job_loc_1'] > 0) {
-        $data['preferred_job_location_1'] = $_POST['pref_job_loc_1'];
-    }
-    
-    if ($_POST['pref_job_loc_2'] > 0) {
-        $data['preferred_job_location_2'] = $_POST['pref_job_loc_2'];
-    }
+    // if ($_POST['pref_job_loc_1'] > 0) {
+    //     $data['preferred_job_location_1'] = $_POST['pref_job_loc_1'];
+    // }
+    // 
+    // if ($_POST['pref_job_loc_2'] > 0) {
+    //     $data['preferred_job_location_2'] = $_POST['pref_job_loc_2'];
+    // }
     
     if ($member->update($data) === false) {
         echo 'ko - error_update';

@@ -228,7 +228,7 @@ function save_job_profile() {
     }
     
     var params = 'email_addr=' + $('member_email_addr').value + '&action=add_job_profile';
-    params = params + '&specialization=' + $('specialization').value;
+    // params = params + '&specialization=' + $('specialization').value;
     params = params + '&position_title=' + $('position_title').value;
     params = params + '&position_superior_title=' + $('position_superior_title').value;
     params = params + '&organization_size=' + $('organization_size').value;
@@ -238,8 +238,8 @@ function save_job_profile() {
     params = params + '&emp_desc=' + $('emp_desc').value;
     params = params + '&emp_specialization=' + $('emp_specialization').value;
     params = params + '&total_work_years=' + $('total_work_years').value;
-    params = params + '&pref_job_loc_1=' + $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].value;
-    params = params + '&pref_job_loc_2=' + $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].value;
+    // params = params + '&pref_job_loc_1=' + $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].value;
+    // params = params + '&pref_job_loc_2=' + $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].value;
     params = params + '&seeking=' + $('seeking').value.replace("\n", '<br/>');
     
     var uri = root + "/members/sign_up_action.php";

@@ -414,14 +414,14 @@ class EmployeeMembersPage extends Page {
                     <table class="new_application">
                         <tr>
                             <td class="title" colspan="2">Referrer</td>
-                            <td class="title">Notes</td>
+                            <td class="title">Progress Notes</td>
                         </tr>
                         <tr>
                             <td class="auto_fill" colspan="2">
                                 <input type="checkbox" id="auto_fill_checkbox" onClick="auto_fill_referrer();" />
                                 <label for="auto_fill_checkbox">Referrer is YellowElevator.com</label>
                             </td>
-                            <td rowspan="8">
+                            <td rowspan="10">
                                 <textarea class="quick_notes" id="quick_notes"></textarea>
                             </td>
                         </tr>
@@ -451,6 +451,14 @@ class EmployeeMembersPage extends Page {
                         <tr>
                             <td class="label">E-mail:</td>
                             <td><input type="text" class="field" id="candidate_email_addr" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Current Position:</td>
+                            <td><input type="text" class="field" id="candidate_current_pos" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Current Company:</td>
+                            <td><input type="text" class="field" id="candidate_current_emp" /></td>
                         </tr>
                     </table>
                 </div>
