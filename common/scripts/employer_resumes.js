@@ -135,7 +135,7 @@ function show_resumes_of(_job_id, _job_title) {
                 var resumes_table = new FlexTable('resumes_table', 'resumes');
                 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referrals.referred_on');\">Applied On</a>", '', 'header'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'referrals.referred_on');\">Received On</a>", '', 'header'));
                 // header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applications', 'candidate');\">Candidate</a>", '', 'header'));
                 header.set(1, new Cell("Resume Number", '', 'header'));
                 header.set(2, new Cell("Resume", '', 'header'));
@@ -188,15 +188,29 @@ function show_resumes_of(_job_id, _job_title) {
                     var resume_link = '<a class="no_link" onClick="download_resume(' + referral_ids[i].childNodes[0].nodeValue + ', ' + resume_ids[i].childNodes[0].nodeValue + ', ' + i + ', ' + agreed_terms + ');">Download</a>';
                     
                     if (has_testimony) {
-                        resume_link = resume_link + '<br/><a class="no_link testimony_link" onClick="show_testimony_popup(' + i + ', ' + referral_ids[i].childNodes[0].nodeValue + ');">(View Testimony)</a>';
+                        resume_link = resume_link;
                     }
                     row.set(2, new Cell(resume_link, '', 'cell actions_column'));
                     
                     var remarks_link = '<span style="font-style: italic; color: #CCCCCC;">Disabled</span>';
                     if (is_agreed_terms) {
-                        remarks_link = '<a class="no_link" onClick="show_remarks_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">View/Update</a>';
+                        var link_caption = 'Add';
+                        if (remarks[i].childNodes.length > 0) {
+                            link_caption = 'View/Update';
+                        } 
+                        remarks_link = '<a class="no_link" onClick="show_remarks_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">' + link_caption + '</a>';
                     }
-                    row.set(3, new Cell(remarks_link, '', 'cell actions_column'));
+                    
+                    var remarks_cell = remarks_link;
+                    if (!isEmpty(candidates[i].employer_remarks)) {
+                        var remarks_str = '';
+                        var lines = candidates[i].employer_remarks.split("\r\n");
+                        for (var l=0; l < lines.length; l++) {
+                            remarks_str = remarks_str + lines[l] + '<br/>';
+                        }
+                        remarks_cell = '<div class="remarks_cell">' + remarks_str  + '</div><br/>' + remarks_link;
+                    }
+                    row.set(3, new Cell(remarks_cell, '', 'cell remarks_column'));
                     
                     var actions = '';
                     if (employed_ons[i].childNodes.length > 0) {
@@ -213,7 +227,7 @@ function show_resumes_of(_job_id, _job_title) {
                         actions = actions + get_display_stars_for(referral_ids[i].childNodes[0].nodeValue, stars);
                         actions = actions + '</span>';
                         actions = actions + '<br/>';
-                        actions = actions + '<a class="no_link" onClick="show_employment_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Employed</a>';
+                        actions = actions + '<a class="no_link" onClick="show_employment_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Employ Candidate</a>';
                         actions = actions + '&nbsp;|&nbsp;';
                         actions = actions + '<a class="no_link" onClick="show_notify_popup(' + referral_ids[i].childNodes[0].nodeValue + ');">Consult</a>';
                     }
@@ -266,30 +280,28 @@ function show_referred_jobs() {
                 var jobs_table = new FlexTable('referred_jobs_table', 'referred_jobs');
                 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'industries.industry');\">Specialization</a>", '', 'header'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'jobs.expire_on');\">Expires On</a>", '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'jobs.title');\">Job</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'jobs.expire_on');\">Expires On</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'num_referrals');\">Resumes</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'num_referrals');\">Resumes</a>", '', 'header'));
                 jobs_table.set(0, header);
                 
                 for (var i=0; i < job_ids.length; i++) {
                     job_titles[i] = titles[i].childNodes[0].nodeValue;
                     
                     var row = new Row('');
-                    row.set(0, new Cell(industries[i].childNodes[0].nodeValue, '', 'cell'));
+                    
+                    row.set(0, new Cell(expire_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     var job_title = "<a class=\"no_link\" onClick=\"toggle_job_description('" + i + "');\">" + titles[i].childNodes[0].nodeValue + "</a>";
                     job_title = job_title + "<div id=\"inline_job_desc_" + i + "\" class=\"inline_job_desc\">" + descriptions[i].childNodes[0].nodeValue + "</div>";
                     row.set(1, new Cell(job_title, '', 'cell'));
-                    
-                    row.set(2, new Cell(expire_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     var referral = "<a class=\"no_link\" onClick=\"show_resumes_of('" + job_ids[i].childNodes[0].nodeValue + "', '" + add_slashes(titles[i].childNodes[0].nodeValue) + "');\">" + referrals[i].childNodes[0].nodeValue;
                     if (parseInt(new_referrals[i].childNodes[0].nodeValue) > 0) {
                         referral = referral + "&nbsp;<span style=\"vertical-align: top; font-size: 7pt;\">[ " + new_referrals[i].childNodes[0].nodeValue + " new ]</span>"
                     }
                     referral = referral + "</a>";
-                    row.set(3, new Cell(referral, '', 'cell resumes_column'));
+                    row.set(2, new Cell(referral, '', 'cell resumes_column'));
                     jobs_table.set((parseInt(i)+1), row);
                 }
                 

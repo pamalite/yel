@@ -131,26 +131,23 @@ class EmployerResumesPage extends Page {
             } else {
                 $jobs_table = new HTMLTable('referred_jobs_table', 'referred_jobs');
                 
-                $jobs_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'industries.industry');\">Specialization</a>", '', 'header');
+                $jobs_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'jobs.expire_on');\">Expire On</a>", '', 'header');
                 $jobs_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'jobs.title');\">Job</a>", '', 'header');
-                $jobs_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'jobs.expire_on');\">Expire On</a>", '', 'header');
-                $jobs_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'num_referrals');\">Resumes</a>", '', 'header');
+                $jobs_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referred_jobs', 'num_referrals');\">Resumes</a>", '', 'header');
                 
                 foreach ($referred_jobs as $i=>$referred_job) {
-                    $jobs_table->set($i+1, 0, $referred_job['industry'], '', 'cell');
+                    $jobs_table->set($i+1, 0, $referred_job['formatted_expire_on'], '', 'cell');
                     
                     $job_title = "<a class=\"no_link\" onClick=\"toggle_job_description('". $i. "');\">". $referred_job['title']. "</a>";
                     $job_title .= "<div id=\"inline_job_desc_". $i. "\" class=\"inline_job_desc\">". $referred_job['description']. "</div>";
                     $jobs_table->set($i+1, 1, $job_title, '', 'cell');
-                    
-                    $jobs_table->set($i+1, 2, $referred_job['formatted_expire_on'], '', 'cell');
                     
                     $resumes = "<a class=\"no_link\" onClick=\"show_resumes_of('". $referred_job['id']. "', '". addslashes($referred_job['title']). "');\">". $referred_job['num_referrals'];
                     if ($referred_job['new_referrals_count'] > 0) {
                         $resumes .= "&nbsp;<span style=\"vertical-align: top; font-size: 7pt;\">[ ". $referred_job['new_referrals_count']. " new ]</span>";
                     }
                     $resumes .= "</a>";
-                    $jobs_table->set($i+1, 3, $resumes, '', 'cell resumes_column');
+                    $jobs_table->set($i+1, 2, $resumes, '', 'cell resumes_column');
                 }
                 
                 echo $jobs_table->get_html();

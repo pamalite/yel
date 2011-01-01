@@ -139,27 +139,37 @@
     padding: 3px 3px 3px 3px;
 }
 
-.profile_form {
+.profile_form, 
+.career_summary_form {
     width: 98%;
     margin: auto;
     padding-top: 5px;
     padding-bottom: 5px;
 }
 
-.profile_form_table {
+div.career_summary_form {
+    height: 89%;
+    overflow: auto;
+}
+
+.profile_form_table, 
+.career_summary_form_table {
     width: 98%;
     margin: auto;
 }
 
-.profile_form_table td {
+.profile_form_table td, 
+.career_summary_form_table td {
     padding: 5px 5px 5px 5px;
 }
 
-.profile_form_table td.field {
+.profile_form_table td.field, 
+.career_summary_form_table td.field {
     width: 35%;
 }
 
-.profile_form_table td.odd {
+.profile_form_table td.odd, 
+.career_summary_form_table td.odd {
     background-color: #EEEEEE;
 }
 
@@ -179,8 +189,13 @@ textarea {
 
 #notes_window, #texts_window, #ranges_window, 
 #choices_window, #job_profile_window, 
-#countries_window {
+#countries_window, #career_summary_window {
     display: none;
+}
+
+#career_summary_window {
+    width: 750px;
+    height: 580px;
 }
 
 input.texts {

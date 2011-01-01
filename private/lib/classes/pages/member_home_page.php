@@ -77,9 +77,12 @@ class MemberHomePage extends Page {
                           members.reason_for_leaving, members.current_position, 
                           members.current_salary_currency, members.current_salary, 
                           members.current_salary_end, members.notice_period, 
-                          countries.country AS pref_job_loc_1, countries_1.country AS pref_job_loc_2", 
+                          members.preferred_job_location_1 AS pref_job_loc_1, 
+                          members.preferred_job_location_2 AS pref_job_loc_2, 
+                          countries.country AS pref_job_location_1, 
+                          countries2.country AS pref_job_location_2", 
             'joins' => "countries ON countries.country_code = members.preferred_job_location_1, 
-                        countries AS countries_1 ON countries_1.country_code = members.preferred_job_location_2",
+                        countries AS countries2 ON countries2.country_code = members.preferred_job_location_2", 
             'match' => "members.email_addr = '". $this->member->getId(). "'", 
             'limit' => "1"
         );
@@ -90,13 +93,13 @@ class MemberHomePage extends Page {
         $result[0]['reason_for_leaving'] = htmlspecialchars_decode(stripslashes($result[0]['reason_for_leaving']));
         $result[0]['current_position'] = htmlspecialchars_decode(stripslashes($result[0]['current_position']));
         
-        $result[0]['seeking'] = str_replace("\n", '<br/>', $result[0]['seeking']);
-        $result[0]['reason_for_leaving'] = str_replace("\n", '<br/>', $result[0]['reason_for_leaving']);
-        $result[0]['current_position'] = str_replace("\n", '<br/>', $result[0]['current_position']);
-        
-        $result[0]['seeking'] = addslashes($result[0]['seeking']);
-        $result[0]['reason_for_leaving'] = addslashes($result[0]['reason_for_leaving']);
-        $result[0]['current_position'] = addslashes($result[0]['current_position']);
+        // $result[0]['seeking'] = str_replace("\n", '<br/>', $result[0]['seeking']);
+        // $result[0]['reason_for_leaving'] = str_replace("\n", '<br/>', $result[0]['reason_for_leaving']);
+        // $result[0]['current_position'] = str_replace("\n", '<br/>', $result[0]['current_position']);
+        // 
+        // $result[0]['seeking'] = addslashes($result[0]['seeking']);
+        // $result[0]['reason_for_leaving'] = addslashes($result[0]['reason_for_leaving']);
+        // $result[0]['current_position'] = addslashes($result[0]['current_position']);
         
         return $result[0];
     }
@@ -321,7 +324,7 @@ class MemberHomePage extends Page {
                     </div>
                     
                     <div class="profile">
-                        <div class="profile_title">Summary</div>
+                        <div class="profile_title">Summary [<a class="no_link" onClick="show_career_summary_popup();">edit</a>]</div>
                         <div class="profile_form">
                             Please help us answer the following questions as part of our on-going effort to understand you better. You may also update youe answers if necessary.<br/>
                             <table class="profile_form_table">
@@ -340,28 +343,13 @@ class MemberHomePage extends Page {
                                         }
                                         ?>
                                     </td>
-                                    <td class="action"><a class="no_link edit" onClick="show_choices_popup('Active Job Seeker?', 'Yes|No', '<?php echo ($is_active) ? 'Yes' : 'No'; ?>', 'save_is_active_job_seeker');">edit</a>
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td class="field odd">Briefly, tell us what are your goals and experiences.</td>
                                     <td class="odd">
                                         <span id="seeking_field">
                                         <?php
-                                        if ($is_active) {
-                                            echo $answers['seeking'];
-                                        }
-                                        ?>
-                                        </span>
-                                    </td>
-                                    <td class="action">
-                                        <span id="seeking_edit">
-                                        <?php
-                                        if ($is_active) {
-                                        ?>
-                                            <a class="no_link edit" onClick="show_notes_popup('Goals and Experiences', '<?php echo $answers['seeking']; ?>', 'save_seeking');">edit</a>
-                                        <?php
-                                        }
+                                            echo str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['seeking']);
                                         ?>
                                         </span>
                                     </td>
@@ -371,21 +359,8 @@ class MemberHomePage extends Page {
                                     <td>
                                         <span id="expected_salary_field">
                                         <?php 
-                                        if ($is_active) {
                                             echo $answers['expected_salary_currency']. '$&nbsp;';
                                             echo number_format($answers['expected_salary'], 2, '.', ' '). ' to '. number_format($answers['expected_salary_end'], 2, '.', ' ');
-                                        }
-                                        ?>
-                                        </span>
-                                    </td>
-                                    <td class="action">
-                                        <span id="expected_salary_edit">
-                                        <?php
-                                        if ($is_active) {
-                                        ?>
-                                            <a class="no_link edit" onClick="show_ranges_popup('Expected Salary Range', '<?php echo $answers['expected_salary']; ?>', '<?php echo $answers['expected_salary_end']; ?>', '<?php echo $answers['expected_salary_currency']; ?>', 'save_expected_salary');">edit</a>
-                                        <?php
-                                        }
                                         ?>
                                         </span>
                                     </td>
@@ -396,20 +371,7 @@ class MemberHomePage extends Page {
                                         1. 
                                         <span id="pref_job_loc_1_field">
                                         <?php 
-                                        if ($is_active) {
-                                            echo $answers['pref_job_loc_1'];
-                                        }
-                                        ?>
-                                        </span>
-                                    </td>
-                                    <td class="action">
-                                        <span id="pref_job_loc_1_edit">
-                                        <?php
-                                        if ($is_active) {
-                                        ?>
-                                            <a class="no_link edit" onClick="show_countries_popup('Job Location Preference 1', '<?php echo $answers['pref_job_loc_1']; ?>', 'save_pref_job_loc_1');">edit</a>
-                                        <?php
-                                        }
+                                            echo $answers['pref_job_location_1'];
                                         ?>
                                         </span>
                                     </td>
@@ -419,20 +381,7 @@ class MemberHomePage extends Page {
                                         2. 
                                         <span id="pref_job_loc_2_field">
                                         <?php 
-                                        if ($is_active) {
-                                            echo $answers['pref_job_loc_2'];
-                                        }
-                                        ?>
-                                        </span>
-                                    </td>
-                                    <td class="action">
-                                        <span id="pref_job_loc_2_edit">
-                                        <?php
-                                        if ($is_active) {
-                                        ?>
-                                            <a class="no_link edit" onClick="show_countries_popup('Job Location Preference 2', '<?php echo $answers['pref_job_loc_2']; ?>', 'save_pref_job_loc_2');">edit</a>
-                                        <?php
-                                        }
+                                            echo $answers['pref_job_location_2'];
                                         ?>
                                         </span>
                                     </td>
@@ -442,21 +391,8 @@ class MemberHomePage extends Page {
                                     <td>
                                         <span id="travel_field">
                                         <?php
-                                        if ($is_active) {
                                             echo ($answers['can_travel_relocate'] == 'Y') ? 'Yes' : 'No';
-                                        }
                                         ?>
-                                    </td>
-                                    <td class="action">
-                                        <span id="travel_edit">
-                                        <?php
-                                        if ($is_active) {
-                                        ?>
-                                            <a class="no_link edit" onClick="show_choices_popup('Can Travel/Relocate?', 'Yes|No', '<?php echo ($answers['can_travel_relocate'] == 'Y') ? 'Yes' : 'No'; ?>', 'save_travel_relocate');">edit</a>
-                                        <?php
-                                        }
-                                        ?>
-                                        </span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -464,20 +400,7 @@ class MemberHomePage extends Page {
                                     <td class="odd">
                                         <span id="leaving_field">
                                         <?php
-                                        if ($is_active) {
-                                            echo $answers['reason_for_leaving'];
-                                        }
-                                        ?>
-                                        </span>
-                                    </td>
-                                    <td class="action">
-                                        <span id="leaving_edit">
-                                        <?php
-                                        if ($is_active) {
-                                        ?>
-                                            <a class="no_link edit" onClick="show_notes_popup('Reason for Leaving', '<?php echo $answers['reason_for_leaving']; ?>', 'save_reason_for_leaving');">edit</a>
-                                        <?php
-                                        }
+                                            echo str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['reason_for_leaving']);
                                         ?>
                                         </span>
                                     </td>
@@ -487,20 +410,7 @@ class MemberHomePage extends Page {
                                     <td>
                                         <span id="current_job_field">
                                         <?php
-                                        if ($is_active) {
                                             echo stripslashes($answers['current_position']);
-                                        }
-                                        ?>
-                                        </span>
-                                    </td>
-                                    <td class="action">
-                                        <span id="current_job_edit">
-                                        <?php
-                                        if ($is_active) {
-                                        ?>
-                                            <a class="no_link edit" onClick="show_notes_popup('Current Job Description', '<?php echo $answers['current_position']; ?>', 'save_current_job_desc');">edit</a>
-                                        <?php
-                                        }
                                         ?>
                                         </span>
                                     </td>
@@ -510,21 +420,8 @@ class MemberHomePage extends Page {
                                     <td class="odd">
                                         <span id="current_salary_field">
                                         <?php 
-                                        if ($is_active) {
                                             echo $answers['current_salary_currency']. '$&nbsp;';
                                             echo number_format($answers['current_salary'], 2, '.', ' ') .' to '.  number_format($answers['current_salary_end'], 2, '.' , ' ');
-                                        }
-                                        ?>
-                                        </span>
-                                    </td>
-                                    <td class="action">
-                                        <span id="current_salary_edit">
-                                        <?php
-                                        if ($is_active) {
-                                        ?>
-                                            <a class="no_link edit" onClick="show_ranges_popup('Current Salary Range', '<?php echo $answers['current_salary']; ?>', '<?php echo $answers['current_salary_end']; ?>', '<?php echo $answers['current_salary_currency']; ?>', 'save_current_salary');">edit</a>
-                                        <?php
-                                        }
                                         ?>
                                         </span>
                                     </td>
@@ -534,20 +431,7 @@ class MemberHomePage extends Page {
                                     <td>
                                         <span id="notice_period_field">
                                         <?php
-                                        if ($is_active) {
                                             echo $answers['notice_period']. ' months';
-                                        }
-                                        ?>
-                                        </span>
-                                    </td>
-                                    <td class="action">
-                                        <span id="notice_period_edit">
-                                        <?php
-                                        if ($is_active) {
-                                        ?>
-                                            <a class="no_link edit" onClick="show_texts_popup('Notice Period (in Months)', '<?php echo $answers['notice_period']; ?>', 'save_notice_period');">edit</a>
-                                        <?php
-                                        }
                                         ?>
                                         </span>
                                     </td>
@@ -632,87 +516,138 @@ class MemberHomePage extends Page {
         </table>
         
         <!-- popup windows goes here -->
-        <div id="notes_window" class="popup_window">
-            <div id="notes_title" class="popup_window_title">Career Profile Update</div>
-            <form onSubmit="return false;">
-                <input type="hidden" id="id" value="" />
-                <input type="hidden" id="notes_action" value="" />
-                <div class="notes_form">
-                    <textarea id="notes" class="notes"></textarea>
+        <div id="career_summary_window" class="popup_window">
+            <div class="popup_window_title">Career Summary</div>
+                <div class="career_summary_form">
+                    <table class="career_summary_form_table">
+                        <tr>
+                            <td class="field">Are you actively seeking for a new job or experience?</td>
+                            <td>
+                                <select id="is_active">
+                                <?php
+                                if ($is_active) {
+                                ?>
+                                    <option value="1" selected>Yes</option>
+                                    <option value="0">No</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="1">Yes</option>
+                                    <option value="0" selected>No</option>
+                                <?php
+                                }
+                                ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field odd">Briefly, tell us what are your goals and experiences.</td>
+                            <td class="odd">
+                                <textarea id="seeking"><?php echo str_replace('<br/>', "\r\n", $answers['seeking']); ?></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field">What will be your expected salary range?</td>
+                            <td>
+                                <select id="expected_sal_currency">
+                                <?php
+                                foreach ($GLOBALS['currencies'] as $i=>$currency) {
+                                    if ($currency == $answers['expected_salary_currency']) {
+                                ?>
+                                    <option value="<?php echo $currency; ?>" selected><?php echo $currency; ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $currency; ?>"><?php echo $currency; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                                $&nbsp;
+                                <input type="text" id="expected_sal_start" value="<?php echo number_format($answers['expected_salary'], 2, '.', ' '); ?>" /> to <input type="text" id="expected_sal_end" value="<?php echo number_format($answers['expected_salary_end'], 2, '.', ' '); ?>" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field odd" rowspan="2">Preferred Job Location?</td>
+                            <td class="odd">
+                                <?php 
+                                    echo $this->generate_countries($answers['pref_job_loc_1'], 'pref_job_loc_1');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="odd">
+                                <?php 
+                                    echo $this->generate_countries($answers['pref_job_loc_2'], 'pref_job_loc_2');
+                                ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field">Perhaps you can travel, or relocate, if the new job requires it?</td>
+                            <td>
+                                <select id="can_travel">
+                                <?php
+                                if ($answers['can_travel_relocate'] == 'Y') {
+                                ?>
+                                    <option value="Y" selected>Yes</option>
+                                    <option value="N">No</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="Y">Yes</option>
+                                    <option value="N" selected>No</option>
+                                <?php
+                                }
+                                ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field odd">Briefly, why do you want to leave your current job?</td>
+                            <td class="odd">
+                                <textarea id="reason_leaving"><?php echo str_replace('<br/>', "\r\n", $answers['reason_for_leaving']); ?></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field">Briefly, what is your current position, and what do you do?</td>
+                            <td>
+                                <textarea id="current_pos"><?php echo str_replace('<br/>', "\r\n", $answers['current_position']); ?></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field odd">What is your current salary range?</td>
+                            <td class="odd">
+                                <select id="current_sal_currency">
+                                <?php
+                                foreach ($GLOBALS['currencies'] as $i=>$currency) {
+                                    if ($currency == $answers['current_salary_currency']) {
+                                ?>
+                                    <option value="<?php echo $currency; ?>" selected><?php echo $currency; ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $currency; ?>"><?php echo $currency; ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                                $&nbsp;
+                                <input type="text" id="current_sal_start" value="<?php echo number_format($answers['current_salary'], 2, '.', ' '); ?>" /> to <input type="text" id="current_sal_end" value="<?php echo number_format($answers['current_salary_end'], 2, '.', ' '); ?>" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="field">What is your notice period?</td>
+                            <td>
+                                <input type="text" id="notice_period" value="<?php echo $answers['notice_period']; ?>" /> months
+                            </td>
+                        </tr>
+                    </table>
                 </div>
-            </form>
             <div class="popup_window_buttons_bar">
-                <input type="button" value="Save" onClick="close_notes_popup(true);" />
-                <input type="button" value="Cancel" onClick="close_notes_popup(false);" />
-            </div>
-        </div>
-        
-        <div id="texts_window" class="popup_window">
-            <div id="texts_title" class="popup_window_title">Career Profile Update</div>
-            <form onSubmit="return false;">
-                <input type="hidden" id="id" value="" />
-                <input type="hidden" id="texts_action" value="" />
-                <div class="texts_form">
-                    <input type="text" class="texts" id="texts" />
-                </div>
-            </form>
-            <div class="popup_window_buttons_bar">
-                <input type="button" value="Save" onClick="close_texts_popup(true);" />
-                <input type="button" value="Cancel" onClick="close_texts_popup(false);" />
-            </div>
-        </div>
-        
-        <div id="ranges_window" class="popup_window">
-            <div id="ranges_title" class="popup_window_title">Career Profile Update</div>
-            <form onSubmit="return false;">
-                <input type="hidden" id="id" value="" />
-                <input type="hidden" id="ranges_action" value="" />
-                <div class="ranges_form">
-                    <select id="range_currency" class="range_currency">
-                    <?php
-                    foreach ($GLOBALS['currencies'] as $i=>$currency) {
-                    ?>
-                        <option value="<?php echo $currency; ?>"><?php echo $currency; ?></option>
-                    <?php
-                    }
-                    ?>
-                    </select>
-                    <input type="text" class="range" id="range_start" /> to <input type="text" class="range" id="range_end" />
-                </div>
-            </form>
-            <div class="popup_window_buttons_bar">
-                <input type="button" value="Save" onClick="close_ranges_popup(true);" />
-                <input type="button" value="Cancel" onClick="close_ranges_popup(false);" />
-            </div>
-        </div>
-        
-        <div id="choices_window" class="popup_window">
-            <div id="choices_title" class="popup_window_title">Career Profile Update</div>
-            <form onSubmit="return false;">
-                <input type="hidden" id="id" value="" />
-                <input type="hidden" id="choices_action" value="" />
-                <div class="choices_form">
-                    <span id="choices_dropdown"></span>
-                </div>
-            </form>
-            <div class="popup_window_buttons_bar">
-                <input type="button" value="Save" onClick="close_choices_popup(true);" />
-                <input type="button" value="Cancel" onClick="close_choices_popup(false);" />
-            </div>
-        </div>
-        
-        <div id="countries_window" class="popup_window">
-            <div id="countries_title" class="popup_window_title">Job Location Preference</div>
-            <form onSubmit="return false;">
-                <input type="hidden" id="id" value="" />
-                <input type="hidden" id="countries_action" value="" />
-                <div class="countries_form">
-                    <?php echo $this->generate_countries('', 'pref_job_loc'); ?>
-                </div>
-            </form>
-            <div class="popup_window_buttons_bar">
-                <input type="button" value="Save" onClick="close_countries_popup(true);" />
-                <input type="button" value="Cancel" onClick="close_countries_popup(false);" />
+                <input type="button" value="Save" onClick="close_career_summary_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_career_summary_popup(false);" />
             </div>
         </div>
         
@@ -786,6 +721,7 @@ class MemberHomePage extends Page {
                 <input type="button" value="Cancel" onClick="close_job_profile_popup(false);" />
             </div>
         </div>
+        
         <?php
     }
 }

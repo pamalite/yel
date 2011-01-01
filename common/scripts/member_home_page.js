@@ -128,243 +128,57 @@ function save_census_answers() {
     request.send(params);
 }
 
-function toggle_the_rest_of_form(_is_active) {
-    if (_is_active) {
-        $('seeking_field').setStyle('display', 'block');
-        $('seeking_edit').setStyle('display', 'block');
-        $('pref_job_loc_1_field').setStyle('display', 'block');
-        $('pref_job_loc_1_edit').setStyle('display', 'block');
-        $('pref_job_loc_2_field').setStyle('display', 'block');
-        $('pref_job_loc_2_edit').setStyle('display', 'block');
-        $('seeking_field').setStyle('display', 'block');
-        $('seeking_edit').setStyle('display', 'block');
-        $('expected_salary_field').setStyle('display', 'block');
-        $('expected_salary_edit').setStyle('display', 'block');
-        $('travel_field').setStyle('display', 'block');
-        $('travel_edit').setStyle('display', 'block');
-        $('leaving_field').setStyle('display', 'block');
-        $('leaving_edit').setStyle('display', 'block');
-        $('current_job_field').setStyle('display', 'block');
-        $('current_job_edit').setStyle('display', 'block');
-        $('current_salary_field').setStyle('display', 'block');
-        $('current_salary_edit').setStyle('display', 'block');
-        $('notice_period_field').setStyle('display', 'block');
-        $('notice_period_edit').setStyle('display', 'block');
-    } else {
-        $('seeking_field').setStyle('display', 'none');
-        $('seeking_edit').setStyle('display', 'none');
-        $('pref_job_loc_1_field').setStyle('display', 'none');
-        $('pref_job_loc_1_edit').setStyle('display', 'none');
-        $('pref_job_loc_2_field').setStyle('display', 'none');
-        $('pref_job_loc_2_edit').setStyle('display', 'none');
-        $('expected_salary_field').setStyle('display', 'none');
-        $('expected_salary_edit').setStyle('display', 'none');
-        $('travel_field').setStyle('display', 'none');
-        $('travel_edit').setStyle('display', 'none');
-        $('leaving_field').setStyle('display', 'none');
-        $('leaving_edit').setStyle('display', 'none');
-        $('current_job_field').setStyle('display', 'none');
-        $('current_job_edit').setStyle('display', 'none');
-        $('current_salary_field').setStyle('display', 'none');
-        $('current_salary_edit').setStyle('display', 'none');
-        $('notice_period_field').setStyle('display', 'none');
-        $('notice_period_edit').setStyle('display', 'none');
-    }
+function show_career_summary_popup() {
+    show_window('career_summary_window');
 }
 
-function show_choices_popup(_title, _choices_str, _selected, _action) {
-    $('choices_title').set('html', _title);
-    $('choices_action').value = _action;
-    
-    var choices = _choices_str.split('|');
-    if (choices.length <= 0) {
-        return;
-    }
-    
-    var html = '<select id="choices" class="choices">' + "\n";
-    for (var i=0; i < choices.length; i++) {
-        if (choices[i].toUpperCase() == _selected.toUpperCase()) {
-            html = html + '<option value="' + choices[i] + '" selected>' + choices[i] + '</option>' + "\n";
-        } else {
-            html = html + '<option value="' + choices[i] + '">' + choices[i] + '</option>' + "\n";
-        }
-    }
-    html = html + '</select>' + "\n";
-    
-    $('choices_dropdown').set('html', html);
-    
-    show_window('choices_window');
-    // window.scrollTo(0, 0);
-}
-
-function close_choices_popup(_is_save) {
+function close_career_summary_popup(_is_save) {
     if (_is_save) {
-        var choice = $('choices').options[$('choices').selectedIndex].value;
-        var params = 'id=' + id + '&action=' + $('choices_action').value + '&choice=' + choice;
+        var seeking = encodeURIComponent($('seeking').value);
+        var reason_leaving = encodeURIComponent($('reason_leaving').value);
+        var current_pos = encodeURIComponent($('current_pos').value);
         
-        var uri = root + "/members/home_action.php";
-        var request = new Request({
-            url: uri,
-            method: 'post',
-            onSuccess: function(txt, xml) {
-                set_status('');
-                
-                if (txt == 'ko') {
-                    alert('An error occured when saving. Please try again later.');
-                    return;
-                }
-                
-                if ($('choices_action').value == 'save_is_active_job_seeker') {
-                    // toggle the rest            
-                    toggle_the_rest_of_form((choice.toUpperCase() == 'YES'));
-                }
-                
-                location.reload(true);
-            }
-        });
-
-        request.send(params);
-    } else {
-        close_window('choices_window');
-    }
-}
-
-function show_notes_popup(_title, _texts, _action) {
-    $('notes_title').set('html', _title);
-    $('notes_action').value = _action;
-    
-    $('notes').value = _texts.replace(/<br\/>/g, "\n");
-    
-    show_window('notes_window');
-    // window.scrollTo(0, 0);
-}
-
-function close_notes_popup(_is_save) {
-    if (_is_save) {
-        var text = $('notes').value.replace(/\n/g, "<br/>");
-        text = add_slashes(text);
-        
-        if (isEmpty(text)) {
-            alert('You need to enter some texts in order to save.' + "\n\n" + 'You can click the \'Cancel\' button to close this popup window.');
+        if (!isEmpty($('expected_sal_start').value) && isNaN($('expected_sal_start').value)) {
+            alert('Expected salary must be a number.');
             return;
-        }
-        
-        var params = 'id=' + id + '&action=' + $('notes_action').value;
-        params = params + '&text=' + encodeURIComponent(text);
-        
-        var uri = root + "/members/home_action.php";
-        var request = new Request({
-            url: uri,
-            method: 'post',
-            onSuccess: function(txt, xml) {
-                set_status('');
-                
-                if (txt == 'ko') {
-                    alert('An error occured when saving. Please try again later.');
-                    return;
-                }
-                
-                location.reload(true);
-            }
-        });
-
-        request.send(params);
-    } else {
-        close_window('notes_window');
-    }
-}
-
-function show_texts_popup(_title, _texts, _action) {
-    $('texts_title').set('html', _title);
-    $('texts_action').value = _action;
-    
-    $('texts').value = _texts;
-    
-    show_window('texts_window');
-    // window.scrollTo(0, 0);
-}
-
-function close_texts_popup(_is_save) {
-    if (_is_save) {
-        var text = encodeURIComponent(add_slashes($('texts').value));
-        
-        if (isEmpty(text)) {
-            alert('You need to enter some texts in order to save.' + "\n\n" + 'You can click the \'Cancel\' button to close this popup window.');
+        } else if (!isEmpty($('expected_sal_end').value) && isNaN($('expected_sal_end').value)) {
+            alert('Expected salary must be a number.');
             return;
-        }
-        
-        var params = 'id=' + id + '&action=' + $('texts_action').value;
-        params = params + '&text=' + text;
-        
-        var uri = root + "/members/home_action.php";
-        var request = new Request({
-            url: uri,
-            method: 'post',
-            onSuccess: function(txt, xml) {
-                set_status('');
-                
-                if (txt == 'ko') {
-                    alert('An error occured when saving. Please try again later.');
-                    return;
-                }
-                
-                location.reload(true);
-            }
-        });
-
-        request.send(params);
-    } else {
-        close_window('texts_window');
-    }
-}
-
-function show_ranges_popup(_title, _start, _end, _currency, _action) {
-    $('ranges_title').set('html', _title);
-    $('ranges_action').value = _action;
-    
-    $('range_start').value = _start;
-    $('range_end').value = _end;
-    
-    for (var i=0; i < $('range_currency').options.length; i++) {
-        if ($('range_currency').options[i].value == _currency) {
-            $('range_currency').selectedIndex = i;
-            break;
-        }
-    }
-    
-    show_window('ranges_window');
-    // window.scrollTo(0, 0);
-}
-
-function close_ranges_popup(_is_save) {
-    if (_is_save) {
-        if (isEmpty($('range_start').value)) {
-            alert('You need to enter a starting value of a range.');
-            return;
-        } else {
-            if (isNaN($('range_start').value)) {
-                alert('The starting value must be a number.');
+        } else if (!isEmpty($('expected_sal_start').value) && !isEmpty($('expected_sal_end').value)) {
+            if (parseInt($('expected_sal_start').value) > parseInt($('expected_sal_end').value)) {
+                alert('Expected salary range is invalid.');
                 return;
             }
         }
         
-        var start = parseFloat($('range_start').value);
-        var end = 0.00;
-        if (!isEmpty($('range_end').value) && !isNaN($('range_end').value)) {
-            end = parseFloat($('range_end').value);
-            
-            if (end < start) {
-                alert('The ending value must be larger than the starting value.');
+        if (!isEmpty($('current_sal_start').value) && isNaN($('current_sal_start').value)) {
+            alert('Expected salary must be a number.');
+            return;
+        } else if (!isEmpty($('current_sal_end').value) && isNaN($('current_sal_end').value)) {
+            alert('Expected salary must be a number.');
+            return;
+        } else if (!isEmpty($('current_sal_start').value) && !isEmpty($('current_sal_end').value)) {
+            if (parseInt($('current_sal_start').value) > parseInt($('current_sal_end').value)) {
+                alert('Expected salary range is invalid.');
                 return;
-            } else if (end == start) {
-                end = 0.00;
             }
-        } 
+        }
         
-        var params = 'id=' + id + '&action=' + $('ranges_action').value;
-        params = params + '&start=' + start;
-        params = params + '&end=' + end;
-        params = params + '&currency=' + $('range_currency').options[$('range_currency').selectedIndex].value;
+        var params = 'id=' + id + '&action=save_career_summary';
+        params = params + '&is_active=' + $('is_active').options[$('is_active').selectedIndex].value;
+        params = params + '&can_travel=' + $('can_travel').options[$('can_travel').selectedIndex].value;
+        params = params + '&expected_sal_currency=' + $('expected_sal_currency').options[$('expected_sal_currency').selectedIndex].value;
+        params = params + '&current_sal_currency=' + $('current_sal_currency').options[$('current_sal_currency').selectedIndex].value;
+        params = params + '&pref_job_loc_1=' + $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].value;
+        params = params + '&pref_job_loc_2=' + $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].value;
+        params = params + '&seeking=' + seeking;
+        params = params + '&current_pos=' + current_pos;
+        params = params + '&reason_leaving=' + reason_leaving;
+        params = params + '&notice_period=' + $('notice_period').value;
+        params = params + '&expected_sal_start=' + $('expected_sal_start').value;
+        params = params + '&expected_sal_end=' + $('expected_sal_end').value;
+        params = params + '&current_sal_start=' + $('current_sal_start').value;
+        params = params + '&current_sal_end=' + $('current_sal_end').value;
         
         var uri = root + "/members/home_action.php";
         var request = new Request({
@@ -384,65 +198,9 @@ function close_ranges_popup(_is_save) {
 
         request.send(params);
     } else {
-        close_window('ranges_window');
+        close_window('career_summary_window');
     }
 }
-
-function show_countries_popup(_title, _selected, _action) {
-    $('countries_title').set('html', _title);
-    $('countries_action').value = _action;
-    
-    var countries = $('pref_job_loc').options;
-    for (var i=0; i < countries.length; i++) {
-        if (countries[i].value == _selected) {
-            $('pref_job_loc').selectedIndex = i;
-            break;
-        }
-    }
-    
-    show_window('countries_window');
-    // window.scrollTo(0, 0);
-}
-
-function close_countries_popup(_is_save) {
-    if (_is_save) {
-        var action = $('countries_action').value;
-        
-        var pref = '1'
-        if (action.substr(action.length-2) == '_2') {
-            pref = '2'
-        }
-        
-        var pref_country = $('pref_job_loc').options[$('pref_job_loc').selectedIndex].value;
-        if (pref_country == '0') {
-            pref_country = '';
-        }
-        
-        var params = 'id=' + id + '&action=save_job_loc_pref&pref=' + pref;
-        params = params + '&country=' + pref_country;
-        
-        var uri = root + "/members/home_action.php";
-        var request = new Request({
-            url: uri,
-            method: 'post',
-            onSuccess: function(txt, xml) {
-                set_status('');
-                
-                if (txt == 'ko') {
-                    alert('An error occured when saving. Please try again later.');
-                    return;
-                }
-                
-                location.reload(true);
-            }
-        });
-
-        request.send(params);
-    } else {
-        close_window('countries_window');
-    }
-}
-
 
 function validate_job_profile() {
     if ($('specialization').selectedIndex == 0) {

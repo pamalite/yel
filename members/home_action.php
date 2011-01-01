@@ -31,133 +31,22 @@ if ($_POST['action'] == 'save_census_answers') {
     exit();
 }
 
-if ($_POST['action'] == 'save_is_active_job_seeker') {
+if ($_POST['action'] == 'save_career_summary') {
     $data = array();
-    $data['is_active_seeking_job'] = (strtoupper($_POST['choice']) == 'YES') ? true : false;
-    $data['updated_on'] = date('Y-m-d');
-    
-    $member = new Member($_POST['id']);
-    if ($member->update($data) === false) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'save_travel_relocate') {
-    $data = array();
-    $data['can_travel_relocate'] = (strtoupper($_POST['choice']) == 'YES') ? "Y" : "N";
-    $data['updated_on'] = date('Y-m-d');
-    
-    $member = new Member($_POST['id']);
-    if ($member->update($data) === false) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-
-if ($_POST['action'] == 'save_seeking') {
-    $data = array();
-    $data['seeking'] = $_POST['text'];
-    $data['updated_on'] = date('Y-m-d');
-    
-    $member = new Member($_POST['id']);
-    if ($member->update($data) === false) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'save_reason_for_leaving') {
-    $data = array();
-    $data['reason_for_leaving'] = $_POST['text'];
-    $data['updated_on'] = date('Y-m-d');
-    
-    $member = new Member($_POST['id']);
-    if ($member->update($data) === false) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'save_current_job_desc') {
-    $data = array();
-    $data['current_position'] = $_POST['text'];
-    $data['updated_on'] = date('Y-m-d');
-    
-    $member = new Member($_POST['id']);
-    if ($member->update($data) === false) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'save_notice_period') {
-    $data = array();
-    $data['notice_period'] = is_numeric($_POST['text']) ? $_POST['text'] : "0";
-    $data['updated_on'] = date('Y-m-d');
-    
-    $member = new Member($_POST['id']);
-    if ($member->update($data) === false) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'save_current_salary') {
-    $data = array();
-    $data['current_salary_currency'] = $_POST['currency'];
-    $data['current_salary'] = $_POST['start'];
-    $data['current_salary_end'] = $_POST['end'];
-    $data['updated_on'] = date('Y-m-d');
-    
-    $member = new Member($_POST['id']);
-    if ($member->update($data) === false) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'save_expected_salary') {
-    $data = array();
-    $data['expected_salary_currency'] = $_POST['currency'];
-    $data['expected_salary'] = $_POST['start'];
-    $data['expected_salary_end'] = $_POST['end'];
-    
-    $member = new Member($_POST['id']);
-    if ($member->update($data) === false) {
-        echo 'ko';
-        exit();
-    }
-    
-    echo 'ok';
-    exit();
-}
-
-if ($_POST['action'] == 'save_job_loc_pref') {
-    $data = array();
-    $data['preferred_job_location_'. $_POST['pref']] = $_POST['country'];
+    $data['is_active_seeking_job'] = $_POST['is_active'];
+    $data['seeking'] = $_POST['seeking'];
+    $data['expected_salary_currency'] = $_POST['expected_sal_currency'];
+    $data['expected_salary'] = $_POST['expected_sal_start'];
+    $data['expected_salary_end'] = $_POST['expected_sal_end'];
+    $data['can_travel_relocate'] = $_POST['can_travel'];
+    $data['reason_for_leaving'] = $_POST['reason_leaving'];
+    $data['current_position'] = $_POST['current_pos'];
+    $data['current_salary_currency'] = $_POST['current_sal_currency'];
+    $data['current_salary'] = $_POST['current_sal_start'];
+    $data['current_salary_end'] = $_POST['current_sal_end'];
+    $data['preferred_job_location_1'] = $_POST['pref_job_loc_1'];
+    $data['preferred_job_location_2'] = $_POST['pref_job_loc_2'];
+    $data['notice_period'] = is_numeric($_POST['notice_period']) ? $_POST['notice_period'] : "0";
     $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);

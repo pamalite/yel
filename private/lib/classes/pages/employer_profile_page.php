@@ -33,7 +33,7 @@ class EmployerProfilePage extends Page {
     public function show() {
         $this->begin();
         $this->support($this->employer->getId());
-        $this->top('Profile');
+        $this->top('Company Profile');
         $this->menu('employer', 'profile');
         
         $branch = $this->employer->getAssociatedBranch();
