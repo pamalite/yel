@@ -105,12 +105,26 @@ class WelcomePage extends Page {
         return $industries;
     }
     
+    private function get_countries() {
+        $criteria = array(
+            'columns' => "DISTINCT countries.country_code, countries.country", 
+            'joins' => "countries ON countries.country_code = jobs.country",
+            // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'order' => "countries.country ASC"
+        );
+        
+        $job = new Job();
+        $countries = $job->find($criteria);
+        return ($countries === false) ? array() : $countries;
+    }
+    
     public function show() {
         $this->begin();
         $this->top_welcome();
         
         $employers = $this->get_employers();
         $industries = $this->get_industries();
+        $countries = $this->get_countries();
         
         $country = $_SESSION['yel']['country_code'];
         if (isset($_SESSION['yel']['member']) &&
@@ -164,14 +178,28 @@ class WelcomePage extends Page {
                         echo '</option>'. "\n";
                     }
                     ?>
+                </select>
+                <select id="country" name="country">
+                    <option value="">Any Country</option>
+                    <option value="" disabled>&nbsp;</option>
+                    <?php
+                    foreach ($countries as $a_country) {
+                        if ($country == $a_country['country_code']) {
+                            echo '<option value="'. $a_country['country_code']. '" selected>'. $a_country['country']. '</option>'. "\n";
+                        } else {
+                            echo '<option value="'. $a_country['country_code']. '">'. $a_country['country']. '</option>'. "\n";
+                        }
+                    }
+                    ?>
                 </select><br/>
                 <input type="text" name="keywords" id="keywords" value="" alt="Job title or keywords" />
-                <input type="submit" value="Search Jobs" /><br/>
+                <input type="submit" value="Search Jobs" />
+                <!-- br/>
                 <input type="radio" id="local" name="is_local" value="1" checked />
                 <label class="scope" for="local">local jobs</label>
                 &nbsp;
                 <input type="radio" id="international" name="is_local" value="0" />
-                <label class="scope" for="international">international jobs</label>
+                <label class="scope" for="international">international jobs</label -->
             </form>
         </div>
         

@@ -3,6 +3,7 @@ var employers_index = 0;
 function verify() {
     if ($('industry').options[$('industry').selectedIndex].value == 0 && 
         $('employer').options[$('employer').selectedIndex].value == 0 && 
+        $('country').options[$('country').selectedIndex].value == '' && 
         ($('keywords').value == 'Job title or keywords' || $('keywords').value == '')) {
         alert('Please select an employer, industry/sub-industry or enter the job title/keywords in order to do a search. You may choose to do all if you wish to do a more specific search.');
         return false;

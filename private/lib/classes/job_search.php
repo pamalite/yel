@@ -208,12 +208,18 @@ class JobSearch {
             $this->keywords = $this->remove_punctuations_from($keywords);
         }
         
-        if (array_key_exists('country_code', $_criterias)) {
-            $this->country_code = $_criterias['country_code'];
+        // if (array_key_exists('country_code', $_criterias)) {
+        //     $this->country_code = $_criterias['country_code'];
+        // } else {
+        //     if ($_criterias['is_local'] <= 0) {
+        //         $this->country_code = NULL;
+        //     }
+        // }
+        
+        if (array_key_exists('countrye', $_criterias)) {
+            $this->country_code = $_criterias['country'];
         } else {
-            if ($_criterias['is_local'] <= 0) {
-                $this->country_code = NULL;
-            }
+            $this->country_code = NULL;
         }
         
         if ($_criterias['salary'] > 0) {

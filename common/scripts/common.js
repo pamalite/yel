@@ -855,6 +855,7 @@ function show_industries_in(placeholder) {
 function verify_mini() {
     if ($('mini_industry').options[$('mini_industry').selectedIndex].value == 0 && 
         $('mini_employer').options[$('mini_employer').selectedIndex].value == 0 && 
+        $('mini_country').options[$('mini_country').selectedIndex].value == '' && 
         ($('mini_keywords').value == 'Job title or keywords' || $('mini_keywords').value == '')) {
         alert('Please select an industry/sub-industry or enter the job title/keywords in order to do a search. You may choose to do all if you wish to do a more specific search');
         return false;

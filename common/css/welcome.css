@@ -118,8 +118,9 @@ body {
 }
 
 .search #employer, 
-.search #industry {
-    width: 49%;
+.search #industry, 
+.search #country {
+    width: 30%;
     font-size: 12pt;
 }
 

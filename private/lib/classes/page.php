@@ -160,7 +160,7 @@ class Page {
         $criteria = array(
             'columns' => 'DISTINCT employers.id, employers.name', 
             'joins' => 'jobs ON employers.id = jobs.employer',
-            'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
             'order' => 'employers.name ASC'
         );
         $employer = new Employer();
@@ -189,6 +189,18 @@ class Page {
             }
             $i++;
         }
+        
+        // get the countries
+        $criteria = array(
+            'columns' => "DISTINCT countries.country_code, countries.country", 
+            'joins' => "countries ON countries.country_code = jobs.country",
+            // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'order' => "countries.country ASC"
+        );
+        
+        $job = new Job();
+        $countries = $job->find($criteria);
+        
         ?>
         
         <div class="top">
@@ -247,11 +259,25 @@ class Page {
                                 ?>
                             </select>
                             &nbsp;
+                            <select id="mini_country" name="country">
+                                <option value="">Any Country</option>
+                                <option value="" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($countries as $a_country) {
+                                    if ($country == $a_country['country_code']) {
+                                        echo '<option value="'. $a_country['country_code']. '" selected>'. $a_country['country']. '</option>'. "\n";
+                                    } else {
+                                        echo '<option value="'. $a_country['country_code']. '">'. $a_country['country']. '</option>'. "\n";
+                                    }
+                                }
+                                ?>
+                            </select>
+                            <!-- &nbsp;
                             <input type="radio" id="local" name="is_local" value="1" checked />
                             <label for="local">local jobs</label>
                             &nbsp;
                             <input type="radio" id="international" name="is_local" value="0" />
-                            <label for="international">international jobs</label>
+                            <label for="international">international jobs</label -->
                             <br/>
                             <input type="text" name="keywords" id="mini_keywords" alt="Job title or keywords" value="" />
                             &nbsp;
