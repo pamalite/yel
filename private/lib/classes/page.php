@@ -358,9 +358,9 @@ class Page {
             <div class="menu">
                 <ul class="menu">
                     <li <?php echo ($page == 'home') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/home.php">Career Profile</a></li>
-                    <li <?php echo ($page == 'profile') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/profile.php">My Profile</a></li>
                     <li <?php echo ($page == 'resumes') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/resumes.php">Resumes</a></li>
                     <li <?php echo ($page == 'job_applications') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/job_applications.php">Opportunities Explored</a></li>
+                    <li <?php echo ($page == 'profile') ? $style : '';?>><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/profile.php">My Account</a></li>
                     <li><a class="menu" href="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/members/logout.php">Logout</a></li>
                 </ul>
             </div>

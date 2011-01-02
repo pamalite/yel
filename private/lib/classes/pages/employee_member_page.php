@@ -319,6 +319,32 @@ class EmployeeMemberPage extends Page {
         return $jobs_str;
     }
     
+    private function get_hr_contacts() {
+        $criteria = array(
+            'columns' => "DISTINCT employers.hr_contacts", 
+            'joins' => "employers ON employers.id = jobs.employer",
+            'match' => "jobs.id IN (". implode(',', $this->selected_jobs). ")"
+        );
+        
+        $job = new Job();
+        $result = $job->find($criteria);
+        
+        if ($result === false || is_null($result) || empty($result)) {
+            return '';
+        }
+        
+        $contacts_str = '';
+        foreach ($result as $i=>$row) {
+            $contacts_str .= $row['hr_contacts'];
+            
+            if ($i < count($result)-1) {
+                $contacts_str .= ',';
+            }
+        }
+        
+        return $contacts_str;
+    }
+    
     private function get_job_profiles() {
         $criteria = array(
             'columns' => "member_job_profiles.id, member_job_profiles.position_title, 
@@ -644,7 +670,7 @@ class EmployeeMemberPage extends Page {
                         
                         $resume_action = '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>';
                         if ($resume['is_yel_uploaded'] == '1') {
-                            $resume_action .= '&nbsp;|&nbsp;<a class="no_link" onClick="show_apply_job_popup('. $resume['id']. ', \''. addslashes($resume['file_name']). '\');">Apply Job</a>';
+                            $resume_action .= '&nbsp;|&nbsp;<a class="no_link" onClick="show_apply_job_popup('. $resume['id']. ', \''. addslashes($resume['file_name']). '\');">Submit</a>';
                         }
                         $resumes_table->set($i+1, 2, $resume_action, '', 'cell actions');
                     }
@@ -1015,11 +1041,11 @@ class EmployeeMemberPage extends Page {
         </div>
                 
         <div id="apply_job_window" class="popup_window">
-            <div class="popup_window_title">Apply Job</div>
+            <div class="popup_window_title">Submission</div>
             <div id="div_resume_info" class="resume_info">
                 <div class="resume_desc">
-                    <span style="font-weight: bold;"><label for="hr_contact">HR Contact:</label></span>
-                    <span><input type="text" class="field hr_contact" id="hr_contact" value="" /></span>
+                    <span style="font-weight: bold;"><label for="hr_contact">HR Contacts:</label></span>
+                    <span><input type="text" class="field hr_contact" id="hr_contact" value="<?php echo $this->get_hr_contacts(); ?>" /></span>
                 </div>
                 <div class="resume_desc">
                     <span style="font-weight: bold;">Resume selected:</span>
@@ -1117,7 +1143,7 @@ class EmployeeMemberPage extends Page {
                 </div>
                 <div class="popup_window_buttons_bar">
                     <a class="no_link" onClick="show_window('message_window'); $('message').focus();">Add Message</a>&nbsp;
-                    <input type="button" id="apply_btn" value="Apply" onClick="close_apply_job_popup(true);" />
+                    <input type="button" id="apply_btn" value="Submit" onClick="close_apply_job_popup(true);" />
                     <input type="button" value="Cancel" onClick="close_apply_job_popup(false);" />
                 </div>
             </form>

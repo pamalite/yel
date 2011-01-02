@@ -460,6 +460,24 @@ function delete_job_profile(_id) {
     }
 }
 
+function close_upload_photo_popup(_is_upload) {
+    if (_is_upload) {
+        if (isEmpty($('my_file').value)) {
+            alert('You need to select a photo to upload.');
+            return false;
+        }
+        
+        close_safari_connection();
+        return true;
+    } else {
+        close_window('upload_photo_window');
+    }
+}
+
+function show_upload_photo_popup() {
+    show_window('upload_photo_window');
+}
+
 function onDomReady() {
     initialize_page();
     

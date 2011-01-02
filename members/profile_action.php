@@ -142,11 +142,13 @@ if ($_POST['action'] == 'upload') {
     $data['FILE']['tmp_name'] = $_FILES['my_file']['tmp_name'];
     
     if ($member->savePhoto($data) === false) {
-        redirect_to('profile.php?error=1');
+        // redirect_to('profile.php?error=1');
+        redirect_to('home.php?error=1');
         exit();
     }
     
-    redirect_to('profile.php');
+    // redirect_to('profile.php');
+    redirect_to('home.php');
     exit();
 }
 ?>

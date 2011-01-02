@@ -266,6 +266,10 @@ class EmployeeEmployerPage extends Page {
                         <td class="field"><input class="field" type="text" id="contact_person" name="contact_person" value="<?php echo htmlspecialchars_decode(stripslashes($profile['contact_person'])) ?>"  /></td>
                     </tr>
                     <tr>
+                        <td class="label"><label for="hr_contacts">HR Contacts:</label></td>
+                        <td class="field"><input class="field" type="text" id="hr_contacts" name="hr_contacts" value="<?php echo htmlspecialchars_decode(stripslashes($profile['hr_contacts'])) ?>"  /></td>
+                    </tr>
+                    <tr>
                         <td class="label"><label for="phone_num">Telephone Number:</label></td>
                         <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" value="<?php echo $profile['phone_num'] ?>"  /></td>
                     </tr>

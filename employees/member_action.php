@@ -598,7 +598,7 @@ if ($_POST['action'] == 'apply_job') {
             $hr_contacts[$i] = trim($hr_contact);
         }
         
-        $employer_emails .= ', '. implode(',', $hr_contacts);
+        $employer_emails = implode(',', $hr_contacts);
     }
     $send = mail($employer_emails, $subject, $body, $headers);
     

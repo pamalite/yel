@@ -3,6 +3,7 @@ require_once dirname(__FILE__). "/../../utilities.php";
 
 class MemberProfilePage extends Page {
     private $member = NULL;
+    private $error_message = '';
     
     function __construct($_session) {
         $this->member = new Member($_session['id'], $_session['sid']);
@@ -146,7 +147,7 @@ class MemberProfilePage extends Page {
         
         <div id="profile" class="profile">
             <form id="profile_form" method="post" onSubmit="return false;">
-                <div class="profile_photo_area">
+                <!-- div class="profile_photo_area">
                     <div class="photo">
                     <?php
                     if ($this->member->hasPhoto()) {
@@ -165,7 +166,7 @@ class MemberProfilePage extends Page {
                     <div class="upload_button">
                         <input type="button" value="Upload Photo" onClick="show_upload_photo_popup();" />
                     </div>
-                </div>
+                </div -->
                 
                 <table class="profile_form">
                     <tr>

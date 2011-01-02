@@ -118,6 +118,16 @@ function validate_profile_form() {
         return false;
     }
     
+    if (!isEmpty($('hr_contacts').value)) {
+        var contacts = $('hr_contacts').value.split(',');
+        for (var i=0; i < contacts.length; i++) {
+            if (!isEmail(trim(contacts[i]))) {
+                alert('HR Contacts must be one or many email addresses separated by comma.');
+                return false;
+            }
+        }
+    }
+    
     if (isEmpty($('phone_num').value)) {
         alert('Telephone number cannot be empty.');
         return false;
@@ -181,6 +191,7 @@ function save_profile() {
     params = params + '&email_addr=' + $('email').value;
     params = params + '&name=' + $('name').value;
     params = params + '&contact_person=' + $('contact_person').value;
+    params = params + '&hr_contacts=' + $('hr_contacts').value;
     params = params + '&phone_num=' + $('phone_num').value;
     params = params + '&fax_num=' + $('fax_num').value;
     params = params + '&address=' + $('address').value;

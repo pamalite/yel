@@ -969,7 +969,10 @@ function close_apply_job_popup(_is_apply_job) {
             var contacts = $('hr_contact').value.split(',');
             for (var i=0; i < contacts.length; i++) {
                 contacts[i] = trim(contacts[i]);
-                if (isEmail(contacts[i])) {
+                if (!isEmail(contacts[i])) {
+                    alert('HR Contacts must be one or many email addresses separated by commas.');
+                    return;
+                } else {
                     if (isEmpty(hr_contacts)) {
                         hr_contacts = contacts[i];
                     } else {
@@ -979,7 +982,12 @@ function close_apply_job_popup(_is_apply_job) {
             }
         }
         
-        if (!confirm('Confirm to apply the selected jobs for candidate?')) {
+        var msg = 'Confirm to submit the resume to the selected job(s) for candidate?';
+        if (isEmpty($('hr_contact').value)) {
+            msg = msg + "\n\nThe HR Contacts field has been left blank. The system will submit to the employer's default email address."; 
+        }
+        
+        if (!confirm(msg)) {
             return;
         }
         

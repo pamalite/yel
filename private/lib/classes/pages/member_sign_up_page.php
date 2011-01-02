@@ -254,6 +254,10 @@ class MemberSignUpPage extends Page {
                         <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
                     </tr>
                     <tr>
+                        <td class="label"><label for="company">Current Company:</label></td>
+                        <td class="field"><input class="field" type="text" id="company" name="company" /></td>
+                    </tr>
+                    <tr>
                         <td class="label"><label for="work_from_month">Duration at Current Company:</label></td>
                         <td class="field">
                             <?php echo generate_month_dropdown('work_from_month', ''); ?>
@@ -266,10 +270,6 @@ class MemberSignUpPage extends Page {
                             <input type="checkbox" id="work_to_present" onClick="toggle_work_to();" /> 
                             <label for="work_to_present">Present</label>
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="company">Current Company:</label></td>
-                        <td class="field"><input class="field" type="text" id="company" name="company" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="emp_desc">Company Description:</label></td>
@@ -302,7 +302,7 @@ class MemberSignUpPage extends Page {
                         </td>
                     </tr -->
                     <tr>
-                        <td class="label"><label for="seeking">Goals &amp; Experiences:</label></td>
+                        <td class="label"><label for="seeking">Job Responsibilities &amp; Experience:</label></td>
                         <td class="field">
                             <textarea id="seeking" class="field">Brief our Recruitment Consulstants about your career goals and experiences, enough to help them identify suitable opportunities for your recommendation.</textarea>
                         </td>

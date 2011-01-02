@@ -622,9 +622,9 @@ if ($_POST['action'] == 'get_progress_notes') {
     }
     
     if (empty($progress_notes)) {
-        echo "--- ". date('Y-m-d H:i:s'). " ---\n";
+        echo "--- ". date('Y-m-d H:i'). " ---\n";
     } else {
-        echo $progress_notes. "\n\n--- ". date('Y-m-d H:i:s'). " ---\n";
+        echo $progress_notes. "\n\n--- ". date('Y-m-d H:i'). " ---\n";
     }
     exit();
 }

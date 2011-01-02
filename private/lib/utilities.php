@@ -6,6 +6,8 @@ require_once "interfaces.php";
 require_once "models.php";
 require_once "classes.php";
 
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
 function sanitize($_in = '') {
     $out = '';
     

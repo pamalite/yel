@@ -358,6 +358,7 @@ if ($_POST['action'] == 'save_profile') {
     $data['fax_num'] = $_POST['fax_num'];
     $data['email_addr'] = $_POST['email_addr'];
     $data['contact_person'] = $_POST['contact_person'];
+    $data['hr_contacts'] = $_POST['hr_contacts'];
     $data['address'] = $_POST['address'];
     $data['state'] = $_POST['state'];
     $data['zip'] = $_POST['zip'];

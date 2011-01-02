@@ -339,3 +339,65 @@ div.job_profiles {
     font-size: 9pt;
     color: #666666;
 }
+
+#upload_photo_window{
+    display: none;
+    width: 500px;
+}
+
+#upload_progress {
+    display: none;
+}
+
+.upload_photo_form {
+    width: 99%;
+    height: 165px;
+    margin: auto;
+    overflow: auto;
+}
+
+.upload_field {
+    margin-top: 3px;
+    text-align: center;
+    margin: auto;
+    width: 100%;
+}
+
+.note {
+    font-size: 9pt;
+    font-style: italic;
+    color: #666666;
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.profile_photo_area {
+    margin-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    text-align: center;
+}
+
+.photo {
+    border: 1px solid #CCCCCC;
+    width: 205px;
+    height: 225px;
+    margin: auto;
+    text-align: center;
+    font-size: 9pt;
+    overflow: auto;
+    color: #666666;
+}
+
+.photo_image {
+    border: none;
+    vertical-align: middle;
+    /*width: 200px;
+    height: 220px;*/
+}
+
+.upload_button {
+    padding-top: 5px;
+    text-align: center;
+}

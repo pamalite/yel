@@ -6,10 +6,21 @@ require_once dirname(__FILE__). "/../htmltable.php";
 class MemberHomePage extends Page {
     private $member = NULL;
     private $mysqli = NULL;
+    private $error_message = '';
     
     function __construct($_session) {
         $this->member = new Member($_session['id'], $_session['sid']);
         $this->mysqli = Database::connect();
+    }
+    
+    public function set_error($_error) {
+        switch ($_error) {
+            case '1':
+                $this->error_message = 'An error occured when trying to upload your photo.\\n\\nPlease try again later. Please make sure that the file you are uploading is listed in the resume upload window.\\n\\nIf problem persist, please contact our technical support for further assistance.';
+                break;
+            default:
+                $this->error_message = '';
+        }
     }
     
     public function insert_inline_css() {
@@ -31,6 +42,11 @@ class MemberHomePage extends Page {
     public function insert_inline_scripts() {
         echo '<script type="text/javascript">'. "\n";
         echo 'var id = "'. $this->member->getId(). '";'. "\n";
+        
+        if (!empty($this->error_message)) {
+            echo "alert(\"". $this->error_message. "\");\n";
+        }
+        
         echo '</script>'. "\n";
     }
     
@@ -324,6 +340,30 @@ class MemberHomePage extends Page {
                     </div>
                     
                     <div class="profile">
+                        <div class="profile_title">My Phoho</div>
+                        <div class="profile_photo_area">
+                            <div class="photo">
+                            <?php
+                            if ($this->member->hasPhoto()) {
+                            ?>
+                                <img id="photo_image" class="photo_image" src="candidate_photo.php?id=<?php echo $this->member->getId(); ?>" />
+                            <?php
+                            } else {
+                            ?>
+                                <div style="text-align: center; margin: auto;">
+                                    Upload your photo here by clicking the "Upload Photo" button.
+                                </div>
+                            <?php
+                            }
+                            ?>
+                            </div>
+                            <div class="upload_button">
+                                <input type="button" value="Upload Photo" onClick="show_upload_photo_popup();" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile">
                         <div class="profile_title">Summary [<a class="no_link" onClick="show_career_summary_popup();">edit</a>]</div>
                         <div class="profile_form">
                             Please help us answer the following questions as part of our on-going effort to understand you better. You may also update youe answers if necessary.<br/>
@@ -516,6 +556,36 @@ class MemberHomePage extends Page {
         </table>
         
         <!-- popup windows goes here -->
+        <div id="upload_photo_window" class="popup_window">
+            <div class="popup_window_title">Upload Photo</div>
+            <form id="upload_photo_form" action="profile_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_upload_photo_popup(true);">
+                <div class="upload_photo_form">
+                    <br/>
+                    <input type="hidden" name="id" value="<?php echo $this->member->getId(); ?>" />
+                    <input type="hidden" name="action" value="upload" />
+                    <div id="upload_progress" style="text-align: center; width: 99%; margin: auto;">
+                        Please wait while your photo is being uploaded... <br/><br/>
+                        <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" /><br/><br/>
+                        NOTE: To Safari/Chrome (WebKit) on Mac OS X users, the mentioned browsers have a problem uploading any file through this page. Please try Firefox to upload your resume.
+                    </div>
+                    <div id="upload_field" class="upload_field">
+                        <input id="my_file" name="my_file" type="file" />
+                        <div style="font-size: 9pt; margin-top: 15px;">
+                            <ol>
+                                <li>Only GIF (*.gif), JPEG (*.jpg, *.jpeg), Portable Network Graphics (*.png), TIFF (*.tiff) or Bitmap (*.bmp) with the file size of less than 150KB are allowed.</li>
+                                <li>Maximum photo resolution is 200 (width) x 220 (height) pixels.</li>
+                                <li>You can update your photo by uploading a new one.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup_window_buttons_bar">
+                    <input type="submit" value="Upload Photo" />
+                    <input type="button" value="Close" onClick="close_upload_photo_popup(false);" />
+                </div>
+            </form>
+        </div>
+        
         <div id="career_summary_window" class="popup_window">
             <div class="popup_window_title">Career Summary</div>
                 <div class="career_summary_form">
