@@ -216,7 +216,7 @@ class JobSearch {
         //     }
         // }
         
-        if (array_key_exists('countrye', $_criterias)) {
+        if (array_key_exists('country', $_criterias)) {
             $this->country_code = $_criterias['country'];
         } else {
             $this->country_code = NULL;
