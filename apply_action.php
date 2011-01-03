@@ -147,10 +147,11 @@ if (!empty($_FILES['apply_resume']['name'])) {
         $data['resume_file_size'] = 'NULL';
         $data['resume_file_text'] = 'NULL';
         $referral_buffer->update($data);
-    } else {
-        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=3');
-        exit();
-    }
+    } 
+    // else {
+    //     redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=3');
+    //     exit();
+    // }
 }
 
 // 4 Send email to team.xx@yellowelevator.com

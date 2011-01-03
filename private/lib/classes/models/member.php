@@ -1013,5 +1013,49 @@ class Member implements Model {
                   WHERE member_jobs.member = '". $this->id. "'". $order_by;
         return $this->mysqli->query($query);
     }
+    
+    public function getReferrals($_order = 'referred_on DESC') {
+        $order_by = $_order;
+        if (empty($order_by)) {
+            $order_by = "referred_on DESC";
+        }
+        
+        $query = "SELECT 'buf' AS tab, referral_buffers.id, 
+                  referral_buffers.candidate_email AS candidate_email, 
+                  referral_buffers.candidate_name AS candidate_name, 
+                  referral_buffers.job AS job_id, jobs.alternate_employer, 
+                  employers.name AS employer, jobs.title AS job, 
+                  referral_buffers.requested_on AS referred_on, 
+                  DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_referred_on
+                  FROM referral_buffers 
+                  LEFT JOIN jobs ON jobs.id = referral_buffers.job 
+                  LEFT JOIN employers ON employers.id = jobs.employer 
+                  WHERE referral_buffers.referrer_email = '". $this->id. "' AND 
+                  referral_buffers.deleted_by_referrer = FALSE 
+                  UNION 
+                  SELECT 'job', member_jobs.id, 
+                  members.email_addr, 
+                  CONCAT(members.lastname, ', ', members.firstname), 
+                  member_jobs.job, jobs.alternate_employer, 
+                  employers.name AS employer, jobs.title AS job, 
+                  member_jobs.applied_on, 
+                  DATE_FORMAT(member_jobs.applied_on, '%e %b, %Y')
+                  FROM member_jobs 
+                  LEFT JOIN members ON members.email_addr = member_jobs.member 
+                  LEFT JOIN jobs ON jobs.id = member_jobs.job 
+                  LEFT JOIN employers ON employers.id = jobs.employer 
+                  WHERE member_jobs.referrer = '". $this->id. "' ORDER BY ". $order_by;
+        return $this->mysqli->query($query);
+    }
+    
+    public function deleteReferral($_id) {
+        if (empty($_id) || $_id <= 0) {
+            return false;
+        }
+        
+        $query = "UPDATE referral_buffers SET deleted_by_referrer = TRUE 
+                  WHERE id = ". $_id;
+        return $this->mysqli->query($query);
+    }
 }
 ?>
