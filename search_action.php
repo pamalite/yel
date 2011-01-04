@@ -42,6 +42,11 @@ if (!isset($_POST['action'])) {
         $_SESSION['yel']['job_search']['criteria']['country_code'] = $_POST['country_code'];
     }
     
+    if (isset($_POST['country'])) {
+        $criteria['country'] = $_POST['country'];
+        $_SESSION['yel']['job_search']['criteria']['country'] = $_POST['country'];
+    }
+    
     if (isset($_POST['is_local'])) {
         $criteria['is_local'] = $_POST['is_local'];
         $_SESSION['yel']['job_search']['criteria']['is_local'] = $_POST['is_local'];

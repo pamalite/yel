@@ -3,7 +3,7 @@ var order = 'desc';
 var is_filter = false;
 
 function changed_country() {
-    is_local = 0;
+    // is_local = 0;
 }
 
 function ascending_or_descending() {
@@ -38,7 +38,8 @@ function show_jobs() {
     var params = 'industry=' + industry;
     params = params + '&employer=' + employer;
     params = params + '&country_code=' + country_code;
-    params = params + '&is_local=' + is_local;
+    params = params + '&country=' + country_code;
+    // params = params + '&is_local=' + is_local;
     params = params + '&salary=' + filter_salary;
     
     if (parseInt(filter_salary_end) > 0) {

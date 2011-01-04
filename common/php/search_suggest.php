@@ -8,6 +8,7 @@ if (!empty($_POST['keywords'])) {
     $criteria['industry'] = 0;
     $criteria['employer'] = '';
     $criteria['country_code'] = '';
+    $criteria['country'] = $_POST['country'];
     $criteria['limit'] = $GLOBALS['default_results_per_page'];
     $criteria['offset'] = 0;
     $criteria['keywords'] = $_POST['keywords'];

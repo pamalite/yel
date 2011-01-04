@@ -43,18 +43,18 @@ class SearchPage extends Page {
         if (!is_null($this->member)) {
             echo 'var id = "'. $this->member->getId(). '";'. "\n";
             
-            $this->country_code = (isset($this->criterias['country_code'])) ? $this->criterias['country_code'] : $this->member->getCountry();
+            $this->country_code = (isset($this->criterias['country'])) ? $this->criterias['country'] : $this->member->getCountry();
             echo 'var country_code = "'. $this->country_code. '";'. "\n";
         } else {
             echo 'var id = 0;'. "\n";
             
-            $this->country_code = (isset($this->criterias['country_code'])) ? $this->criterias['country_code'] : $_SESSION['yel']['country_code'];
+            $this->country_code = (isset($this->criterias['country'])) ? $this->criterias['country'] : $_SESSION['yel']['country_code'];
             echo 'var country_code = "'. $this->country_code. '";'. "\n";
         }
         echo 'var industry = "'. $this->criterias['industry']. '";'. "\n";
         echo 'var employer = "'. $this->criterias['employer']. '";'. "\n";
         echo 'var keywords = "'. $this->criterias['keywords']. '";'. "\n";
-        echo 'var is_local = '. $this->criterias['is_local']. ';'. "\n";
+        // echo 'var is_local = '. $this->criterias['is_local']. ';'. "\n";
         echo 'var filter_salary = '. $this->criterias['salary']. ';'. "\n";
         echo 'var filter_salary_end = '. ((isset($this->criterias['salary_end'])) ? $this->criterias['salary_end'] : 0). ';'. "\n";
         

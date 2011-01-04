@@ -22,7 +22,7 @@ function initialize_page() {
             'postVar': 'keywords',
             'minLength' : 1,
             'overflow' : true,
-            'delay' : 30
+            'delay' : 15
         });
     }
     
@@ -34,7 +34,7 @@ function initialize_page() {
             'postVar': 'keywords',
             'minLength' : 1,
             'overflow' : true,
-            'delay' : 30
+            'delay' : 15
         });
     }
     
