@@ -212,12 +212,13 @@ function show_resumes_of(_job_id, _job_title) {
                     }
                     row.set(3, new Cell(remarks_cell, '', 'cell remarks_column'));
                     
-                    var actions = 'Resume viewed.';
+                    var actions = '&nbsp;';
                     if (employed_ons[i].childNodes.length > 0) {
                         actions = 'Employed on ' + employed_ons[i].childNodes[0].nodeValue;
-                    } else if (!is_agreed_terms) {
-                        actions = 'Resume not viewed yet.';
                     } 
+                    // else if (!is_agreed_terms) {
+                    //     actions = 'Resume not viewed yet.';
+                    // } 
                     // else {
                     //     var stars = 0;
                     //     if (parseInt(ratings[i].childNodes[0].nodeValue) > 0) {
