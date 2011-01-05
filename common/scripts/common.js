@@ -17,6 +17,11 @@ function initialize_page() {
             }
         });
         
+        if (!isEmpty(keywords)) {
+            mini_keywords_overtext.hide();
+            $('mini_keywords').value = keywords;
+        }
+        
         var suggest_url = root + '/common/php/search_suggest.php';
         new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
             'postVar': 'keywords',

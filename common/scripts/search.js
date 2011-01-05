@@ -365,6 +365,27 @@ function refer() {
 
 function onDomReady() {
     initialize_page();
+    
+    for (var i=0; i < $('mini_employer').options.length; i++) {
+        if ($('mini_employer').options[i].value == employer) {
+            $('mini_employer').selectedIndex = i;
+            break;
+        }
+    }
+    
+    for (var i=0; i < $('mini_industry').options.length; i++) {
+        if ($('mini_industry').options[i].value == industry) {
+            $('mini_industry').selectedIndex = i;
+            break;
+        }
+    }
+    
+    for (var i=0; i < $('mini_country').options.length; i++) {
+        if ($('mini_country').options[i].value == country_code) {
+            $('mini_country').selectedIndex = i;
+            break;
+        }
+    }
 }
 
 window.addEvent('domready', onDomReady);

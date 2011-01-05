@@ -212,25 +212,26 @@ function show_resumes_of(_job_id, _job_title) {
                     }
                     row.set(3, new Cell(remarks_cell, '', 'cell remarks_column'));
                     
-                    var actions = '';
+                    var actions = 'Resume viewed.';
                     if (employed_ons[i].childNodes.length > 0) {
                         actions = 'Employed on ' + employed_ons[i].childNodes[0].nodeValue;
                     } else if (!is_agreed_terms) {
                         actions = 'Resume not viewed yet.';
-                    } else {
-                        var stars = 0;
-                        if (parseInt(ratings[i].childNodes[0].nodeValue) > 0) {
-                            stars = parseInt(ratings[i].childNodes[0].nodeValue);
-                        }
-                        
-                        actions = '<span id="referral_' + referral_ids[i].childNodes[0].nodeValue + '">'
-                        actions = actions + get_display_stars_for(referral_ids[i].childNodes[0].nodeValue, stars);
-                        actions = actions + '</span>';
-                        actions = actions + '<br/>';
-                        actions = actions + '<a class="no_link" onClick="show_employment_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Employ Candidate</a>';
-                        actions = actions + '&nbsp;|&nbsp;';
-                        actions = actions + '<a class="no_link" onClick="show_notify_popup(' + referral_ids[i].childNodes[0].nodeValue + ');">Consult</a>';
-                    }
+                    } 
+                    // else {
+                    //     var stars = 0;
+                    //     if (parseInt(ratings[i].childNodes[0].nodeValue) > 0) {
+                    //         stars = parseInt(ratings[i].childNodes[0].nodeValue);
+                    //     }
+                    //     
+                    //     actions = '<span id="referral_' + referral_ids[i].childNodes[0].nodeValue + '">'
+                    //     actions = actions + get_display_stars_for(referral_ids[i].childNodes[0].nodeValue, stars);
+                    //     actions = actions + '</span>';
+                    //     actions = actions + '<br/>';
+                    //     actions = actions + '<a class="no_link" onClick="show_employment_popup(' + referral_ids[i].childNodes[0].nodeValue + ', ' + i + ');">Employ Candidate</a>';
+                    //     actions = actions + '&nbsp;|&nbsp;';
+                    //     actions = actions + '<a class="no_link" onClick="show_notify_popup(' + referral_ids[i].childNodes[0].nodeValue + ');">Consult</a>';
+                    // }
                     row.set(4, new Cell(actions, '', 'cell actions_column'));
                     resumes_table.set((parseInt(i)+1), row);
                 }
