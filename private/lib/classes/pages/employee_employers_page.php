@@ -63,11 +63,6 @@ class EmployeeEmployersPage extends Page {
         
         // $available_subscriptions = $subscriptions_rates[Currency::getSymbolFromCountryCode($branch[0]['country_code'])];
         
-        if (is_null($employers) || count($employers) <= 0 || $employers === false) {
-        ?>
-        <div class="empty_results">No employers at this moment.</div>
-        <?php
-        } else {
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
@@ -78,6 +73,11 @@ class EmployeeEmployersPage extends Page {
         </div>
         <div id="div_employers">
         <?php
+            if (is_null($employers) || count($employers) <= 0 || $employers === false) {
+            ?>
+            <div class="empty_results">No employers at this moment.</div>
+            <?php
+            } else {
             $employers_table = new HTMLTable('employers_table', 'employers');
             
             $employers_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('employers', 'employers.joined_on');\">Joined On</a>", '', 'header');
