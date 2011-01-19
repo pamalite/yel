@@ -68,6 +68,11 @@ class EmployeeEmployersPage extends Page {
             <span id="span_status" class="status"></span>
         </div>
         
+        <form id="employer_page_form" method="post" action="employer.php">
+            <input type="hidden" id="id" name="id" value="" />
+            <input type="hidden" id="from_employer" name="from_employer" value="" />
+        </form>
+        
         <div class="buttons_bar">
             <input class="button" type="button" id="add_new_employer" name="add_new_employer" value="Add New Employer" onClick="add_new_employer();" />
         </div>
@@ -120,10 +125,6 @@ class EmployeeEmployersPage extends Page {
             <input class="button" type="button" id="add_new_employer" name="add_new_employer" value="Add New Employer" onClick="add_new_employer();" />
         </div>
         
-        <form id="employer_page_form" method="post" action="employer.php">
-            <input type="hidden" id="id" name="id" value="" />
-            <input type="hidden" id="from_employer" name="from_employer" value="" />
-        </form>
         <?php
         }
         ?>

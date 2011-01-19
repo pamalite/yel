@@ -1057,5 +1057,25 @@ class Member implements Model {
                   WHERE id = ". $_id;
         return $this->mysqli->query($query);
     }
+    
+    public function setReminder($_id, $_date) {
+        if (is_null($_id) || empty($_id)) {
+            return false;
+        }
+        
+        $query = "UPDATE member_jobs SET remind_on = '". $_date. "' 
+                  WHERE id = ". $_id;
+        return $this->mysqli->execute($query);
+    }
+    
+    public function resetReminder($_id) {
+        if (is_null($_id) || empty($_id)) {
+            return false;
+        }
+        
+        $query = "UPDATE member_jobs SET remind_on = NULL 
+                  WHERE id = ". $_id;
+        return $this->mysqli->execute($query);
+    }
 }
 ?>

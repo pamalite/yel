@@ -600,6 +600,29 @@ class EmployeeMembersPage extends Page {
             </div>
         </div>
         
+        <div id="reminder_window" class="popup_window">
+            <div class="popup_window_title">Follow Up</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="reminder_id" value="" />
+                <input type="hidden" id="reminder_is_buffer" value="1" />
+                <div class="reminder_form">
+                    Follow up in 
+                    <select id="reminder_days">
+                        <option value="1" selected>1 day</option>
+                        <option value="2">2 days</option>
+                        <option value="3">3 days</option>
+                        <option value="4">4 days</option>
+                        <option value="5">5 days</option>
+                        <option value="6">6 days</option>
+                        <option value="7">7 days</option>
+                    </select>
+                </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Set" onClick="close_reminder_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_reminder_popup(false);" />
+            </div>
+        </div>
         <?php
     }
 }

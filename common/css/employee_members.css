@@ -468,3 +468,17 @@ span.tiny {
     display: none;
     width: auto;
 }
+
+#reminder_window {
+    display: none;
+    width: auto;
+}
+
+div.reminder_form {
+    text-align: center;
+    padding: 10px 10px 10px 10px;
+}
+
+span.remind_warn {
+    color: #ff0000;
+}

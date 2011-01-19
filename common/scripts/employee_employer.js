@@ -899,6 +899,8 @@ function save_job() {
                 return false;
             }
             
+            alert('Job successfully saved.' + "\n\nClick 'OK' to continue.");
+            
             show_jobs();
             show_updated_jobs();
         },

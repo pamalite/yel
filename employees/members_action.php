@@ -97,9 +97,12 @@ if ($_POST['action'] == 'get_jobs') {
     }
     
     $criteria = array(
-        'columns' => "title AS job_title, jobs.id, employer",
-        'match' => "employer IN (". $employers. ")",
-        'order' => "title"
+        'columns' => "DISTINCT jobs.title AS job_title, jobs.id, jobs.employer",
+        'joins' => "referral_buffers ON jobs.id = referral_buffers.job, 
+                    member_jobs ON jobs.id = member_jobs.job", 
+        'match' => "jobs.employer IN (". $employers. ") 
+                    AND (referral_buffers.id IS NOT NULL OR member_jobs.id IS NOT NULL)",
+        'order' => "jobs.title"
     );
     
     $job = new Job();
@@ -174,6 +177,8 @@ if ($_POST['action'] == 'get_new_applicants') {
                       IF(members.email_addr IS NULL, 0, 1) AS is_member,
                       jobs.title AS job, jobs.employer,  
                       DATE_FORMAT(referral_buffers.requested_on, '%e %b, %Y') AS formatted_requested_on, 
+                      DATE_FORMAT(referral_buffers.remind_on, '%e %b, %Y') AS formatted_remind_on, 
+                      DATEDIFF(referral_buffers.remind_on, NOW()) AS days_left, 
                       (SELECT COUNT(buf.id) 
                        FROM referral_buffers AS buf 
                        WHERE buf.candidate_email = referral_buffers.candidate_email) AS num_jobs_attached, 
@@ -278,6 +283,8 @@ if ($_POST['action'] == 'get_applicants') {
                       DATE_FORMAT(referrals.employer_agreed_terms_on, '%e %b, %Y') AS formatted_employer_agreed_terms_on,
                       DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on,
                       DATE_FORMAT(referrals.employer_rejected_on, '%e %b, %Y') AS formatted_employer_rejected_on, 
+                      DATE_FORMAT(member_jobs.remind_on, '%e %b, %Y') AS formatted_remind_on, 
+                      DATEDIFF(member_jobs.remind_on, NOW()) AS days_left, 
                       (SELECT COUNT(id) 
                        FROM resumes WHERE member = members.email_addr 
                        AND is_yel_uploaded = TRUE) AS num_yel_resumes,
@@ -609,7 +616,7 @@ if ($_POST['action'] == 'get_progress_notes') {
     $progress_notes = '';
     if ($_POST['is_buffer'] == '1') {
         $criteria = array(
-            'column' => "progress_notes",
+            'columns' => "progress_notes",
             'match' => "id = ". $_POST['id'],
             'limit' => "1"
         );
@@ -1475,4 +1482,73 @@ if ($_POST['action'] == 'get_referrer_remarks') {
     echo trim(htmlspecialchars_decode(stripslashes($record[0]['referrer_remarks'])));
     exit();
 }
+
+if ($_POST['action'] == 'get_remind_on') {
+    $result = array();
+    
+    if ($_POST['is_buffer'] == '1') {
+        $criteria = array(
+            'columns' => "DATEDIFF(remind_on, NOW()) AS days_left",
+            'match' => "id = ". $_POST['id'],
+            'limit' => "1"
+        );
+        $buffer = new ReferralBuffer();
+        $result = $buffer->find($criteria);
+    } else {
+        $criteria = array(
+            'columns' => "DATEDIFF(member_jobs.remind_on, NOW()) AS days_left",
+            'joins' => "member_jobs ON members.email_addr = member_jobs.member", 
+            'match' => "member_jobs.id = ". $_POST['id'],
+            'limit' => "1"
+        );
+        $member = new Member();
+        $result = $member->find($criteria);
+    }
+    
+    echo $result[0]['days_left'];
+    exit();
+}
+
+if ($_POST['action'] == 'set_reminder') {
+    if ($_POST['is_buffer'] == '1') {
+        $data = array();
+        $data['remind_on'] = sql_date_add(now(), $_POST['days'], 'day');
+        $buffer = new ReferralBuffer($_POST['id']);
+        if ($buffer->update($data) === false) {
+            echo 'ko';
+            exit();
+        }
+    } else {
+        $member = new Member();
+        if ($member->setReminder($_POST['id'], sql_date_add(now(), $_POST['days'], 'day')) === false) {
+            echo 'ko';
+            exit();
+        }
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'reset_reminder') {
+    if ($_POST['is_buffer'] == '1') {
+        $data = array();
+        $data['remind_on'] = 'NULL';
+        $buffer = new ReferralBuffer($_POST['id']);
+        if ($buffer->update($data) === false) {
+            echo 'ko';
+            exit();
+        }
+    } else {
+        $member = new Member();
+        if ($member->resetReminder($_POST['id']) === false) {
+            echo 'ko';
+            exit();
+        }
+    }
+    
+    echo 'ok';
+    exit();
+}
+
 ?>
