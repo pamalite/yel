@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/../private/lib/utilities.php";
+require_once dirname(__FILE__). "/../private/lib/recaptchalib.php";
 
 session_start();
 
@@ -10,8 +11,17 @@ if (!isset($_POST['action'])) {
 if ($_POST['action'] == 'sign_up') {
     // echo 'ok';
     // exit();
+    
     // verify captcha first
-    // if not valid echo 'ko - captcha';
+    $privatekey = '6LdwqsASAAAAAEJESjRalI-y5sjko4b82nMLC5mH';
+    $resp = recaptcha_check_answer ($privatekey,
+                                    'yellowelevator.com',
+                                    $_POST["recaptcha_challenge"],
+                                    $_POST["recaptcha_response"]);
+    if (!$resp->is_valid) {
+        echo 'ko - captcha';
+        exit();
+    }
     
     if (!isset($_POST['email_addr']) || !isset($_POST['phone_num']) || 
         !isset($_POST['forget_password_question']) || !isset($_POST['forget_password_answer'])) {

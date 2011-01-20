@@ -200,8 +200,19 @@ class MemberSignUpPage extends Page {
                         <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" /></td>
                     </tr>
                     <tr>
-                        <td colspan="2">
-                            <!-- reCAPTCHA goes here -->
+                        <td class="label">&nbsp;</td>
+                        <td class="field">
+                            <script type="text/javascript"
+                                 src="http://www.google.com/recaptcha/api/challenge?k=6LdwqsASAAAAAJuZpFkYJo6a0-QAJET_OafO3n6D">
+                              </script>
+                              <noscript>
+                                 <iframe src="http://www.google.com/recaptcha/api/noscript?k=6LdwqsASAAAAAJuZpFkYJo6a0-QAJET_OafO3n6D"
+                                     height="300" width="500" frameborder="0" id="recaptcha"></iframe><br>
+                                 <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+                                 </textarea>
+                                 <input type="hidden" name="recaptcha_response_field"
+                                     value="manual_challenge">
+                              </noscript>
                         </td>
                     </tr>
                     <tr>

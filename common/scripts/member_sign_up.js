@@ -179,6 +179,8 @@ function sign_up() {
     params = params + '&forget_password_question=' + $('forget_password_question').value;
     params = params + '&forget_password_answer=' + $('forget_password_answer').value;
     params = params + '&phone_num=' + $('phone_num').value;
+    params = params + '&recaptcha_challenge=' + encodeURIComponent($('recaptcha_challenge_field').value);
+    params = params + '&recaptcha_response=' + encodeURIComponent($('recaptcha_response_field').value);
     
     var uri = root + "/members/sign_up_action.php";
     var request = new Request({
@@ -204,7 +206,8 @@ function sign_up() {
             } else if (responses[1] == 'error_activation') {
                 alert('An error when trying to send an activation email.' + "\n\n" + 'Please contact us to have the problem sorted.');
             } else if (responses[1] == 'captcha') {
-                alert('The security code was incorrectly entered.');
+                alert('The the reCAPTCHA text was incorrectly entered.');
+                Recaptcha.reload();
             }
         },
         onRequest: function(instance) {
