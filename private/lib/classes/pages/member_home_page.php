@@ -339,146 +339,153 @@ class MemberHomePage extends Page {
                         </div>
                     </div>
                     
-                    <div class="profile">
-                        <div class="profile_title">My Phoho</div>
-                        <div class="profile_photo_area">
-                            <div class="photo">
-                            <?php
-                            if ($this->member->hasPhoto()) {
-                            ?>
-                                <img id="photo_image" class="photo_image" src="candidate_photo.php?id=<?php echo $this->member->getId(); ?>" />
-                            <?php
-                            } else {
-                            ?>
-                                <div style="text-align: center; margin: auto;">
-                                    Upload your photo here by clicking the "Upload Photo" button.
-                                </div>
-                            <?php
-                            }
-                            ?>
-                            </div>
-                            <div class="upload_button">
-                                <input type="button" value="Upload Photo" onClick="show_upload_photo_popup();" />
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="profile">
-                        <div class="profile_title">Summary [<a class="no_link" onClick="show_career_summary_popup();">edit</a>]</div>
-                        <div class="profile_form">
-                            Please help us answer the following questions as part of our on-going effort to understand you better. You may also update youe answers if necessary.<br/>
-                            <table class="profile_form_table">
-                                <tr>
-                                    <td class="field">Are you actively seeking for a new job or experience?</td>
-                                    <td>
+                    <table>
+                        <tr>
+                            <td style="width: 25%;">
+                                <div class="profile">
+                                    <div class="profile_title">My Phoho</div>
+                                    <div class="profile_photo_area">
+                                        <div class="photo">
                                         <?php
-                                        if ($is_active) {
+                                        if ($this->member->hasPhoto()) {
                                         ?>
-                                        Yes
+                                            <img id="photo_image" class="photo_image" src="candidate_photo.php?id=<?php echo $this->member->getId(); ?>" />
                                         <?php
                                         } else {
                                         ?>
-                                        No
-                                        <?php    
+                                            <div style="text-align: center; margin: auto;">
+                                                Upload your photo here by clicking the "Upload Photo" button.
+                                            </div>
+                                        <?php
                                         }
                                         ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="field odd">Briefly, tell us what are your goals and experiences.</td>
-                                    <td class="odd">
-                                        <span id="seeking_field">
-                                        <?php
-                                            echo str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['seeking']);
-                                        ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="field">What will be your expected salary range?</td>
-                                    <td>
-                                        <span id="expected_salary_field">
-                                        <?php 
-                                            echo $answers['expected_salary_currency']. '$&nbsp;';
-                                            echo number_format($answers['expected_salary'], 2, '.', ' '). ' to '. number_format($answers['expected_salary_end'], 2, '.', ' ');
-                                        ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="field odd" rowspan="2">Preferred Job Location?</td>
-                                    <td class="odd">
-                                        1. 
-                                        <span id="pref_job_loc_1_field">
-                                        <?php 
-                                            echo $answers['pref_job_location_1'];
-                                        ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="odd">
-                                        2. 
-                                        <span id="pref_job_loc_2_field">
-                                        <?php 
-                                            echo $answers['pref_job_location_2'];
-                                        ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="field">Perhaps you can travel, or relocate, if the new job requires it?</td>
-                                    <td>
-                                        <span id="travel_field">
-                                        <?php
-                                            echo ($answers['can_travel_relocate'] == 'Y') ? 'Yes' : 'No';
-                                        ?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="field odd">Briefly, why do you want to leave your current job?</td>
-                                    <td class="odd">
-                                        <span id="leaving_field">
-                                        <?php
-                                            echo str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['reason_for_leaving']);
-                                        ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="field">Briefly, what is your current position, and what do you do?</td>
-                                    <td>
-                                        <span id="current_job_field">
-                                        <?php
-                                            echo stripslashes($answers['current_position']);
-                                        ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="field odd">What is your current salary range?</td>
-                                    <td class="odd">
-                                        <span id="current_salary_field">
-                                        <?php 
-                                            echo $answers['current_salary_currency']. '$&nbsp;';
-                                            echo number_format($answers['current_salary'], 2, '.', ' ') .' to '.  number_format($answers['current_salary_end'], 2, '.' , ' ');
-                                        ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="field">What is your notice period?</td>
-                                    <td>
-                                        <span id="notice_period_field">
-                                        <?php
-                                            echo $answers['notice_period']. ' months';
-                                        ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
+                                        </div>
+                                        <div class="upload_button">
+                                            <input type="button" value="Upload Photo" onClick="show_upload_photo_popup();" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="profile">
+                                    <div class="profile_title">Summary [<a class="no_link" onClick="show_career_summary_popup();">edit</a>]</div>
+                                    <div class="profile_form">
+                                        Please help us answer the following questions as part of our on-going effort to understand you better. You may also update youe answers if necessary.<br/>
+                                        <table class="profile_form_table">
+                                            <tr>
+                                                <td class="field">Are you actively seeking for a new job or experience?</td>
+                                                <td>
+                                                    <?php
+                                                    if ($is_active) {
+                                                    ?>
+                                                    Yes
+                                                    <?php
+                                                    } else {
+                                                    ?>
+                                                    No
+                                                    <?php    
+                                                    }
+                                                    ?>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="field odd">Briefly, tell us what are your goals and experiences.</td>
+                                                <td class="odd">
+                                                    <span id="seeking_field">
+                                                    <?php
+                                                        echo str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['seeking']);
+                                                    ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="field">What will be your expected salary range?</td>
+                                                <td>
+                                                    <span id="expected_salary_field">
+                                                    <?php 
+                                                        echo $answers['expected_salary_currency']. '$&nbsp;';
+                                                        echo number_format($answers['expected_salary'], 2, '.', ' '). ' to '. number_format($answers['expected_salary_end'], 2, '.', ' ');
+                                                    ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="field odd" rowspan="2">Preferred Job Location?</td>
+                                                <td class="odd">
+                                                    1. 
+                                                    <span id="pref_job_loc_1_field">
+                                                    <?php 
+                                                        echo $answers['pref_job_location_1'];
+                                                    ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="odd">
+                                                    2. 
+                                                    <span id="pref_job_loc_2_field">
+                                                    <?php 
+                                                        echo $answers['pref_job_location_2'];
+                                                    ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="field">Perhaps you can travel, or relocate, if the new job requires it?</td>
+                                                <td>
+                                                    <span id="travel_field">
+                                                    <?php
+                                                        echo ($answers['can_travel_relocate'] == 'Y') ? 'Yes' : 'No';
+                                                    ?>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="field odd">Briefly, why do you want to leave your current job?</td>
+                                                <td class="odd">
+                                                    <span id="leaving_field">
+                                                    <?php
+                                                        echo str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['reason_for_leaving']);
+                                                    ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="field">Briefly, what is your current position, and what do you do?</td>
+                                                <td>
+                                                    <span id="current_job_field">
+                                                    <?php
+                                                        echo stripslashes($answers['current_position']);
+                                                    ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="field odd">What is your current salary range?</td>
+                                                <td class="odd">
+                                                    <span id="current_salary_field">
+                                                    <?php 
+                                                        echo $answers['current_salary_currency']. '$&nbsp;';
+                                                        echo number_format($answers['current_salary'], 2, '.', ' ') .' to '.  number_format($answers['current_salary_end'], 2, '.' , ' ');
+                                                    ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="field">What is your notice period?</td>
+                                                <td>
+                                                    <span id="notice_period_field">
+                                                    <?php
+                                                        echo $answers['notice_period']. ' months';
+                                                    ?>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                     
                     <div id="job_profiles" class="profile">
                         <div class="profile_title">Positions Held &amp; Currently Holding</div>

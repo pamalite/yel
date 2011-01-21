@@ -97,11 +97,13 @@ if ($_POST['action'] == 'get_jobs') {
     }
     
     $criteria = array(
-        'columns' => "DISTINCT jobs.title AS job_title, jobs.id, jobs.employer",
-        'joins' => "referral_buffers ON jobs.id = referral_buffers.job, 
-                    member_jobs ON jobs.id = member_jobs.job", 
-        'match' => "jobs.employer IN (". $employers. ") 
-                    AND (referral_buffers.id IS NOT NULL OR member_jobs.id IS NOT NULL)",
+        'columns' => "jobs.title AS job_title, jobs.id, jobs.employer, jobs.deleted, 
+                      COUNT(referral_buffers.id) AS buf_count, 
+                      COUNT(member_jobs.id) AS app_count",
+        'joins' => "referral_buffers ON referral_buffers.job = jobs.id, 
+                    member_jobs ON member_jobs.job = jobs.id", 
+        'match' => "jobs.employer IN (". $employers. ")",
+        'group' => "jobs.id", 
         'order' => "jobs.title"
     );
     
@@ -118,11 +120,17 @@ if ($_POST['action'] == 'get_jobs') {
         exit();
     }
     
+    $jobs = array();
     foreach($result as $i=>$row) {
-        $result[$i]['job_title'] = htmlspecialchars_decode(stripslashes($row['job_title']));
+        if ($row['deleted'] == '1' && ($row['buf_count'] + $row['app_count']) <= 0) {
+            continue;
+        }
+        
+        $row['job_title'] = htmlspecialchars_decode(stripslashes($row['job_title']));
+        $jobs[] = $row;
     }
     
-    $response = array('jobs' => array('job' => $result));
+    $response = array('jobs' => array('job' => $jobs));
     header('Content-type: text/xml');
     echo $xml_dom->get_xml_from_array($response);
     exit();
