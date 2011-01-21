@@ -45,9 +45,13 @@ class EmployeeMembersPage extends Page {
     }
     
     private function get_employers() {
+        $branch = $this->employee->getBranch();
+        
         $criteria = array(
             'columns' => "DISTINCT employers.name AS employer, employers.id", 
-            'joins' => "employers ON employers.id = jobs.employer", 
+            'joins' => "employers ON employers.id = jobs.employer, 
+                        employees ON employees.id = employers.registered_by",
+            'match' => "employees.branch = ". $branch[0]['id'],  
             'order' => "employers.name"
         );
         
