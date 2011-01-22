@@ -214,14 +214,14 @@ class Page {
                     <td class="top_search">
                         <form method="post" action="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/search.php" onSubmit="return verify_mini();">
                             <?php
-                                $country = $_SESSION['yel']['country_code'];
-                                if (isset($_SESSION['yel']['member']) &&
-                                    !empty($_SESSION['yel']['member']['id']) && 
-                                    !empty($_SESSION['yel']['member']['sid']) && 
-                                    !empty($_SESSION['yel']['member']['hash'])) {
-                                    $member = new Member($_SESSION['yel']['member']['id']);
-                                    $country = $member->getCountry();
-                                }
+                                // $country = $_SESSION['yel']['country_code'];
+                                // if (isset($_SESSION['yel']['member']) &&
+                                //     !empty($_SESSION['yel']['member']['id']) && 
+                                //     !empty($_SESSION['yel']['member']['sid']) && 
+                                //     !empty($_SESSION['yel']['member']['hash'])) {
+                                //     $member = new Member($_SESSION['yel']['member']['id']);
+                                //     $country = $member->getCountry();
+                                // }
                             ?>
                             <input type="hidden" name="country_code" value="<?php echo $country ?>" />
                             <select id="mini_employer" name="employer">
@@ -260,15 +260,16 @@ class Page {
                             </select>
                             &nbsp;
                             <select id="mini_country" name="country">
-                                <option value="">Any Country</option>
+                                <option value="" selected>Any Country</option>
                                 <option value="" disabled>&nbsp;</option>
                                 <?php
                                 foreach ($countries as $a_country) {
-                                    if ($country == $a_country['country_code']) {
-                                        echo '<option value="'. $a_country['country_code']. '" selected>'. $a_country['country']. '</option>'. "\n";
-                                    } else {
-                                        echo '<option value="'. $a_country['country_code']. '">'. $a_country['country']. '</option>'. "\n";
-                                    }
+                                    echo '<option value="'. $a_country['country_code']. '">'. $a_country['country']. '</option>'. "\n";
+                                    // if ($country == $a_country['country_code']) {
+                                    //     echo '<option value="'. $a_country['country_code']. '" selected>'. $a_country['country']. '</option>'. "\n";
+                                    // } else {
+                                    //     echo '<option value="'. $a_country['country_code']. '">'. $a_country['country']. '</option>'. "\n";
+                                    // }
                                 }
                                 ?>
                             </select>
