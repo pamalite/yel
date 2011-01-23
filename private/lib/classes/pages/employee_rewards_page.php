@@ -74,7 +74,8 @@ class EmployeeRewardsPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top('Rewards');
+        $branch = $this->employee->getBranch();
+        $this->top('Rewards - '. $branch[0]['country']);
         $this->menu_employee('rewards');
         
         $new_rewards = $this->get_rewards();
@@ -153,7 +154,7 @@ class EmployeeRewardsPage extends Page {
                     }
                     $new_rewards_table->set($i+1, 2, $referrer_short_details, '', 'cell');
                     
-                    $new_rewards_table->set($i+1, 3, '<a class="no_link" onClick="show_invoice_page('. $new_reward['invoice']. '">'. $new_reward['padded_invoice']. '</a>&nbsp;<a href="invoice_pdf.php?id='. $new_reward['invoice']. '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell');
+                    $new_rewards_table->set($i+1, 3, '<a class="no_link" onClick="show_invoice_page('. $new_reward['invoice']. ');">'. $new_reward['padded_invoice']. '</a>&nbsp;<a href="invoice_pdf.php?id='. $new_reward['invoice']. '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell');
                     $new_rewards_table->set($i+1, 4, $new_reward['currency']. '$ '. $new_reward['total_reward'], '', 'cell');
                     
                     $actions = '<input type="button" value="Award" onClick="show_award_popup('. $new_reward['referral']. ');" />';
@@ -237,7 +238,8 @@ class EmployeeRewardsPage extends Page {
                         <tr>
                             <td class="label">Total Reward:</td>
                             <td class="field">
-                                <span id="lbl_reward"></span>
+                                <!-- span id="lbl_reward"></span -->
+                                <span id="lbl_reward_currency"></span>$ <input type="text" id="amount" value="1.00" />
                             </td>
                         </tr>
                         <tr>
@@ -268,8 +270,8 @@ class EmployeeRewardsPage extends Page {
                 </div>
             </form>
             <div class="popup_window_buttons_bar">
-                <input type="button" value="Cancel" onClick="close_award_popup(false);" />
                 <input type="button" value="Confirm" onClick="close_award_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_award_popup(false);" />
             </div>
         </div>
         

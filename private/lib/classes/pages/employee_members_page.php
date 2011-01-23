@@ -143,10 +143,10 @@ class EmployeeMembersPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top('Candidates');
+        $branch = $this->employee->getBranch();
+        $this->top('Candidates - '. $branch[0]['country']);
         $this->menu_employee('members');
         
-        $branch = $this->employee->getBranch();
         $sales_email_addr = 'team.'. strtolower($branch[0]['country']). '@yellowelevator.com';
         $employers = $this->get_employers();
         

@@ -88,10 +88,10 @@ class EmployeeStatusPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top('Application Status');
+        $branch = $this->employee->getBranch();
+        $this->top('Application Status - '. $branch[0]['country']);
         $this->menu_employee('status');
         
-        $branch = $this->employee->getBranch();
         $applications = $this->get_applications();
         
         $employers_filter = '<select id="employers_filter" onChange="update_applications();">';

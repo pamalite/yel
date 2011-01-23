@@ -78,7 +78,8 @@ class EmployeePaymentsPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top('Payments');
+        $branch = $this->employee->getBranch();
+        $this->top('Payments - '. $branch[0]['country']);
         $this->menu_employee('payments');
         
         $employers = $this->get_employers();

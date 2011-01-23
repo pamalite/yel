@@ -300,8 +300,11 @@ function show_award_popup(_referral_id) {
             
             $('lbl_referrer').set('html', referrers[0].childNodes[0].nodeValue);
             
-            var amount = currencies[0].childNodes[0].nodeValue + '$ ' + total_rewards[0].childNodes[0].nodeValue;
-            $('lbl_reward').set('html', amount);
+            // var amount = currencies[0].childNodes[0].nodeValue + '$ ' + total_rewards[0].childNodes[0].nodeValue;
+            // $('lbl_reward').set('html', amount);
+            
+            $('lbl_reward_currency').set('html', currencies[0].childNodes[0].nodeValue);
+            $('amount').value = total_rewards[0].childNodes[0].nodeValue;
             
             show_window('award_window');
             // window.scrollTo(0, 0);
@@ -322,11 +325,17 @@ function close_award_popup(_is_award) {
             params = params + '&award_mode=gift';
             params = params + '&gift=' + $('gift').value;
         } else {
+            if (isNaN($('amount').value) || $('amount').value <= 0) {
+                alert('Reward amount must be a number and more then $0.00');
+                return;
+            }
+            
             params = params + '&award_mode=money';
             params = params + '&bank=' + $('bank_account').options[$('bank_account').selectedIndex].value;
             params = params + '&payment_mode=' + $('payment_mode').options[$('payment_mode').selectedIndex].value;
             params = params + '&receipt=' + $('receipt').value;
-            params = params + '&amount=' + $('lbl_reward').get('html').substr(5);
+            // params = params + '&amount=' + $('lbl_reward').get('html').substr(5);
+            params = params + '&amount=' + $('amount').value;
         }
         
         var uri = root + "/employees/rewards_action.php";

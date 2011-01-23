@@ -54,11 +54,11 @@ class EmployeeEmployersPage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top('Employers');
+        $branch = $this->employee->getBranch();
+        $this->top('Employers - '. $branch[0]['country']);
         $this->menu_employee('employers');
         
         $subscriptions_rates = $GLOBALS['subscriptions_rates'];
-        $branch = $this->employee->getBranch();
         $employers = $this->get_employers($branch[0]['id']);
         
         // $available_subscriptions = $subscriptions_rates[Currency::getSymbolFromCountryCode($branch[0]['country_code'])];

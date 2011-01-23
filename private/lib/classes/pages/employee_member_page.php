@@ -376,14 +376,13 @@ class EmployeeMemberPage extends Page {
     
     public function show() {
         $this->begin();
+        $branch = $this->employee->getBranch();
         if ($this->is_new) {
-            $this->top('Candidate - New Candidate');
+            $this->top('Candidate - '. $branch[0]['country']. ' - New Candidate');
         } else {
-            $this->top('Candidate - '. htmlspecialchars_decode(stripslashes($this->member->getFullName())));
+            $this->top('Candidate - '. $branch[0]['country']. ' - '. htmlspecialchars_decode(stripslashes($this->member->getFullName())));
         }
         $this->menu_employee('members');
-        
-        $branch = $this->employee->getBranch();
         
         $raw_data = array();
         $profile = array();

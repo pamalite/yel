@@ -137,15 +137,15 @@ class EmployeeEmployerPage extends Page {
     
     public function show() {
         $this->begin();
+        $branch = $this->employee->getBranch();
         if ($this->is_new) {
-            $this->top('Employer - New Employer');
+            $this->top('Employer - '. $branch[0]['country'].' - New Employer');
         } else {
-            $this->top('Employer - '. htmlspecialchars_decode(stripslashes($this->employer->getName())));
+            $this->top('Employer - '. $branch[0]['country']. ' - '. htmlspecialchars_decode(stripslashes($this->employer->getName())));
         }
         $this->menu_employee('employers');
         
         $subscriptions_rates = $GLOBALS['subscriptions_rates'];
-        $branch = $this->employee->getBranch();
         $available_subscriptions = $subscriptions_rates[Currency::getSymbolFromCountryCode($branch[0]['country'])];
         
         $raw_data = array();

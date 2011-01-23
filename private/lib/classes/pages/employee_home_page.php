@@ -34,7 +34,8 @@ class EmployeeHomePage extends Page {
     
     public function show() {
         $this->begin();
-        $this->top('Home');
+        $branch = $this->employee->getBranch();
+        $this->top('Home - '. $branch[0]['country']);
         $this->menu_employee('home');
         
         ?>
