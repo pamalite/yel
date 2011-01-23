@@ -18,8 +18,8 @@ function create_member_from($_email_addr, $_fullname, $_phone) {
     $firstname = $_fullname;
     $names = explode(',', $_fullname);
     if (count($names) > 1) {
-        $lastname = $names[0];
-        $firstname = $names[1];
+        $lastname = trim($names[0]);
+        $firstname = trim($names[1]);
     }
     
     $data = array();
