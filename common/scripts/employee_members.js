@@ -522,18 +522,19 @@ function update_applicants() {
                         progress = progress + '<br/><a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\');">Update</a>';
                     }
                     
-                    var reminder = '<span id="reminder_' + i + '"></span><br/><a class="no_link" onClick="show_reminder_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\', ' + i + ');">Set Follow Up</a>';
+                    var reminder = '<span id="reminder_' + i + '" class="remind"></span><br/><a class="no_link" onClick="show_reminder_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\', ' + i + ');">Set Follow Up</a>';
                     if (remind_ons[i].childNodes.length > 0) {
                         if (parseInt(remind_days_left[i].childNodes[0].nodeValue) <= 0) {
-                            reminder = '<span id="reminder_' + i + '"><span class="remind_warn">' + remind_ons[i].childNodes[0].nodeValue + '</span></span><br/>';
+                            reminder = '<span id="reminder_' + i + '"><span class="remind warn">' + remind_ons[i].childNodes[0].nodeValue + '</span></span><br/>';
                             
                         } else {
-                            reminder = '<span id="reminder_' + i + '">' + remind_ons[i].childNodes[0].nodeValue + '</span><br/>';
+                            reminder = '<span id="reminder_' + i + '" class="remind">' + remind_ons[i].childNodes[0].nodeValue + '</span><br/>';
                         }
                         
                         reminder = reminder + '<a class="no_link" onClick="show_reminder_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\', ' + i + ');">Set</a>';
                         reminder = reminder + '&nbsp;|&nbsp;<a class="no_link" onClick="reset_reminder(\'' + ids[i].childNodes[0].nodeValue + '\', \'0\', ' + i + ');">Reset</a> Follow Up';
                     }
+                    reminder = '<div id="reminder_area_' + i + '">' + reminder + '</div>';
                     row.set(6, new Cell(progress + '<br/><br/>' + reminder, '', 'cell progress_cell'));
                     
                     applicants_table.set((parseInt(i)+1), row);
@@ -934,18 +935,19 @@ function update_new_applicants() {
                         progress = progress + '<br/><a class="no_link" onClick="show_progress_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'1\');">Update</a>';
                     }
                     
-                    var reminder = '<span id="reminder_p_' + i + '"></span><br/><a class="no_link" onClick="show_reminder_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'1\', ' + i + ');">Set Follow Up</a>';
+                    var reminder = '<span id="reminder_p_' + i + '" class="remind"></span><br/><a class="no_link" onClick="show_reminder_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'1\', ' + i + ');">Set Follow Up</a>';
                     if (remind_ons[i].childNodes.length > 0) {
                         if (parseInt(remind_days_left[i].childNodes[0].nodeValue) <= 0) {
-                            reminder = '<span id="reminder_p_' + i + '"><span class="remind_warn">' + remind_ons[i].childNodes[0].nodeValue + '</span></span><br/>';
+                            reminder = '<span id="reminder_p_' + i + '"><span class="remind warn">' + remind_ons[i].childNodes[0].nodeValue + '</span></span><br/>';
                             
                         } else {
-                            reminder = '<span id="reminder_p_' + i + '">' + remind_ons[i].childNodes[0].nodeValue + '</span><br/>';
+                            reminder = '<span id="reminder_p_' + i + '" class="remind">' + remind_ons[i].childNodes[0].nodeValue + '</span><br/>';
                         }
                         
                         reminder = reminder + '<a class="no_link" onClick="show_reminder_popup(\'' + ids[i].childNodes[0].nodeValue + '\', \'1\', ' + i + ');">Set</a>';
                         reminder = reminder + '&nbsp;|&nbsp;<a class="no_link" onClick="reset_reminder(\'' + ids[i].childNodes[0].nodeValue + '\', \'1\', ' + i + ');">Reset</a> Follow Up';
                     }
+                    reminder = '<div id="reminder_area_p_' + i + '">' + reminder + '</div>';
                     row.set(4, new Cell(progress + '<br/><br/>' + reminder, '', 'cell progress_cell'));
                     
                     // actions
@@ -1229,7 +1231,7 @@ function delete_application(_app_id, _is_buffer) {
 }
 
 function make_member_from(_app_id) {
-    if (!confirm('Confirm to sign up the selected applicant?' + "\n\n" + 'All other application made to/for this candidate will be moved to Members section as well.' +"\n")) {
+    if (!confirm('Confirm to sign up the selected applicant?' + "\n\n" + 'All other application made to/for this candidate will be moved to Applicants section as well.' +"\n")) {
         return;
     }
     
@@ -1241,6 +1243,7 @@ function make_member_from(_app_id) {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            alert(txt);
             set_status('');
             
             if (!isEmail(txt)) {
@@ -2068,9 +2071,9 @@ function reset_reminder(_id, _is_buffer, _idx) {
         onSuccess: function(txt, xml) {
             if (txt == 'ok') {
                 if (_is_buffer == '1') {
-                    $('reminder_p_' + _idx).set('html', '');
+                    $('reminder_area_p_' + _idx).set('html', '<span id="reminder_p_' + _idx + '" class="remind"></span><br/><a class="no_link" onClick="show_reminder_popup(\'' + _id + '\', \'1\', ' + _idx + ');">Set Follow Up</a>');
                 } else {
-                    $('reminder_' + _idx).set('html', '');
+                    $('reminder_area_' + _idx).set('html', '<span id="reminder_' + _idx + '" class="remind"></span><br/><a class="no_link" onClick="show_reminder_popup(\'' + _id + '\', \'0\', ' + _idx + ');">Set Follow Up</a>');
                 }
             }
         }

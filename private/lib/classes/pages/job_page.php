@@ -244,7 +244,13 @@ class JobPage extends Page {
             ?>
             <div class="job_title"><?php echo $job['title'] ?></div>
             <div class="employer_country">
-                <?php echo $job['employer_name'] ?>
+                <?php 
+                    if (!is_null($job['employer_website_url']) && !empty($job['employer_website_url'])) {
+                        echo '<a href="'. $job['employer_website_url']. '" target="_new">'. $job['employer_name']. '</a>';
+                    } else {
+                        echo $job['employer_name'];
+                    }
+                ?>
                 &nbsp;
                 <span class="country">
                 <?php 
@@ -439,17 +445,6 @@ class JobPage extends Page {
                 if (!is_null($this->member)) {
                 ?>
                     <tr>
-                        <td class="label"><label for="apply_email">E-mail Address:</label></td>
-                        <td>
-                            <input type="hidden" name="apply_email" id="apply_email" value="<?php echo $this->member->getId(); ?>" />
-                            <?php echo $this->member->getId(); ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="apply_phone">Telephone:</label></td>
-                        <td><input type="text" class="field" name="apply_phone" id="apply_phone" value="<?php echo  $this->member->getPhone(); ?>" /></td>
-                    </tr>
-                    <tr>
                         <td class="label"><label for="apply_name">Name:</label></td>
                         <td>
                             <input type="hidden" name="apply_name" id="apply_name" value="<?php echo  $this->member->getFullName(); ?>" />
@@ -463,6 +458,17 @@ class JobPage extends Page {
                     <tr>
                         <td class="label"><label for="apply_current_emp">Current Company:</label></td>
                         <td><input type="text" class="field" name="apply_current_emp" id="apply_current_emp" value="<?php echo $career['current_employer']; ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_email">E-mail Address:</label></td>
+                        <td>
+                            <input type="hidden" name="apply_email" id="apply_email" value="<?php echo $this->member->getId(); ?>" />
+                            <?php echo $this->member->getId(); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_phone">Telephone:</label></td>
+                        <td><input type="text" class="field" name="apply_phone" id="apply_phone" value="<?php echo  $this->member->getPhone(); ?>" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="apply_resume">Resume:</label></td>
@@ -507,14 +513,6 @@ class JobPage extends Page {
                 } else {
                 ?>
                     <tr>
-                        <td class="label"><label for="apply_email">E-mail Address:</label></td>
-                        <td><input type="text" class="field" name="apply_email" id="apply_email" value="" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="apply_phone">Telephone:</label></td>
-                        <td><input type="text" class="field" name="apply_phone" id="apply_phone" value="" /></td>
-                    </tr>
-                    <tr>
                         <td class="label"><label for="apply_name">Name:</label></td>
                         <td><input type="text" class="field" name="apply_name" id="apply_name" value="" /></td>
                     </tr>
@@ -527,8 +525,16 @@ class JobPage extends Page {
                         <td><input type="text" class="field" name="apply_current_emp" id="apply_current_emp" value="" /></td>
                     </tr>
                     <tr>
+                        <td class="label"><label for="apply_email">E-mail Address:</label></td>
+                        <td><input type="text" class="field" name="apply_email" id="apply_email" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="apply_phone">Telephone:</label></td>
+                        <td><input type="text" class="field" name="apply_phone" id="apply_phone" value="" /></td>
+                    </tr>
+                    <tr>
                         <td class="label"><label for="apply_resume">Resume:</label></td>
-                        <td><input type="file" name="apply_resume" id="apply_resume" value="" /></td>
+                        <td><input type="file" name="apply_resume" id="apply_resume" value="" /> (optional)</td>
                     </tr>
                     <tr>
                         <td colspan="2">

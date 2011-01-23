@@ -479,6 +479,10 @@ div.reminder_form {
     padding: 10px 10px 10px 10px;
 }
 
-span.remind_warn {
-    color: #ff0000;
+span.remind {
+    font-weight: bold;
+}
+
+span.remind.warn {
+    color: #00CC00;
 }

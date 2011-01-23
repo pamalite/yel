@@ -194,11 +194,11 @@ function save_profile() {
     params = params + '&hr_contacts=' + $('hr_contacts').value;
     params = params + '&phone_num=' + $('phone_num').value;
     params = params + '&fax_num=' + $('fax_num').value;
-    params = params + '&address=' + $('address').value;
+    params = params + '&address=' + encodeURIComponent($('address').value);
     params = params + '&state=' + $('state').value;
     params = params + '&zip=' + $('zip').value;
     params = params + '&country=' + $('country').options[$('country').selectedIndex].value;
-    params = params + '&website_url=' + $('website_url').value;
+    params = params + '&website_url=' + encodeURIComponent($('website_url').value);
     
     if (mode == 'create') {
         params = params + '&user_id=' + $('user_id').value;

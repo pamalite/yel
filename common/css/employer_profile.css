@@ -1,15 +1,22 @@
 .profile {
     padding-top: 20px;
+    width: 100%;
 }
 
 .profile_form {
     margin: auto;
+    width: 65%;
 }
 
 .profile_form td {
     padding: 5px 5px 5px 5px;
 }
-.label {;
+
+.profile_form td.label {
+    width: 35%;
+}
+
+.label {
     vertical-align: top;
     font-weight: bold;
     text-align: right;
@@ -22,11 +29,34 @@
     font-weight: bold;
 }
 
+span.note {
+    color: #666666;
+    font-style: italic;
+    font-size: 9pt;
+    font-weight: normal;
+}
+
+.buttons_bar {
+    background-color: #CCCCCC;
+    text-align: right;
+    padding: 3px 3px 3px 3px;
+    height: 20px;
+}
+
 .change_instructions {
     margin: auto;
-    width: 50%;
+    width: 75%;
     text-align: center;
     padding: 5px 5px 5px 5px;
     border: 1px solid #CCCCCC;
     background-color: #EEEEEE;
+}
+
+input.field, textarea, select {
+    width: 98%;
+    font-size: 12pt;
+}
+
+textarea {
+    height: 100px;
 }

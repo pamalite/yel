@@ -177,7 +177,7 @@ class SearchPage extends Page {
                         </div>
                         
                         <div class="filter">
-                            <div class="filter_title">Filter Jobs</div>
+                            <div class="filter_title">Filter By</div>
                             <div class="filter_options">
                                 <label for="filter_employer">Employer:</label>
                                 <select id="filter_employer">

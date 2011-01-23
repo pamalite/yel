@@ -44,17 +44,17 @@ function create_member_from($_email_addr, $_fullname, $_phone) {
     $subject = 'New Membership from Yellow Elevator';
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     
-    mail($_email_addr, $subject, $message, $headers);
+    // mail($_email_addr, $subject, $message, $headers);
     
-    // $file_name = '/tmp/email_to_'. $_email_addr. '.txt';
-    // if (file_exists($file_name)) {
-    //     $file_name .= '.'. generate_random_string_of(6). '.txt';
-    // }
-    // $handle = fopen($file_name, 'w');
-    // fwrite($handle, 'Header: '. $headers. "\n\n");
-    // fwrite($handle, 'Subject: '. $subject. "\n\n");
-    // fwrite($handle, $message);
-    // fclose($handle);
+    $file_name = '/tmp/email_to_'. $_email_addr. '.txt';
+    if (file_exists($file_name)) {
+        $file_name .= '.'. generate_random_string_of(6). '.txt';
+    }
+    $handle = fopen($file_name, 'w');
+    fwrite($handle, 'Header: '. $headers. "\n\n");
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);
     
     return true;
 }
@@ -762,12 +762,14 @@ if ($_POST['action'] == 'sign_up') {
         // 5. move resume
         $resume = null;
         $resume_successfully_moved = false;
-        if (!is_null($buffer_result[0]['existing_resume_id']) || 
+        if (!is_null($buffer_result[0]['existing_resume_id']) && 
             is_null($buffer_result[0]['resume_file_hash'])) {
             // used pre-uploaded resumes
             $resume = new Resume($buffer_result[0]['candidate_email'], $buffer_result[0]['existing_resume_id']);
             $resume_successfully_moved = true;
-        } else {
+        } else if (is_null($buffer_result[0]['existing_resume_id']) && 
+                   !is_null($buffer_result[0]['resume_file_hash'])) {
+            // move buffered resume
             $resume = new Resume($buffer_result[0]['candidate_email']);
             $new_hash = generate_random_string_of(6);
             $data = array();
@@ -798,7 +800,10 @@ if ($_POST['action'] == 'sign_up') {
             $data = array();
             $data['applied_on'] = $buffer_result[0]['requested_on'];
             $data['job'] = $buffer_result[0]['job'];
-            $data['progress_notes'] = htmlspecialchars_decode(stripslashes($buffer_result[0]['progress_notes']));
+            $data['progress_notes'] = 'NULL';
+            if (!is_null($buffer_result[0]['progress_notes'])) {
+                $data['progress_notes'] = htmlspecialchars_decode(stripslashes($buffer_result[0]['progress_notes']));
+            } 
             
             if ($referrer_email[1] != 'yellowelevator.com') {
                 $data['referrer'] = $referrer->getId();

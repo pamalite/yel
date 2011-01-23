@@ -30,6 +30,31 @@ class EmployerProfilePage extends Page {
         echo '</script>'. "\n";
     }
     
+    private function generate_countries($_selected, $_name = 'country') {
+        $criteria = array(
+            'columns' => "country_code, country", 
+            'order' => "country"
+        );
+        $countries = Country::find($criteria);
+        
+        echo '<select class="field" id="'. $_name. '" name="'. $_name. '">'. "\n";
+        
+        if (empty($_selected) || is_null($_selected)) {
+            echo '<option value="" selected>Select a Country</option>'. "\n";
+            echo '<option value="" disabled>&nbsp;</option>'. "\n";
+        }
+        
+        foreach ($countries as $country) {
+            if ($country['country_code'] != $_selected) {
+                echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
+            } else {
+                echo '<option value="'. $country['country_code']. '" selected>'. $country['country']. '</option>'. "\n";
+            }
+        }
+        
+        echo '</select>'. "\n";
+    }
+    
     public function show() {
         $this->begin();
         $this->support($this->employer->getId());
@@ -45,15 +70,19 @@ class EmployerProfilePage extends Page {
         </div>
         
         <div class="change_instructions">
-            Please <a href="mailto: sales.<?php echo strtolower($branch[0]['country']); ?>@yellowelevator.com">let us know</a> if the following details need to be updated.
+            Please <a href="mailto: sales.<?php echo strtolower($branch[0]['country']); ?>@yellowelevator.com">let us know</a> if either the Business Registration No., the Business Name, or both needs to be updated.
         </div>
         
         <div class="profile">
-            <form onSubmit="return">
+            <form onSubmit="return false;">
             <table class="profile_form">
                 <tr>
                     <td class="label">Company/Business Registration No.:</td>
                     <td class="field"><?php echo $profile[0]['license_num']; ?></td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="name">Company/Business Name:</label></td>
+                    <td class="field"><?php echo $profile[0]['name']; ?></td>
                 </tr>
                 <tr>
                     <td class="title" colspan="2">Sign In Details</td>
@@ -76,51 +105,70 @@ class EmployerProfilePage extends Page {
                     </td>
                 </tr>
                 <tr>
-                    <td class="title" colspan="2">Contact Details</td>
+                    <td class="title" colspan="2">Contact Details<br/><span class="note">Fields marked with * indicates cannot be left empty.</span></td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="email">E-mail Address:</label></td>
-                    <td class="field"><?php echo $profile[0]['email_addr']; ?></td>
+                    <td class="label"><label for="email">* E-mail Address:</label></td>
+                    <td class="field">
+                        <input type="text" id="email_addr" class="field" value="<?php echo $profile[0]['email_addr']; ?>" />
+                    </td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="name">Company/Business Name:</label></td>
-                    <td class="field"><?php echo $profile[0]['name']; ?></td>
+                    <td class="label"><label for="contact_person">* Contact Person:</label></td>
+                    <td class="field">
+                        <input type="text" id="contact_person" class="field" value="<?php echo $profile[0]['contact_person']; ?>" />
+                    </td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="contact_person">Contact Person:</label></td>
-                    <td class="field"><?php echo $profile[0]['contact_person']; ?></td>
-                </tr>
-                <tr>
-                    <td class="label"><label for="phone_num">Contact Number:</label></td>
-                    <td class="field"><?php echo $profile[0]['phone_num']; ?></td>
+                    <td class="label"><label for="phone_num">* Contact Number:</label></td>
+                    <td class="field">
+                        <input type="text" id="phone_num" class="field" value="<?php echo $profile[0]['phone_num']; ?>" />
+                    </td>
                 </tr>
                 <tr>
                     <td class="label"><label for="fax_num">Fax Number:</label></td>
-                    <td class="field"><?php echo $profile[0]['fax_num']; ?></td>
+                    <td class="field">
+                        <input type="text" id="fax_num" class="field" value="<?php echo $profile[0]['fax_num']; ?>" />
+                    </td>
                 </tr>
                 <tr>
                     <td class="label"><label for="address">Mailing Address:</label></td>
-                    <td class="field"><?php echo $profile[0]['address']; ?></td>
+                    <td class="field">
+                        <textarea id="address"><?php echo stripslashes($profile[0]['address']); ?></textarea>
+                    </td>
                 </tr>
                 <tr>
                     <td class="label"><label for="state">State/Province:</label></td>
-                    <td class="field"><?php echo $profile[0]['state']; ?></td>
+                    <td class="field">
+                        <input type="text" id="state" class="field" value="<?php echo $profile[0]['state']; ?>" />
+                    </td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="zip">Zip/Postal Code:</label></td>
-                    <td class="field"><?php echo $profile[0]['zip']; ?></td>
+                    <td class="label"><label for="zip">* Zip/Postal Code:</label></td>
+                    <td class="field">
+                        <input type="text" id="zip" class="field" value="<?php echo $profile[0]['zip']; ?>" />
+                    </td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="country">Country:</label></td>
-                    <td class="field"><?php echo Country::getCountryFrom($this->employer->getCountryCode()); ?></td>
+                    <td class="label"><label for="country">* Country:</label></td>
+                    <td class="field">
+                        <?php echo $this->generate_countries($this->employer->getCountryCode()); ?>
+                    </td>
                 </tr>
                 <tr>
                     <td class="label"><label for="website_url">Web-site:</label></td>
-                    <td class="field"><?php echo $profile[0]['website_url']; ?></td>
+                    <td class="field">
+                        <input type="text" id="website_url" class="field" value="<?php echo $profile[0]['website_url']; ?>" />
+                    </td>
                 </tr>
                 <tr>
                     <td class="label"><label for="about">Business Summary:</label></td>
-                    <td class="field"><?php echo $profile[0]['about']; ?></td>
+                    <td class="field">
+                        <textarea id="summary"><?php echo stripslashes($profile[0]['about']); ?></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="buttons_bar" colspan="2"><input type="button" onClick="save_profile();" value="Save &amp; Update Contact Details" /></td>
                 </tr>
             </table>
             </form>

@@ -613,12 +613,13 @@ class EmployeeMembersPage extends Page {
                     Follow up in 
                     <select id="reminder_days">
                         <option value="1" selected>1 day</option>
-                        <option value="2">2 days</option>
-                        <option value="3">3 days</option>
-                        <option value="4">4 days</option>
-                        <option value="5">5 days</option>
-                        <option value="6">6 days</option>
-                        <option value="7">7 days</option>
+                    <?php
+                    for ($i=2; $i <= 14; $i++) {
+                    ?>
+                        <option value="<?php echo $i; ?>"><?php echo $i; ?> days</option>
+                    <?php
+                    }
+                    ?>
                     </select>
                 </div>
             </form>
