@@ -332,7 +332,7 @@ class Resume implements Model{
             
             foreach ($GLOBALS['allowable_resume_types'] as $mime_type) {
                 if ($type == $mime_type) {
-                    $allowed = true;
+                    $allowed_type = true;
                     $hash = generate_random_string_of(6);
                     $new_name = $this->id. ".". $hash;
                     if (move_uploaded_file($temp, $GLOBALS['resume_dir']. "/". $new_name)) {

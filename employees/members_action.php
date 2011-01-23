@@ -13,10 +13,19 @@ function create_member_from($_email_addr, $_fullname, $_phone) {
     
     $password = generate_random_string_of(6);
     $timestamp = now();
+    
+    $lastname = '(n/a)';
+    $firstname = $_fullname;
+    $names = explode(',', $_fullname);
+    if (count($names) > 1) {
+        $lastname = $names[0];
+        $firstname = $names[1];
+    }
+    
     $data = array();
     $data['phone_num'] = $_phone;
-    $data['firstname'] = $_fullname;
-    $data['lastname'] = $data['firstname'];
+    $data['firstname'] = $firstname;
+    $data['lastname'] = $lastname;
     $data['password'] = md5($password);
     $data['forget_password_question'] = '1';
     $data['forget_password_answer'] = '(System Generated)';
