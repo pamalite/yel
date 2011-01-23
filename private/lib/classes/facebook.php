@@ -52,6 +52,53 @@ class Facebook {
         return $this->error;
     }
     
+    public function get_industries() {
+        $industries = array();
+        $main_industries = Industry::getMain(true);
+        $i = 0;
+        foreach ($main_industries as $main) {
+            $industries[$i]['id'] = $main['id'];
+            $industries[$i]['name'] = $main['industry'];
+            $industries[$i]['job_count'] = $main['job_count'];
+            $industries[$i]['is_main'] = true;
+            $subs = Industry::getSubIndustriesOf($main['id'], true);
+            foreach ($subs as $sub) {
+                $i++;
+
+                $industries[$i]['id'] = $sub['id'];
+                $industries[$i]['name'] = $sub['industry'];
+                $industries[$i]['job_count'] = $sub['job_count'];
+                $industries[$i]['is_main'] = false;
+            }
+            $i++;
+        }
+        
+        return $industries;
+    }
+    
+    public function get_countries() {
+        $criteria = array(
+            'columns' => "DISTINCT countries.country_code, countries.country", 
+            'joins' => "countries ON countries.country_code = jobs.country",
+            // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'order' => "countries.country ASC"
+        );
+
+        $job = new Job();
+        return $job->find($criteria);
+    }
+    
+    public function get_employers() {
+        $criteria = array(
+            'columns' => 'DISTINCT employers.id, employers.name', 
+            'joins' => 'jobs ON employers.id = jobs.employer',
+            // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'order' => 'employers.name ASC'
+        );
+        $employer = new Employer();
+        return $employer->find($criteria);
+    }
+    
     public function get_jobs($_keyword_str='', $_industry=0, $_country='', $_employer='', 
                              $_limit='', $_offset=0, 
                              $_order_by='jobs.created_on', $_order='DESC', 
@@ -98,14 +145,13 @@ class Facebook {
         return $jobs;
     }
     
-    public function recommend_candidate($_candidate_email, $_candidate_name='', $_candidate_phone='', 
+    public function recommend_candidate($_candidate_email, $_candidate_name, $_candidate_phone='', 
                                         $_candidate_pos='not provided', 
                                         $_candidate_emp='not provided', 
                                         $_remarks='not provided', 
                                         $_job_id=0, 
                                         $_referrer_email='', $_referrer_name='', $_referrer_phone='') {
-        if (empty($_candidate_email) || empty($_candidate_name) || 
-            empty($_candidate_phone) || $_job_id <= 0) {
+        if (empty($_candidate_email) || empty($_candidate_name) || $_job_id <= 0) {
             $this->error = 'recommend_candidate : candidate_email, name, phone or job_id is empty or invalid.';
             return false;
         }
