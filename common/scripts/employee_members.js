@@ -1243,7 +1243,6 @@ function make_member_from(_app_id) {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            alert(txt);
             set_status('');
             
             if (!isEmail(txt)) {

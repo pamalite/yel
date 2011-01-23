@@ -44,17 +44,17 @@ function create_member_from($_email_addr, $_fullname, $_phone) {
     $subject = 'New Membership from Yellow Elevator';
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     
-    // mail($_email_addr, $subject, $message, $headers);
+    mail($_email_addr, $subject, $message, $headers);
     
-    $file_name = '/tmp/email_to_'. $_email_addr. '.txt';
-    if (file_exists($file_name)) {
-        $file_name .= '.'. generate_random_string_of(6). '.txt';
-    }
-    $handle = fopen($file_name, 'w');
-    fwrite($handle, 'Header: '. $headers. "\n\n");
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);
+    // $file_name = '/tmp/email_to_'. $_email_addr. '.txt';
+    // if (file_exists($file_name)) {
+    //     $file_name .= '.'. generate_random_string_of(6). '.txt';
+    // }
+    // $handle = fopen($file_name, 'w');
+    // fwrite($handle, 'Header: '. $headers. "\n\n");
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     return true;
 }
