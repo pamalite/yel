@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__). "/../utilities.php";
 
-class Facebook {
+class YEFacebook {
     private $api_id;
     private $available_ye_branches;
     private $error;
@@ -46,6 +46,11 @@ class Facebook {
         }
         
         return $output;
+    }
+    
+    private function is_member($_email_addr) {
+        $member = new Member($_email_addr);
+        return $member->isActive();
     }
     
     public function last_error() {
@@ -143,6 +148,20 @@ class Facebook {
         $jobs['total'] = $job_search->total_results(); 
         $jobs['jobs'] = $result;
         return $jobs;
+    }
+    
+    public function get_recommendations($_referrer_email, $_order_by='referred_on', $_order='DESC') {
+        if ($this->is_member($_referrer_email) === false) {
+            $this->error = 'get_recommendations : referrer is not an active member of YE.';
+            return false;
+        }
+        
+        $order = $_order_by. ' '. $_order;
+        
+        $this->log_api_usage('get_recommendations : of '. $_referrer_email. '; order='. $order);
+        
+        $member = new Member($_referrer_email);
+        return $member->getReferrals($order);
     }
     
     public function recommend_candidate($_candidate_email, $_candidate_name, $_candidate_phone='', 
