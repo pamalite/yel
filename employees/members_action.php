@@ -684,7 +684,7 @@ if ($_POST['action'] == 'delete_application') {
         }
     } else {
         $member = new Member();
-        if ($member->removeJobProfile($_POST['id']) === false) {
+        if ($member->removeAppliedJob($_POST['id']) === false) {
             echo 'ko';
             exit();
         }
@@ -867,10 +867,15 @@ if ($_POST['action'] == 'check_member') {
 if ($_POST['action'] == 'add_new_application') {
     $is_success = true;
     
+    $employee = new Employee($_POST['user_id']);
+    $branch = $employee->getBranch();
+    $yel_email = 'team.'. strtolower($branch[0]['country']). '@yellowelevator.com';
+    
     $data = array();
     $data['requested_on'] = now();
-    $data['referrer_email'] = $_POST['referrer_email'];
+    $data['referrer_email'] = $yel_email;
     if ($_POST['referrer_is_yel'] == '0') {
+        $data['referrer_email'] = $_POST['referrer_email'];
         $data['referrer_name'] = (empty($_POST['referrer_name']) ? "NULL" : $_POST['referrer_name']);
         $data['referrer_phone'] = (empty($_POST['referrer_phone']) ? "NULL" : $_POST['referrer_phone']);;
     }
@@ -1347,7 +1352,7 @@ if ($_POST['action'] == 'confirm_employed') {
         // fwrite($handle, 'Subject: '. $subject. "\n\n");
         // fwrite($handle, $body);
         
-        unlink($GLOBALS['data_path']. '/general_invoice/'. $filename. '.pdf');
+        // unlink($GLOBALS['data_path']. '/general_invoice/'. $filename. '.pdf');
     } else {
         if ($credit_amount > 0) {
             $credit_note_desc = 'Refund of balance for Invoice: '. pad($previous_invoice, 11, '0');
@@ -1454,7 +1459,7 @@ if ($_POST['action'] == 'confirm_employed') {
             $body .= '--yel_mail_sep_'. $filename. "--\n\n";
             mail($employer->getEmailAddress(), $subject, $body, $headers);
 
-            unlink($GLOBALS['data_path']. '/credit_notes/'. $filename. '.pdf');
+            // unlink($GLOBALS['data_path']. '/credit_notes/'. $filename. '.pdf');
         }
     }
     

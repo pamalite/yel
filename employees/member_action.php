@@ -323,8 +323,32 @@ if ($_POST['action'] == 'get_applications') {
         }
     }
     
+    $applications = array();
+    $skips = array();
+    for ($i=0; $i < count($result); $i++) {
+        $current_row = $result[$i];
+        $next_i = $i+1;
+        if ($next_i <= count($result)-1) {
+            for ($j=$next_i; $j < count($result); $j++) {
+                if (!in_array($j, $skips)) {
+                    if ($current_row['job'] == $result[$j]['job']) {
+                        if ($current_row['tab'] == 'ref') {
+                            $skips[] = $j;
+                        } else {
+                            $skips[] = $i;
+                        }
+                    }
+                }
+            }
+        }
+        
+        if (!in_array($i, $skips)) {
+            $applications[] = $current_row;
+        }
+    }
+    
     header('Content-type: text/xml');
-    echo $xml_dom->get_xml_from_array(array('applications' => array('application' => $result)));
+    echo $xml_dom->get_xml_from_array(array('applications' => array('application' => $applications)));
     exit();
 }
 
@@ -463,11 +487,12 @@ if ($_POST['action'] == 'apply_job') {
     //    1.3 If the diff yields empty, that means all jobs are already in member_jobs, so skip. 
     // 2. Add the complements into member_jobs for tracking purposes, if there is any.
     $criteria = array(
-        'columns' => "DISTNCT member_jobs.job", 
+        'columns' => "DISTINCT member_jobs.job", 
         'joins' => "member_jobs ON member_jobs.member = members.email_addr", 
         'match' => "members.email_addr = '". $referee. "' AND 
                     member_jobs.job IN (". implode(',', $job_ids). ")"
     );
+    
     $member_obj = new Member();
     $result = $member_obj->find($criteria);
     

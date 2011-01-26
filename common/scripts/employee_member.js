@@ -810,7 +810,7 @@ function update_applications() {
                     
                     var status = '<span class="not_viewed_yet">Not submitted</span>';
                     if (tabs[i].childNodes[0].nodeValue == 'ref') {
-                        status = '<span class="not_viewed_yet">Not Viewed Yet</span>';
+                        status = '<span class="not_viewed_yet">Employer Not Viewed Yet</span>';
                         if (viewed_ons[i].childNodes.length > 0) {
                             status = '<span class="viewed">Viewed On:</span> ' + viewed_ons[i].childNodes[0].nodeValue;
                         }

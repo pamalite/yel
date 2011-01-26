@@ -961,6 +961,11 @@ class Member implements Model {
         return $this->mysqli->execute($query);
     }
     
+    public function removeAppliedJob($_id) {
+        $query = "DELETE FROM member_jobs WHERE id = ". $_id;
+        return $this->mysqli->execute($query);
+    }
+    
     public function getAllAppliedJobs($_order = "") {
         $order_by = "";
         if (empty($_order)) {
