@@ -867,7 +867,7 @@ if ($_POST['action'] == 'check_member') {
 if ($_POST['action'] == 'add_new_application') {
     $is_success = true;
     
-    $employee = new Employee($_POST['user_id']);
+    $employee = new Employee($_POST['id']);
     $branch = $employee->getBranch();
     $yel_email = 'team.'. strtolower($branch[0]['country']). '@yellowelevator.com';
     
@@ -1352,7 +1352,7 @@ if ($_POST['action'] == 'confirm_employed') {
         // fwrite($handle, 'Subject: '. $subject. "\n\n");
         // fwrite($handle, $body);
         
-        // unlink($GLOBALS['data_path']. '/general_invoice/'. $filename. '.pdf');
+        unlink($GLOBALS['data_path']. '/general_invoice/'. $filename. '.pdf');
     } else {
         if ($credit_amount > 0) {
             $credit_note_desc = 'Refund of balance for Invoice: '. pad($previous_invoice, 11, '0');
@@ -1459,7 +1459,7 @@ if ($_POST['action'] == 'confirm_employed') {
             $body .= '--yel_mail_sep_'. $filename. "--\n\n";
             mail($employer->getEmailAddress(), $subject, $body, $headers);
 
-            // unlink($GLOBALS['data_path']. '/credit_notes/'. $filename. '.pdf');
+            unlink($GLOBALS['data_path']. '/credit_notes/'. $filename. '.pdf');
         }
     }
     

@@ -756,8 +756,8 @@ function update_new_applicants() {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            //set_status('<pre>' + txt + '</pre>');
-            //return;
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
             if (txt == 'ko') {
                 alert('An error occured while loading new applicants.');
                 return false;
