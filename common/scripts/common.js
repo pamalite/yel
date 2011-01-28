@@ -17,9 +17,11 @@ function initialize_page() {
             }
         });
         
-        if (!isEmpty($('mini_keywords').value)) {
-            mini_keywords_overtext.hide();
-            $('mini_keywords').value = keywords;
+        if (typeof keywords != 'undefined') {
+            if (!isEmpty(keywords)) {
+                mini_keywords_overtext.hide();
+                $('mini_keywords').value = keywords;
+            }
         }
         
         var suggest_url = root + '/common/php/search_suggest.php';
