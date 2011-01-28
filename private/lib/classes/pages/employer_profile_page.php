@@ -108,19 +108,19 @@ class EmployerProfilePage extends Page {
                     <td class="title" colspan="2">Contact Details<br/><span class="note">Fields marked with * indicates cannot be left empty.</span></td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="email">* E-mail Address:</label></td>
+                    <td class="label"><label for="email">* HR Contact Emails:</label></td>
                     <td class="field">
                         <input type="text" id="email_addr" class="field" value="<?php echo $profile[0]['email_addr']; ?>" />
                     </td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="contact_person">* Contact Person:</label></td>
+                    <td class="label"><label for="contact_person">* HR Contacts:</label></td>
                     <td class="field">
                         <input type="text" id="contact_person" class="field" value="<?php echo $profile[0]['contact_person']; ?>" />
                     </td>
                 </tr>
                 <tr>
-                    <td class="label"><label for="phone_num">* Contact Number:</label></td>
+                    <td class="label"><label for="phone_num">* HR Contact Numbers:</label></td>
                     <td class="field">
                         <input type="text" id="phone_num" class="field" value="<?php echo $profile[0]['phone_num']; ?>" />
                     </td>

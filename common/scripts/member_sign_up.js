@@ -283,6 +283,7 @@ function toggle_work_to() {
 function update_overtexts() {
     new OverText($('position_title'));
     new OverText($('position_superior_title'));
+    new OverText($('organization_size'));
     new OverText($('work_from_year'));
     new OverText($('work_to_year'));
 }

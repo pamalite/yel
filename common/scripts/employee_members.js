@@ -1022,12 +1022,12 @@ function update_members() {
         params = params + '&position=' + encodeURIComponent($('search_position').value);
         params = params + '&employer=' + encodeURIComponent($('search_employer').value);
         params = params + '&total_work_years=' + $('search_total_years').value;
-        params = params + '&notice_period=' + $('search_notice_period').value;
-        params = params + '&exp_sal_currency=' + $('search_expected_salary_currency').options[$('search_expected_salary_currency').selectedIndex].value;
-        params = params + '&exp_sal_start=' + $('search_expected_salary_start').value;
-        params = params + '&exp_sal_end=' + $('search_expected_salary_end').value;
+        // params = params + '&notice_period=' + $('search_notice_period').value;
+        // params = params + '&exp_sal_currency=' + $('search_expected_salary_currency').options[$('search_expected_salary_currency').selectedIndex].value;
+        // params = params + '&exp_sal_start=' + $('search_expected_salary_start').value;
+        // params = params + '&exp_sal_end=' + $('search_expected_salary_end').value;
         params = params + '&specialization=' + $('search_specialization').options[$('search_specialization').selectedIndex].value;
-        params = params + '&emp_specialization=' + $('search_emp_specialization').options[$('search_emp_specialization').selectedIndex].value;
+        // params = params + '&emp_specialization=' + $('search_emp_specialization').options[$('search_emp_specialization').selectedIndex].value;
         params = params + '&emp_desc=' + $('search_emp_desc').options[$('search_emp_desc').selectedIndex].value;
         params = params + '&seeking=' + encodeURIComponent($('search_seeking').value);
     } else {

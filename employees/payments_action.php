@@ -17,7 +17,7 @@ function get_payments($_is_invoice = true, $_order = "invoices.issued_on",
     $criteria = array(
         "columns" => "invoices.id, invoices.type, invoices.payable_by,
                       employers.name AS employer, employers.contact_person, employers.email_addr, 
-                      employers.fax_num, employers.phone_num, 
+                      employers.fax_num, employers.phone_num, 'N/A' AS placement, 
                       SUM(invoice_items.amount) AS amount_payable, currencies.symbol AS currency, 
                       DATE_FORMAT(invoices.issued_on, '%e %b, %Y') AS formatted_issued_on, 
                       DATE_FORMAT(invoices.payable_by, '%e %b, %Y') AS formatted_payable_by,
@@ -41,7 +41,52 @@ function get_payments($_is_invoice = true, $_order = "invoices.issued_on",
         $criteria['match'] .= " AND invoices.employer = '". $_employer_to_filter. "'";
     }
     
-    return Invoice::find($criteria);
+    $invoices = Invoice::find($criteria);
+    
+    if (empty($invoices) || is_null($invoices) || $invoices === false) {
+        return array();
+    }
+    
+    $invoice_ids = array();
+    foreach ($invoices as $row) {
+        $invoice_ids[] = $row['id'];
+    }
+    
+    $criteria = array(
+        'columns' => "DISTINCT invoices.id, invoice_items.item, referrals.job, jobs.title, 
+                      CONCAT(members.lastname, ', ', members.firstname) AS candidate", 
+        'joins' => "invoice_items ON invoice_items.invoice = invoices.id, 
+                    referrals ON referrals.id = invoice_items.item,
+                    jobs ON jobs.id = referrals.job, 
+                    members ON members.email_addr = referrals.referee",
+        'match' => "invoices.is_copy = FALSE AND invoices.type = 'R' AND 
+                    invoices.id IN (". implode(',', $invoice_ids). ")"
+    );
+    
+    $result = Invoice::find($criteria);
+    
+    if (empty($result) || is_null($result) || $iresult === false) {
+        return $invoices;
+    }
+    
+    foreach ($invoices as $i => $invoice) {
+        foreach ($result as $row) {
+            if ($row['id'] == $invoice['id']) {
+                if ((is_null($row['job']) || empty($row['job'])) || 
+                    (is_null($row['candidate']) || empty($row['candidate'])) || 
+                    (is_null($row['title']) || empty($row['title']))) {
+                    $invoices[$i]['placement'] = '(Data is missing)';
+                    break;
+                } 
+                
+                $invoices[$i]['placement'] = htmlspecialchars_decode(stripslashes($row['title'])). ' to ';
+                $invoices[$i]['placement'] .= htmlspecialchars_decode(stripslashes($row['candidate']));
+                break;
+            }
+        }
+    }
+    
+    return $invoices;
 }
 
 $xml_dom = new XMLDOM();

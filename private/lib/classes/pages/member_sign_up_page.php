@@ -251,18 +251,18 @@ class MemberSignUpPage extends Page {
                     <tr>
                         <td class="label"><label for="position_title">Job Title:</label></td>
                         <td class="field">
-                            <input class="field" type="text" id="position_title" name="position_title" alt="eg: Director, Manager, GM, VP, etc." />
+                            <input class="field" type="text" id="position_title" name="position_title" alt="eg: Finance Manager, Operations Director, etc." />
                         </td>
                     </tr>
                     <tr>
                         <td class="label"><label for="position_superior_title">Reporting to:</label></td>
                         <td class="field">
-                            <input class="field" type="text" id="position_superior_title" name="position_superior_title" alt="eg: Director, Manager, GM, VP, etc." />
+                            <input class="field" type="text" id="position_superior_title" name="position_superior_title" alt="eg: Financial Controller,  VP of Operations, etc." />
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="organization_size">Number of people reporting to you:</label></td>
-                        <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
+                        <td class="label"><label for="organization_size">Positions reporting to you:</label></td>
+                        <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" alt="eg: 2 Managers, 3 Specialists, and 5 Executives" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="company">Current Company:</label></td>
@@ -289,14 +289,9 @@ class MemberSignUpPage extends Page {
                         </td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="emp_specialization">Industry:</label></td>
+                        <td class="label"><label for="emp_specialization">Company Industry:</label></td>
                         <td class="field">
                             <?php $this->generate_industries('emp_specialization', array()); ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="section_title" colspan="2">
-                            Career Goals &amp; Experiences, and Job Preference
                         </td>
                     </tr>
                     <tr>

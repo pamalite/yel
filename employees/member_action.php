@@ -651,7 +651,7 @@ if ($_POST['action'] == 'save_career') {
     $data['can_travel_relocate'] = $_POST['can_travel'];
     $data['seeking'] = $_POST['seeking'];
     $data['reason_for_leaving'] = $_POST['reason_leaving'];
-    $data['current_position'] = $_POST['current_position'];
+    // $data['current_position'] = $_POST['current_position'];
     $data['notice_period'] = $_POST['notice_period'];
     $data['total_work_years'] = $_POST['total_years'];
     $data['expected_salary_currency'] = $_POST['expected_currency'];

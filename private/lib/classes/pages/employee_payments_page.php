@@ -37,7 +37,7 @@ class EmployeePaymentsPage extends Page {
         $criteria = array(
             "columns" => "invoices.id, invoices.type, invoices.payable_by, 
                           employers.name AS employer, employers.contact_person, employers.email_addr, 
-                          employers.fax_num, employers.phone_num, 
+                          employers.fax_num, employers.phone_num, 'N/A' AS placement, 
                           SUM(invoice_items.amount) AS amount_payable, currencies.symbol AS currency, 
                           DATE_FORMAT(invoices.issued_on, '%e %b, %Y') AS formatted_issued_on, 
                           DATE_FORMAT(invoices.payable_by, '%e %b, %Y') AS formatted_payable_by,
@@ -58,7 +58,52 @@ class EmployeePaymentsPage extends Page {
             $criteria['order'] = "invoices.paid_on DESC";
         }
         
-        return Invoice::find($criteria);
+        $invoices = Invoice::find($criteria);
+        
+        if (empty($invoices) || is_null($invoices) || $invoices === false) {
+            return array();
+        }
+        
+        $invoice_ids = array();
+        foreach ($invoices as $row) {
+            $invoice_ids[] = $row['id'];
+        }
+        
+        $criteria = array(
+            'columns' => "DISTINCT invoices.id, invoice_items.item, referrals.job, jobs.title, 
+                          CONCAT(members.lastname, ', ', members.firstname) AS candidate", 
+            'joins' => "invoice_items ON invoice_items.invoice = invoices.id, 
+                        referrals ON referrals.id = invoice_items.item,
+                        jobs ON jobs.id = referrals.job, 
+                        members ON members.email_addr = referrals.referee",
+            'match' => "invoices.is_copy = FALSE AND invoices.type = 'R' AND 
+                        invoices.id IN (". implode(',', $invoice_ids). ")"
+        );
+        
+        $result = Invoice::find($criteria);
+        
+        if (empty($result) || is_null($result) || $iresult === false) {
+            return $invoices;
+        }
+        
+        foreach ($invoices as $i => $invoice) {
+            foreach ($result as $row) {
+                if ($row['id'] == $invoice['id']) {
+                    if ((is_null($row['job']) || empty($row['job'])) || 
+                        (is_null($row['candidate']) || empty($row['candidate'])) || 
+                        (is_null($row['title']) || empty($row['title']))) {
+                        $invoices[$i]['placement'] = '(Data is missing)';
+                        break;
+                    } 
+                    
+                    $invoices[$i]['placement'] = htmlspecialchars_decode(stripslashes($row['title'])). ' to ';
+                    $invoices[$i]['placement'] .= htmlspecialchars_decode(stripslashes($row['candidate']));
+                    break;
+                }
+            }
+        }
+        
+        return $invoices;
     }
     
     private function get_employers($_for_invoice = true) {
@@ -149,10 +194,11 @@ class EmployeePaymentsPage extends Page {
                 $invoices_table->set(0, 0, '&nbsp;', '', 'header expiry_status');
                 $invoices_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('invoices', 'invoices.issued_on');\">Issued On</a>", '', 'header');
                 $invoices_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('invoices', 'employers.name');\">Employer</a>", '', 'header');
-                $invoices_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('invoices', 'invoices.id');\">Invoice</a>", '', 'header');
-                $invoices_table->set(0, 4, 'Payable By', '', 'header');
-                $invoices_table->set(0, 5, 'Amount Payable', '', 'header');
-                $invoices_table->set(0, 6, 'Actions', '', 'header action');
+                $invoices_table->set(0, 3, "Placement", '', 'header');
+                $invoices_table->set(0, 4, "<a class=\"sortable\" onClick=\"sort_by('invoices', 'invoices.id');\">Invoice</a>", '', 'header');
+                $invoices_table->set(0, 5, 'Payable By', '', 'header');
+                $invoices_table->set(0, 6, 'Amount Payable', '', 'header');
+                $invoices_table->set(0, 7, 'Actions', '', 'header action');
 
                 foreach ($invoices as $i=>$invoice) {
                     $status = '';
@@ -173,14 +219,16 @@ class EmployeePaymentsPage extends Page {
                     $employer_contacts .= '<span class="contact_label">Contact:</span> '. $invoice['contact_person']. '<br/></div>';
                     $invoices_table->set($i+1, 2, $employer_contacts, '', 'cell');
                     
-                    $invoices_table->set($i+1, 3, '<a class="no_link" onClick="show_invoice_page('. $invoice['id']. ');">'. $invoice['padded_id']. '</a>&nbsp;<a href="invoice_pdf.php?id='. $invoice['id']. '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell');                    
-                    $invoices_table->set($i+1, 4, $invoice['formatted_payable_by'], '', 'cell');
+                    $invoices_table->set($i+1, 3, $invoice['placement'], '', 'cell');
+                    
+                    $invoices_table->set($i+1, 4, '<a class="no_link" onClick="show_invoice_page('. $invoice['id']. ');">'. $invoice['padded_id']. '</a>&nbsp;<a href="invoice_pdf.php?id='. $invoice['id']. '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell');                    
+                    $invoices_table->set($i+1, 5, $invoice['formatted_payable_by'], '', 'cell');
                     
                     $amount = $invoice['currency']. '$&nbsp;'. $invoice['amount_payable'];
-                    $invoices_table->set($i+1, 5, $amount, '', 'cell');
+                    $invoices_table->set($i+1, 6, $amount, '', 'cell');
                     
                     $actions = '<input type="button" value="Paid" onClick="show_payment_popup('. $invoice['id']. ', \''. $invoice['padded_id']. '\');" /><input type="button" value="Resend" onClick="show_resend_popup('. $invoice['id']. ', \''. $invoice['padded_id']. '\');" />';
-                    $invoices_table->set($i+1, 6, $actions, '', 'cell action');
+                    $invoices_table->set($i+1, 7, $actions, '', 'cell action');
                 }
 
                 echo $invoices_table->get_html();
@@ -219,25 +267,29 @@ class EmployeePaymentsPage extends Page {
 
                 $receipts_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('receipts', 'receipts.issued_on');\">Issued On</a>", '', 'header');
                 $receipts_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('receipts', 'employers.name');\">Employer</a>", '', 'header');
-                $receipts_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('receipts', 'invoices.id');\">Receipt</a>", '', 'header');
-                $receipts_table->set(0, 3, 'Paid On', '', 'header');
-                $receipts_table->set(0, 4, 'Amount Paid', '', 'header');
-                $receipts_table->set(0, 5, 'Payment', '', 'header payment');
+                $receipts_table->set(0, 2, 'Placement', '', 'header');
+                $receipts_table->set(0, 3, "<a class=\"sortable\" onClick=\"sort_by('receipts', 'invoices.id');\">Receipt</a>", '', 'header');
+                $receipts_table->set(0, 4, 'Paid On', '', 'header');
+                $receipts_table->set(0, 5, 'Amount Paid', '', 'header');
+                $receipts_table->set(0, 6, 'Payment', '', 'header payment');
 
                 foreach ($receipts as $i=>$receipt) {
                     $receipts_table->set($i+1, 0, $receipt['formatted_issued_on'], '', 'cell');
                     $receipts_table->set($i+1, 1, htmlspecialchars_decode(stripslashes($receipt['employer'])), '', 'cell');
-                    $receipts_table->set($i+1, 2, '<a class="no_link" onClick="show_receipt_page('. $receipt['id']. ');">'. $receipt['padded_id']. '</a>&nbsp;<a href="invoice_pdf.php?id='. $receipt['id']. '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell');                    
-                    $receipts_table->set($i+1, 3, $receipt['formatted_paid_on'], '', 'cell');
+                    $receipts_table->set($i+1, 2, $receipt['placement'], '', 'cell');
+                    
+                    $receipts_table->set($i+1, 3, '<a class="no_link" onClick="show_receipt_page('. $receipt['id']. ');">'. $receipt['padded_id']. '</a>&nbsp;<a href="invoice_pdf.php?id='. $receipt['id']. '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell');
+                    
+                    $receipts_table->set($i+1, 4, $receipt['formatted_paid_on'], '', 'cell');
                     
                     $amount = $receipt['currency']. '$&nbsp;'. $receipt['amount_payable'];
-                    $receipts_table->set($i+1, 4, $amount, '', 'cell');
+                    $receipts_table->set($i+1, 5, $amount, '', 'cell');
                     
                     $payment = 'By Cash';
                     if ($receipt['paid_through'] != 'CSH') {
                         $payment = 'Bank Receipt #:<br/>'. $receipt['paid_id'];
                     }
-                    $receipts_table->set($i+1, 5, $payment, '', 'cell payment');
+                    $receipts_table->set($i+1, 6, $payment, '', 'cell payment');
                 }
 
                 echo $receipts_table->get_html();

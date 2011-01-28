@@ -281,20 +281,16 @@ class EmployeeMembersPage extends Page {
                             <td class="search_form">
                                 <table id="search_form_table">
                                     <tr>
-                                        <td class="label"><label for="search_email">E-mail: </label></td>
-                                        <td class="field"><input type="text" class="field" id="search_email" /></td>
-                                    </tr>
-                                    <tr>
                                         <td class="label"><label for="search_name">Name:</label></td>
                                         <td class="field"><input type="text" class="field" id="search_name" /></td>
                                     </tr>
                                     <tr>
-                                        <td class="label"><label for="search_position">Position:</label></td>
-                                        <td class="field"><input type="text" class="field" id="search_position" /></td>
+                                        <td class="label"><label for="search_email">E-mail: </label></td>
+                                        <td class="field"><input type="text" class="field" id="search_email" /></td>
                                     </tr>
                                     <tr>
-                                        <td class="label"><label for="search_specialization">Specialization:</label></td>
-                                        <td class="field"><?php $this->generate_industries(array(), 'search_specialization'); ?></td>
+                                        <td class="label"><label for="search_position">Position:</label></td>
+                                        <td class="field"><input type="text" class="field" id="search_position" /></td>
                                     </tr>
                                     <tr>
                                         <td class="label"><label for="search_employer">Company:</label></td>
@@ -305,29 +301,15 @@ class EmployeeMembersPage extends Page {
                                         <td class="field"><?php $this->generate_employer_description('search_emp_desc', -1); ?></td>
                                     </tr>
                                     <tr>
-                                        <td class="label"><label for="search_emp_specialization">Company Specialization:</label></td>
-                                        <td class="field"><?php $this->generate_industries(array(), 'search_emp_specialization'); ?></td>
+                                        <td class="label"><label for="search_specialization">Specialization:</label></td>
+                                        <td class="field"><?php $this->generate_industries(array(), 'search_specialization'); ?></td>
                                     </tr>
                                     <tr>
                                         <td class="label"><label for="search_total_years">Total Work Years:</label></td>
                                         <td class="field"><input type="text" class="field years" id="search_total_years" maxlength="2" /> years</td>
                                     </tr>
                                     <tr>
-                                        <td class="label"><label for="search_notice_period">Notice Period:</label></td>
-                                        <td class="field"><input type="text" class="field years" id="search_notice_period" maxlength="2" /> months</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="label"><label for="search_expected_salary_start">Expected Salary:</label></td>
-                                        <td class="field">
-                                            <?php $this->generate_currencies('search_expected_salary_currency'); ?>
-                                            <input type="text" class="field salary" id="search_expected_salary_start" />
-                                            to 
-                                            <input type="text" class="field salary" id="search_expected_salary_end" />
-                                        </td>
-                                    </tr>
-                                
-                                    <tr>
-                                        <td class="label"><label for="search_seeking">Goals &amp; Experiences:</label></td>
+                                        <td class="label"><label for="search_seeking">Job Responsibilities &amp; Experiences:</label></td>
                                         <td class="field">
                                             <textarea class="field" id="search_seeking"></textarea>
                                         </td>

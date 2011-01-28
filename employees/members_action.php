@@ -392,9 +392,9 @@ if ($_POST['action'] == 'get_members') {
             $criteria['total_work_years'] = $_POST['total_work_years'];
         }
         
-        if (!empty($_POST['notice_period']) && $_POST['notice_period'] >= 1) {
-            $criteria['notice_period'] = $_POST['notice_period'];
-        }
+        // if (!empty($_POST['notice_period']) && $_POST['notice_period'] >= 1) {
+        //     $criteria['notice_period'] = $_POST['notice_period'];
+        // }
         
         if (!empty($_POST['specialization']) && $_POST['specialization'] >= 1) {
             $criteria['specialization'] = $_POST['specialization'];
@@ -404,23 +404,23 @@ if ($_POST['action'] == 'get_members') {
             $criteria['emp_desc'] = $_POST['emp_desc'];
         }
         
-        if (!empty($_POST['emp_specialization']) && $_POST['emp_specialization'] >= 1) {
-            $criteria['emp_spec'] = $_POST['emp_spec'];
-        }
-        
-        if (!empty($_POST['exp_sal_start']) && $_POST['exp_sal_start'] >= 1) {
-            $criteria['expected_salary']['start'] = $_POST['exp_sal_start'];
-            
-            if ($_POST['exp_sal_currency'] != '0') {
-                $criteria['expected_salary']['currency'] = $_POST['exp_sal_currency'];
-            } else {
-                $criteria['expected_salary']['currency'] = '';
-            }
-            
-            if (!empty($_POST['exp_sal_end']) && $_POST['exp_sal_end'] >= 1) {
-                $criteria['expected_salary']['end'] = $_POST['exp_sal_end'];
-            }
-        }
+        // if (!empty($_POST['emp_specialization']) && $_POST['emp_specialization'] >= 1) {
+        //     $criteria['emp_spec'] = $_POST['emp_spec'];
+        // }
+        // 
+        // if (!empty($_POST['exp_sal_start']) && $_POST['exp_sal_start'] >= 1) {
+        //     $criteria['expected_salary']['start'] = $_POST['exp_sal_start'];
+        //     
+        //     if ($_POST['exp_sal_currency'] != '0') {
+        //         $criteria['expected_salary']['currency'] = $_POST['exp_sal_currency'];
+        //     } else {
+        //         $criteria['expected_salary']['currency'] = '';
+        //     }
+        //     
+        //     if (!empty($_POST['exp_sal_end']) && $_POST['exp_sal_end'] >= 1) {
+        //         $criteria['expected_salary']['end'] = $_POST['exp_sal_end'];
+        //     }
+        // }
         
         if (!empty($_POST['seeking'])) {
             $criteria['seeking_keywords'] = $_POST['seeking'];
@@ -1436,6 +1436,7 @@ if ($_POST['action'] == 'confirm_employed') {
         // fwrite($handle, $body);
         
         unlink($GLOBALS['data_path']. '/general_invoice/'. $filename. '.pdf');
+        unlink($GLOBALS['data_path']. '/general_invoice/'. $filename_copy. '.pdf');
     } else {
         if ($credit_amount > 0) {
             $credit_note_desc = 'Refund of balance for Invoice: '. pad($previous_invoice, 11, '0');

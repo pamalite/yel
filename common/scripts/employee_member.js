@@ -338,8 +338,8 @@ function save_career() {
     var reason_leaving = $('reason_for_leaving').value.replace(/\n/g, "<br/>");
     reason_leaving = add_slashes(reason_leaving);
     
-    var current_position = $('current_position').value.replace(/\n/g, "<br/>");
-    current_position = add_slashes(current_position);
+    // var current_position = $('current_position').value.replace(/\n/g, "<br/>");
+    // current_position = add_slashes(current_position);
     
     var params = 'id=' + member_id;
     params = params + '&action=save_career';
@@ -347,7 +347,7 @@ function save_career() {
     params = params + '&can_travel=' + $('can_travel_relocate').options[$('can_travel_relocate').selectedIndex].value;
     params = params + '&seeking=' + seeking;
     params = params + '&reason_leaving=' + reason_leaving;
-    params = params + '&current_position=' + current_position;
+    // params = params + '&current_position=' + current_position;
     params = params + '&notice_period=' + $('notice_period').value;
     params = params + '&total_years=' + $('total_years').value;
     params = params + '&expected_currency=' + $('expected_salary_currency').options[$('expected_salary_currency').selectedIndex].value;
@@ -1496,12 +1496,9 @@ function show_copy_friendly_popup() {
             seeking = seeking + '<br/>';
         }
     }
-    summary = summary + '<b>Goals &amp; Experiences:</b><br/> ' + seeking + '<br/><br/>';
+    summary = summary + '<b>Job Responsibilities &amp; Experiences:</b><br/> ' + seeking + '<br/><br/>';
     
-    var expected_salary = $('expected_salary_currency').options[$('expected_salary_currency').selectedIndex].text + '$&nbsp;';
-    expected_salary = expected_salary + $('expected_salary').value + ' - ';
-    expected_salary = expected_salary + $('expected_salary_end').value;
-    summary = summary + '<b>Expected Salary:</b> ' + expected_salary + '<br/><br/>';
+    summary = summary + '<b>Total years of work experience:</b> ' + $('total_years').value + '<br/><br/>';
     
     summary = summary + '<b>Preferred job locations:</b> ' + $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].text + ', ' + $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].text + '<br/><br/>';
     
@@ -1518,16 +1515,10 @@ function show_copy_friendly_popup() {
     }
     summary = summary + '<b>Reason for leaving:</b><br/> ' + reason_for_leaving + '<br/><br/>';
     
-    var current_position = '';
-    lines = $('current_position').value.split("\n");
-    for (var i=0; i < lines.length; i++) {
-        current_position = current_position + lines[i];
-        
-        if (i < lines.length-1) {
-            current_position = current_position + '<br/>';
-        }
-    }
-    summary = summary + '<b>Reason for leaving:</b><br/> ' + current_position + '<br/><br/>';
+    var expected_salary = $('expected_salary_currency').options[$('expected_salary_currency').selectedIndex].text + '$&nbsp;';
+    expected_salary = expected_salary + $('expected_salary').value + ' - ';
+    expected_salary = expected_salary + $('expected_salary_end').value;
+    summary = summary + '<b>Expected Salary:</b> ' + expected_salary + '<br/><br/>';
     
     var current_salary = $('current_salary_currency').options[$('current_salary_currency').selectedIndex].text + '$&nbsp;';
     current_salary = current_salary + $('current_salary').value + ' - ';
@@ -1535,7 +1526,17 @@ function show_copy_friendly_popup() {
     summary = summary + '<b>Current Salary:</b> ' + current_salary + '<br/><br/>';
     
     summary = summary + '<b>Notice period:</b> ' + $('notice_period').value + '<br/><br/>';
-    summary = summary + '<b>Total years of work experience:</b> ' + $('total_years').value + '<br/><br/>';
+    
+    // var current_position = '';
+    // lines = $('current_position').value.split("\n");
+    // for (var i=0; i < lines.length; i++) {
+    //     current_position = current_position + lines[i];
+    //     
+    //     if (i < lines.length-1) {
+    //         current_position = current_position + '<br/>';
+    //     }
+    // }
+    // summary = summary + '<b>Reason for leaving:</b><br/> ' + current_position + '<br/><br/>';
     
     $('summary').set('html', summary);
     show_window('copy_friendly_window');

@@ -122,6 +122,7 @@ function update_invoices_list() {
                 var expireds = xml.getElementsByTagName('expired');
                 var issued_ons = xml.getElementsByTagName('formatted_issued_on');
                 var payable_bys = xml.getElementsByTagName('formatted_payable_by');
+                var placements = xml.getElementsByTagName('placement');
                 
                 var invoices_table = new FlexTable('invoices_table', 'invoices');
 
@@ -129,10 +130,11 @@ function update_invoices_list() {
                 header.set(0, new Cell('&nbsp;', '', 'header expiry_status'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('invoices', 'invoices.issued_on');\">Issued On</a>", '', 'header'));
                 header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('invoices', 'employers.name');\">Employer</a>", '', 'header'));
-                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('invoices', 'invoices.id');\">Invoice</a>", '', 'header'));
-                header.set(4, new Cell('Payable By', '', 'header'));
-                header.set(5, new Cell('Amount Payable', '', 'header'));
-                header.set(6, new Cell('Actions', '', 'header action'));
+                header.set(3, new Cell('Placement', '', 'header'));
+                header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('invoices', 'invoices.id');\">Invoice</a>", '', 'header'));
+                header.set(5, new Cell('Payable By', '', 'header'));
+                header.set(6, new Cell('Amount Payable', '', 'header'));
+                header.set(7, new Cell('Actions', '', 'header action'));
                 invoices_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
@@ -162,15 +164,17 @@ function update_invoices_list() {
                     contacts = contacts + '</div>';
                     row.set(2, new Cell(contacts, '', 'cell'));
                     
-                    row.set(3, new Cell('<a class="no_link" onClick="show_invoice_page(' + ids[i].childNodes[0].nodeValue + ');">' + padded_ids[i].childNodes[0].nodeValue + '</a>&nbsp;<a href="invoice_pdf.php?id=' + ids[i].childNodes[0].nodeValue + '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell'));
-                    row.set(4, new Cell(payable_bys[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(3, new Cell(placements[i].childNodes[0].nodeValue, '', 'cell'));
+                    
+                    row.set(4, new Cell('<a class="no_link" onClick="show_invoice_page(' + ids[i].childNodes[0].nodeValue + ');">' + padded_ids[i].childNodes[0].nodeValue + '</a>&nbsp;<a href="invoice_pdf.php?id=' + ids[i].childNodes[0].nodeValue + '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell'));
+                    row.set(5, new Cell(payable_bys[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     var amount = currencies[i].childNodes[0].nodeValue + '$&nbsp;' + amount_payables[i].childNodes[0].nodeValue;
-                    row.set(5, new Cell(amount, '', 'cell'));
+                    row.set(6, new Cell(amount, '', 'cell'));
                     
                     var actions = '';
                     actions = '<input type="button" value="Paid" onClick="show_payment_popup(' + ids[i].childNodes[0].nodeValue + ', \'' + padded_ids[i].childNodes[0].nodeValue + '\');" /><input type="button" value="Resend" onClick="show_resend_popup(' + ids[i].childNodes[0].nodeValue + ', \'' + padded_ids[i].childNodes[0].nodeValue + '\');" />';                    
-                    row.set(6, new Cell(actions, '', 'cell action'));
+                    row.set(7, new Cell(actions, '', 'cell action'));
                     
                     invoices_table.set((parseInt(i)+1), row);
                 }
@@ -216,16 +220,18 @@ function update_receipts_list() {
                 var paid_ons = xml.getElementsByTagName('formatted_paid_on');
                 var paid_throughs = xml.getElementsByTagName('paid_through');
                 var paid_ids = xml.getElementsByTagName('paid_id');
+                var placements = xml.getElementsByTagName('placement');
                 
                 var receipts_table = new FlexTable('receipts_table', 'receipts');
 
                 var header = new Row('');
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('receipts', 'invoices.issued_on');\">Issued On</a>", '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('receipts', 'employers.name');\">Employer</a>", '', 'header'));
-                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('receipts', 'invoices.id');\">Receipt</a>", '', 'header'));
-                header.set(3, new Cell('Paid On', '', 'header'));
-                header.set(4, new Cell('Amount Paid', '', 'header'));
-                header.set(5, new Cell('Payment', '', 'header payment'));
+                header.set(2, new Cell("Placement", '', 'header'))
+                header.set(3, new Cell("<a class=\"sortable\" onClick=\"sort_by('receipts', 'invoices.id');\">Receipt</a>", '', 'header'));
+                header.set(4, new Cell('Paid On', '', 'header'));
+                header.set(5, new Cell('Amount Paid', '', 'header'));
+                header.set(6, new Cell('Payment', '', 'header payment'));
                 receipts_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
@@ -233,17 +239,18 @@ function update_receipts_list() {
                     
                     row.set(0, new Cell(issued_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     row.set(1, new Cell(employers[i].childNodes[0].nodeValue, '', 'cell'));
-                    row.set(2, new Cell('<a class="no_link" onClick="show_receipt_page(' + ids[i].childNodes[0].nodeValue + ');">' + padded_ids[i].childNodes[0].nodeValue + '</a>&nbsp;<a href="invoice_pdf.php?id=' + ids[i].childNodes[0].nodeValue + '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell'));
-                    row.set(3, new Cell(paid_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(2, new Cell(placements[i].childNodes[0].nodeValue, '', 'cell'));
+                    row.set(3, new Cell('<a class="no_link" onClick="show_receipt_page(' + ids[i].childNodes[0].nodeValue + ');">' + padded_ids[i].childNodes[0].nodeValue + '</a>&nbsp;<a href="invoice_pdf.php?id=' + ids[i].childNodes[0].nodeValue + '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell'));
+                    row.set(4, new Cell(paid_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
                     var amount = currencies[i].childNodes[0].nodeValue + '$&nbsp;' + amount_payables[i].childNodes[0].nodeValue;
-                    row.set(4, new Cell(amount, '', 'cell'));
+                    row.set(5, new Cell(amount, '', 'cell'));
                     
                     var payment = 'By Cash';
                     if (paid_throughs[i].childNodes[0].nodeValue != 'CSH') {
                         payment = 'Bank Receipt #:<br/>' + paid_ids[i].childNodes[0].nodeValue;
                     }
-                    row.set(5, new Cell(payment, '', 'cell payment'));
+                    row.set(6, new Cell(payment, '', 'cell payment'));
                     
                     receipts_table.set((parseInt(i)+1), row);
                 }
