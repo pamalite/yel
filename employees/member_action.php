@@ -4,6 +4,8 @@ require_once dirname(__FILE__). "/../private/config/job_profile.inc";
 
 session_start();
 
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
 if (!isset($_POST['id'])) {
     redirect_to('member.php');
 }

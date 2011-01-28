@@ -426,8 +426,30 @@ class EmployeeMemberPage extends Page {
         $potential_referrers = $this->get_potential_referrers();
         $potential_candidates = $this->get_potential_candidates();
         //$applications = $this->get_applications();
-        $applications = $this->member->getAllAppliedJobs();
-        
+        $temp_apps = $this->member->getAllAppliedJobs();
+        $applications = array();
+        $skips = array();
+        for ($i=0; $i < count($temp_apps); $i++) {
+            $current_row = $temp_apps[$i];
+            $next_i = $i+1;
+            if ($next_i <= count($temp_apps)-1) {
+                for ($j=$next_i; $j < count($temp_apps); $j++) {
+                    if (!in_array($j, $skips)) {
+                        if ($current_row['job'] == $temp_apps[$j]['job']) {
+                            if ($current_row['tab'] == 'ref') {
+                                $skips[] = $j;
+                            } else {
+                                $skips[] = $i;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!in_array($i, $skips)) {
+                $applications[] = $current_row;
+            }
+        }
         ?>
         <!-- submenu -->
         <div class="menu">

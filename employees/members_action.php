@@ -6,6 +6,8 @@ require_once dirname(__FILE__). "/../employers/general_invoice.php";
 
 session_start();
 
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
 function create_member_from($_email_addr, $_fullname, $_phone) {
     if (empty($_email_addr) || empty($_fullname) || empty($_phone)) {
         return false;
@@ -1167,7 +1169,7 @@ if ($_POST['action'] == 'confirm_employed') {
         $criteria = array(
             'columns' => 'invoices.id, SUM(invoice_items.amount) AS amount_payable', 
             'joins' => 'invoice_items ON invoice_items.invoice = invoices.id', 
-            'match' => "invoices.type ='R' AND 
+            'match' => "invoices.type ='R' AND invoices.is_copy = FALSE AND 
                         invoice_items.item = ". $previous_referral, 
             'group' => 'invoices.id'
         );
@@ -1209,7 +1211,7 @@ if ($_POST['action'] == 'confirm_employed') {
         exit();
     }
     
-    $referral_desc = 'Reference fee for ['. $job['id']. '] '. $job['title'];
+    $referral_desc = 'Reference fee for ['. $job['id']. '] '. $job['title']. ' of '. $candidate->getFullName();
     if ($is_free_replacement) {
         $referral_desc = 'Free replacement for Invoice: '. pad($previous_invoice, 11, '0');
     } 
@@ -1237,13 +1239,27 @@ if ($_POST['action'] == 'confirm_employed') {
             exit();
         }
         
+        $data_copy = $data;
+        $data_copy['is_copy'] = '1';
+        $invoice_copy = Invoice::create($data_copy);
+        if (!$invoice_copy) {
+            echo 'ko';
+            exit();
+        }
+        
+        $item_copy_added = Invoice::addItem($invoice_copy, $subtotal, $referral->getId(), 'Job referral fee');
+        $item_copy_added = Invoice::addItem($invoice_copy, $discount, $referral->getId(), 'Discount');
+        $item_copy_added = Invoice::addItem($invoice_copy, $extra_charges, $referral->getId(), 'Extra charges');
+        
         // generate and send invoice
         $filename = generate_random_string_of(8). '.'. generate_random_string_of(8);
+        $filename_copy = generate_random_string_of(8). '.'. generate_random_string_of(8);
         $branch = $employer->getAssociatedBranch();
         $sales = 'sales.'. strtolower($branch[0]['country']). '@yellowelevator.com';
         $currency = $branch[0]['currency'];
 
         $items = Invoice::getItems($invoice);
+        $items_copy = Invoice::getItems($invoice_copy);
         $amount_payable = 0.00;
         foreach($items as $i=>$item) {
             $amount_payable += $item['amount'];
@@ -1252,6 +1268,8 @@ if ($_POST['action'] == 'confirm_employed') {
         $amount_payable = number_format($amount_payable, 2, '.', ', ');
         $invoice_or_receipt = 'Invoice';
         
+        
+        // generate for HR
         $pdf = new GeneralInvoice();
         $pdf->AliasNbPages();
         $pdf->SetAuthor('Yellow Elevator. This invoice was automatically generated. Signature is not required.');
@@ -1309,7 +1327,66 @@ if ($_POST['action'] == 'confirm_employed') {
         $pdf->Close();
         $pdf->Output($GLOBALS['data_path']. '/general_invoices/'. $filename. '.pdf', 'F');
         
+        // generate general invoice
+        $pdf = new GeneralInvoice();
+        $pdf->AliasNbPages();
+        $pdf->SetAuthor('Yellow Elevator. This invoice was automatically generated. Signature is not required.');
+        $pdf->SetTitle($GLOBALS['COMPANYNAME']. ' - Invoice '. pad($invoice_copy, 11, '0'));
+        $pdf->SetInvoiceType('R', $invoice_or_receipt);
+        $pdf->SetCurrency($currency);
+        $pdf->SetBranch($branch);
+        $pdf->AddPage();
+        $pdf->SetFont('Arial', '', 10);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->SetFillColor(54, 54, 54);
+        $pdf->Cell(60, 5, "Invoice Number",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, "Issuance Date",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, "Payable By",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, "Amount Payable (". $currency. ")",1,0,'C',1);
+        $pdf->Ln(6);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(60, 5, pad($invoice_copy, 11, '0'),1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, $issued_on, 1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(33, 5, format_date($data['payable_by']),1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, $amount_payable,1,0,'C');
+        $pdf->Ln(6);
+        $pdf->SetTextColor(255, 255, 255);
+        $pdf->Cell(60, 5, "User ID",1,0,'C',1);
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, "Employer Name",1,0,'C',1);
+        $pdf->Ln(6);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Cell(60, 5, $employer->getId(),1,0,'C');
+        $pdf->Cell(1);
+        $pdf->Cell(0, 5, $employer->getName(),1,0,'C');
+        $pdf->Ln(10);
+        
+        $table_header = array("No.", "Item", "Amount (". $currency. ")");
+        $pdf->FancyTable($table_header, $items_copy, $amount_payable);
+        
+        $pdf->Ln(13);
+        $pdf->SetFont('','I');
+        $pdf->Cell(0, 0, "This invoice was automatically generated. Signature is not required.", 0, 0, 'C');
+        $pdf->Ln(6);
+        $pdf->Cell(0, 5, "Payment Notice",'LTR',0,'C');
+        $pdf->Ln();
+        $pdf->Cell(0, 5, "- Payment shall be made payable to ". $branch[0]['branch']. ".", 'LR', 0, 'C');
+        $pdf->Ln();
+        $pdf->Cell(0, 5, "- To facilitate the processing of the payment, please write down the invoice number(s) on your cheque(s)/payment slip(s)", 'LBR', 0, 'C');
+        $pdf->Ln(10);
+        $pdf->Cell(0, 0, "E. & O. E.", 0, 0, 'C');
+        
+        $pdf->Close();
+        $pdf->Output($GLOBALS['data_path']. '/general_invoices/'. $filename_copy. '.pdf', 'F');
+        
         $attachment = chunk_split(base64_encode(file_get_contents($GLOBALS['data_path']. '/general_invoices/'. $filename. '.pdf')));
+        $attachment_copy = chunk_split(base64_encode(file_get_contents($GLOBALS['data_path']. '/general_invoices/'. $filename_copy. '.pdf')));
 
         $subject = "Notice of Invoice ". pad($invoice, 11, '0');
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
@@ -1343,6 +1420,12 @@ if ($_POST['action'] == 'confirm_employed') {
         $body .= 'Content-Transfer-Encoding: base64'. "\n";
         $body .= 'Content-Disposition: attachment'. "\n";
         $body .= $attachment. "\n";
+        $body .= '--yel_mail_sep_'. $filename. "--\n\n";
+        $body .= '--yel_mail_sep_'. $filename. "\n";
+        $body .= 'Content-Type: application/pdf; name="yel_invoice_'. pad($invoice_copy, 11, '0'). '.pdf"'. "\n";
+        $body .= 'Content-Transfer-Encoding: base64'. "\n";
+        $body .= 'Content-Disposition: attachment'. "\n";
+        $body .= $attachment_copy. "\n";
         $body .= '--yel_mail_sep_'. $filename. "--\n\n";
         mail($employer->getEmailAddress(), $subject, $body, $headers);
         

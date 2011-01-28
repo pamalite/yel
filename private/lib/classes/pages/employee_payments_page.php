@@ -50,11 +50,11 @@ class EmployeePaymentsPage extends Page {
         );
         
         if ($_is_invoice) {
-            $criteria['match'] = "invoices.paid_on IS NULL";
+            $criteria['match'] = "invoices.paid_on IS NULL AND invoices.is_copy = FALSE";
             $criteria['order'] = "invoices.issued_on";
         } else {
             $criteria['columns'] .= ", invoices.paid_through, invoices.paid_id";
-            $criteria['match'] = "invoices.paid_on IS NOT NULL";
+            $criteria['match'] = "invoices.paid_on IS NOT NULL AND invoices.is_copy = FALSE";
             $criteria['order'] = "invoices.paid_on DESC";
         }
         

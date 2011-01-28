@@ -430,7 +430,7 @@ class Member implements Model {
     }
     
     public function getFullName() {
-        $query = "SELECT CONCAT(firstname, ' ', lastname) AS name 
+        $query = "SELECT CONCAT(lastname, ', ', firstname) AS name 
                   FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
         if ($name = $this->mysqli->query($query)) {
             return $name[0]['name'];
