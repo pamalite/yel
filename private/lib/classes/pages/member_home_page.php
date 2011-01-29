@@ -389,7 +389,7 @@ class MemberHomePage extends Page {
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="field odd">Briefly, tell us what are your goals and experiences.</td>
+                                                <td class="field odd">Briefly, tell us what are job responsibilities and experiences.</td>
                                                 <td class="odd">
                                                     <span id="seeking_field">
                                                     <?php
@@ -450,18 +450,8 @@ class MemberHomePage extends Page {
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="field">Briefly, what is your current position, and what do you do?</td>
+                                                <td class="field">What is your current salary range?</td>
                                                 <td>
-                                                    <span id="current_job_field">
-                                                    <?php
-                                                        echo stripslashes($answers['current_position']);
-                                                    ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="field odd">What is your current salary range?</td>
-                                                <td class="odd">
                                                     <span id="current_salary_field">
                                                     <?php 
                                                         echo $answers['current_salary_currency']. '$&nbsp;';
@@ -471,8 +461,8 @@ class MemberHomePage extends Page {
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="field">What is your notice period?</td>
-                                                <td>
+                                                <td class="field odd">What is your notice period?</td>
+                                                <td class="odd">
                                                     <span id="notice_period_field">
                                                     <?php
                                                         echo $answers['notice_period']. ' months';
@@ -618,13 +608,13 @@ class MemberHomePage extends Page {
                             </td>
                         </tr>
                         <tr>
-                            <td class="field odd">Briefly, tell us what are your goals and experiences.</td>
+                            <td class="field odd">Briefly, what are your job responsibilities and experiences?</td>
                             <td class="odd">
                                 <textarea id="seeking"><?php echo str_replace('<br/>', "\r\n", $answers['seeking']); ?></textarea>
                             </td>
                         </tr>
                         <tr>
-                            <td class="field">What will be your expected salary range?</td>
+                            <td class="field">Expected salary range?</td>
                             <td>
                                 <select id="expected_sal_currency">
                                 <?php
@@ -687,14 +677,8 @@ class MemberHomePage extends Page {
                             </td>
                         </tr>
                         <tr>
-                            <td class="field">Briefly, what is your current position, and what do you do?</td>
+                            <td class="field">Current salary range?</td>
                             <td>
-                                <textarea id="current_pos"><?php echo str_replace('<br/>', "\r\n", $answers['current_position']); ?></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="field odd">What is your current salary range?</td>
-                            <td class="odd">
                                 <select id="current_sal_currency">
                                 <?php
                                 foreach ($GLOBALS['currencies'] as $i=>$currency) {
@@ -715,8 +699,8 @@ class MemberHomePage extends Page {
                             </td>
                         </tr>
                         <tr>
-                            <td class="field">What is your notice period?</td>
-                            <td>
+                            <td class="field odd">What is your notice period?</td>
+                            <td class="odd">
                                 <input type="text" id="notice_period" value="<?php echo $answers['notice_period']; ?>" /> months
                             </td>
                         </tr>
@@ -745,7 +729,7 @@ class MemberHomePage extends Page {
                             <td class="field">
                                 <input class="field" type="text" id="position_title" name="position_title" />
                                 <br/>
-                                <span class="tips">eg: Director, Manager, GM, VP, etc.</span>
+                                <span class="tips">eg: Financial Controller,  VP of Operations, etc.</span>
                             </td>
                         </tr>
                         <tr>
@@ -753,11 +737,11 @@ class MemberHomePage extends Page {
                             <td class="field">
                                 <input class="field" type="text" id="position_superior_title" name="position_superior_title" />
                                 <br/>
-                                <span class="tips">eg: Director, Manager, GM, VP, etc.</span>
+                                <span class="tips">eg: Financial Controller,  VP of Operations, etc.</span>
                             </td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="organization_size">Number of Direct Reports:</label></td>
+                            <td class="label"><label for="organization_size">Positions reporting to you:</label></td>
                             <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
                         </tr>
                         <tr>

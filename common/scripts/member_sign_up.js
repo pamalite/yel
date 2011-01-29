@@ -149,13 +149,13 @@ function validate_job_profile() {
         reset_field($('emp_specialization'));
     }
     
-    if (isNaN($('organization_size').value)) {
-        alert('Only numbers are accepted for Number of Direct Reports.');
-        $('organization_size').setStyle('border', '2px solid #FF0000');
-        return false;
-    } else {
-        reset_field($('organization_size'));
-    }
+    // if (isNaN($('organization_size').value)) {
+    //     alert('Only numbers are accepted for Number of Direct Reports.');
+    //     $('organization_size').setStyle('border', '2px solid #FF0000');
+    //     return false;
+    // } else {
+    //     reset_field($('organization_size'));
+    // }
     
     if (isNaN($('total_work_years').value)) {
         alert('Only numbers are accepted for Number of Direct Reports.');
@@ -234,7 +234,7 @@ function save_job_profile() {
     // params = params + '&specialization=' + $('specialization').value;
     params = params + '&position_title=' + $('position_title').value;
     params = params + '&position_superior_title=' + $('position_superior_title').value;
-    params = params + '&organization_size=' + $('organization_size').value;
+    params = params + '&organization_size=' + encodeURIComponent($('organization_size').value);
     params = params + '&work_from=' + work_from;
     params = params + '&work_to=' + work_to;
     params = params + '&employer=' + $('company').value;

@@ -315,7 +315,7 @@ class MemberSignUpPage extends Page {
                     </tr>
                     <tr>
                         <td class="buttons_bar" colspan="2">
-                            <input type="button" id="save" onClick="save_job_profile();" value="Save Job Profile" />
+                            <input type="button" id="save" onClick="save_job_profile();" value="Finish" />
                         </td>
                     </tr>
                 </table>

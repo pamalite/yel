@@ -136,7 +136,7 @@ function close_career_summary_popup(_is_save) {
     if (_is_save) {
         var seeking = encodeURIComponent($('seeking').value);
         var reason_leaving = encodeURIComponent($('reason_leaving').value);
-        var current_pos = encodeURIComponent($('current_pos').value);
+        // var current_pos = encodeURIComponent($('current_pos').value);
         
         if (!isEmpty($('expected_sal_start').value) && isNaN($('expected_sal_start').value)) {
             alert('Expected salary must be a number.');
@@ -172,7 +172,7 @@ function close_career_summary_popup(_is_save) {
         params = params + '&pref_job_loc_1=' + $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].value;
         params = params + '&pref_job_loc_2=' + $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].value;
         params = params + '&seeking=' + seeking;
-        params = params + '&current_pos=' + current_pos;
+        // params = params + '&current_pos=' + current_pos;
         params = params + '&reason_leaving=' + reason_leaving;
         params = params + '&notice_period=' + $('notice_period').value;
         params = params + '&expected_sal_start=' + $('expected_sal_start').value;
@@ -250,10 +250,10 @@ function validate_job_profile() {
         return false;
     }
     
-    if (isNaN($('organization_size').value)) {
-        alert('Only numbers are accepted for Number of Direct Reports.');
-        return false;
-    } 
+    // if (isNaN($('organization_size').value)) {
+    //     alert('Only numbers are accepted for Number of Direct Reports.');
+    //     return false;
+    // } 
     
     return true;
 }
@@ -405,7 +405,7 @@ function close_job_profile_popup(_is_save) {
         params = params + '&specialization=' + $('specialization').value;
         params = params + '&position_title=' + $('position_title').value;
         params = params + '&superior_title=' + $('position_superior_title').value;
-        params = params + '&organization_size=' + $('organization_size').value;
+        params = params + '&organization_size=' + encodeURIComponent($('organization_size').value);
         params = params + '&work_from=' + work_from;
         params = params + '&work_to=' + work_to;
         params = params + '&employer=' + encodeURIComponent($('company').value);

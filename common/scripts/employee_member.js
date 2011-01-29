@@ -1273,10 +1273,10 @@ function validate_job_profile() {
         return false;
     }
     
-    if (isNaN($('organization_size').value)) {
-        alert('Only numbers are accepted for Number of Direct Reports.');
-        return false;
-    } 
+    // if (isNaN($('organization_size').value)) {
+    //     alert('Only numbers are accepted for Number of Direct Reports.');
+    //     return false;
+    // } 
     
     return true;
 }
@@ -1428,7 +1428,7 @@ function close_job_profile_popup(_is_save) {
         params = params + '&specialization=' + $('specialization').value;
         params = params + '&position_title=' + $('position_title').value;
         params = params + '&superior_title=' + $('position_superior_title').value;
-        params = params + '&organization_size=' + $('organization_size').value;
+        params = params + '&organization_size=' + encodeURIComponent($('organization_size').value);
         params = params + '&work_from=' + work_from;
         params = params + '&work_to=' + work_to;
         params = params + '&employer=' + encodeURIComponent($('company').value);

@@ -1343,7 +1343,7 @@ class EmployeeMemberPage extends Page {
                             </td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="organization_size">Number of Direct Reports:</label></td>
+                            <td class="label"><label for="organization_size">Positions Reporting From:</label></td>
                             <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
                         </tr>
                         <tr>
