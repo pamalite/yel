@@ -37,7 +37,7 @@ function initialize_page() {
         var keywords_overtext = new OverText($('keywords'));
         
         var suggest_url = root + '/common/php/search_suggest.php';
-        new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
+        new Autocompleter.Ajax.Json('keywords', suggest_url, {
             'postVar': 'keywords',
             'minLength' : 1,
             'overflow' : true,
