@@ -1406,7 +1406,7 @@ if ($_POST['action'] == 'confirm_employed') {
             $message .= $line;
         }
 
-        $message = str_replace('%company%', $employer->getName(), $message);
+        $message = str_replace('%employer%', $employer->getName(), $message);
         $message = str_replace('%invoice%', pad($invoice, 11, '0'), $message);
         $message = str_replace('%issued_on%', $issued_on, $message);
         $message = str_replace('%payable_by%', format_date($data['payable_by']), $message);
@@ -1420,7 +1420,6 @@ if ($_POST['action'] == 'confirm_employed') {
         $body .= 'Content-Transfer-Encoding: base64'. "\n";
         $body .= 'Content-Disposition: attachment'. "\n";
         $body .= $attachment. "\n";
-        $body .= '--yel_mail_sep_'. $filename. "--\n\n";
         $body .= '--yel_mail_sep_'. $filename. "\n";
         $body .= 'Content-Type: application/pdf; name="yel_invoice_'. pad($invoice_copy, 11, '0'). '.pdf"'. "\n";
         $body .= 'Content-Transfer-Encoding: base64'. "\n";
