@@ -1,36 +1,80 @@
 <div class="introduction_panels">
-    Introduction panels goes here.
-    <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
-    <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
-    <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
-    <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
+    <div class="main-title"><img src="%root%/common/images/executive_search_firm.jpg" title="The Executive Search Firm" /></div>
+    <div class="connect_with_recruitment"></div>
+    <div class="get_cash_bonus"></div>
+    <div class="years_work_experience"></div>
+</div>
+
+<div class="content">
+    <table cellpadding="0" cellspacing="0">
+        <tr>
+            <td rowspan="2" style="padding-left:8px;" valign="top" width="524">
+                <div><img src="%root%/common/images/why_connect.jpg" width="340" height="19" /></div><br />
+                <div><img src="%root%/common/images/why_content.jpg" /></div>
+                <div style="margin-top:23px;"><a href="#"><img src="%root%/common/images/get_connected_but.jpg" /></a></div>
+            </td>
+            <td valign="top">
+                <div style="padding-left:14px; padding-bottom:0px; width:231px;" class="left-line bottom-line">
+                    <img src="%root%/common/images/practice_promise.jpg" width="229" height="63" />
+                    <div class="side-text">
+                        <p>We always maintain confidentiality of our recommenders and will not disclose your name when you recommend someone to our consultants.</p>
+                        <p>We always maintain confidentiality of our candidates and will disclose your personal info to the employers only upon your consent.</p>
+                        <p>We promise that you will receive your Cash Bonus within 2 weeks upon us receiving payment from 
+        our clients.</p>
+                        <center><img src="%root%/common/images/shake_hand.jpg" width="136" height="53" style="margin-top:0px;" /></center>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="left-line bottom-line" style="padding:8px 0 0px 20px;"><iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.facebook.com%2Fpages%2FGizwiz-Studio%2F147378438637370&amp;layout=standard&amp;show_faces=true&amp;width=222&amp;action=like&amp;colorscheme=light&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:222px; height:73px;" allowTransparency="true"></iframe></div>
+                <div class="left-line" style="padding:4px 0 0px 20px;">
+                    <a href="#"><img src="%root%/common/images/watch_video.jpg" width="217" height="57" /></a></div>
+            </td>
+        </tr>
+    </table>
 </div>
 
 <div class="search">
+    <div class="bottom-line"><img src="%root%/common/images/find_out_jobs.jpg" width="544" height="29" /></div>
     <form method="post" action="%root%/search.php" onSubmit="return verify();">
-        <select id="employer" name="employer">
-            <option value="0">Any Employer</option>
-            <option value="0" disabled>&nbsp;</option>
-            <!-- %employers_options% -->
-        </select>
-        <select id="industry" name="industry">
-            <option value="0">Any Specialization</option>
-            <option value="0" disabled>&nbsp;</option>
-            <!-- %industries_options% -->
-        </select>
-        <select id="country" name="country">
-            <option value="" selected>Any Country</option>
-            <option value="" disabled>&nbsp;</option>
-            <!-- %countries_options% -->
-        </select><br/>
+        <div class="search-jobs"><!-- <img src="%root%/common/images/search_jobs.jpg" /> //--></div>
+        <div style="width:654px;margin:0 0 4px 67px;height:22px;">
+            <div class="my-skinnable-select">
+                <select id="employer" name="employer">
+                    <option value="0">Any Employer</option>
+                    <option value="0" disabled>&nbsp;</option>
+                    <!-- %employers_options% -->
+                </select>
+            </div>
+            <div class="my-skinnable-select">
+                <select id="industry" name="industry">
+                    <option value="0">Any Specialization</option>
+                    <option value="0" disabled>&nbsp;</option>
+                    <!-- %industries_options% -->
+                </select>
+            </div>
+            <div class="my-skinnable-select">
+                <select id="country" name="country">
+                    <option value="" selected>Any Country</option>
+                    <option value="" disabled>&nbsp;</option>
+                    <!-- %countries_options% -->
+                </select>
+            </div>
+        </div>
         <input type="text" name="keywords" id="keywords" value="" alt="Job title or keywords" />
-        <input type="submit" value="Search Jobs" />
+        <input type="submit" value="Search Jobs" class="submitbut" />
+        <center></center>
     </form>
 </div>
 
 <div class="top_jobs">
+    <div class="bottom-line"><img src="%root%/common/images/top_jobs.jpg" width="266" height="29" /></div>
     <!-- %top_jobs% -->
 </div>
+
+<div class="bottom-line" style="height:20px;margin-bottom: 27px;"></div>
 
 <div id="top_employers">
     <div id="employers_carousel">
@@ -39,7 +83,7 @@
                 <td colspan="3"><img src="%root%/common/images/head-whousesye.jpg" width="328" height="46" style="margin-left: 45px; vertical-align: bottom;" /></td>
             </tr>
             <tr>
-                <td width="23"><a id="toggle_left" class="no_link"><img src="%root%/common/images/nav-logo-left.jpg" width="23" height="134" class="prev" /></a></td>
+                <td width="8"><a id="toggle_left" class="no_link"><img src="%root%/common/images/nav-logo-left.jpg" width="8" height="14" class="prev" /></a></td>
                 <td class="nav-center" id="employer_tabs">
                     <div class="employer_logos" id="employers_0">
                         <a href="%root%/search.php?industry=0&employer=MATTEL_M&keywords=">
@@ -92,7 +136,7 @@
                         </a>
                     </div>
                 </td>
-                <td width="23"><a id="toggle_right" class="no_link"><img src="%root%/common/images/nav-logo-right.jpg" width="23" height="134" class="prev" /></a></td>
+                <td width="8"><a id="toggle_right" class="no_link"><img src="%root%/common/images/nav-logo-right.jpg" width="8" height="14" class="prev" /></a></td>
             </tr>
         </table>
     </div>

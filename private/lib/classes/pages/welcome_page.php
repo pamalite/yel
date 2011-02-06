@@ -4,6 +4,10 @@ require_once dirname(__FILE__). '/../htmltable.php';
 
 class WelcomePage extends Page {
     
+    function __construct() {
+        parent::__construct();
+    }
+    
     public function insert_inline_css() {
         // TODO: Any inline CSS for welcome page goes here.
     }
@@ -13,11 +17,13 @@ class WelcomePage extends Page {
     }
     
     public function insert_welcome_scripts() {
-        $this->insert_scripts('welcome.js');
+        $this->insert_scripts(array('welcome.js', 'jquery.min.js', 'jquery.skinned-select.js'));
     }
     
     public function insert_inline_scripts() {
-        // TODO: Any inline scripts for welcome page goes here.
+        $script = 'jquery(document).ready(function() {'. "\n";
+        $script .= 'jquery(\'.overTxtLabel\').attr(\'style\',\'\');});'. "\n";
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function generate_top_jobs() {

@@ -89,3 +89,111 @@ td.buttons {
 label {
     font-size: 12pt;
 }
+
+/* jasmine start */
+.wrapper {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin-bottom:-162px;
+	/*border:1px red solid;	*/
+}
+
+div.page_title {
+    text-align: right;
+    padding-top: 2px;
+}
+
+.content {
+    width: 780px;
+    margin: 0 auto 50px;
+    padding-top: 35px;
+}
+.content .main {
+    width: 523px;
+    float: left;
+}
+.content .side {
+    width: 234px;
+    float: right;
+    padding-left: 22px;
+    border-left: 1px #d9d9d9 solid;
+    padding-top: 65px;
+    padding-bottom: 50px;
+}
+.content .side .login_form {
+    width: auto;
+    border: 0;
+    border-bottom: 1px #d9d9d9 solid;
+    padding-bottom: 54px;
+}
+.content .side .login_form #id, .content .side .login_form #password {
+    width: 217px;
+    height: 22px;
+    border: 1px #abadb3 solid;
+    font-size: 12px;
+    margin-top: 3px;
+}
+.content .side .login_form label {
+    font-size: 12px;
+}
+.content .side .login_form .left {
+    float: none;
+    width: auto;
+}
+.content .side .login_form .right {
+    width: auto;
+    padding-right: 5px;
+    padding-top: 10px;
+}
+.content .side .login_form .right input {
+    border: 1px #cccccc solid;
+    background: #f0f0f0;
+    width: 55px;
+    height: 25px;
+    padding-bottom: 3px;
+    text-align: center;
+}
+.content .side .login_form a {
+    color: #ff8e00;
+    font-weight: normal;
+    font-size: 13px;
+}
+.content .login-enquiry-box {
+    background: url('../images/login_enquiry_box.jpg') no-repeat center;
+    width: 496px;
+    height: 85px;
+    margin-bottom: 30px;
+    color: #ffffff;
+    margin-left: -5px;
+}
+.content .login-enquiry-box span {
+    display: block;
+    padding: 27px 0 0 30px;
+}
+.content .login-enquiry-box a {
+    color: #fc8f02;
+    font-weight: bold;
+}
+.clear {
+    clear: both;
+}
+.client-box {
+    padding-top: 28px;
+    padding-left: 5px;
+}
+.client-box .employer_logos {
+    width: 230px;
+}
+#employers_carousel {
+    margin-left:-10px;
+}
+div.status {
+    position: absolute;
+    width: 100%;
+}
+
+
+.push{
+	height: 162px;	
+}

@@ -285,3 +285,254 @@ div.top_employers table.top_employers td div.employer_logos {
 div.employer_logos {
     text-align: center;
 }
+
+/* jasmine start */
+body {
+    background-image: url('../images/welcome_bgfinal.jpg') !important;
+    font-family: "Nimbus Sans Becker L",Arial,Helvetica,sans-serif !important;
+}
+body, div, p, td, input, textarea, select {
+    font-family: "Nimbus Sans Becker L",Arial,Helvetica,sans-serif !important;
+}
+div.top {
+    border-bottom: 0 !important;
+}
+#welcome_top {
+    background-image: none !important;
+    height: 38px !important;
+    width: 847px !important;
+}
+#welcome_top #logo {
+    margin-left: 32px !important;
+    float: none !important;
+    position: absolute;
+    z-index: 10;
+}
+#welcome_top .loginpanel {
+    margin: 0 !important;
+    position: absolute;
+    width: 797px;
+    padding-right: 50px;
+    z-index: 0;
+    padding-top: 8px;
+}
+#welcome_top .loginpanel a strong {
+    font-weight: normal;
+}
+#welcome_top .loginpanel a {
+    color: #ffffff;
+    font-size: 15px;
+}
+#welcome_top .loginpanel a:hover, #welcome_top .topmenu td a:hover {
+    text-decoration: none;
+    color: #fdca02 /* !important */;
+}
+#welcome_top .topmenu {
+    margin-top: 0 !important;
+    position: absolute;
+    padding-top: 5px;
+    z-index: 5;
+}
+#welcome_top .topmenu table {
+    float: none !important;
+    margin-left: 270px;
+}
+#welcome_top .topmenu td.topmenudivider {
+    background-image: url('../images/topmenu-divider.gif') !important;
+    background-position: center 3px;
+    height: 14px !important;
+    width: 5px !important;
+}
+#welcome_top .topmenu td a {
+    width: auto !important;
+}
+#welcome_top .topmenu td a:hover {
+    text-decoration: none !important;
+}
+#welcome_top .topmenu table a {
+    color: #ffffff;
+    font-size: 15px;
+}
+#welcome_top .topmenu table a strong {
+    font-weight: normal;
+}
+.introduction_panels {
+    height: 393px !important;
+    padding-top: 62px;
+    width: 847px !important;
+}
+.introduction_panels .main-title {
+	letter-spacing: -1px;
+	text-align: center;
+	color:#484848;
+	font-size:40px;
+	font-weight: normal;
+	margin-bottom: 5px;
+}
+.introduction_panels .main-title1 {
+    margin-top: -5px;
+    letter-spacing: 0px;
+    text-align: center;
+    color:#484848;
+    font-size:20px;
+    font-weight: normal;
+    margin-bottom: 46px;
+}
+.introduction_panels .connect_with_recruitment {
+    background: url('../images/connect_with_recruitment.jpg');
+    width: 228px;
+    height: 241px;
+    float: left;
+    margin-left: 25px;
+}
+.introduction_panels .get_cash_bonus {
+    background: url('../images/get_cash_bonus.jpg');
+    width: 228px;
+    height: 241px;
+    float: left;
+    margin-left: 44px;
+}
+.introduction_panels .years_work_experience {
+    background: url('../images/7years_work_experience.jpg');
+    width: 228px;
+    height: 241px;
+    float: left;
+    margin-left: 38px;
+}
+
+.content {
+    width: 847px;
+    margin: 0 auto;
+}
+.content table {
+    width: 770px;
+    margin-left: 21px;
+}
+
+.left-line {
+    border-left: 1px #d9d9d9 solid;
+}
+.bottom-line {
+    border-bottom: 1px #d9d9d9 solid;
+}
+.side-text {
+	color: #000000;
+	font-size: 12px;
+	padding: 3px 10px 0 10px;
+}
+.side-text p {
+	margin-top:0;
+	margin-bottom:6px;
+}
+
+.search {
+    width: 847px !important;
+    border: 1px #d9d9d9 solid;
+    padding-top: 16px !important;
+    margin-top: 15px !important;
+    text-align: left !important;
+    color: #000000;
+}
+.search td {
+    font-size: 14px !important;
+}
+.search .bottom-line {
+    padding-left: 31px;
+    padding-bottom: 13px;
+}
+.search form {
+    padding: 16px 0 14px;
+}
+.search #keywords {
+    border: 1px #abadb3 solid;
+    width: 558px !important;
+    height: 22px;
+    margin-left: 67px;
+}
+.search .overTxtLabel {
+    color: #000000;
+    font-size: 13px !important;
+    margin-top: 5px;
+    position: absolute;
+    margin-left:-550px;
+}
+.search .submitbut {
+    background: #f0f0f0;
+    border: 1px #cccccc solid;
+    font-size: 12px;
+    width: 84px;
+    height: 26px;
+}
+.search input, .search .scope, label.overTxtLabel {
+    font-size: 12px !important;
+}
+.search-jobs {
+    float: right;
+    margin: 16px 25px 0 0;
+}
+
+.top_jobs {
+    width: 847px !important;
+    margin-top: 13px !important;
+    margin-bottom: 43px !important;
+}
+.top_jobs .bottom-line {
+    padding-left: 31px;
+    padding-bottom: 4px;
+    padding-top:20px;
+    position: relative;
+}
+#top_jobs_table {
+    width: 784px !important;
+    margin-top: 17px !important;
+    color: #8b8987;
+}
+#top_jobs_table td.header {
+    font-size: 16px;
+    color: #4b4b4b;
+    padding-bottom: 9px;
+}
+#top_jobs_table a {
+    color: #fc8f02;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#top_employers {
+    background-image: none !important;
+}
+#top_employers #employers_carousel table {
+    width: 869px !important;
+}
+#top_employers #employers_carousel table td.nav-center {
+    background-image: none !important;
+}
+#top_employers #employers_carousel {
+    width: 869px !important;
+}
+#top_employers #employers_carousel .bottom-line {
+    margin: 0 14px 5px 8px;
+    padding: 0 0 14px 30px;
+}
+
+div .orangecolor {
+    color: #fc8f02;
+}
+
+.search #employer, .search #industry, .search #country {
+    font-size: 12px !important;
+}
+
+table.totals td {
+	color:#FC8F02;
+	font-size:11pt;
+}
+table.totals td strong, table.totals td div {
+	color:black;
+}
+#welcome_top .loginpanel a.employer {
+	color:#FC8F02;
+}
+#welcome_top .loginpanel a.employer:hover {
+	color:#ffffff;
+}

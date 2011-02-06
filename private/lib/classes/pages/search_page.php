@@ -98,60 +98,34 @@ class SearchPage extends Page {
                     ?>
                         <div class="job_short_details">
                             <div class="job_title">
-                                <span class="industry"><?php echo $row['industry'] ?></span>
                                 <a href="./job/<?php echo $row['id']; ?>"><?php echo $row['title'] ?></a>
                             </div>
                             <div class="employer">
                                 <?php 
                                     echo (!is_null($row['alternate_employer']) && !empty($row['alternate_employer'])) ? $row['alternate_employer'] : $row['employer'];
                                 ?>
-                                <span class="country"><?php echo $row['country'] ?></span>                    
-                            </div>
-                            <div class="description">
-                                <?php
-                                $new_lines = array("\r", "\n", "\r\n");
-                                $description = desanitize($row['description']);
-                                $description = str_replace('&amp;', '&', $description);
-                                $description = str_replace('&lt;', '<', $description);
-                                $description = str_replace('&gt;', '>', $description);
-                                $description = str_replace('<br>', ' ', $description);
-                                $description = str_replace('<br/>', ' ', $description);
-                                $description = str_replace('<br />', ' ', $description);
-                                $description = str_replace('&nbsp;', ' ', $description);
-                                $description = str_replace($new_lines, ' ', $description);
-                                $description = preg_replace('/<(.|\n)*?>/', ' ', $description);
-                                
-                                $words = explode(' ', $description);
-                                $short_description = '';
-                                foreach ($words as $w=>$word) {
-                                    if ($w < 50) {
-                                        $short_description .= trim($word). ' ';
-                                    }
-                                }
-                                echo $short_description. '...';
-                                ?>
+                                <span class="country"><?php echo $row['country'] ?></span> | <span class="industry"><?php echo $row['industry'] ?></span>
                             </div>
                             <div class="date_and_salary">
-                                <span class="salary">
+                                    Salary Range: 
                                 <?php 
                                     echo $row['currency']. '$ '. number_format($row['salary'], 2, '.', ',');
                                     if (!empty($row['salary_end']) && !is_null($row['salary_end'])) {
                                         echo ' - '. number_format($row['salary_end'], 2, '.', ',');
                                     }
                                 ?>
-                                </span>
-                                &nbsp;
-                                <span class="reward">Potential Reward: 
+                                <br/>
+                                Recommender's Cash Bonus: 
                                 <?php 
                                     echo $row['currency']. '$ '. number_format($row['potential_reward'], 2, '.', ',');
                                 ?>
-                                </span>
-                                &nbsp;
+                                <br/>
+                                <br/>
                                 <span class="controls">
-                                    <a href="./job/<?php echo $row['id'] ?>?refer=1">Refer Now</a>
-                                    |
-                                    <a href="./job/<?php echo $row['id'] ?>?apply=1">Explore Now</a>
-                                    |
+                                    <a href="./job/<?php echo $row['id'] ?>?refer=1">Recommend Someone</a>
+                                    <span class="black">|</span>
+                                    <a href="./job/<?php echo $row['id'] ?>?apply=1">Explore This Opportunity</a>
+                                    <span class="black">|</span>
                                     <a href="./job/<?php echo $row['id']; ?>">View Details</a>
                                 </span>
                             </div>
@@ -297,6 +271,15 @@ class SearchPage extends Page {
                             </div>
                             <div class="filter_button">
                                 <input type="button" value="Filter" onClick="filter_jobs();" />
+                            </div>
+                            <div class="practice">
+                                <div class="practice_title">Our Practice & Promise To You</div>
+                                <div class="practice_content"> 
+                                    <p>We always maintain confidentiality of our recommenders and will not disclose your name when you recommend someone to our consultants.</p><br/>
+
+                                    <p>We promise that you will receive your Cash Bonus within 2 weeks upon us receiving payment from our clients.</p>
+                                    <img src="<?php echo $this->url_root; ?>/common/images/shake_hand.jpg" />
+                                </div>
                             </div>
                         </div>
                     </td>

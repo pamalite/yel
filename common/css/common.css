@@ -1,5 +1,9 @@
+html, body, .wrap{
+	margin:0;
+	height: 100%;	
+}
 body, div, p, td, input, textarea, select {
-    font-family: Verdana, Arial, Helvetica;
+    font-family: "Nimbus Sans Becker L",Arial,Helvetica,sans-serif !important;
 }
 
 body {
@@ -163,9 +167,9 @@ table.top td.employee_help {
 }
 
 div.top {
-    padding-top: 5px;
-    text-align: center;
-    border-bottom: 1px solid #CCCCCC;
+	height: 68px;
+	background: url('../images/search_headbg.jpg') repeat-x;
+	padding-top: 0;
 }
 
 td.logo {
@@ -190,6 +194,24 @@ div.page_title {
 
 span.slogan {
     font-style: italic;
+}
+
+div.footer {
+    background: url('../images/footbg.jpg') repeat-x;
+    color: #ffffff;
+    height: 130px;
+    padding-top: 32px;
+}
+div.footer a {
+    color: #fc8f02;
+}
+div.footer a:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+div.footer table {
+    font-size: 12px;
+    margin: 0 auto;
 }
 
 div.footer p {
@@ -308,7 +330,16 @@ option.main_industry {
 }
 
 #mini_keywords {
-    width: 465px;
+	width: 467px;
+	height: 20px;
+	border: 1px #abadb3 solid;
+}
+
+#mini_search_button {
+	border: 1px #cccccc solid;
+	background: #f0f0f0;
+	padding: 0 5px;
+	height: 25px;
 }
 
 #industry {
@@ -399,4 +430,105 @@ p.small_notes {
 .overTxtLabel {
     font-size: 9pt;
     color: #AAAAAA;
+}
+
+.top_logo {
+	padding-top: 0;
+	width: 435px;
+	text-align: left;
+}
+
+div.skinned-select {
+        margin-right: 5px;
+        float: left;
+}
+div.skinned-select select {
+	opacity: 0;
+	filter: alpha(opacity = 0);
+	moz-opacity: 0;
+	position: relative;
+	z-index: 100;
+}
+div.skinned-select .select-text {
+	position: absolute;
+	text-indent: 3px;
+	z-index: 1;
+}
+
+div.skinned-select .select-text,
+div.skinned-select select,
+div.skinned-select select option {
+	color: #000;
+}
+/* non javascript version select */
+.my-skinnable-select select {
+  width: 262px;
+  border: 1px solid #D5E6EE;
+}
+.clear {
+	clear: both;
+}
+
+
+.select-wrap1 {
+	height: 23px;
+	width: 790px;
+	padding-top: 10px;
+}
+
+.selectbox1 {
+	background: url('../images/search_select1.jpg');
+	width: 185px;
+	height: 20px;
+        float: left;
+}
+.selectbox1 select {
+	height: 20px;
+	width: 185px !important;
+}
+.selectbox1 .select-text {
+	width: 185px;
+	line-height: 20px;
+}
+.selectbox2 {
+	background: url('../images/search_select2.jpg');
+	width: 107px;
+	height: 20px;
+        float: left;
+}
+.selectbox2 select {
+	height: 20px;
+	width: 107px !important;
+}
+.selectbox2 .select-text {
+	width: 107px;
+	line-height: 20px;
+}
+.selectbox3 {
+	background: url('../images/search_select3.jpg');
+	width: 123px;
+	height: 20px;
+        float: left;
+}
+.selectbox3 select {
+	height: 20px;
+	width: 123px !important;
+}
+.selectbox3 .select-text {
+	width: 123px;
+	line-height: 20px;
+}
+.selectbox4 {
+	background: url('../images/search_select4.jpg');
+	width: 45px;
+	height: 20px;
+        float: left;
+}
+.selectbox4 select {
+	height: 20px;
+	width: 45px !important;
+}
+.selectbox4 .select-text {
+	width: 45px;
+	line-height: 20px;
 }

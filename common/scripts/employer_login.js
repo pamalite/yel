@@ -1,3 +1,4 @@
+var employers_index = 0;
 var seed = "";
 var sid = "";
 
@@ -140,11 +141,64 @@ function show_contact_drop_form() {
     show_window('contact_drop_form');
 }
 
+function set_employers_mouse_events() {
+    var employers = new Array();
+    var number_of_tabs = 0;
+    
+    for (var i=0; i < $('employer_tabs').childNodes.length; i++) {
+        if ($('employer_tabs').childNodes[i].nodeName == 'DIV') {
+            number_of_tabs++;
+        }
+    }
+    
+    for (var i=0; i < number_of_tabs; i++) {
+        var tab = 'employers_' + i;
+        employers[i] = new Fx.Tween(tab);
+        
+        if (i > 0) {
+            employers[i].set('display', 'none');
+        }
+    }
+    
+    $('toggle_right').addEvent('click', function(e) {
+        e.stop();
+        
+        employers[employers_index].start('opacity', '0');
+        employers[employers_index].set('display', 'none');
+        
+        employers_index++;
+        if (employers_index >= number_of_tabs) {
+            employers_index = 0;
+        }
+        
+        employers[employers_index].set('display', 'block');
+        employers[employers_index].set('opacity', '0');
+        employers[employers_index].start('opacity', '1');
+    });
+    
+    $('toggle_left').addEvent('click', function(e) {
+        e.stop();
+        
+        employers[employers_index].start('opacity', '0');
+        employers[employers_index].set('display', 'none');
+        
+        employers_index--;
+        if (employers_index < 0) {
+            employers_index = number_of_tabs - 1;
+        }
+        
+        employers[employers_index].set('display', 'block');
+        employers[employers_index].set('opacity', '0');
+        employers[employers_index].start('opacity', '1');
+    });
+}
+
 function onDomReady() {
     initialize_page();
     get_seed();
     $('login').addEvent('click', login);
-    $('drop').addEvent('click', drop_contact_now);
+    // $('drop').addEvent('click', drop_contact_now);
+    set_employers_mouse_events();
 }
 
 window.addEvent('domready', onDomReady);
