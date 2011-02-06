@@ -6,6 +6,8 @@ class EmployerResumesPage extends Page {
     private $employer = NULL;
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->employer = new Employer($_session['id'], $_session['sid']);
     }
     
@@ -14,21 +16,15 @@ class EmployerResumesPage extends Page {
     }
     
     public function insert_employer_resumes_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employer_resumes.css">'. "\n";
+        $this->insert_css('employer_resumes.css');
     }
     
     public function insert_employer_resumes_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employer_resumes.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'employer_resumes.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employer->getId(). '";'. "\n";
+        $script = 'var id = "'. $this->employer->getId(). '";'. "\n";
         
         $criteria = array(
             'columns' => "CONCAT(employees.firstname, ', ', employees.lastname) AS employee_name,
@@ -38,9 +34,10 @@ class EmployerResumesPage extends Page {
         );
         $result = $this->employer->find($criteria);
         
-        echo 'var employee_name = "'. htmlspecialchars_decode($result[0]['employee_name']). '";'. "\n";
-        echo 'var employee_email = "'. $result[0]['email_addr']. '";'. "\n";
-        echo '</script>'. "\n";
+        $script .= 'var employee_name = "'. htmlspecialchars_decode($result[0]['employee_name']). '";'. "\n";
+        $script .= 'var employee_email = "'. $result[0]['email_addr']. '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function get_referred_jobs() {

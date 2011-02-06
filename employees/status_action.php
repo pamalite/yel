@@ -47,6 +47,7 @@ if ($_POST['action'] == 'get_applications') {
                            (referrals.employed_on IS NULL OR referrals.employed_on = '0000-00-00') AND 
                            (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 
                            (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00')";
+                break;
            case 'confirmed':
                $match .= "AND (referrals.referee_confirmed_hired_on IS NOT NULL AND referrals.referee_confirmed_hired_on <> '0000-00-00') AND 
                           (referrals.employer_rejected_on IS NULL OR referrals.employer_rejected_on = '0000-00-00') AND 

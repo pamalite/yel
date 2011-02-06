@@ -5,6 +5,8 @@ class EmployerProfilePage extends Page {
     private $employer = NULL;
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->employer = new Employer($_session['id'], $_session['sid']);
     }
     
@@ -13,21 +15,17 @@ class EmployerProfilePage extends Page {
     }
     
     public function insert_employer_profile_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employer_profile.css">'. "\n";
+        $this->insert_css('employer_profile.css');
     }
     
     public function insert_employer_profile_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employer_profile.js"></script>'. "\n";
+        $this->insert_scripts('employer_profile.js');
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employer->getId(). '";'. "\n";
-        echo '</script>'. "\n";
+        $script = 'var id = "'. $this->employer->getId(). '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function generate_countries($_selected, $_name = 'country') {

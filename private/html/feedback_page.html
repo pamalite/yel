@@ -1,0 +1,66 @@
+<div id="div_status" class="status">
+    <span id="span_status" class="status">%error_message%</span>
+</div>
+
+<div style="text-align: center; font-size: 12pt; padding-top: 100px; display: %is_success%">
+    Your feedback had been received. Thank you!
+</div>
+
+<div class="profile" style="display: %show_form%;">
+    <form id="profile" method="post" action="feedback_action.php" onSubmit="return validate();">
+        <table class="profile_form">
+            <tr>
+                <td class="instruction" colspan="2">Please fill up <span style="font-weight: bold; text-decoration: underline;">ALL</span> fields.</td>
+            </tr>
+            <tr>
+                <td class="section_title" colspan="2">About You &amp; Your Feedback</td>
+            </tr>
+            <tr>
+                <td class="label"><label for="firstname">First Name / Given Names:</label></td>
+                <td class="field"><input class="field" type="text" id="firstname" name="firstname" value="%firstname%" /></td>
+            </tr>
+            <tr>
+                <td class="label"><label for="lastname">Last Name / Surname:</label></td>
+                <td class="field">
+                    <input class="field" type="text" id="lastname" name="lastname" value="%lastname%" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="email_addr">E-mail Address:</label></td>
+                <td class="field">
+                    <input class="field" type="text" id="email_addr" name="email_addr" value="%email_addr%" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="country">Country:</label></td>
+                <td class="field">
+                    %countries%
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="feedback">Feedback:</label></td>
+                <td class="field">
+                    <textarea class="field" id="feedback" name="feedback">%feedback%</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td class="label">Security:</td>
+                <td class="field">
+                    <script type="text/javascript"  src="http://www.google.com/recaptcha/api/challenge?k=6LdwqsASAAAAAJuZpFkYJo6a0-QAJET_OafO3n6D"></script>
+                    <noscript>
+                        <iframe src="http://www.google.com/recaptcha/api/noscript?k=6LdwqsASAAAAAJuZpFkYJo6a0-QAJET_OafO3n6D"
+                             height="300" width="500" frameborder="0" id="recaptcha"></iframe><br/>
+                         <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+                         <input type="hidden" name="recaptcha_response_field" value="manual_challenge" />
+                    </noscript>
+                </td>
+            </tr>
+            <tr>
+                <td class="buttons_bar" colspan="2">
+                    <input type="submit" id="submit" value="Send Feedback" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+

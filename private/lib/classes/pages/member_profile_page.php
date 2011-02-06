@@ -6,6 +6,8 @@ class MemberProfilePage extends Page {
     private $error_message = '';
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->member = new Member($_session['id'], $_session['sid']);
     }
     
@@ -24,26 +26,21 @@ class MemberProfilePage extends Page {
     }
     
     public function insert_member_profile_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/member_profile.css">'. "\n";
+        $this->insert_css('member_profile.css');
     }
     
     public function insert_member_profile_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/member_profile.js"></script>'. "\n";
+        $this->insert_scripts('member_profile.js');
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->member->getId(). '";'. "\n";
+        $script = 'var id = "'. $this->member->getId(). '";'. "\n";
         
         if (!empty($this->error_message)) {
-            echo "alert(\"". $this->error_message. "\");\n";
+            $script .= "alert(\"". $this->error_message. "\");\n";
         }
         
-        echo '</script>'. "\n";
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function generate_countries($_selected, $_name = 'country') {

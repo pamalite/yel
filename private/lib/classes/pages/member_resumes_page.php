@@ -7,6 +7,8 @@ class MemberResumesPage extends Page {
     private $error_message = '';
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->member = new Member($_session['id'], $_session['sid']);
     }
     
@@ -31,27 +33,21 @@ class MemberResumesPage extends Page {
     }
     
     public function insert_member_resumes_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/member_resumes.css">'. "\n";
+        $this->insert_css('member_resumes.css');
     }
     
     public function insert_member_resumes_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/member_resumes.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'member_resumes.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->member->getId(). '";'. "\n";
+        $script = 'var id = "'. $this->member->getId(). '";'. "\n";
         
         if (!empty($this->error_message)) {
-            echo "alert(\"". $this->error_message. "\");\n";
+            $script .= "alert(\"". $this->error_message. "\");\n";
         }
         
-        echo '</script>'. "\n";
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function get_resumes() {

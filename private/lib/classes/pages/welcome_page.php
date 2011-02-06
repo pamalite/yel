@@ -9,15 +9,11 @@ class WelcomePage extends Page {
     }
     
     public function insert_welcome_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/welcome.css">'. "\n";
+        $this->insert_css('welcome.css');
     }
     
     public function insert_welcome_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/welcome.js"></script>'. "\n";
+        $this->insert_scripts('welcome.js');
     }
     
     public function insert_inline_scripts() {
@@ -25,6 +21,8 @@ class WelcomePage extends Page {
     }
     
     private function generate_top_jobs() {
+        $top_jobs_html = '';
+        
         $criteria = array(
             'columns' => "jobs.id AS job_id, jobs.title AS position_title, jobs.salary AS salary_start, 
                           jobs.salary_end AS salary_end, jobs.potential_reward AS potential_reward, 
@@ -61,8 +59,10 @@ class WelcomePage extends Page {
                 $top_jobs_table->set($i+1, 3, $job['currency']. '$ '. number_format($job['potential_reward'], 0, '.', ','), '', '');
             }
 
-            echo $top_jobs_table->get_html();
+            $top_jobs_html = $top_jobs_table->get_html();
         } 
+        
+        return $top_jobs_html;
     }
     
     private function get_employers() {
@@ -126,155 +126,39 @@ class WelcomePage extends Page {
         $industries = $this->get_industries();
         $countries = $this->get_countries();
         
-        // $country = $_SESSION['yel']['country_code'];
-        // if (isset($_SESSION['yel']['member']) &&
-        //     !empty($_SESSION['yel']['member']['id']) && 
-        //     !empty($_SESSION['yel']['member']['sid']) && 
-        //     !empty($_SESSION['yel']['member']['hash'])) {
-        //     $member = new Member($_SESSION['yel']['member']['id']);
-        //     $country = $member->getCountry();
-        // }
+        $page = file_get_contents(dirname(__FILE__). '/../../../html/welcome_page.html');
+        $page = str_replace('%root%', $this->url_root, $page);
         
-        ?>
-        <div class="introduction_panels">
-            Introduction panels goes here.
-            <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
-            <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
-            <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
-            <div style="float: left; width: 24%; height: 80%; border: 1px solid white;">&nbsp;</div>
-        </div>
+        $employers_options = '';
+        foreach ($employers as $emp) {
+            $employers_options .= '<option value="'. $emp['id'].'">'. desanitize($emp['name']). '</option>'. "\n";
+        }
+        $page = str_replace('<!-- %employers_options% -->', $employers_options, $page);
         
-        <div class="search">
-            <form method="post" action="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/search.php" onSubmit="return verify();">
-                <select id="employer" name="employer">
-                    <option value="0">Any Employer</option>
-                    <option value="0" disabled>&nbsp;</option>
-                    <?php
-                    foreach ($employers as $emp) {
-                    ?>
-                    <option value="<?php echo $emp['id'] ?>">
-                        <?php echo desanitize($emp['name']); ?>
-                    </option>
-                    <?php
-                    }
-                    ?>
-                </select>
-                <select id="industry" name="industry">
-                    <option value="0">Any Specialization</option>
-                    <option value="0" disabled>&nbsp;</option>
-                    <?php
-                    foreach ($industries as $industry) {
-                        if ($industry['is_main']) {
-                            echo '<option value="'. $industry['id']. '" class="main_industry">';
-                            echo $industry['name'];
-                        } else {
-                            echo '<option value="'. $industry['id']. '">';
-                            echo '&nbsp;&nbsp;&nbsp;&nbsp;'. $industry['name'];
-                        }
+        $industries_options = '';
+        foreach ($industries as $industry) {
+            if ($industry['is_main']) {
+                $industries_options .= '<option value="'. $industry['id']. '" class="main_industry">'. $industry['name'];
+            } else {
+                $industries_options .= '<option value="'. $industry['id']. '">&nbsp;&nbsp;&nbsp;&nbsp;'. $industry['name'];
+            }
 
-                        if ($industry['job_count'] > 0) {
-                            echo '&nbsp;('. $industry['job_count']. ')';
-                        }
-                        echo '</option>'. "\n";
-                    }
-                    ?>
-                </select>
-                <select id="country" name="country">
-                    <option value="" selected>Any Country</option>
-                    <option value="" disabled>&nbsp;</option>
-                    <?php
-                    foreach ($countries as $a_country) {
-                        echo '<option value="'. $a_country['country_code']. '">'. $a_country['country']. '</option>'. "\n";
-                        // if ($country == $a_country['country_code']) {
-                        //     echo '<option value="'. $a_country['country_code']. '" selected>'. $a_country['country']. '</option>'. "\n";
-                        // } else {
-                        //     echo '<option value="'. $a_country['country_code']. '">'. $a_country['country']. '</option>'. "\n";
-                        // }
-                    }
-                    ?>
-                </select><br/>
-                <input type="text" name="keywords" id="keywords" value="" alt="Job title or keywords" />
-                <input type="submit" value="Search Jobs" />
-                <!-- br/>
-                <input type="radio" id="local" name="is_local" value="1" checked />
-                <label class="scope" for="local">local jobs</label>
-                &nbsp;
-                <input type="radio" id="international" name="is_local" value="0" />
-                <label class="scope" for="international">international jobs</label -->
-            </form>
-        </div>
+            if ($industry['job_count'] > 0) {
+                $industries_options .= '&nbsp;('. $industry['job_count']. ')';
+            }
+            $industries_options .= '</option>'. "\n";
+        }
+        $page = str_replace('<!-- %industries_options% -->', $industries_options, $page);
         
-        <div class="top_jobs">
-            <?php $this->generate_top_jobs() ?>
-        </div>
+        $countries_options = '';
+        foreach ($countries as $a_country) {
+            $countries_options .= '<option value="'. $a_country['country_code']. '">'. $a_country['country']. '</option>'. "\n";
+        }
+        $page = str_replace('<!-- %countries_options% -->', $countries_options, $page);
         
-        <div id="top_employers">
-            <div id="employers_carousel">
-                <table border="0" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td colspan="3"><img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/head-whousesye.jpg" width="328" height="46" style="margin-left: 45px; vertical-align: bottom;" /></td>
-                    </tr>
-                    <tr>
-                        <td width="23"><a id="toggle_left" class="no_link"><img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/nav-logo-left.jpg" width="23" height="134" class="prev" /></a></td>
-                        <td class="nav-center" id="employer_tabs">
-                            <div class="employer_logos" id="employers_0">
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=MATTEL_M&keywords=">
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/mattel.jpg" alt="Mattel" style="vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=wdc_m&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/wd.jpg" alt="Western Digital" style="vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=digi&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/digi.jpg" alt="digi" style="vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=altera&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/altera.jpg" alt="altera" style="vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=entegris&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/entegris.jpg" alt="entegris" style="width: 105px; height: 93px; vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=nuskin&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/nuskin.jpg" alt="nuskin" style="width: 105px; height: 93px; vertical-align: middle;" />
-                                </a>
-                            </div>
-                            <div class="employer_logos" id="employers_1">
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=rstn_m&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/rstn.jpg" alt="RSTN" style="vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=elawyer&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/el.jpg" alt="elawyers" style="width: 105px; height: 93px; vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=exabytes&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/ex.jpg" alt="Exabytes" style="width: 105px; vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=dsem&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/dsem.jpg" alt="dsem" style="width: 105px; height: 93px; vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=silterra&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/silterra.jpg" alt="silterra" style="width: 105px; height: 93px; vertical-align: middle;" />
-                                </a>
-                                &nbsp;&nbsp;&nbsp;
-                                <a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/search.php?industry=0&employer=ESS&keywords=" >
-                                    <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/logos/essence.jpg" alt="Essence" style="width: 105px; height: 93px; vertical-align: middle;" />
-                                </a>
-                            </div>
-                        </td>
-                        <td width="23"><a id="toggle_right" class="no_link"><img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/nav-logo-right.jpg" width="23" height="134" class="prev" /></a></td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+        $page = str_replace('<!-- %top_jobs% -->', $this->generate_top_jobs(), $page);
         
-        <?php
+        echo $page;
     }
 }
 ?>

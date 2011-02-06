@@ -61,7 +61,7 @@ if ($_POST['action'] == 'save_career_summary') {
 
 if ($_POST['action'] == 'save_job_profile') {
     $data = array();
-    $data['specialization'] = $_POST['specialization'];
+    // $data['specialization'] = $_POST['specialization'];
     $data['position_title'] = $_POST['position_title'];
     $data['position_superior_title'] = $_POST['superior_title'];
     $data['organization_size'] = $_POST['organization_size'];

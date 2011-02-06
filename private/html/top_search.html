@@ -1,0 +1,34 @@
+<div class="top">
+    <table class="top">
+        <tr>
+            <td class="top_logo">
+                <a href="%root%/index.php"><img name="logo" src="%root%/common/images/logos/top.jpg" /></a>
+            </td>
+            <td class="top_search">
+                <form method="post" action="%root%/search.php" onSubmit="return verify_mini();">
+                    <select id="mini_employer" name="employer">
+                        <option value="0">Any Employer</option>
+                        <option value="0" disabled>&nbsp;</option>
+                        <!-- %employers_options% -->
+                    </select>
+                    &nbsp;
+                    <select id="mini_industry" name="industry">
+                        <option value="0">Any Specialization</option>
+                        <option value="0" disabled>&nbsp;</option>
+                        <!-- %industries_options% -->
+                    </select>
+                    &nbsp;
+                    <select id="mini_country" name="country">
+                        <option value="" selected>Any Country</option>
+                        <option value="" disabled>&nbsp;</option>
+                        <!-- %countries_options% -->
+                    </select>
+                    <br/>
+                    <input type="text" name="keywords" id="mini_keywords" alt="Job title or keywords" value="" />
+                    &nbsp;
+                    <input id="mini_search_button" type="submit" value="Search Jobs">
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>

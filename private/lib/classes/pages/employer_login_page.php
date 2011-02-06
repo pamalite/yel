@@ -8,15 +8,11 @@ class EmployerLoginPage extends Page {
     }
     
     public function insert_employer_login_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employer_login.css">'. "\n";
+        $this->insert_css('employer_login.css');
     }
     
     public function insert_employer_login_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employer_login.js"></script>'. "\n";
+        $this->insert_scripts('employer_login.js');
     }
     
     public function insert_inline_scripts() {

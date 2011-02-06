@@ -1,0 +1,369 @@
+<div id="div_status" class="status">
+    <span id="span_status" class="status">%error_message%</span>
+</div>
+
+<table class="content">
+    <tr>
+        <td class="left_content">        
+            <div id="div_hrm_census" style="%display_hrm_questions%">
+                <div class="census_title">One-time Survey</div>
+                <div class="census_form">
+                    Please help us answer the following <span style="text-decoration: underline; font-weight: bold;">one-time</span> questions as part of our on-going effort to serve you better.<br/>
+                    <ol>
+                        <li>
+                            Gender: 
+                            <select id="gender">
+                                <option value="">Please select one</option>
+                                <option value="" disabled>&nbsp;</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </li>
+                        <li>
+                            Ethnicity:
+                            <select id="ethnicity">
+                                <option value="">Please select one</option>
+                                <option value="" disabled>&nbsp;</option>
+                                <option value="malay">Malay</option>
+                                <option value="chinese">Chinese</option>
+                                <option value="indian">Indian</option>
+                                <option value="caucasian">Caucasian</option>
+                                <option value="other">Other (please specify)</option>
+                            </select>
+                            <input type="text" id="ethnicity_txt" alt="specify only when Other is selected" value="" />
+                        </li>
+                        <li>
+                            Birth Date:
+                            %birthdate_day% %birthdate_month% 
+                            <input type="text" class="year" id="birthdate_year" alt="year" maxlength="4" value="" />
+                        </li>
+                    </ol>
+                </div>
+                <div class="buttons">
+                    <input type="button" value="Save &amp; Close Forever" onClick="save_census_answers();" />
+                </div>
+            </div>
+            
+            <div class="profile_completeness">
+                <div class="completeness_title">Profile Completeness:</div>
+                <div class="progress">
+                    <div id="progress_bar" style="width: %completeness_percent%%;"></div>
+                </div>
+                <div id="percent">%completeness_percent%%</div>
+                <div class="progress_details">
+                    Tip: <span id="details">%next_step%</span>
+                </div>
+            </div>
+            
+            <table>
+                <tr>
+                    <td style="width: 25%;">
+                        <div class="profile">
+                            <div class="profile_title">My Photo</div>
+                            <div class="profile_photo_area">
+                                <div class="photo">
+                                    %photo_html%
+                                </div>
+                                <div class="upload_button">
+                                    <input type="button" value="Upload Photo" onClick="show_upload_photo_popup();" />
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    
+                    <td>
+                        <div class="profile">
+                            <div class="profile_title">Career Profile [<a class="no_link" onClick="show_career_summary_popup();">edit</a>]</div>
+                            <div class="profile_form">
+                                Our recruitment consultants will identify relevant opportunities for you based on your Career Profile. Please keep your Career Profile as up-to-date as possible.<br/>
+                                <table class="profile_form_table">
+                                    <tr>
+                                        <td class="field">Currently looking for a job:</td>
+                                        <td>%is_active%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="field odd">Current job responsibilities / experiences:</td>
+                                        <td class="odd">
+                                            <span id="seeking_field">%seeking%</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="field">Current salary:</td>
+                                        <td>
+                                            <span id="current_salary_field">
+                                                %current_salary_currency%$ %current_salary% - %expected_salary_end%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="field">Expected salary:</td>
+                                        <td>
+                                            <span id="expected_salary_field">
+                                                %expected_salary_currency%$ %expected_salary% - %expected_salary_end%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="field odd" rowspan="2">Preferred Job Location:</td>
+                                        <td class="odd">
+                                            1. 
+                                            <span id="pref_job_loc_1_field">
+                                                %pref_job_loc_1%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="odd">
+                                            2. 
+                                            <span id="pref_job_loc_2_field">
+                                                %pref_job_loc_2%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="field">Willing to travel, or relocate:</td>
+                                        <td>
+                                            <span id="travel_field">
+                                                %can_travel%
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="field odd">Reason for leaving:</td>
+                                        <td class="odd">
+                                            <span id="leaving_field">
+                                                %reason_for_leaving%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="field odd">Notice period:</td>
+                                        <td class="odd">
+                                            <span id="notice_period_field">
+                                                %notice_period% months
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            
+            <div id="job_profiles" class="profile">
+                <div class="profile_title">Present &amp; Past Positions</div>
+                <div class="buttons">
+                    <input type="button" value="Add Position" onClick="show_job_profile_popup(0);" />
+                </div>
+                <div class="job_profiles">
+                    <div class="empty_results" style="display: %no_positions%;">No positions found.</div>
+                    %job_profiles_table%
+                </div>
+            </div>
+        </td>
+        
+        <td class="right_content">
+            <div class="quick_search">
+                <div class="quick_search_title">Quick Search</div>
+                <ul class="quick_search_list">
+                    <li><a href="../search.php?special=latest">Latest opportunities</a></li>
+                    <li><a href="../search.php?special=top">Top opportunities</a></li>
+                    <li>
+                        Opportunities by country:
+                        <ul class="quick_search_list_inner">
+                            <li><a href="../search.php?special=country&country=MY">Malaysia</a></li>
+                            <li><a href="../search.php?special=country&country=SG">Singapore</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        Opportunities by salary range:
+                        <ul class="quick_search_list_inner">
+                            <li><a href="../search.php?special=salary&range=0&country=%country_code%">above 8,000</a></li>
+                            <li><a href="../search.php?special=salary&range=1&country=%country_code%">7,000 - 8,000</a></li>
+                            <li><a href="../search.php?special=salary&range=2&country=%country_code%">6,000 - 7,000</a></li>
+                            <li><a href="../search.php?special=salary&range=3&country=%country_code%">5,000 - 6,000</a></li>
+                            <li><a href="../search.php?special=salary&range=4&country=%country_code%">4,000 - 5,000</a></li>
+                            <li><a href="../search.php?special=salary&range=5&country=%country_code%">3,000 - 4,000</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<!-- popup windows goes here -->
+<div id="upload_photo_window" class="popup_window">
+    <div class="popup_window_title">Upload Photo</div>
+    <form id="upload_photo_form" action="profile_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_upload_photo_popup(true);">
+        <div class="upload_photo_form">
+            <br/>
+            <input type="hidden" name="id" value="%upload_photo_member_id%" />
+            <input type="hidden" name="action" value="upload" />
+            <div id="upload_progress" style="text-align: center; width: 99%; margin: auto;">
+                Please wait while your photo is being uploaded... <br/><br/>
+                <img src="%root%/common/images/progress/circle_big.gif" /><br/><br/>
+                NOTE: To Safari/Chrome (WebKit) on Mac OS X users, the mentioned browsers have a problem uploading any file through this page. Please try Firefox to upload your resume.
+            </div>
+            <div id="upload_field" class="upload_field">
+                <input id="my_file" name="my_file" type="file" />
+                <div style="font-size: 9pt; margin-top: 15px;">
+                    <ol>
+                        <li>Only GIF (*.gif), JPEG (*.jpg, *.jpeg), Portable Network Graphics (*.png), TIFF (*.tiff) or Bitmap (*.bmp) with the file size of less than 150KB are allowed.</li>
+                        <li>Maximum photo resolution is 200 (width) x 220 (height) pixels.</li>
+                        <li>You can update your photo by uploading a new one.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="popup_window_buttons_bar">
+            <input type="submit" value="Upload Photo" />
+            <input type="button" value="Close" onClick="close_upload_photo_popup(false);" />
+        </div>
+    </form>
+</div>
+
+<div id="career_summary_window" class="popup_window">
+    <div class="popup_window_title">Career Summary</div>
+        <div class="career_summary_form">
+            <table class="career_summary_form_table">
+                <tr>
+                    <td class="field">Are you currently looking for a job?</td>
+                    <td>
+                        <select id="is_active">
+                            <option value="1" %is_active_yes_option%>Yes</option>
+                            <option value="0" %is_active_no_option%>No</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="field odd">Please describe your current job responsibilities / experiences to us.</td>
+                    <td class="odd">
+                        <textarea id="seeking">%seeking_txt%</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="field">What is your current salary? (please provide an estimated range)</td>
+                    <td>
+                        <select id="current_sal_currency">
+                            %current_salary_currency_options%
+                        </select>
+                        $&nbsp;
+                        <input type="text" id="current_sal_start" value="%current_salary_txt%" /> to <input type="text" id="current_sal_end" value="%current_salary_end_txt%" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="field">What is your expected salary? (please provide an estimated range)</td>
+                    <td>
+                        <select id="expected_sal_currency">
+                            %expected_salary_currency_options%
+                        </select>
+                        $&nbsp;
+                        <input type="text" id="expected_sal_start" value="%expected_salary_txt%" /> to <input type="text" id="expected_sal_end" value="%expected_salary_end_txt%" />
+                    </td>
+                </tr>
+                <tr>
+                    <td class="field odd" rowspan="2">What is your preferred job location?</td>
+                    <td class="odd">
+                        %pref_job_loc_1_select%
+                    </td>
+                </tr>
+                <tr>
+                    <td class="odd">
+                        %pref_job_loc_2_select%
+                    </td>
+                </tr>
+                <tr>
+                    <td class="field">Are you willing to travel / relocate?</td>
+                    <td>
+                        <select id="can_travel">
+                            <option value="Y" %can_travel_yes%>Yes</option>
+                            <option value="N" %can_travel_no%>No</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="field odd">Please share the reason for leaving your current job (push / pull factors):</td>
+                    <td class="odd">
+                        <textarea id="reason_leaving">%reason_for_leaving_txt%</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="field odd">What is your notice period?</td>
+                    <td class="odd">
+                        <input type="text" id="notice_period" value="%notice_period_txt%" /> months
+                    </td>
+                </tr>
+            </table>
+        </div>
+    <div class="popup_window_buttons_bar">
+        <input type="button" value="Save" onClick="close_career_summary_popup(true);" />
+        <input type="button" value="Cancel" onClick="close_career_summary_popup(false);" />
+    </div>
+</div>
+
+<div id="job_profile_window" class="popup_window">
+    <div class="popup_window_title">Job Profile</div>
+    <form onSubmit="return false;">
+        <input type="hidden" id="job_profile_id" value="0" />
+        <div class="job_profile_form">
+            <table class="job_profile_form">
+                <tr>
+                    <td class="label"><label for="position_title">Job Title:</label></td>
+                    <td class="field">
+                        <input class="field" type="text" id="position_title" name="position_title" />
+                        <br/>
+                        <span class="tips">eg: Financial Controller,  VP of Operations, etc.</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="position_superior_title">Reporting To:</label></td>
+                    <td class="field">
+                        <input class="field" type="text" id="position_superior_title" name="position_superior_title" />
+                        <br/>
+                        <span class="tips">eg: Financial Controller,  VP of Operations, etc.</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="organization_size">Positions reporting to you:</label></td>
+                    <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="work_from_month">Duration:</label></td>
+                    <td class="field">
+                        %work_from_month_select%
+                        <input type="text" class="year" maxlength="4" id="work_from_year" value="yyyy" /> 
+                        to 
+                        <span id="work_to_dropdown">
+                            %work_to_month_select%
+                            <input type="text" class="year" maxlength="4" id="work_to_year" value="yyyy" />
+                        </span>
+                        <input type="checkbox" id="work_to_present" onClick="toggle_work_to();" /> 
+                        <label for="work_to_present">Present</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="company">Employer:</label></td>
+                    <td class="field"><input class="field" type="text" id="company" name="company" /></td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="emp_desc">Employer Description:</label></td>
+                    <td class="field">
+                        %emp_desc_select%
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label"><label for="emp_specialization">Employer Specialization:</label></td>
+                    <td class="field">
+                        %industry_select%
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+    <div class="popup_window_buttons_bar">
+        <input type="button" value="Save" onClick="close_job_profile_popup(true);" />
+        <input type="button" value="Cancel" onClick="close_job_profile_popup(false);" />
+    </div>
+</div>
+

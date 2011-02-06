@@ -6,6 +6,8 @@ class EmployeeHomePage extends Page {
     private $clearances = array();
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->employee = new Employee($_session['id'], $_session['sid']);
         $this->clearances = $_session['security_clearances'];
     }
@@ -15,21 +17,17 @@ class EmployeeHomePage extends Page {
     }
     
     public function insert_employee_home_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_home_page.css">'. "\n";
+        $this->insert_css('employee_home_page.css');
     }
     
     public function insert_employee_home_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_home_page.js"></script>'. "\n";
+        $this->insert_scripts('employee_home_page.js');
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employee->getId(). '";'. "\n";
-        echo '</script>'. "\n";
+        $script = 'var id = "'. $this->employee->getId(). '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     public function show() {

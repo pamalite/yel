@@ -6,6 +6,8 @@ class MemberRecommendationsPage extends Page {
     private $member = NULL;
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->member = new member($_session['id'], $_session['sid']);
     }
     
@@ -14,22 +16,17 @@ class MemberRecommendationsPage extends Page {
     }
     
     public function insert_member_recommendations_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/member_recommendations.css">'. "\n";
+        $this->insert_css('member_recommendations.css');
     }
     
     public function insert_member_recommendations_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/member_recommendations.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'member_recommendations.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->member->getId(). '";'. "\n";
-        echo '</script>'. "\n";
+        $script = 'var id = "'. $this->member->getId(). '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     public function show() {

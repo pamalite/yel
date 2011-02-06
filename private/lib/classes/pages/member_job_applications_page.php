@@ -6,6 +6,8 @@ class MemberJobApplicationsPage extends Page {
     private $member = NULL;
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->member = new member($_session['id'], $_session['sid']);
     }
     
@@ -14,22 +16,17 @@ class MemberJobApplicationsPage extends Page {
     }
     
     public function insert_member_job_applications_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/member_job_applications.css">'. "\n";
+        $this->insert_css('member_job_applications.css');
     }
     
     public function insert_member_job_applications_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/member_job_applications.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'member_job_applications.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->member->getId(). '";'. "\n";
-        echo '</script>'. "\n";
+        $script = 'var id = "'. $this->member->getId(). '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     public function show() {
@@ -53,8 +50,8 @@ class MemberJobApplicationsPage extends Page {
             } else {
                 $applications_table = new HTMLTable('applications_table', 'applications');
                 
-                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'applied_on');\">Applied On</a>", '', 'header');
-                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'job');\">Job</a>", '', 'header');
+                $applications_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'applied_on');\">Explored On</a>", '', 'header');
+                $applications_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'job');\">Job Opportunity</a>", '', 'header');
                 $applications_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('referrals', 'employer');\">Employer</a>", '', 'header');
                 $applications_table->set(0, 3, "Resume Submitted", '', 'header');
                 $applications_table->set(0, 4, "&nbsp;", '', 'header actions');

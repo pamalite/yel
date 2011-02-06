@@ -80,8 +80,8 @@ function show_applications() {
                 var applications_table = new FlexTable('applications_table', 'applications');
                 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'applied_on');\">Applied On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'job');\">Job</a>", '', 'header'));
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'applied_on');\">Explored On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'job');\">Job Opportunity</a>", '', 'header'));
                 header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('referrals', 'employer');\">Employer</a>", '', 'header'));
                 header.set(3, new Cell("Resume Submitted", '', 'header'));
                 header.set(4, new Cell("&nbsp;", '', 'header actions'));

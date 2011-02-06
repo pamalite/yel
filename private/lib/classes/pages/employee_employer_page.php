@@ -10,6 +10,8 @@ class EmployeeEmployerPage extends Page {
     private $current_page = 'profile';
     
     function __construct($_session, $_employer_id = '') {
+        parent::__construct();
+        
         $this->employee = new Employee($_session['id'], $_session['sid']);
         
         if (!empty($_employer_id)) {
@@ -30,38 +32,31 @@ class EmployeeEmployerPage extends Page {
     }
     
     public function insert_employee_employer_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_employer.css">'. "\n";
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/job_desc.css">'. "\n";
+        $this->insert_css(array('employee_employer.css', 'job_desc.css'));
     }
     
     public function insert_employee_employer_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_employer.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'employee_employer.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employee->getId(). '";'. "\n";
-        echo 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
-        echo 'var current_page = "'. $this->current_page. '";'. "\n";
+        $script = 'var id = "'. $this->employee->getId(). '";'. "\n";
+        $script .= 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
+        $script .= 'var current_page = "'. $this->current_page. '";'. "\n";
         
         if ($this->is_new) {
-            echo 'var employer_id = "0";'. "\n";
+            $script .= 'var employer_id = "0";'. "\n";
             
             if (!is_null($this->employer)) {
-                echo 'var from_employer = "'. $this->employer->getId(). '"'. "\n";
+                $script .= 'var from_employer = "'. $this->employer->getId(). '"'. "\n";
             } else {
-                echo 'var from_employer = ""'. "\n";
+                $script .= 'var from_employer = ""'. "\n";
             }
         } else {
-            echo 'var employer_id = "'. $this->employer->getId(). '";'. "\n";
+            $script .= 'var employer_id = "'. $this->employer->getId(). '";'. "\n";
         }
         
-        echo '</script>'. "\n";
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function generate_countries($_selected, $_name = 'country') {

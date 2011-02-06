@@ -9,6 +9,8 @@ class MemberHomePage extends Page {
     private $error_message = '';
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->member = new Member($_session['id'], $_session['sid']);
         $this->mysqli = Database::connect();
     }
@@ -28,26 +30,21 @@ class MemberHomePage extends Page {
     }
     
     public function insert_member_home_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/member_home_page.css">'. "\n";
+        $this->insert_css('member_home_page.css');
     }
     
     public function insert_member_home_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/member_home_page.js"></script>'. "\n";
+        $this->insert_scripts('member_home_page.js');
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->member->getId(). '";'. "\n";
+        $script = 'var id = "'. $this->member->getId(). '";'. "\n";
         
         if (!empty($this->error_message)) {
-            echo "alert(\"". $this->error_message. "\");\n";
+            $script .= "alert(\"". $this->error_message. "\");\n";
         }
         
-        echo '</script>'. "\n";
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function get_completeness() {
@@ -150,39 +147,44 @@ class MemberHomePage extends Page {
     }
     
     private function generate_countries($_selected, $_name = 'country') {
+        $country_options_str = '<select class="field" id="'. $_name. '" name="'. $_name. '">'. "\n";
+        
         $criteria = array(
             'columns' => "country_code, country", 
             'order' => "country"
         );
         $countries = Country::find($criteria);
         
-        echo '<select class="field" id="'. $_name. '" name="'. $_name. '">'. "\n";
         if (empty($_selected) || is_null($_selected) || $_selected == '0') {
-            echo '<option value="0" selected>Please select a county.</option>'. "\n";    
+            $country_options_str .= '<option value="0" selected>Please select a county.</option>'. "\n";    
         } else {
-            echo '<option value="0">Please select a country.</option>'. "\n";
+            $country_options_str .= '<option value="0">Please select a country.</option>'. "\n";
         }
         
-        echo '<option value="0">&nbsp;</option>';
+        $country_options_str .= '<option value="0">&nbsp;</option>';
         foreach ($countries as $country) {
             if ($country['country_code'] != $_selected) {
-                echo '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
+                $country_options_str .= '<option value="'. $country['country_code']. '">'. $country['country']. '</option>'. "\n";
             } else {
-                echo '<option value="'. $country['country_code']. '" selected>'. $country['country']. '</option>'. "\n";
+                $country_options_str .= '<option value="'. $country['country_code']. '" selected>'. $country['country']. '</option>'. "\n";
             }
         }
         
-        echo '</select>'. "\n";
+        $country_options_str .= '</select>'. "\n";
+        
+        return $country_options_str;
     }
     
     private function generate_industries($_id, $_selecteds, $_is_multi=false) {
+        $industries_options_str = '';
+        
         $criteria = array('columns' => "id, industry, parent_id");
         $industries = Industry::find($criteria);
         
         if ($_is_multi) {
-            echo '<select class="multiselect" id="'. $_id. '" name="'. $_id. '[]" multiple>'. "\n";
+            $industries_options_str = '<select class="multiselect" id="'. $_id. '" name="'. $_id. '[]" multiple>'. "\n";
         } else {
-            echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+            $industries_options_str = '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
         }
         
         $options_str = '';
@@ -209,32 +211,36 @@ class MemberHomePage extends Page {
             }
         }
         
-        echo '<option value="0" '. (($has_selected) ? '' : 'selected'). '>Select a Specialization</option>'. "\n";
-        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
-        echo $options_str;
-        echo '</select>'. "\n";
+        $industries_options_str .= '<option value="0" '. (($has_selected) ? '' : 'selected'). '>Select a Specialization</option>'. "\n";
+        $industries_options_str .= '<option value="0" disabled>&nbsp;</option>'. "\n";
+        $industries_options_str .= $options_str;
+        $industries_options_str .= '</select>'. "\n";
+        
+        return $industries_options_str;
     }
     
     private function generate_employer_description($_id, $_selected) {
         $descs = $GLOBALS['emp_descs'];
         
-        echo '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
+        $emp_descs_options_str = '<select class="field" id="'. $_id. '" name="'. $_id. '">'. "\n";
         if (empty($_selected) || is_null($_selected) || $_selected < 0) {
-            echo '<option value="0" selected>Please select one</option>'. "\n";    
+            $emp_descs_options_str .= '<option value="0" selected>Please select one</option>'. "\n";    
         } else {
-            echo '<option value="0">Please select One</option>'. "\n";
+            $emp_descs_options_str .= '<option value="0">Please select One</option>'. "\n";
         }
         
-        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
+        $emp_descs_options_str .= '<option value="0" disabled>&nbsp;</option>'. "\n";
         foreach ($descs as $i=>$desc) {
             if ($i != $_selected) {
-                echo '<option value="'. $i. '">'. $desc. '</option>'. "\n";
+                $emp_descs_options_str .= '<option value="'. $i. '">'. $desc. '</option>'. "\n";
             } else {
-                echo '<option value="'. $i. '" selected>'. $desc. '</option>'. "\n";
+                $emp_descs_options_str .= '<option value="'. $i. '" selected>'. $desc. '</option>'. "\n";
             }
         }
         
-        echo '</select>'. "\n";
+        $emp_descs_options_str .= '</select>'. "\n";
+        
+        return $emp_descs_options_str;
     }
     
     public function show() {
@@ -280,510 +286,169 @@ class MemberHomePage extends Page {
         
         $job_profiles = $this->get_job_profiles();
         
-        ?>
-        <div id="div_status" class="status">
-            <span id="span_status" class="status"></span>
-        </div>
+        $page = file_get_contents(dirname(__FILE__). '/../../../html/member_home_page.html');
+        $page = str_replace('%root%', $this->url_root, $page);
+        $page = str_replace('%country_code%', $country, $page);
+        $page = str_replace('%country%', Country::getCountryFrom($country), $page);
+        $page = str_replace('%currency%', $currency, $page);
         
-        <table class="content">
-            <tr>
-                <td class="left_content">        
-                    <div id="div_hrm_census" style="<?php echo $display_hrm_questions; ?>">
-                        <div class="census_title">One-time Survey</div>
-                        <div class="census_form">
-                            Please help us answer the following <span style="text-decoration: underline; font-weight: bold;">one-time</span> questions as part of our on-going effort to serve you better.<br/>
-                            <ol>
-                                <li>
-                                    Gender: 
-                                    <select id="gender">
-                                        <option value="">Please select one</option>
-                                        <option value="" disabled>&nbsp;</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                    </select>
-                                </li>
-                                <li>
-                                    Ethnicity:
-                                    <select id="ethnicity">
-                                        <option value="">Please select one</option>
-                                        <option value="" disabled>&nbsp;</option>
-                                        <option value="malay">Malay</option>
-                                        <option value="chinese">Chinese</option>
-                                        <option value="indian">Indian</option>
-                                        <option value="caucasian">Caucasian</option>
-                                        <option value="other">Other (please specify)</option>
-                                    </select>
-                                    <input type="text" id="ethnicity_txt" alt="specify only when Other is selected" value="" />
-                                </li>
-                                <li>
-                                    Birth Date:
-                                    <?php echo generate_dropdown('birthdate_day', '', 1, 31, '', 2, 'Day'); ?>
-                                    <?php echo generate_month_dropdown('birthdate_month', '', 'Month'); ?>
-                                    <input type="text" class="year" id="birthdate_year" alt="year" maxlength="4" value="" />
-                                </li>
-                            </ol>
-                        </div>
-                        <div class="buttons">
-                            <input type="button" value="Save &amp; Close Forever" onClick="save_census_answers();" />
-                        </div>
-                    </div>
+        // if (!empty($this->error_message)) {
+        //     $page = str_replace('%error_message%', $this->error_message, $page);
+        // } else {
+        //     $page = str_replace('%error_message%', '', $page);
+        // }
+        
+        // HRM
+        $page = str_replace('%display_hrm_questions%', $display_hrm_questions, $page);
+        $page = str_replace('%birthdate_day%', generate_dropdown('birthdate_day', '', 1, 31, '', 2, 'Day'), $page);
+        $page = str_replace('%birthdate_month%', generate_month_dropdown('birthdate_month', '', 'Month'), $page);
+        
+        // completeness
+        $page = str_replace('%completeness_percent%', $completeness_percent, $page);
+        $page = str_replace('%next_step%', $next_step, $page);
+        
+        // photo
+        $photo_html = '<div style="text-align: center; margin: auto;">Upload your photo here by clicking the "Upload Photo" button.</div>';
+        if ($this->member->hasPhoto()) {
+            $photo_html = '<img id="photo_image" class="photo_image" src="candidate_photo.php?id='. $this->member->getId(). '" />';
+        }
+        $page = str_replace('%photo_html%', $photo_html, $page);
+        
+        // career profile
+        $is_active_str = 'No';
+        if ($is_active) {
+            $is_active_str = 'Yes';
+        }
+        $page = str_replace('%is_active%', $is_active_str, $page);
+        
+        $seeking_txt = str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['seeking']);
+        $page = str_replace('%seeking%', $seeking_txt, $page);
+        
+        $page = str_replace('%expected_salary_currency%', $answers['expected_salary_currency'], $page);
+        $page = str_replace('%expected_salary%', number_format($answers['expected_salary'], 2, '.', ','), $page);
+        $page = str_replace('%expected_salary_end%', number_format($answers['expected_salary_end'], 2, '.', ','), $page);
+        
+        $page = str_replace('%current_salary_currency%', $answers['current_salary_currency'], $page);
+        $page = str_replace('%current_salary%', number_format($answers['current_salary'], 2, '.', ','), $page);
+        $page = str_replace('%current_salary_end%', number_format($answers['current_salary_end'], 2, '.', ','), $page);
+        
+        $page = str_replace('%pref_job_loc_1%', $answers['pref_job_location_1'], $page);
+        $page = str_replace('%pref_job_loc_2%', $answers['pref_job_location_2'], $page);
+        
+        if ($answers['can_travel_relocate'] == 'Y') {
+            $page = str_replace('%can_travel%', 'Yes', $page);
+        } else {
+            $page = str_replace('%can_travel%', 'No', $page);
+        }
+        
+        $reason_for_leaving_txt = str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['reason_for_leaving']);
+        $page = str_replace('%reason_for_leaving%', $reason_for_leaving_txt, $page);
+        
+        $page = str_replace('%notice_period%', $answers['notice_period'], $page);
+        
+        // job profiles
+        if (empty($job_profiles)) {
+            $page = str_replace('%no_positions%', 'block', $page);
+            $page = str_replace('%job_profiles_table%', '', $page);
+        } else {
+            $page = str_replace('%no_positions%', 'none', $page);
+            
+            $job_profiles_table = new HTMLTable('job_profiles_table', 'job_profiles');
 
-                    <div class="profile_completeness">
-                        <div class="completeness_title">Profile Completeness:</div>
-                        <div class="progress">
-                            <div id="progress_bar" style="width: <?php echo $completeness_percent; ?>%;"></div>
-                        </div>
-                        <div id="percent"><?php echo $completeness_percent; ?>%</div>
-                        <div class="progress_details">
-                            Tip: <span id="details"><?php echo $next_step; ?></span>
-                        </div>
-                    </div>
-                    
-                    <table>
-                        <tr>
-                            <td style="width: 25%;">
-                                <div class="profile">
-                                    <div class="profile_title">My Phoho</div>
-                                    <div class="profile_photo_area">
-                                        <div class="photo">
-                                        <?php
-                                        if ($this->member->hasPhoto()) {
-                                        ?>
-                                            <img id="photo_image" class="photo_image" src="candidate_photo.php?id=<?php echo $this->member->getId(); ?>" />
-                                        <?php
-                                        } else {
-                                        ?>
-                                            <div style="text-align: center; margin: auto;">
-                                                Upload your photo here by clicking the "Upload Photo" button.
-                                            </div>
-                                        <?php
-                                        }
-                                        ?>
-                                        </div>
-                                        <div class="upload_button">
-                                            <input type="button" value="Upload Photo" onClick="show_upload_photo_popup();" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="profile">
-                                    <div class="profile_title">Summary [<a class="no_link" onClick="show_career_summary_popup();">edit</a>]</div>
-                                    <div class="profile_form">
-                                        Please help us answer the following questions as part of our on-going effort to understand you better. You may also update youe answers if necessary.<br/>
-                                        <table class="profile_form_table">
-                                            <tr>
-                                                <td class="field">Are you actively seeking for a new job or experience?</td>
-                                                <td>
-                                                    <?php
-                                                    if ($is_active) {
-                                                    ?>
-                                                    Yes
-                                                    <?php
-                                                    } else {
-                                                    ?>
-                                                    No
-                                                    <?php    
-                                                    }
-                                                    ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="field odd">Briefly, tell us what are job responsibilities and experiences.</td>
-                                                <td class="odd">
-                                                    <span id="seeking_field">
-                                                    <?php
-                                                        echo str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['seeking']);
-                                                    ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="field">What will be your expected salary range?</td>
-                                                <td>
-                                                    <span id="expected_salary_field">
-                                                    <?php 
-                                                        echo $answers['expected_salary_currency']. '$&nbsp;';
-                                                        echo number_format($answers['expected_salary'], 2, '.', ' '). ' to '. number_format($answers['expected_salary_end'], 2, '.', ' ');
-                                                    ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="field odd" rowspan="2">Preferred Job Location?</td>
-                                                <td class="odd">
-                                                    1. 
-                                                    <span id="pref_job_loc_1_field">
-                                                    <?php 
-                                                        echo $answers['pref_job_location_1'];
-                                                    ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="odd">
-                                                    2. 
-                                                    <span id="pref_job_loc_2_field">
-                                                    <?php 
-                                                        echo $answers['pref_job_location_2'];
-                                                    ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="field">Perhaps you can travel, or relocate, if the new job requires it?</td>
-                                                <td>
-                                                    <span id="travel_field">
-                                                    <?php
-                                                        echo ($answers['can_travel_relocate'] == 'Y') ? 'Yes' : 'No';
-                                                    ?>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="field odd">Briefly, why do you want to leave your current job?</td>
-                                                <td class="odd">
-                                                    <span id="leaving_field">
-                                                    <?php
-                                                        echo str_replace(array("\r\n", "\r", "\n"), '<br/>', $answers['reason_for_leaving']);
-                                                    ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="field">What is your current salary range?</td>
-                                                <td>
-                                                    <span id="current_salary_field">
-                                                    <?php 
-                                                        echo $answers['current_salary_currency']. '$&nbsp;';
-                                                        echo number_format($answers['current_salary'], 2, '.', ' ') .' to '.  number_format($answers['current_salary_end'], 2, '.' , ' ');
-                                                    ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="field odd">What is your notice period?</td>
-                                                <td class="odd">
-                                                    <span id="notice_period_field">
-                                                    <?php
-                                                        echo $answers['notice_period']. ' months';
-                                                    ?>
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                    
-                    <div id="job_profiles" class="profile">
-                        <div class="profile_title">Positions Held &amp; Currently Holding</div>
-                        <div class="buttons">
-                            <input type="button" value="Add Position" onClick="show_job_profile_popup(0);" />
-                        </div>
-                        <div class="job_profiles">
-                        <?php
-                        if (empty($job_profiles)) {
-                        ?>
-                        <div class="empty_results">No positions found.</div>
-                        <?php
-                        } else {
-                            $job_profiles_table = new HTMLTable('job_profiles_table', 'job_profiles');
+            $job_profiles_table->set(0, 0, '&nbsp;', '', 'header action');
+            $job_profiles_table->set(0, 1, 'From', '', 'header');
+            $job_profiles_table->set(0, 2, 'To', '', 'header');
+            $job_profiles_table->set(0, 3, 'Employer', '', 'header');
+            $job_profiles_table->set(0, 4, 'Position', '', 'header');
+            $job_profiles_table->set(0, 5, '&nbsp;', '', 'header action');
 
-                            $job_profiles_table->set(0, 0, '&nbsp;', '', 'header action');
-                            $job_profiles_table->set(0, 1, 'From', '', 'header');
-                            $job_profiles_table->set(0, 2, 'To', '', 'header');
-                            $job_profiles_table->set(0, 3, 'Employer', '', 'header');
-                            $job_profiles_table->set(0, 4, 'Position', '', 'header');
-                            $job_profiles_table->set(0, 5, '&nbsp;', '', 'header action');
-
-                            foreach ($job_profiles as $i => $job_profile) {
-                                $job_profiles_table->set($i+1, 0, '<a class="no_link" onClick="delete_job_profile('. $job_profile['id']. ')">delete</a>', '', 'cell action');
-                                $job_profiles_table->set($i+1, 1, $job_profile['formatted_work_from'], '', 'cell');
-                                $work_to = $job_profile['formatted_work_to'];
-                                if (is_null($work_to) || empty($work_to) || $work_to == '0000-00-00') {
-                                    $work_to = 'Present';
-                                }
-                                $job_profiles_table->set($i+1, 2, $work_to, '', 'cell');
-                                
-                                $emp = htmlspecialchars_decode(stripslashes($job_profile['employer']));
-                                $emp .= '<br/><span class="mini_spec">'. $job_profile['employer_specialization']. '</span><br/>';
-                                $emp .= '<span class="mini_emp_desc">'. $job_profile['employer_description']. '</span><br/>';
-                                $job_profiles_table->set($i+1, 3, $emp, '', 'cell');
-                                
-                                $pos = htmlspecialchars_decode(stripslashes($job_profile['position_title']));
-                                $pos .= '<br/><span class="mini_spec">'. $job_profile['specialization']. '</span><br/>';
-                                $pos .= '<span class="mini_superior">'. $job_profile['position_superior_title']. '</span>';
-                                $job_profiles_table->set($i+1, 4, $pos, '', 'cell');
-                                
-                                $job_profiles_table->set($i+1, 5, '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">edit</a>', '', 'cell action');
-                            }
-                            
-                            echo $job_profiles_table->get_html();
-                        }
-                        ?>
-                        </div>
-                    </div>
-                </td>
-                <td class="right_content">
-                    <div class="quick_search">
-                        <div class="quick_search_title">Quick Search</div>
-                        <ul class="quick_search_list">
-                            <li><a href="../search.php?special=latest&country=<?php echo $country; ?>">Latest jobs</a></li>
-                            <li><a href="../search.php?special=top&country=<?php echo $country; ?>">Top jobs</a></li>
-                            <li>
-                                <a href="../search.php?special=country&country=<?php echo $country; ?>">Jobs in <?php echo Country::getCountryFrom($country); ?></a>
-                            </li>
-                            <li>
-                                Jobs in salary range:
-                                <ul class="quick_search_list_inner">
-                                    <li><a href="../search.php?special=salary&range=0&country=<?php echo $country; ?>">above <?php echo $currency; ?>$ 8,000</a></li>
-                                    <li><a href="../search.php?special=salary&range=1&country=<?php echo $country; ?>">$ 7,000 - 8,000</a></li>
-                                    <li><a href="../search.php?special=salary&range=2&country=<?php echo $country; ?>">$ 6,000 - 7,000</a></li>
-                                    <li><a href="../search.php?special=salary&range=3&country=<?php echo $country; ?>">$ 5,000 - 6,000</a></li>
-                                    <li><a href="../search.php?special=salary&range=4&country=<?php echo $country; ?>">$ 4,000 - 5,000</a></li>
-                                    <li><a href="../search.php?special=salary&range=5&country=<?php echo $country; ?>">$ 3,000 - 4,000</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </td>
-            </tr>
-        </table>
+            foreach ($job_profiles as $i => $job_profile) {
+                $job_profiles_table->set($i+1, 0, '<a class="no_link" onClick="delete_job_profile('. $job_profile['id']. ')">delete</a>', '', 'cell action');
+                $job_profiles_table->set($i+1, 1, $job_profile['formatted_work_from'], '', 'cell');
+                $work_to = $job_profile['formatted_work_to'];
+                if (is_null($work_to) || empty($work_to) || $work_to == '0000-00-00') {
+                    $work_to = 'Present';
+                }
+                $job_profiles_table->set($i+1, 2, $work_to, '', 'cell');
+                
+                $emp = htmlspecialchars_decode(stripslashes($job_profile['employer']));
+                $emp .= '<br/><span class="mini_spec">'. $job_profile['employer_specialization']. '</span><br/>';
+                $emp .= '<span class="mini_emp_desc">'. $job_profile['employer_description']. '</span><br/>';
+                $job_profiles_table->set($i+1, 3, $emp, '', 'cell');
+                
+                $pos = htmlspecialchars_decode(stripslashes($job_profile['position_title']));
+                $pos .= '<br/><span class="mini_spec">reporting to</span><br/>';
+                $pos .= '<span class="mini_superior">'. $job_profile['position_superior_title']. '</span>';
+                $job_profiles_table->set($i+1, 4, $pos, '', 'cell');
+                
+                $job_profiles_table->set($i+1, 5, '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">edit</a>', '', 'cell action');
+            }
+            
+            $page = str_replace('%job_profiles_table%', $job_profiles_table->get_html(), $page);
+        }
         
-        <!-- popup windows goes here -->
-        <div id="upload_photo_window" class="popup_window">
-            <div class="popup_window_title">Upload Photo</div>
-            <form id="upload_photo_form" action="profile_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_upload_photo_popup(true);">
-                <div class="upload_photo_form">
-                    <br/>
-                    <input type="hidden" name="id" value="<?php echo $this->member->getId(); ?>" />
-                    <input type="hidden" name="action" value="upload" />
-                    <div id="upload_progress" style="text-align: center; width: 99%; margin: auto;">
-                        Please wait while your photo is being uploaded... <br/><br/>
-                        <img src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" /><br/><br/>
-                        NOTE: To Safari/Chrome (WebKit) on Mac OS X users, the mentioned browsers have a problem uploading any file through this page. Please try Firefox to upload your resume.
-                    </div>
-                    <div id="upload_field" class="upload_field">
-                        <input id="my_file" name="my_file" type="file" />
-                        <div style="font-size: 9pt; margin-top: 15px;">
-                            <ol>
-                                <li>Only GIF (*.gif), JPEG (*.jpg, *.jpeg), Portable Network Graphics (*.png), TIFF (*.tiff) or Bitmap (*.bmp) with the file size of less than 150KB are allowed.</li>
-                                <li>Maximum photo resolution is 200 (width) x 220 (height) pixels.</li>
-                                <li>You can update your photo by uploading a new one.</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-                <div class="popup_window_buttons_bar">
-                    <input type="submit" value="Upload Photo" />
-                    <input type="button" value="Close" onClick="close_upload_photo_popup(false);" />
-                </div>
-            </form>
-        </div>
+        // popup windows
+        // photo upload
+        $page = str_replace('%upload_photo_member_id%', $this->member->getId(), $page);
         
-        <div id="career_summary_window" class="popup_window">
-            <div class="popup_window_title">Career Summary</div>
-                <div class="career_summary_form">
-                    <table class="career_summary_form_table">
-                        <tr>
-                            <td class="field">Are you actively seeking for a new job or experience?</td>
-                            <td>
-                                <select id="is_active">
-                                <?php
-                                if ($is_active) {
-                                ?>
-                                    <option value="1" selected>Yes</option>
-                                    <option value="0">No</option>
-                                <?php
-                                } else {
-                                ?>
-                                    <option value="1">Yes</option>
-                                    <option value="0" selected>No</option>
-                                <?php
-                                }
-                                ?>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="field odd">Briefly, what are your job responsibilities and experiences?</td>
-                            <td class="odd">
-                                <textarea id="seeking"><?php echo str_replace('<br/>', "\r\n", $answers['seeking']); ?></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="field">Expected salary range?</td>
-                            <td>
-                                <select id="expected_sal_currency">
-                                <?php
-                                foreach ($GLOBALS['currencies'] as $i=>$currency) {
-                                    if ($currency == $answers['expected_salary_currency']) {
-                                ?>
-                                    <option value="<?php echo $currency; ?>" selected><?php echo $currency; ?></option>
-                                <?php
-                                    } else {
-                                ?>
-                                    <option value="<?php echo $currency; ?>"><?php echo $currency; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                                </select>
-                                $&nbsp;
-                                <input type="text" id="expected_sal_start" value="<?php echo number_format($answers['expected_salary'], 2, '.', ' '); ?>" /> to <input type="text" id="expected_sal_end" value="<?php echo number_format($answers['expected_salary_end'], 2, '.', ' '); ?>" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="field odd" rowspan="2">Preferred Job Location?</td>
-                            <td class="odd">
-                                <?php 
-                                    echo $this->generate_countries($answers['pref_job_loc_1'], 'pref_job_loc_1');
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="odd">
-                                <?php 
-                                    echo $this->generate_countries($answers['pref_job_loc_2'], 'pref_job_loc_2');
-                                ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="field">Perhaps you can travel, or relocate, if the new job requires it?</td>
-                            <td>
-                                <select id="can_travel">
-                                <?php
-                                if ($answers['can_travel_relocate'] == 'Y') {
-                                ?>
-                                    <option value="Y" selected>Yes</option>
-                                    <option value="N">No</option>
-                                <?php
-                                } else {
-                                ?>
-                                    <option value="Y">Yes</option>
-                                    <option value="N" selected>No</option>
-                                <?php
-                                }
-                                ?>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="field odd">Briefly, why do you want to leave your current job?</td>
-                            <td class="odd">
-                                <textarea id="reason_leaving"><?php echo str_replace('<br/>', "\r\n", $answers['reason_for_leaving']); ?></textarea>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="field">Current salary range?</td>
-                            <td>
-                                <select id="current_sal_currency">
-                                <?php
-                                foreach ($GLOBALS['currencies'] as $i=>$currency) {
-                                    if ($currency == $answers['current_salary_currency']) {
-                                ?>
-                                    <option value="<?php echo $currency; ?>" selected><?php echo $currency; ?></option>
-                                <?php
-                                    } else {
-                                ?>
-                                    <option value="<?php echo $currency; ?>"><?php echo $currency; ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                                </select>
-                                $&nbsp;
-                                <input type="text" id="current_sal_start" value="<?php echo number_format($answers['current_salary'], 2, '.', ' '); ?>" /> to <input type="text" id="current_sal_end" value="<?php echo number_format($answers['current_salary_end'], 2, '.', ' '); ?>" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="field odd">What is your notice period?</td>
-                            <td class="odd">
-                                <input type="text" id="notice_period" value="<?php echo $answers['notice_period']; ?>" /> months
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            <div class="popup_window_buttons_bar">
-                <input type="button" value="Save" onClick="close_career_summary_popup(true);" />
-                <input type="button" value="Cancel" onClick="close_career_summary_popup(false);" />
-            </div>
-        </div>
+        // career summary editor
+        if ($is_active) {
+            $page = str_replace('%is_active_yes_option', 'selected', $page);
+            $page = str_replace('%is_active_no_option', '', $page);
+        } else {
+            $page = str_replace('%is_active_yes_option', '', $page);
+            $page = str_replace('%is_active_no_option', 'selected', $page);
+        }
         
-        <div id="job_profile_window" class="popup_window">
-            <div class="popup_window_title">Job Profile</div>
-            <form onSubmit="return false;">
-                <input type="hidden" id="job_profile_id" value="0" />
-                <div class="job_profile_form">
-                    <table class="job_profile_form">
-                        <tr>
-                            <td class="label"><label for="specialization">Specialization:</label></td>
-                            <td class="field">
-                                <?php $this->generate_industries('specialization', array()); ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="position_title">Job Title:</label></td>
-                            <td class="field">
-                                <input class="field" type="text" id="position_title" name="position_title" />
-                                <br/>
-                                <span class="tips">eg: Financial Controller,  VP of Operations, etc.</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="position_superior_title">Superior Title:</label></td>
-                            <td class="field">
-                                <input class="field" type="text" id="position_superior_title" name="position_superior_title" />
-                                <br/>
-                                <span class="tips">eg: Financial Controller,  VP of Operations, etc.</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="organization_size">Positions reporting to you:</label></td>
-                            <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="work_from_month">Duration:</label></td>
-                            <td class="field">
-                                <?php echo generate_month_dropdown('work_from_month', ''); ?>
-                                <input type="text" class="year" maxlength="4" id="work_from_year" value="yyyy" /> 
-                                to 
-                                <span id="work_to_dropdown">
-                                    <?php echo generate_month_dropdown('work_to_month', ''); ?>
-                                    <input type="text" class="year" maxlength="4" id="work_to_year" value="yyyy" />
-                                </span>
-                                <input type="checkbox" id="work_to_present" onClick="toggle_work_to();" /> 
-                                <label for="work_to_present">Present</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="company">Employer:</label></td>
-                            <td class="field"><input class="field" type="text" id="company" name="company" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="emp_desc">Employer Description:</label></td>
-                            <td class="field">
-                                <?php $this->generate_employer_description('emp_desc', -1); ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="emp_specialization">Employer Specialization:</label></td>
-                            <td class="field">
-                                <?php $this->generate_industries('emp_specialization', array()); ?>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </form>
-            <div class="popup_window_buttons_bar">
-                <input type="button" value="Save" onClick="close_job_profile_popup(true);" />
-                <input type="button" value="Cancel" onClick="close_job_profile_popup(false);" />
-            </div>
-        </div>
+        $page = str_replace('%seeking_txt%', str_replace('<br/>', "\r\n", $answers['seeking']), $page);
         
-        <?php
+        $exp_currency_options_str = '';
+        foreach ($GLOBALS['currencies'] as $i=>$currency) {
+            if ($currency == $answers['expected_salary_currency']) {
+                $exp_currency_options_str .= '<option value="'. $currency. '" selected>'. $currency. '</option>'. "\n";
+            } else {
+                $exp_currency_options_str .= '<option value="'. $currency. '">'. $currency. '</option>'. "\n";
+            }
+        }
+        $page = str_replace('%expected_salary_currency_options%', $exp_currency_options_str, $page);
+        $page = str_replace('%expected_salary_txt%', number_format($answers['expected_salary'], 2), $page);
+        $page = str_replace('%expected_salary_end_txt%', number_format($answers['expected_salary_end'], 2), $page);
+        
+        $cur_currency_options_str = '';
+        foreach ($GLOBALS['currencies'] as $i=>$currency) {
+            if ($currency == $answers['currenty_salary_currency']) {
+                $cur_currency_options_str .= '<option value="'. $currency. '" selected>'. $currency. '</option>'. "\n";
+            } else {
+                $cur_currency_options_str .= '<option value="'. $currency. '">'. $currency. '</option>'. "\n";
+            }
+        }
+        $page = str_replace('%current_salary_currency_options%', $cur_currency_options_str, $page);
+        $page = str_replace('%current_salary_txt%', number_format($answers['current_salary'], 2), $page);
+        $page = str_replace('%current_salary_end_txt%', number_format($answers['current_salary_end'], 2), $page);
+        
+        $page = str_replace('%pref_job_loc_1_select%', $this->generate_countries($answers['pref_job_loc_1'], 'pref_job_loc_1'), $page);
+        $page = str_replace('%pref_job_loc_2_select%', $this->generate_countries($answers['pref_job_loc_2'], 'pref_job_loc_2'), $page);
+        
+        if ($answers['can_travel_relocate'] == 'Y') {
+            $page = str_replace('%can_travel_yes', 'selected', $page);
+            $page = str_replace('%can_travel_no', '', $page);
+        } else {
+            $page = str_replace('%can_travel_yes', '', $page);
+            $page = str_replace('%can_travel_no', 'selected', $page);
+        }
+        
+        $page = str_replace('%reason_for_leaving_txt%', str_replace('<br/>', "\r\n", $answers['reason_for_leaving']), $page);
+        
+        $page = str_replace('%notice_period_txt%', $answers['notice_period'], $page);
+        
+        // job profile
+        $page = str_replace('%work_from_month_select%', generate_month_dropdown('work_from_month', ''), $page);
+        $page = str_replace('%work_to_month_select%', generate_month_dropdown('work_to_month', ''), $page);
+        $page = str_replace('%emp_desc_select%', $this->generate_employer_description('emp_desc', -1), $page);
+        $page = str_replace('%industry_select%', $this->generate_industries('emp_specialization', array()), $page);
+        
+        // present page
+        echo $page;
     }
 }
 ?>

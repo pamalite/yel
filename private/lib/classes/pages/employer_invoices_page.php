@@ -6,6 +6,8 @@ class EmployerInvoicesPage extends Page {
     private $employer = NULL;
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->employer = new Employer($_session['id'], $_session['sid']);
     }
     
@@ -14,22 +16,17 @@ class EmployerInvoicesPage extends Page {
     }
     
     public function insert_employer_invoices_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employer_invoices.css">'. "\n";
+        $this->insert_css('employer_invoices.css');
     }
     
     public function insert_employer_invoices_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employer_invoices.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'employer_invoices.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employer->getId(). '";'. "\n";
-        echo '</script>'. "\n";
+        $script = 'var id = "'. $this->employer->getId(). '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function get_invoices($_is_paid = false) {

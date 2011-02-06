@@ -31,5 +31,5 @@ if (!$employer->isLoggedIn($_SESSION['yel']['employer']['hash'])) {
 }
 
 // All checks seem to be good.
-redirect_to('home.php');
+redirect_to('resumes.php');
 ?>

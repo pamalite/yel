@@ -10,6 +10,8 @@ class EmployeeStatusPage extends Page {
     private $found_employers = array();
     
     function __construct($_session, $_member_id = '') {
+        parent::__construct();
+        
         $this->employee = new Employee($_session['id'], $_session['sid']);
         $this->referrals = new Referral();
         
@@ -26,24 +28,19 @@ class EmployeeStatusPage extends Page {
     }
     
     public function insert_employee_status_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_status.css">'. "\n";
+        $this->insert_css('employee_status.css');
     }
     
     public function insert_employee_status_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_status.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'employee_status.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employee->getId(). '";'. "\n";
-        echo 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
-        echo 'var period = "'. $this->period[0]. ';'. $this->period[1]. '";'. "\n";
-        echo '</script>'. "\n";
+        $script = 'var id = "'. $this->employee->getId(). '";'. "\n";
+        $script .= 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
+        $script .= 'var period = "'. $this->period[0]. ';'. $this->period[1]. '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function get_applications() {

@@ -10,6 +10,8 @@ class EmployeeMembersPage extends Page {
     private $total_members = 0;
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->employee = new Employee($_session['id'], $_session['sid']);
     }
     
@@ -22,26 +24,19 @@ class EmployeeMembersPage extends Page {
     }
     
     public function insert_employee_members_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/list_box.css">'. "\n";
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_members.css">'. "\n";
+        $this->insert_css(array('list_box.css', 'employee_members.css'));
     }
     
     public function insert_employee_members_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/list_box.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_members.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'list_box.js', 'employee_members.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employee->getId(). '";'. "\n";
-        echo 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
-        echo 'var current_page = "'. $this->current_page. '";'. "\n";
-        echo '</script>'. "\n";
+        $script = 'var id = "'. $this->employee->getId(). '";'. "\n";
+        $script .= 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
+        $script .= 'var current_page = "'. $this->current_page. '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function get_employers() {

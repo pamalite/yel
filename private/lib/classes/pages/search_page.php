@@ -8,6 +8,8 @@ class SearchPage extends Page {
     private $country_code = '';
     
     function __construct($_session = NULL, $_criterias = '') {
+        parent::__construct();
+        
         if (!is_null($_session)) {
             if (!empty($_session['id']) && !empty($_session['sid'])) {
                 $this->member = new Member($_session['id'], $_session['sid']);
@@ -27,43 +29,41 @@ class SearchPage extends Page {
     }
     
     public function insert_search_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/search.css">'. "\n";
+        $this->insert_css('search.css');
     }
     
     public function insert_search_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/search.js"></script>'. "\n";
+        $this->insert_scripts('search.js');
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
+        $script = '';
+        
         if (!is_null($this->member)) {
-            echo 'var id = "'. $this->member->getId(). '";'. "\n";
+            $script .= 'var id = "'. $this->member->getId(). '";'. "\n";
             
             $this->country_code = (isset($this->criterias['country'])) ? $this->criterias['country'] : $this->member->getCountry();
-            echo 'var country_code = "'. $this->country_code. '";'. "\n";
+            $script .= 'var country_code = "'. $this->country_code. '";'. "\n";
         } else {
-            echo 'var id = 0;'. "\n";
+            $script .= 'var id = 0;'. "\n";
             
             $this->country_code = (isset($this->criterias['country'])) ? $this->criterias['country'] : $_SESSION['yel']['country_code'];
-            echo 'var country_code = "'. $this->country_code. '";'. "\n";
+            $script .= 'var country_code = "'. $this->country_code. '";'. "\n";
         }
-        echo 'var industry = "'. $this->criterias['industry']. '";'. "\n";
-        echo 'var employer = "'. $this->criterias['employer']. '";'. "\n";
-        echo 'var keywords = "'. $this->criterias['keywords']. '";'. "\n";
+        $script .= 'var industry = "'. $this->criterias['industry']. '";'. "\n";
+        $script .= 'var employer = "'. $this->criterias['employer']. '";'. "\n";
+        $script .= 'var keywords = "'. $this->criterias['keywords']. '";'. "\n";
         // echo 'var is_local = '. $this->criterias['is_local']. ';'. "\n";
-        echo 'var filter_salary = '. $this->criterias['salary']. ';'. "\n";
-        echo 'var filter_salary_end = '. ((isset($this->criterias['salary_end'])) ? $this->criterias['salary_end'] : 0). ';'. "\n";
+        $script .= 'var filter_salary = '. $this->criterias['salary']. ';'. "\n";
+        $script .= 'var filter_salary_end = '. ((isset($this->criterias['salary_end'])) ? $this->criterias['salary_end'] : 0). ';'. "\n";
         
         $limit = (isset($this->criterias['limit'])) ? $this->criterias['limit'] : $GLOBALS['default_results_per_page'];
-        echo 'var limit = "'. $limit. '";'. "\n";
+        $script .= 'var limit = "'. $limit. '";'. "\n";
         
         $offset = (isset($this->criterias['offset'])) ? $this->criterias['offset'] : 0;
-        echo 'var offset = "'. $offset. '";'. "\n";
-        echo '</script>'. "\n";
+        $script .= 'var offset = "'. $offset. '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     public function show() {
@@ -150,7 +150,7 @@ class SearchPage extends Page {
                                 <span class="controls">
                                     <a href="./job/<?php echo $row['id'] ?>?refer=1">Refer Now</a>
                                     |
-                                    <a href="./job/<?php echo $row['id'] ?>?apply=1">Apply Now</a>
+                                    <a href="./job/<?php echo $row['id'] ?>?apply=1">Explore Now</a>
                                     |
                                     <a href="./job/<?php echo $row['id']; ?>">View Details</a>
                                 </span>
@@ -296,7 +296,7 @@ class SearchPage extends Page {
                                 </select>
                             </div>
                             <div class="filter_button">
-                                <input type="button" value="Filter Now" onClick="filter_jobs();" />
+                                <input type="button" value="Filter" onClick="filter_jobs();" />
                             </div>
                         </div>
                     </td>

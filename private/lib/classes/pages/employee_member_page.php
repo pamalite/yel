@@ -12,6 +12,8 @@ class EmployeeMemberPage extends Page {
     private $selected_jobs = array();
     
     function __construct($_session, $_member_id = '') {
+        parent::__construct();
+        
         $this->employee = new Employee($_session['id'], $_session['sid']);
         $this->member = new Member($_member_id);
     }
@@ -49,37 +51,29 @@ class EmployeeMemberPage extends Page {
     }
     
     public function insert_employee_member_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/list_box.css">'. "\n";
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_member.css">'. "\n";
+        $this->insert_css(array('list_box.css', 'employee_member.css'));
     }
     
     public function insert_employee_member_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/flextable.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/list_box.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_member.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'list_box.js', 'employee_member.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employee->getId(). '";'. "\n";
-        echo 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
-        echo 'var current_page = "'. $this->current_page. '";'. "\n";
+        $script = 'var id = "'. $this->employee->getId(). '";'. "\n";
+        $script .= 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
+        $script .= 'var current_page = "'. $this->current_page. '";'. "\n";
         
         if (!empty($this->error_message)) {
-            echo "alert(\"". $this->error_message. "\");\n";
+            $script .= "alert(\"". $this->error_message. "\");\n";
         }
         
         if ($this->is_new) {
-            echo 'var member_id = "0";'. "\n";
+            $script .= 'var member_id = "0";'. "\n";
         } else {
-            echo 'var member_id = "'. $this->member->getId(). '";'. "\n";
+            $script .= 'var member_id = "'. $this->member->getId(). '";'. "\n";
         }
         
-        echo '</script>'. "\n";
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     private function remove_br($_str) {
@@ -751,7 +745,7 @@ class EmployeeMemberPage extends Page {
                                     $job_profiles_table->set($i+1, 3, $emp, '', 'cell');
                                 
                                     $pos = htmlspecialchars_decode(stripslashes($job_profile['position_title']));
-                                    $pos .= '<br/><span class="mini_spec">'. $job_profile['specialization']. '</span><br/>';
+                                    $pos .= '<br/><span class="mini_spec">reporting to</span><br/>';
                                     $pos .= '<span class="mini_superior">'. $job_profile['position_superior_title']. '</span>';
                                     $job_profiles_table->set($i+1, 4, $pos, '', 'cell');
                                     $job_profiles_table->set($i+1, 5, '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">edit</a>', '', 'cell small_action');
@@ -1321,12 +1315,6 @@ class EmployeeMemberPage extends Page {
                 <div class="job_profile_form">
                     <table class="job_profile_form">
                         <tr>
-                            <td class="label"><label for="specialization">Specialization:</label></td>
-                            <td class="field">
-                                <?php $this->generate_industries('', 'specialization'); ?>
-                            </td>
-                        </tr>
-                        <tr>
                             <td class="label"><label for="position_title">Job Title:</label></td>
                             <td class="field">
                                 <input class="field" type="text" id="position_title" name="position_title" />
@@ -1335,7 +1323,7 @@ class EmployeeMemberPage extends Page {
                             </td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="position_superior_title">Superior Title:</label></td>
+                            <td class="label"><label for="position_superior_title">Reporting To:</label></td>
                             <td class="field">
                                 <input class="field" type="text" id="position_superior_title" name="position_superior_title" />
                                 <br/>
@@ -1343,7 +1331,7 @@ class EmployeeMemberPage extends Page {
                             </td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="organization_size">Positions Reporting From:</label></td>
+                            <td class="label"><label for="organization_size">Positions Reporting To Candidate:</label></td>
                             <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
                         </tr>
                         <tr>

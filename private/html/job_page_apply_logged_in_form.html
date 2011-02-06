@@ -1,0 +1,41 @@
+<table class="apply_form">
+    <tr>
+        <td class="label"><label for="apply_name">Name:</label></td>
+        <td>
+            <input type="hidden" name="apply_name" id="apply_name" value="%apply_member_fullname%" />
+            %apply_member_fullname%
+        </td>
+    </tr>
+    <tr>
+        <td class="label"><label for="apply_current_pos">Current Position:</label></td>
+        <td><input type="text" class="field" name="apply_current_pos" id="apply_current_pos" value="%apply_current_pos%" /></td>
+    </tr>
+    <tr>
+        <td class="label"><label for="apply_current_emp">Current Company:</label></td>
+        <td><input type="text" class="field" name="apply_current_emp" id="apply_current_emp" value="%apply_current_emp%" /></td>
+    </tr>
+    <tr>
+        <td class="label"><label for="apply_email">E-mail Address:</label></td>
+        <td>
+            <input type="hidden" name="apply_email" id="apply_email" value="%apply_member_id%" />
+            %apply_member_id%
+        </td>
+    </tr>
+    <tr>
+        <td class="label"><label for="apply_phone">Telephone:</label></td>
+        <td><input type="text" class="field" name="apply_phone" id="apply_phone" value="%apply_member_phone%" /></td>
+    </tr>
+    <tr>
+        <td class="label"><label for="apply_resume">Resume:</label></td>
+        <td>
+            <!-- %existing_resumes_select% -->
+            Upload New:
+            <input type="file" name="apply_resume" id="apply_resume" value="" />
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <div class="note">Tip: To change your contact details and update your list of resumes, please update your Profile in the Profile page and upload your resume in Resumes page.</div>
+        </td>
+    </tr>
+</table>

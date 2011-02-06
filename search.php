@@ -22,8 +22,11 @@ if (isset($_POST['industry']) && isset($_POST['keywords']) && isset($_POST['empl
     $criteria['employer'] = '';
     $criteria['keywords'] = '';
     // $criteria['is_local'] = 1;
-    $criteria['country_code'] = $_GET['country'];
-    $criteria['country'] = $criteria['country_code'];
+    
+    if (isset($_GET['country'])) {
+        $criteria['country_code'] = $_GET['country'];
+        $criteria['country'] = $criteria['country_code'];
+    }
     
     switch ($_GET['special']) {
         case 'salary':

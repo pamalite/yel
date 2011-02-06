@@ -418,9 +418,9 @@ function update_applicants() {
 
                 var header = new Row('');
                 header.set(0, new Cell('&nbsp;', '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'member_jobs.applied_on');\">Applied On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'member_jobs.applied_on');\">Explored On</a>", '', 'header'));
                 header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'members.lastname');\">Applicant</a>", '', 'header'));
-                header.set(3, new Cell('Job Applied', '', 'header'));
+                header.set(3, new Cell('Job Explored', '', 'header'));
                 header.set(4, new Cell('Resume', '', 'header'));
                 header.set(5, new Cell('Status', '', 'header'));
                 header.set(6, new Cell("<a class=\"sortable\" onClick=\"sort_by('applicants', 'member_jobs.remind_on');\">Progress / Follow Up</a>", '', 'header'));
@@ -816,7 +816,7 @@ function update_new_applicants() {
                 var header = new Row('');
                 header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_applicants', 'referral_buffers.requested_on');\">Created On</a>", '', 'header'));
                 header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_applicants', 'referral_buffers.candidate_name');\">Potential Applicant</a>", '', 'header'));
-                header.set(2, new Cell('Job Applied', '', 'header'));
+                header.set(2, new Cell('Job Explored', '', 'header'));
                 header.set(3, new Cell('Resume', '', 'header'));
                 header.set(4, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_applicants', 'referral_buffers.remind_on');\">Progress / Follow Up</a>", '', 'header'));
                 header.set(5, new Cell('&nbsp;', '', 'header action'));
@@ -1734,7 +1734,7 @@ function show_jobs_popup(_use_email, _match) {
             var jobs_table = new FlexTable('other_jobs_table', 'other_jobs');
 
             var header = new Row('');
-            header.set(0, new Cell('Applied On', '', 'header'));
+            header.set(0, new Cell('Explored On', '', 'header'));
             header.set(1, new Cell('Job', '', 'header'));
             header.set(2, new Cell('Employer', '', 'header'));
             jobs_table.set(0, header);

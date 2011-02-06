@@ -203,10 +203,10 @@ function close_career_summary_popup(_is_save) {
 }
 
 function validate_job_profile() {
-    if ($('specialization').selectedIndex == 0) {
-        alert('You need to select a specialization.');
-        return false;
-    } 
+    // if ($('specialization').selectedIndex == 0) {
+    //     alert('You need to select a specialization.');
+    //     return false;
+    // } 
     
     if (isEmpty($('position_title').value)) {
         alert('Job Title cannot be empty.');
@@ -273,7 +273,7 @@ function show_job_profile_popup(_id) {
     if (_id <= 0) {
         // new
         $('job_profile_id').value = 0;
-        $('specialization').selectedIndex = 0;
+        // $('specialization').selectedIndex = 0;
         $('position_title').value = '';
         $('position_superior_title').value = '';
         $('organization_size').value = '';
@@ -303,7 +303,7 @@ function show_job_profile_popup(_id) {
                     return;
                 }
                 
-                var specialization = xml.getElementsByTagName('specialization');
+                // var specialization = xml.getElementsByTagName('specialization');
                 var position_title = xml.getElementsByTagName('position_title');
                 var position_superior = xml.getElementsByTagName('position_superior_title');
                 var org_size = xml.getElementsByTagName('organization_size');
@@ -319,12 +319,12 @@ function show_job_profile_popup(_id) {
                 $('organization_size').value = org_size[0].childNodes[0].nodeValue;
                 $('company').value = company[0].childNodes[0].nodeValue.replace('&amp;', '&');
                 
-                for (var i=0; i < $('specialization').options.length; i++) {
-                    if ($('specialization').options[i].value == specialization[0].childNodes[0].nodeValue) {
-                        $('specialization').selectedIndex = i;
-                        break;
-                    }
-                }
+                // for (var i=0; i < $('specialization').options.length; i++) {
+                //     if ($('specialization').options[i].value == specialization[0].childNodes[0].nodeValue) {
+                //         $('specialization').selectedIndex = i;
+                //         break;
+                //     }
+                // }
                 
                 for (var i=0; i < $('emp_desc').options.length; i++) {
                     if ($('emp_desc').options[i].value == emp_desc[0].childNodes[0].nodeValue) {
@@ -402,7 +402,7 @@ function close_job_profile_popup(_is_save) {
         
         var params = 'id=' + $('job_profile_id').value + '&action=save_job_profile';
         params = params + '&member=' + id;
-        params = params + '&specialization=' + $('specialization').value;
+        // params = params + '&specialization=' + $('specialization').value;
         params = params + '&position_title=' + $('position_title').value;
         params = params + '&superior_title=' + $('position_superior_title').value;
         params = params + '&organization_size=' + encodeURIComponent($('organization_size').value);

@@ -1,0 +1,59 @@
+<div id="div_status" class="status">
+    <span id="span_status" class="status"></span>
+</div>
+
+<div class="login_form">
+    <form method="post" onSubmit="return false;">
+        <label for="id">E-mail:</label><br/>
+        <input type="text" id="id" name="id" value="" />
+        <br/><br/>
+        <label for="password">Password:</label><br/>
+        <input type="password" id="password" name="password" />
+        <div class="button_bar left">
+            <a class="no_link" onClick="show_password_reset_window();">Reset Password</a>
+        </div>
+        <div class="button_bar right">
+            <a href="sign_up.php">Sign Up</a>&nbsp;
+            <input type="submit" class="login" id="login" value="Sign In" />
+        </div>
+    </form>
+</div>
+
+<!-- popup goes here -->
+<div id="div_password_reset_window" class="popup_window">
+    <div class="window_title" id="window_title" class="popup_window_title">Get My Password Hint</div>
+    
+    <form method="post" onSubmit="return false;">
+        <div id="div_password_hint_form">
+            <table class="password_hint_form">
+                <tr>
+                    <td class="label"><label for="email_addr">Email:</label></td>
+                    <td class="field"><input class="field" type="text" id="email_addr" name="email_addr" /></td>
+                </tr>
+                <tr>
+                    <td class="buttons" colspan="2">
+                        <input type="button" value="Get My Password Hint" onClick="continue_password_reset();" />
+                        <input type="button" onClick="close_password_reset_window(false);" value="Cancel" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div id="div_password_reset_form">
+            <table class="password_reset_form">
+                <tr>
+                    <td class="question"><label for="hint_answer"><span id="password_hint"></span></label></td>
+                </tr>
+                <tr>
+                    <td><input type="text" class="field" id="hint_answer" name="hint_answer" /></td>
+                </tr>
+                <tr>
+                    <td class="buttons" colspan="2">
+                        <input type="button" value="Reset My Password" onClick="close_password_reset_window(true);" />
+                        <input type="button" onClick="close_password_reset_window(false);" value="Cancel" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>

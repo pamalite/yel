@@ -48,24 +48,24 @@ function validate() {
         return false;
     }
     
-    has_industries = false;
-    var industry_count = 0;
-    for (var i=0; i < $('industry').options.length; i++) {
-        if ($('industry').options[i].selected) {
-            industry_count++;
-            has_industries = true;
-        }
-        
-        if (industry_count > 3) {
-            alert('You can only select your top 3 specilizations.');
-            has_industries = false;
-            return false;
-        }
-    }
-    
-    if (!has_industries) {
-        alert('You must at least choose a specialization.');
-    }
+    // has_industries = false;
+    // var industry_count = 0;
+    // for (var i=0; i < $('industry').options.length; i++) {
+    //     if ($('industry').options[i].selected) {
+    //         industry_count++;
+    //         has_industries = true;
+    //     }
+    //     
+    //     if (industry_count > 3) {
+    //         alert('You can only select your top 3 specilizations.');
+    //         has_industries = false;
+    //         return false;
+    //     }
+    // }
+    // 
+    // if (!has_industries) {
+    //     alert('You must at least choose a specialization.');
+    // }
     
     return true;
 }
