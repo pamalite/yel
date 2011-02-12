@@ -81,7 +81,7 @@
     width: 99%;
     text-align: center;
     border: 1px solid #CCCCCC;
-    padding-bottom: 4px;
+    padding-bottom: 3px;
     margin-bottom: 15px;
 }
 
@@ -112,8 +112,8 @@
 
 #percent {
     float: left;
-    margin-left: 280px;
-    margin-top: -19px;
+    margin-left: 155px;
+    margin-top: -18px;
     font-weight: bold;
 }
 

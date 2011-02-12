@@ -8,14 +8,15 @@ function initialize_page() {
     set_root();
     
     if ($('mini_keywords') != undefined) {
-        var mini_keywords_overtext = new OverText($('mini_keywords'), {
-            'positionOptions': {
-                'offset': {
-                    'x': 155,
-                    'y': 2
-                }
-            }
-        });
+        var mini_keywords_overtext = new OverText($('mini_keywords'));
+        // var mini_keywords_overtext = new OverText($('mini_keywords'), {
+        //     'positionOptions': {
+        //         'offset': {
+        //             'x': 15,
+        //             'y': 2
+        //         }
+        //     }
+        // });
         
         if (typeof keywords != 'undefined') {
             if (!isEmpty(keywords)) {

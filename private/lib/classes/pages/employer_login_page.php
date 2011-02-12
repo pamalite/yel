@@ -52,7 +52,7 @@ class EmployerLoginPage extends Page {
         
                         <input type="password" id="password" name="password" />
                         <div class="button_bar left">
-                            <a href="https://yellowelevator.com/yel/contact.php">Forgot Password? Call Support.</a>
+                            <a href="../contact.php">Forgot Password? Call Support.</a>
                         </div>
                         <div class="button_bar right">
                             <input type="submit" class="login" id="login" value="Sign In" />

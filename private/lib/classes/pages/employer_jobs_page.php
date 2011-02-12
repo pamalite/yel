@@ -33,7 +33,7 @@ class EmployerJobsPage extends Page {
     public function show() {
         $this->begin();
         $this->support($this->employer->getId());
-        $this->top('Job Postings');
+        $this->top('Job Descriptions');
         $this->menu('employer', 'jobs');
         
         $branch = $this->employer->getAssociatedBranch();

@@ -1,74 +1,40 @@
-html, body, .wrap{
-	margin:0;
-	height: 100%;	
-}
-body, div, p, td, input, textarea, select {
-    font-family: "Nimbus Sans Becker L",Arial,Helvetica,sans-serif !important;
-}
-
+/* --- This CSS affects all pages on the site --- */
+/* --- <start> General base styles cross pages --- */
 body {
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
 }
 
 body, div, p, td {
+    font-family: Helvetica, sans-serif, Arial;
     font-size: 10pt;
     text-align: left;
 }
 
-table.welcome_top {
-    margin: auto;
-    border-spacing: 0px;
-    width: 800px;
+table.content {
+    padding-left: 10px;
+}
+img {
+    border: none;
 }
 
-table.welcome_top td.welcome_logo {
-    text-align: left;
-    vertical-align: middle;
-    width: 25%;
+div.status {
+    text-align: center;
 }
 
-div.job_search {
-    width: 100%;
-    margin: auto;
-    border-bottom: 1px solid #CCCCCC;
-}
-
-div.search_form {
-    white-space: nowrap;
-}
-
-div.search_form #keywords {
-    width: 85%;
+span.status {
+    padding: 3px 5px 3px 5px;
+    background-color: #FFCC00;
+    visibility: hidden;
     font-size: 10pt;
-    vertical-align: middle;
 }
+/* --- <end> General base styles cross pages --- */
 
-div.search_form #employer, div.search_form #industry {
-    width: 47%;
-    font-size: 10pt;
-    vertical-align: middle;
-}
-
-div.welcome_login {
-    font-size: 11pt;
-    color: #666666;
-    padding-bottom: 5px;
-}
-
-a.industry_item:link, a.industry_item:visited {
-    color: #666666;
-    text-decoration: none;
-}
-
-a.industry_item:active, a.industry_item:hover {
-    color: #0000FF;
-    text-decoration: underline;
-}
-
+/* --- <start> general hyperlinks --- */
 a.no_link {
     cursor: pointer;
-    color: #0000FF;
+    color: #FC8F02;
 }
 
 a.sortable {
@@ -77,12 +43,12 @@ a.sortable {
 }
 
 a {
-    color: #0000FF;
+    color: #FC8F02;
     text-decoration: none;
 }
 
 a:link, a:visited {
-    color:#0000FF;
+    color: #FC8F02;
 }
 
 a:active, a:hover {
@@ -99,21 +65,9 @@ a.menu:active, a.menu:hover {
     color: #FFFFFF;
 }
 
-img {
-    border: none;
-}
+/* --- <end> general hyperlinks --- */
 
-div.status {
-    text-align: center;
-}
-
-span.status {
-    padding: 3px 5px 3px 5px;
-    background-color: #FFCC00;
-    visibility: hidden;
-    font-size: 10pt;
-}
-
+/* --- <start> base table --- */
 table.header {
     width: 100%;
     margin: auto;
@@ -153,7 +107,9 @@ table.list tr:hover {
 table.list td:hover {
     background-color: #BBFCA1;
 }
+/* --- <end> base table --- */
 
+/* --- <start> general page header --- */
 table.top {
     width: 100%;
     margin: auto;
@@ -167,40 +123,59 @@ table.top td.employee_help {
 }
 
 div.top {
-	height: 68px;
-	background: url('../images/search_headbg.jpg') repeat-x;
-	padding-top: 0;
+    height: 68px;
+    background: url('../images/search_headbg.jpg') repeat-x;
+    padding-top: 0px;
 }
 
-td.logo {
-    text-align: center;
-    width: 15%;
+div.top table.top {
+    margin: auto;
+    border-collapse: collapse;
+    width: 100%;
 }
 
-td.logo img {
-    vertical-align: middle;
-    border: none;
+table.top td.top_logo {
+    padding-top: 0px;
+    width: 276px;
 }
 
 div.page_title {
-    text-align: left;
-    color: #666666;
+    text-align: right;
+    color: #FFFFFF;
     vertical-align: middle;
-    font-weight: bold;
+/*    font-weight: bold;*/
     font-size: 18pt;
     margin-left: 10px;
     margin-bottom: 10px;
+    margin-right: 25px;
 }
 
 span.slogan {
     font-style: italic;
 }
 
+/* --- <end> general page top --- */
+
+/* --- <start> top mini job search ---- */
+option.main_industry {
+    font-weight: bold;
+}
+
+#mini_keywords {
+    margin-left: 3px;
+    font-size: 10pt;
+    width: 380px;
+}
+
+/* --- <end> top mini job search ---- */
+
+/* --- <start> general page footer --- */
 div.footer {
     background: url('../images/footbg.jpg') repeat-x;
-    color: #ffffff;
-    height: 130px;
-    padding-top: 32px;
+    color: #FFFFFF;
+    margin-top: 15px;
+    padding-top: 30px;
+    padding-bottom: 30px;
 }
 div.footer a {
     color: #fc8f02;
@@ -222,18 +197,20 @@ div.footer p {
     padding-top: 25px;
     padding-bottom: 3px;
 }
+/* --- <end> general footer --- */
 
+/* --- <start> general top menu --- */
 div.menu {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 1px;
+    padding-bottom: 1px;
     background-color: #EEEEEE;
 }
 
 div.menu ul.menu {
     list-style-type: none;
     white-space: nowrap;
-    padding: 0;
-    margin: 0;
+    padding: 0px 0px 0px 0px;
+    margin-left: 10px;
 }
 
 ul.menu li {
@@ -246,148 +223,23 @@ ul.menu li {
 ul.menu li:hover {
     background-color: #CCCCCC;
 }
+/* --- <end> general top menu --- */
 
+/* --- <start>  employer support bar --- */
 div.support {
+    padding-left: 10px;
     font-size: 9pt;
-    border-bottom: 1px solid #CCCCCC;
+    color: #FFFFFF;
+    border-bottom: 1px solid #474747;
+    background-color: #474747;
 }
 
 div.support span.phone, div.support span.email {
     font-weight: bold;
 }
+/* --- <end>  employer support bar --- */
 
-div.rewards {
-	text-align: center;
-    font-size: 10pt;
-    padding-top: 45px;
-    padding-bottom: 15px;
-    color: #666666;
-}
-
-div.rewards div.rewards_title {
-    text-align: center;
-    font-size: 10pt;
-    padding-bottom: 10px;
-    font-weight: bold;
-}
-
-img.flag {
-    width: 32px;
-    height: 32px;
-    vertical-align: middle;
-    border: none;
-}
-
-div.job_count {
-    font-size: 10pt;
-    padding-top: 15px;
-    padding-bottom: 3px;
-    color: #666666;
-}
-
-span.job_count {
-    font-weight: bold;
-    font-size: 11pt;
-}
-
-div.mini_search {
-    /*border: 1px solid #FFCC00;*/
-}
-
-table.search td.title {
-    text-align: center;
-    vertical-align: middle;
-    /*background-color: #99CCFF;
-    border: 1px solid #99CCFF;*/
-    font-weight: bold;
-}
-
-table.search td.search {
-    text-align: center;
-    vertical-align: middle;
-    /*border: 1px solid #99CCFF;*/
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-
-option.main_industry {
-    font-weight: bold;
-}
-
-#industry_drop_down {
-    /*font-size: 12pt;*/
-    font-size: 10pt;
-    vertical-align: middle;
-}
-
-#employer_drop_down {
-    font-size: 10pt;
-    vertical-align: middle;
-}
-
-#mini_industry, #mini_employer {
-    vertical-align: middle;
-}
-
-#mini_keywords {
-	width: 467px;
-	height: 20px;
-	border: 1px #abadb3 solid;
-}
-
-#mini_search_button {
-	border: 1px #cccccc solid;
-	background: #f0f0f0;
-	padding: 0 5px;
-	height: 25px;
-}
-
-#industry {
-    width: 30%;
-    font-size: 10pt;
-    vertical-align: middle;
-}
-
-#employer {
-    width: 30%;
-    font-size: 10pt;
-    vertical-align: middle;
-}
-
-div.debug {
-    font-size: 8pt;
-}
-
-div.companies {
-    text-align: center;
-    padding-top: 75px;
-    padding-bottom: 20px;
-}
-
-img.companies {
-    border: none;
-    vertical-align: middle;
-}
-
-p.small_notes {
-    font-size: 9pt;
-    font-style: italic;
-    color: #666666;
-}
-
-.reminder {
-    font-size: 9pt;
-    color: #666666;
-    font-style: italic;
-    width: 65%;
-    padding-top: 5px;
-}
-
-.reminder .reminder_warn {
-    float: left;
-    padding-right: 5px;
-}
-
+/* --- <start> base popup window --- */
 .popup_window {
     border: 5px solid #CCCCCC;
     padding: 5px 5px 5px 5px;
@@ -416,119 +268,16 @@ p.small_notes {
     padding-top: 3px;
     padding-bottom: 3px;
 }
+/* --- <end> base popup window --- */
 
-.top_logo {
-    text-align: center;
-    width: 150px;
-    padding-top: 5px;
-}
-
-.top_search {
-    height: 85px;
+/* --- <start> misc --- */
+p.small_notes {
+    font-size: 9pt;
+    font-style: italic;
+    color: #666666;
 }
 
 .overTxtLabel {
-    font-size: 9pt;
     color: #AAAAAA;
 }
-
-.top_logo {
-	padding-top: 0;
-	width: 435px;
-	text-align: left;
-}
-
-div.skinned-select {
-        margin-right: 5px;
-        float: left;
-}
-div.skinned-select select {
-	opacity: 0;
-	filter: alpha(opacity = 0);
-	moz-opacity: 0;
-	position: relative;
-	z-index: 100;
-}
-div.skinned-select .select-text {
-	position: absolute;
-	text-indent: 3px;
-	z-index: 1;
-}
-
-div.skinned-select .select-text,
-div.skinned-select select,
-div.skinned-select select option {
-	color: #000;
-}
-/* non javascript version select */
-.my-skinnable-select select {
-  width: 262px;
-  border: 1px solid #D5E6EE;
-}
-.clear {
-	clear: both;
-}
-
-
-.select-wrap1 {
-	height: 23px;
-	width: 790px;
-	padding-top: 10px;
-}
-
-.selectbox1 {
-	background: url('../images/search_select1.jpg');
-	width: 185px;
-	height: 20px;
-        float: left;
-}
-.selectbox1 select {
-	height: 20px;
-	width: 185px !important;
-}
-.selectbox1 .select-text {
-	width: 185px;
-	line-height: 20px;
-}
-.selectbox2 {
-	background: url('../images/search_select2.jpg');
-	width: 107px;
-	height: 20px;
-        float: left;
-}
-.selectbox2 select {
-	height: 20px;
-	width: 107px !important;
-}
-.selectbox2 .select-text {
-	width: 107px;
-	line-height: 20px;
-}
-.selectbox3 {
-	background: url('../images/search_select3.jpg');
-	width: 123px;
-	height: 20px;
-        float: left;
-}
-.selectbox3 select {
-	height: 20px;
-	width: 123px !important;
-}
-.selectbox3 .select-text {
-	width: 123px;
-	line-height: 20px;
-}
-.selectbox4 {
-	background: url('../images/search_select4.jpg');
-	width: 45px;
-	height: 20px;
-        float: left;
-}
-.selectbox4 select {
-	height: 20px;
-	width: 45px !important;
-}
-.selectbox4 .select-text {
-	width: 45px;
-	line-height: 20px;
-}
+/* --- <end> misc --- */

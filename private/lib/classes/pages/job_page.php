@@ -243,7 +243,7 @@ class JobPage extends Page {
             }
             $page = str_replace('%employer_name%', $employer_name, $page);
             
-            $page = str_replace('%job_description', $job['description'], $page);
+            $page = str_replace('%job_description%', $job['description'], $page);
             
             $employer_country = (!is_null($job['state']) && !empty($job['state'])) ? $job['state']. ', ' : '';
             $employer_country .= $job['country_name'];

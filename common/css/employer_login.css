@@ -99,11 +99,6 @@ label {
 	/*border:1px red solid;	*/
 }
 
-div.page_title {
-    text-align: right;
-    padding-top: 2px;
-}
-
 .content {
     width: 780px;
     margin: 0 auto 50px;
@@ -130,7 +125,7 @@ div.page_title {
 .content .side .login_form #id, .content .side .login_form #password {
     width: 217px;
     height: 22px;
-    border: 1px #abadb3 solid;
+/*    border: 1px #abadb3 solid;*/
     font-size: 12px;
     margin-top: 3px;
 }
@@ -146,7 +141,7 @@ div.page_title {
     padding-right: 5px;
     padding-top: 10px;
 }
-.content .side .login_form .right input {
+/*.content .side .login_form .right input {
     border: 1px #cccccc solid;
     background: #f0f0f0;
     width: 55px;
@@ -159,6 +154,7 @@ div.page_title {
     font-weight: normal;
     font-size: 13px;
 }
+*/
 .content .login-enquiry-box {
     background: url('../images/login_enquiry_box.jpg') no-repeat center;
     width: 496px;

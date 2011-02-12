@@ -1,9 +1,18 @@
 <div class="top">
     <div id="welcome_top">
-        <img src="%root%/common/images/logos/yellowelevator-logo.gif" alt="Elevator" id="logo" />
+        <img src="%root%/common/images/logos/logo2.jpg" alt="Elevator" id="logo" />
+        
+        <div class="topmenu">
+            <a href="about.php">About Us</a>
+            &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="margin-top: 3px;"/>&nbsp;
+            <a href="contact.php">Contact Us</a>
+        </div>
+        
         <div class="loginpanel">
             <span style="display: %not_logged_in%;">
-                <a href="%root%/employers/"><strong>Employers</strong></a>&nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="position:relative;top:2px;" />&nbsp;<a href="%root%/members/"><strong>Candidates Login</strong></a>
+                <a class="welcome_employers" href="%root%/employers/">Employers</a>
+                &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="margin-top: 3px;" />&nbsp;
+                <a class="welcome_members" href="%root%/members/">Candidates Login</a>
             </span>
             <span style="display: %member_logged_in%;">
                 Go back to <span style="font-weight: bold;"><a href="%root%/members">Career Profile</a></span> or <span style="font-weight: bold;"><a href="%root%/members/logout.php">Logout</a></span>
@@ -15,15 +24,6 @@
                 Go back to <span style="font-weight: bold;"><a href="%root%/employees">Employee Home</a></span> or <span style="font-weight: bold;"><a href="%root%/employees/logout.php">Logout</a></span>
             </span>
         </div>
-        <div class="topmenu">
-            <table>
-                <tr>
-                    <td class="aboutus" valign="bottom"><a href="about.php"><strong>About Us</strong></a></td>
-                    <td class="topmenudivider"><!-- strong> | </strong --></td>
-
-                    <td class="contactus" valign="bottom"><a href="contact.php"><strong>Contact Us</strong></a></td>
-                </tr>
-            </table>
-        </div>
+        
     </div>
 </div>
