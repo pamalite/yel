@@ -449,7 +449,7 @@ class Page {
         
         $support = str_replace('%phone_number%', $phone_number, $support);
         $support = str_replace('%fax_number%', $fax_number, $support);
-        $support = str_replace('%country%', $country_code, $support);
+        $support = str_replace('%country%', strtolower($country_code), $support);
         
         echo $support;
     } 

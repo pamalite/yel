@@ -392,16 +392,17 @@ p {
 .filter_options .clear {
 	height: 4px;
 }
-.filter_button {
-	padding-top: 8px;
-	padding-right: 4px;
+/*.filter_button {
+    padding-top: 8px;
+    padding-right: 4px;
 }
 .filter_button input {
-	border: 1px #cccccc solid;
-	background: #f0f0f0;
-	padding: 0 5px;
-	height: 25px;
+    border: 1px #cccccc solid;
+    background: #f0f0f0;
+    padding: 0 5px;
+    height: 25px;
 }
+*/
 .filter {
 	border: 0;
 	padding-bottom: 19px;

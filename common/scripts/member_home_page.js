@@ -478,7 +478,9 @@ function show_upload_photo_popup() {
     show_window('upload_photo_window');
 }
 
-function onDomReady() {
+function onDomReady() {}
+
+function onLoaded() {
     initialize_page();
     
     if ($('div_hrm_census').getStyle('display') != 'none') {
@@ -488,3 +490,4 @@ function onDomReady() {
 }
 
 window.addEvent('domready', onDomReady);
+window.addEvent('load', onLoaded);

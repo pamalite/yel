@@ -293,7 +293,6 @@ function set_mouse_events() {
 }
 
 function onDomReady() {
-    initialize_page();
     set_mouse_events();
     
     // $('industry').addEvent('change', function() {
@@ -365,4 +364,9 @@ function onDomReady() {
     });
 }
 
+function onLoaded() {
+    initialize_page();
+}
+
 window.addEvent('domready', onDomReady);
+window.addEvent('load', onLoaded);

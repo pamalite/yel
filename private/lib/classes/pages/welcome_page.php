@@ -17,13 +17,11 @@ class WelcomePage extends Page {
     }
     
     public function insert_welcome_scripts() {
-        $this->insert_scripts(array('welcome.js', 'jquery.min.js', 'jquery.skinned-select.js'));
+        $this->insert_scripts(array('welcome.js'));
     }
     
     public function insert_inline_scripts() {
-        $script = 'jquery(document).ready(function() {'. "\n";
-        $script .= 'jquery(\'.overTxtLabel\').attr(\'style\',\'\');});'. "\n";
-        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
+        // TODO: Any inline JavaScripts goes here
     }
     
     private function generate_top_jobs() {

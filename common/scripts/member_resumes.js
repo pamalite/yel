@@ -91,8 +91,11 @@ function show_upload_resume_popup(_resume_id) {
     // window.scrollTo(0, 0);
 }
 
-function onDomReady() {
+function onDomReady() {}
+
+function onLoaded() {
     initialize_page();
 }
 
 window.addEvent('domready', onDomReady);
+window.addEvent('load', onLoaded);

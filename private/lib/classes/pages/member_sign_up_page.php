@@ -161,7 +161,7 @@ class MemberSignUpPage extends Page {
     
     public function show($_session) {
         $this->begin();
-        $this->top("Member Sign Up");
+        $this->top("Get Connected");
         
         $page = file_get_contents(dirname(__FILE__). '/../../../html/member_sign_up_page.html');
         $page = str_replace('%root%', $this->url_root, $page);

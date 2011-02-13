@@ -69,8 +69,12 @@ function set_employers_mouse_events() {
 }
 
 function onDomReady() {
-    initialize_page();
     set_employers_mouse_events();
 }
 
+function onLoaded() {
+    initialize_page();
+}
+
 window.addEvent('domready', onDomReady);
+window.addEvent('load', onLoaded);

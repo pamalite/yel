@@ -364,8 +364,6 @@ function refer() {
 }
 
 function onDomReady() {
-    initialize_page();
-    
     for (var i=0; i < $('mini_employer').options.length; i++) {
         if ($('mini_employer').options[i].value == employer) {
             $('mini_employer').selectedIndex = i;
@@ -388,4 +386,9 @@ function onDomReady() {
     }
 }
 
+function onLoaded() {
+    initialize_page();
+}
+
 window.addEvent('domready', onDomReady);
+window.addEvent('load', onLoaded);

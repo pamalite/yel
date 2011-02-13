@@ -9,14 +9,6 @@ function initialize_page() {
     
     if ($('mini_keywords') != undefined) {
         var mini_keywords_overtext = new OverText($('mini_keywords'));
-        // var mini_keywords_overtext = new OverText($('mini_keywords'), {
-        //     'positionOptions': {
-        //         'offset': {
-        //             'x': 15,
-        //             'y': 2
-        //         }
-        //     }
-        // });
         
         if (typeof keywords != 'undefined') {
             if (!isEmpty(keywords)) {

@@ -122,8 +122,11 @@ function show_recommendations() {
     request.send(params);
 }
 
-function onDomReady() {
+function onDomReady() {}
+
+function onLoaded() {
     initialize_page();
 }
 
 window.addEvent('domready', onDomReady);
+window.addEvent('load', onLoaded);
