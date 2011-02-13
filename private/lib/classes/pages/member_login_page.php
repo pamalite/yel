@@ -48,7 +48,7 @@ class MemberLoginPage extends Page {
     
     public function show($_error = "") {
         $this->begin();
-        $this->top("Candidate Sign In");
+        $this->top("Candidate Login");
         
         $page = file_get_contents(dirname(__FILE__). '/../../../html/member_login_page.html');
         

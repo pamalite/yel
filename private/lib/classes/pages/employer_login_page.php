@@ -21,7 +21,7 @@ class EmployerLoginPage extends Page {
     
     public function show($_error = "") {
         $this->begin();
-        $this->top('Employer Sign In');
+        $this->top('Employer Login');
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
@@ -55,7 +55,7 @@ class EmployerLoginPage extends Page {
                             <a href="../contact.php">Forgot Password? Call Support.</a>
                         </div>
                         <div class="button_bar right">
-                            <input type="submit" class="login" id="login" value="Sign In" />
+                            <input type="submit" class="login" id="login" value="Login" />
                         </div>
                     </form>
         

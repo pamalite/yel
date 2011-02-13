@@ -48,7 +48,7 @@ body {
 }
 
 #welcome_top div.loginpanel a.welcome_employers {
-    color: #FC8F02;
+    color: #FDD501;
 }
 
 #welcome_top div.loginpanel a.welcome_employers:hover {
@@ -67,8 +67,7 @@ div.content div.section_top {
 
 div.section_top div.main_title {
     text-align: center;
-    margin-top: 62px;
-    padding-bottom: 40px;
+    margin-top: 40px;
 }
 
 div.section_top div.panel {
@@ -170,11 +169,7 @@ div.search #keywords {
 
 label.overTxtLabel {
     font-size: 12pt;
-/*    position: absolute;
-    left: 280px;
-    top: 850px;
-    padding-top: 4px;
-*/}
+}
 
 div.top_jobs {
     width: 847px;
