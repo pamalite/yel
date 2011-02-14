@@ -301,7 +301,7 @@ function save_job_profile() {
     var birthdate_month = $('birthdate_month').getSelected();
     var birthdate_year = $('birthdate_year').value;
     var birthdate = 'NULL';
-    if (!isEmpty(birthdate_year) {
+    if (!isEmpty(birthdate_year)) {
         birthdate = birthdate_year + '-' + birthdate_month[0].value + '-' + birthdate_day[0].value;
     }
     
