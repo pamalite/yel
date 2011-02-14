@@ -139,7 +139,45 @@
             <tr>
                 <td class="label"><label for="seeking">Job Responsibilities &amp; Experience:</label></td>
                 <td class="field">
-                    <textarea id="seeking" class="field">Brief our Recruitment Consultants about your career goals and experiences, enough to help them identify suitable opportunities for your recommendation.</textarea>
+                    <textarea id="seeking" class="field" alt="Brief our Recruitment Consultants about your career goals and experiences, enough to help them identify suitable opportunities for your recommendation."></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td class="section_title" colspan="2">
+                    General Demographics (Optional)
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="gender">Gender:</label></td>
+                <td class="field">
+                    <select id="gender">
+                        <option value="">Please select one</option>
+                        <option value="" disabled>&nbsp;</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="ethnicity">Ethnicity:</label></td>
+                <td class="field">
+                    <select id="ethnicity">
+                        <option value="">Please select one</option>
+                        <option value="" disabled>&nbsp;</option>
+                        <option value="malay">Malay</option>
+                        <option value="chinese">Chinese</option>
+                        <option value="indian">Indian</option>
+                        <option value="caucasian">Caucasian</option>
+                        <option value="other">Other (please specify)</option>
+                    </select>
+                    <input type="text" id="ethnicity_txt" alt="specify only when Other is selected" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="birthdate_day">Birthdate:</label></td>
+                <td class="field">
+                    %birthdate_day% %birthdate_month% 
+                    <input type="text" class="year" id="birthdate_year" maxlength="4" value="" alt="yyyy"/>
                 </td>
             </tr>
             <tr>

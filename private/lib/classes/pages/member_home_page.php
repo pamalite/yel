@@ -65,23 +65,6 @@ class MemberHomePage extends Page {
         return $response;
     }
     
-    private function is_hrm_questions_filled() {
-        $criteria = array(
-            'columns' => "hrm_gender, hrm_ethnicity, hrm_birthdate", 
-            'match' => "email_addr = '". $this->member->getId(). "'", 
-            'limit' => "1"
-        );
-        
-        $result = $this->member->find($criteria);
-        if ((is_null($result[0]['hrm_gender']) || empty($result[0]['hrm_gender'])) ||
-            (is_null($result[0]['hrm_ethnicity']) || empty($result[0]['hrm_ethnicity'])) || 
-            (is_null($result[0]['hrm_birthdate']) || empty($result[0]['hrm_birthdate']))) {
-            return false;
-        }
-        
-        return true;
-    }
-    
     private function get_answers() {
         $criteria = array(
             'columns' => "members.is_active_seeking_job, members.seeking, 
@@ -276,11 +259,6 @@ class MemberHomePage extends Page {
             }
         }
         
-        $display_hrm_questions = 'display: none;';
-        if (!$this->is_hrm_questions_filled()) {
-            $display_hrm_questions = 'display: block;';
-        }
-        
         $answers = $this->get_answers();
         $is_active = ($answers['is_active_seeking_job'] == '1') ? true : false;
         
@@ -297,11 +275,6 @@ class MemberHomePage extends Page {
         // } else {
         //     $page = str_replace('%error_message%', '', $page);
         // }
-        
-        // HRM
-        $page = str_replace('%display_hrm_questions%', $display_hrm_questions, $page);
-        $page = str_replace('%birthdate_day%', generate_dropdown('birthdate_day', '', 1, 31, '', 2, 'Day'), $page);
-        $page = str_replace('%birthdate_month%', generate_month_dropdown('birthdate_month', '', 'Month'), $page);
         
         // completeness
         $page = str_replace('%completeness_percent%', $completeness_percent, $page);

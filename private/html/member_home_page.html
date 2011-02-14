@@ -4,46 +4,7 @@
 
 <table class="content">
     <tr>
-        <td class="left_content">        
-            <div id="div_hrm_census" style="%display_hrm_questions%">
-                <div class="census_title">One-time Survey</div>
-                <div class="census_form">
-                    Please help us answer the following <span style="text-decoration: underline; font-weight: bold;">one-time</span> questions as part of our on-going effort to serve you better.<br/>
-                    <ol>
-                        <li>
-                            Gender: 
-                            <select id="gender">
-                                <option value="">Please select one</option>
-                                <option value="" disabled>&nbsp;</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                            </select>
-                        </li>
-                        <li>
-                            Ethnicity:
-                            <select id="ethnicity">
-                                <option value="">Please select one</option>
-                                <option value="" disabled>&nbsp;</option>
-                                <option value="malay">Malay</option>
-                                <option value="chinese">Chinese</option>
-                                <option value="indian">Indian</option>
-                                <option value="caucasian">Caucasian</option>
-                                <option value="other">Other (please specify)</option>
-                            </select>
-                            <input type="text" id="ethnicity_txt" alt="specify only when Other is selected" value="" />
-                        </li>
-                        <li>
-                            Birth Date:
-                            %birthdate_day% %birthdate_month% 
-                            <input type="text" class="year" id="birthdate_year" alt="year" maxlength="4" value="" />
-                        </li>
-                    </ol>
-                </div>
-                <div class="buttons">
-                    <input type="button" value="Save &amp; Close Forever" onClick="save_census_answers();" />
-                </div>
-            </div>
-            
+        <td class="left_content">
             <div class="profile_completeness">
                 <div class="completeness_title">Profile Completeness:</div>
                 <div class="progress">

@@ -75,14 +75,6 @@ function validate_sign_up() {
 }
 
 function validate_job_profile() {
-    if ($('specialization').selectedIndex == 0) {
-        alert('You need to select a specialization.');
-        $('specialization').setStyle('border', '2px solid #FF0000');
-        return false;
-    } else {
-        reset_field($('specialization'));
-    }
-    
     if (isEmpty($('position_title').value)) {
         alert('Job Title cannot be empty.');
         $('position_title').setStyle('border', '2px solid #FF0000');
@@ -167,6 +159,71 @@ function validate_job_profile() {
     return true;
 }
 
+function validate_hrm_questions() {
+    var date = new Date();
+    var current_year = date.get('year');
+    var ethnicity = $('ethnicity').getSelected();
+    
+    if (ethnicity[0].value == 'other' && isEmpty($('ethnicity_txt').value)) {
+        alert('You need to provide an ethnicity.');
+        $('ethnicity_txt').setStyle('border', '2px solid #FF0000');
+        return false;
+    }
+    
+    if (!isEmpty($('birthdate_year').value)) {
+        if (isNaN($('birthdate_year').value)) {
+            alert('Birthdate Year must be a number.');
+            $('birthdate_year').setStyle('border', '2px solid #FF0000');
+            return false;
+        }
+        
+        var birthdate_year = parseInt($('birthdate_year').value);
+        if (parseInt(current_year) -  birthdate_year > 65) {
+            alert('Invalid birth year has been entered.');
+            $('birthdate_year').setStyle('border', '2px solid #FF0000');
+            return false;
+        }
+        
+        var birthdate_day = $('birthdate_day').getSelected();
+        var birthdate_month = $('birthdate_month').getSelected();
+        
+        if (isEmpty(birthdate_day[0].value) || isEmpty(birthdate_month[0].value)) {
+            alert('You need to enter the full birthdate.');
+            $('birthdate_day').setStyle('border', '2px solid #FF0000');
+            $('birthdate_month').setStyle('border', '2px solid #FF0000');
+            return false;
+        }
+        
+        var is_leap_year = false;
+        if (birthdate_year % 400 == 0) {
+            is_leap_year = true;
+        } else if (birthdate_year % 100 == 0) {
+            is_leap_year = false;
+        } else if (birthdate_year % 4 == 0) {
+            is_leap_year = true;
+        }
+        
+        if ((is_leap_year && parseInt(birthdate_day[0].value) > 29 && birthdate_month[0].value == '02') || 
+            (!is_leap_year && parseInt(birthdate_day[0].value) > 28 && birthdate_month[0].value == '02')) {
+            alert('Invalid day entered.');
+            $('birthdate_day').setStyle('border', '2px solid #FF0000');
+            return false;
+        }
+        
+        switch (birthdate_month[0].value) {
+            case '04':
+            case '06':
+            case '09':
+            case '11':
+                if (parseInt(birthdate_day[0].value) > 30) {
+                    return false;
+                }
+        }
+    }
+    
+    return true;
+}
+
 function sign_up() {
     if (!validate_sign_up()) {
         return;
@@ -230,6 +287,24 @@ function save_job_profile() {
         work_to = $('work_to_year').value + '-' + $('work_to_month').options[$('work_to_month').selectedIndex].value + '-00';
     }
     
+    if (!validate_hrm_questions()) {
+        return;
+    }
+    
+    var gender = $('gender').getSelected();
+    var ethnicity = $('ethnicity').getSelected();
+    if (ethnicity[0].value == 'other') {
+        ethnicity[0].value = $('ethnicity_txt').value;
+    }
+    
+    var birthdate_day = $('birthdate_day').getSelected();
+    var birthdate_month = $('birthdate_month').getSelected();
+    var birthdate_year = $('birthdate_year').value;
+    var birthdate = 'NULL';
+    if (!isEmpty(birthdate_year) {
+        birthdate = birthdate_year + '-' + birthdate_month[0].value + '-' + birthdate_day[0].value;
+    }
+    
     var params = 'email_addr=' + $('member_email_addr').value + '&action=add_job_profile';
     // params = params + '&specialization=' + $('specialization').value;
     params = params + '&position_title=' + $('position_title').value;
@@ -241,9 +316,10 @@ function save_job_profile() {
     params = params + '&emp_desc=' + $('emp_desc').value;
     params = params + '&emp_specialization=' + $('emp_specialization').value;
     params = params + '&total_work_years=' + $('total_work_years').value;
-    // params = params + '&pref_job_loc_1=' + $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].value;
-    // params = params + '&pref_job_loc_2=' + $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].value;
-    params = params + '&seeking=' + $('seeking').value.replace("\n", '<br/>');
+    params = params + '&seeking=' + $('seeking').value.replace(/\n/g, '<br/>');
+    params = params + '&gender=' + gender[0].value;
+    params = params + '&ethnicity=' + ethnicity[0].value;
+    params = params + '&birthdate=' + birthdate;
     
     var uri = root + "/members/sign_up_action.php";
     var request = new Request({
@@ -286,10 +362,15 @@ function update_overtexts() {
     new OverText($('organization_size'));
     new OverText($('work_from_year'));
     new OverText($('work_to_year'));
+    new OverText($('seeking'), { wrap: true });
+    new OverText($('birthdate_year'));
 }
 
-function onDomReady() {
+function onDomReady() {}
+
+function onLoaded() {
     initialize_page();
 }
 
 window.addEvent('domready', onDomReady);
+window.addEvent('load', onLoaded);

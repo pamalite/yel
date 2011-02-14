@@ -176,8 +176,8 @@ div.footer {
     background: url('../images/footbg.jpg') repeat-x;
     color: #FFFFFF;
     margin-top: 15px;
-    padding-top: 30px;
-    padding-bottom: 30px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 div.footer a {
     color: #fc8f02;

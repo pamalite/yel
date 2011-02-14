@@ -127,6 +127,9 @@ if ($_POST['action'] == 'add_job_profile') {
     }
     
     $data = array();
+    $data['hrm_gender'] = $_POST['gender'];
+    $data['hrm_ethnicity'] = $_POST['ethnicity'];
+    $data['hrm_birthdate'] = $_POST['birthdate'];
     $data['total_work_years'] = $_POST['total_work_years'];
     $data['seeking'] = $_POST['seeking'];
     

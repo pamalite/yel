@@ -170,6 +170,8 @@ class MemberSignUpPage extends Page {
         $page = str_replace('%work_to_month%', generate_month_dropdown('work_to_month', ''), $page);
         $page = str_replace('%emp_desc%', $this->generate_employer_description('emp_desc', -1), $page);
         $page = str_replace('%industries%', $this->generate_industries('emp_specialization', array()), $page);
+        $page = str_replace('%birthdate_day%', generate_dropdown('birthdate_day', '', 1, 31, '', 2, 'Day'), $page);
+        $page = str_replace('%birthdate_month%', generate_month_dropdown('birthdate_month', '', 'Month'), $page);
         
         echo $page;
     }

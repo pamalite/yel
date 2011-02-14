@@ -18,14 +18,14 @@
 }
 
 .quick_search {
-    border: 1px solid #8BB1EB;
+    border: 1px solid #f7f6f6;
 }
 
 .quick_search_title {
     font-size: 12pt;
     font-weight: bold;
-    color: #FFFFFF;
-    background-color: #8BB1EB;
+    color: #000000;
+    background-color: #f7f6f6;
     padding-left: 5px;
     padding-top: 3px;
     padding-bottom: 3px;
@@ -37,20 +37,6 @@
 
 .quick_search_list_inner {
     list-style-type: disc;
-}
-
-#div_hrm_census {
-    width: 99%;
-    border: 1px solid #F89D00;
-    margin-bottom: 15px;
-}
-
-.census_title {
-    font-size: 12pt;
-    font-weight: bold;
-    color: #fff;
-    padding: 3px 3px 3px 3px;
-    background-color: #F89D00;
 }
 
 .buttons {
@@ -95,7 +81,7 @@
 }
 
 .progress {
-    border: 1px solid #0000FF;
+    border: 1px solid #000000;
     background-color: #FFFFFF;
     padding: 1px 1px 1px 1px;
     width: 260px;
@@ -105,8 +91,8 @@
 }
 
 #progress_bar {
-    border: 1px solid #0000FF;
-    background-color: #0000FF;
+    border: 1px solid #FC8F02;
+    background-color: #FC8F02;
     height: 14px;
 }
 
