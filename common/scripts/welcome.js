@@ -74,6 +74,46 @@ function onDomReady() {
 
 function onLoaded() {
     initialize_page();
+    
+    $('connect').addEvent('mouseover', function(e) {
+        $('connect').src = root + '/common/images/connect_with_recruitment_hover.jpg';
+    });
+    
+    $('connect').addEvent('mouseout', function(e) {
+        $('connect').src = root + '/common/images/connect_with_recruitment.jpg';
+    });
+    
+    $('cash_bonus').addEvent('mouseover', function(e) {
+        $('cash_bonus').src = root + '/common/images/get_cash_bonus_hover.jpg';
+    });
+    
+    $('cash_bonus').addEvent('mouseout', function(e) {
+        $('cash_bonus').src = root + '/common/images/get_cash_bonus.jpg';
+    });
+    
+    $('7_years').addEvent('mouseover', function(e) {
+        $('7_years').src = root + '/common/images/7years_work_experience_hover.jpg';
+    });
+    
+    $('7_years').addEvent('mouseout', function(e) {
+        $('7_years').src = root + '/common/images/7years_work_experience.jpg';
+    });
+    
+    $('get_connected_1').addEvent('mouseover', function(e) {
+        $('get_connected_1').src = root + '/common/images/get_connected_but_hover.jpg';
+    });
+    
+    $('get_connected_1').addEvent('mouseout', function(e) {
+        $('get_connected_1').src = root + '/common/images/get_connected_but.jpg';
+    });
+    
+    $('get_connected_2').addEvent('mouseover', function(e) {
+        $('get_connected_2').src = root + '/common/images/get_connected_but_hover.jpg';
+    });
+    
+    $('get_connected_2').addEvent('mouseout', function(e) {
+        $('get_connected_2').src = root + '/common/images/get_connected_but.jpg';
+    });
 }
 
 window.addEvent('domready', onDomReady);
