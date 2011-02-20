@@ -65,6 +65,11 @@ function close_career_summary_popup(_is_save) {
         var reason_leaving = encodeURIComponent($('reason_leaving').value);
         // var current_pos = encodeURIComponent($('current_pos').value);
         
+        var contact_me = '0';
+        if ($('contact_me').checked) {
+            contact_me = '1';
+        }
+        
         if (!isEmpty($('expected_sal_start').value) && isNaN($('expected_sal_start').value)) {
             alert('Expected salary must be a number.');
             return;
@@ -93,6 +98,7 @@ function close_career_summary_popup(_is_save) {
         
         var params = 'id=' + id + '&action=save_career_summary';
         params = params + '&is_active=' + $('is_active').options[$('is_active').selectedIndex].value;
+        params = params + '&contact_me=' + contact_me;
         params = params + '&can_travel=' + $('can_travel').options[$('can_travel').selectedIndex].value;
         params = params + '&expected_sal_currency=' + $('expected_sal_currency').options[$('expected_sal_currency').selectedIndex].value;
         params = params + '&current_sal_currency=' + $('current_sal_currency').options[$('current_sal_currency').selectedIndex].value;

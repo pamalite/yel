@@ -34,6 +34,7 @@ if ($_POST['action'] == 'save_census_answers') {
 if ($_POST['action'] == 'save_career_summary') {
     $data = array();
     $data['is_active_seeking_job'] = $_POST['is_active'];
+    $data['contact_me_for_opportunities'] = $_POST['contact_me'];
     $data['seeking'] = $_POST['seeking'];
     $data['expected_salary_currency'] = $_POST['expected_sal_currency'];
     $data['expected_salary'] = $_POST['expected_sal_start'];

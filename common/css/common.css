@@ -173,18 +173,19 @@ option.main_industry {
 /* --- <start> general page footer --- */
 div.footer {
     width: 100%;
-    background: url('../images/footbg.jpg') repeat-x;
-    color: #FFFFFF;
+    border-top: 1px solid #CDCDCD;
+/*    background: url('../images/footbg.jpg') repeat-x;*/
+/*    color: #FFFFFF;*/
     margin-top: 15px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-top: 3px;
 }
 div.footer a {
     color: #fc8f02;
 }
 div.footer a:hover {
-    color: #ffffff;
-    text-decoration: none;
+/*    color: #ffffff;*/
+    color: #ff0000;
+/*    text-decoration: none;*/
 }
 div.footer table {
     font-size: 12px;

@@ -97,8 +97,8 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="field odd">Notice period:</td>
-                                        <td class="odd">
+                                        <td class="field">Notice period:</td>
+                                        <td>
                                             <span id="notice_period_field">
                                                 %notice_period% months
                                             </span>
@@ -195,6 +195,8 @@
                             <option value="1" %is_active_yes_option%>Yes</option>
                             <option value="0" %is_active_no_option%>No</option>
                         </select>
+                        &nbsp;
+                        <input type="checkbox" id="contact_me" %contact_me% /><label for="contact_me">Contact me if opportunities are available.</label>
                     </td>
                 </tr>
                 <tr>
@@ -250,8 +252,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="field odd">What is your notice period?</td>
-                    <td class="odd">
+                    <td class="field">What is your notice period?</td>
+                    <td>
                         <input type="text" id="notice_period" value="%notice_period_txt%" /> months
                     </td>
                 </tr>

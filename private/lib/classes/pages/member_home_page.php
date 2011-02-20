@@ -48,19 +48,40 @@ class MemberHomePage extends Page {
     }
     
     private function get_completeness() {
-        $query = "SELECT members.checked_profile, bank.has_bank, cv.has_resume, photo.has_photo 
-                  FROM members, 
-                  (SELECT COUNT(*) AS has_bank FROM member_banks WHERE member = '". $_POST['id']. "') bank, 
-                  (SELECT COUNT(*) AS has_resume FROM resumes WHERE member = '". $_POST['id']. "' AND deleted = 'N') cv, 
-                  (SELECT COUNT(*) AS has_photo FROM member_photos WHERE member = '". $_POST['id']. "') photo 
+        $query = "SELECT members.seeking, members.current_salary, members.expected_salary, 
+                         members.preferred_job_location_1, members.can_travel_relocate, 
+                         members.reason_for_leaving, members.notice_period, 
+                         COUNT(member_job_profiles.id) AS has_job_profiles 
+                  FROM members 
+                  LEFT JOIN member_job_profiles ON member_job_profiles.member = members.email_addr 
                   WHERE members.email_addr = '". $this->member->getId(). "'";
         $result = $this->mysqli->query($query);
         
         $response = array();
-        $response['checked_profile'] = ($result[0]['checked_profile'] == 'Y') ? '1' : '0';
-        $response['has_bank'] = ($result[0]['has_bank'] > 0) ? '1' : '0';
-        $response['has_resume'] = ($result[0]['has_resume'] > 0) ? '1' : '0';
-        $response['has_photo'] = ($result[0]['has_photo'] > 0) ? '1' : '0';
+        $response['seeking'] = 0;
+        if (!is_null($result[0]['seeking']) && !empty($result[0]['seeking'])) {
+            $response['seeking'] = 1;
+        }
+        
+        $response['reason_for_leaving'] = 0;
+        if (!is_null($result[0]['reason_for_leaving']) && !empty($result[0]['reason_for_leaving'])) {
+            $response['reason_for_leaving'] = 1;
+        }
+        
+        $response['preferred_job_location'] = 0;
+        if (!is_null($result[0]['preferred_job_location_1']) && !empty($result[0]['preferred_job_location_1'])) {
+            $response['preferred_job_location'] = 1;
+        }
+        
+        $response['can_travel_relocate'] = 0;
+        if (!is_null($result[0]['can_travel_relocate']) && !empty($result[0]['can_travel_relocate'])) {
+            $response['can_travel_relocate'] = 1;
+        }
+        
+        $response['current_salary'] = ($result[0]['current_salary'] > 0) ? '1' : '0';
+        $response['expected_salary'] = ($result[0]['expected_salary'] > 0) ? '1' : '0';
+        $response['notice_period'] = ($result[0]['notice_period'] > 0) ? '1' : '0';
+        $response['has_job_profiles'] = ($result[0]['has_job_profiles'] > 0) ? '1' : '0';
         
         return $response;
     }
@@ -76,7 +97,8 @@ class MemberHomePage extends Page {
                           members.preferred_job_location_1 AS pref_job_loc_1, 
                           members.preferred_job_location_2 AS pref_job_loc_2, 
                           countries.country AS pref_job_location_1, 
-                          countries2.country AS pref_job_location_2", 
+                          countries2.country AS pref_job_location_2, 
+                          members.contact_me_for_opportunities", 
             'joins' => "countries ON countries.country_code = members.preferred_job_location_1, 
                         countries AS countries2 ON countries2.country_code = members.preferred_job_location_2", 
             'match' => "members.email_addr = '". $this->member->getId(). "'", 
@@ -243,19 +265,33 @@ class MemberHomePage extends Page {
             
             if ($value == 0 && empty($next_step)) {
                 switch ($key) {
-                    case 'checked_profile':
-                        $next_step = '<a href="profile.php">Check Your Profile</a>';
+                    case 'seeking':
+                        $next_step = 'Fill in Current Job Responsibilities / Experiences.';
                         break;
-                    case 'has_bank':
-                        $next_step = '<a href="profile.php">Enter a bank account in Profile</a>';
+                    case 'current_salary':
+                        $next_step = 'Fill in Current Salary range.';
                         break;
-                    case 'has_resume':
-                        $next_step = '<a href="resumes.php">Upload a Resume</a>';
+                    case 'expected_salary':
+                        $next_step = 'Fill in Expected Salary range.';
                         break;
-                    case 'has_photo':
-                        $next_step = '<a href="profile.php">Upload a photo in Profile</a>';
+                    case 'preferred_job_location':
+                        $next_step = 'Select your preferred job locations.';
+                        break;
+                    case 'can_travel_relocate':
+                        $next_step = 'Fill in Willing to travel / relocate.';
+                        break;
+                    case 'reason_for_leaving':
+                        $next_step = 'Fill in Reason for Leaving.';
+                        break;
+                    case 'notice_period':
+                        $next_step = 'Fill in Notice Period.';
+                        break;
+                    case 'has_job_profiles':
+                        $next_step = 'Add a Present &amp; Past Position.';
                         break;
                 }
+            } else {
+                $next_step = 'Career Profile is complete!';
             }
         }
         
@@ -291,6 +327,18 @@ class MemberHomePage extends Page {
         $is_active_str = 'No';
         if ($is_active) {
             $is_active_str = 'Yes';
+        }
+        
+        if ($answers['contact_me_for_opportunities'] == '1') {
+            if ($is_active_str == 'No') {
+                $is_active_str .= ', but ';
+            } else {
+                $is_active_str .= '; also ';
+            }
+            $is_active_str .= 'contact me if opportunities are available.';
+            $page = str_replace('%contact_me%', 'checked', $page);
+        } else {
+            $page = str_replace('%contact_me%', '', $page);
         }
         $page = str_replace('%is_active%', $is_active_str, $page);
         
@@ -366,11 +414,11 @@ class MemberHomePage extends Page {
         
         // career summary editor
         if ($is_active) {
-            $page = str_replace('%is_active_yes_option', 'selected', $page);
-            $page = str_replace('%is_active_no_option', '', $page);
+            $page = str_replace('%is_active_yes_option%', 'selected', $page);
+            $page = str_replace('%is_active_no_option%', '', $page);
         } else {
-            $page = str_replace('%is_active_yes_option', '', $page);
-            $page = str_replace('%is_active_no_option', 'selected', $page);
+            $page = str_replace('%is_active_yes_option%', '', $page);
+            $page = str_replace('%is_active_no_option%', 'selected', $page);
         }
         
         $page = str_replace('%seeking_txt%', str_replace('<br/>', "\r\n", $answers['seeking']), $page);
