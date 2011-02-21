@@ -415,11 +415,6 @@ function onDomReady() {}
 
 function onLoaded() {
     initialize_page();
-    
-    if ($('div_hrm_census').getStyle('display') != 'none') {
-        new OverText($('birthdate_year'));
-        new OverText($('ethnicity_txt'));
-    }
 }
 
 window.addEvent('domready', onDomReady);

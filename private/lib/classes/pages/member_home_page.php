@@ -263,7 +263,7 @@ class MemberHomePage extends Page {
             $total += $value;
             $completeness_percent = ($total / count($completeness_raw)) * 100;
             
-            if ($value == 0 && empty($next_step)) {
+            if ($completeness_percent < 100 && empty($next_step)) {
                 switch ($key) {
                     case 'seeking':
                         $next_step = 'Fill in Current Job Responsibilities / Experiences.';
@@ -290,9 +290,11 @@ class MemberHomePage extends Page {
                         $next_step = 'Add a Present &amp; Past Position.';
                         break;
                 }
-            } else {
-                $next_step = 'Career Profile is complete!';
             }
+        }
+        
+        if ($completeness_percent >= 100) {
+            $next_step = 'Career Profile is complete.';
         }
         
         $answers = $this->get_answers();

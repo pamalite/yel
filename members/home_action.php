@@ -45,8 +45,8 @@ if ($_POST['action'] == 'save_career_summary') {
     $data['current_salary_currency'] = $_POST['current_sal_currency'];
     $data['current_salary'] = $_POST['current_sal_start'];
     $data['current_salary_end'] = $_POST['current_sal_end'];
-    $data['preferred_job_location_1'] = $_POST['pref_job_loc_1'];
-    $data['preferred_job_location_2'] = $_POST['pref_job_loc_2'];
+    $data['preferred_job_location_1'] = ($_POST['pref_job_loc_1'] <= 0) ? 'NULL' : $_POST['pref_job_loc_1'];
+    $data['preferred_job_location_2'] = ($_POST['pref_job_loc_2'] <= 0) ? 'NULL' : $_POST['pref_job_loc_2'];
     $data['notice_period'] = is_numeric($_POST['notice_period']) ? $_POST['notice_period'] : "0";
     $data['updated_on'] = date('Y-m-d');
     
