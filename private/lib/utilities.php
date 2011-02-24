@@ -288,4 +288,14 @@ function format_job_description($_description) {
     
     return $formatted_description;
 }
+
+function sql_nullify($_str) {
+    $_str = trim($_str);
+    if (empty($_str) || is_null($_str) || 
+        $_str == '0' || $_str == 0) {
+        return 'NULL';
+    }
+    
+    return $_str;
+}
 ?>

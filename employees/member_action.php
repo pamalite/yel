@@ -35,10 +35,10 @@ if ($_POST['action'] == 'save_profile') {
     $data['state'] = $_POST['state'];
     $data['zip'] = $_POST['zip'];
     $data['country'] = $_POST['country'];
-    $data['citizenship'] = $_POST['citizenship'];
-    $data['hrm_gender'] = $_POST['hrm_gender'];
-    $data['hrm_ethnicity'] = $_POST['hrm_ethnicity'];
-    $data['hrm_birthdate'] = $_POST['hrm_birthdate'];
+    $data['citizenship'] = sql_nullify($_POST['citizenship']);
+    $data['hrm_gender'] = sql_nullify($_POST['hrm_gender']);
+    $data['hrm_ethnicity'] = sql_nullify($_POST['hrm_ethnicity']);
+    $data['hrm_birthdate'] = sql_nullify($_POST['hrm_birthdate']);
     $data['updated_on'] = $today;
     
     $member = NULL;
@@ -660,8 +660,8 @@ if ($_POST['action'] == 'save_career') {
     $data['current_salary_currency'] = $_POST['current_currency'];
     $data['current_salary'] = $_POST['current_salary'];
     $data['current_salary_end'] = $_POST['current_salary_end'];
-    $data['preferred_job_location_1'] = (empty($_POST['pref_job_loc_1'])) ? 'NULL' : $_POST['pref_job_loc_1'];
-    $data['preferred_job_location_2'] = (empty($_POST['pref_job_loc_2'])) ? 'NULL' : $_POST['pref_job_loc_2'];
+    $data['preferred_job_location_1'] = sql_nullify($_POST['pref_job_loc_1']);
+    $data['preferred_job_location_2'] = sql_nullify($_POST['pref_job_loc_2']);
     $data['updated_on'] = date('Y-m-d');
     
     $member = new Member($_POST['id']);
@@ -676,7 +676,7 @@ if ($_POST['action'] == 'save_career') {
 
 if ($_POST['action'] == 'save_job_profile') {
     $data = array();
-    $data['specialization'] = $_POST['specialization'];
+    // $data['specialization'] = $_POST['specialization'];
     $data['position_title'] = $_POST['position_title'];
     $data['position_superior_title'] = $_POST['superior_title'];
     $data['organization_size'] = $_POST['organization_size'];
@@ -761,6 +761,10 @@ if ($_POST['action'] == 'get_job_profile') {
     
     $member = new Member();
     $result = $member->find($criteria);
+    
+    foreach ($result[0] as $key=>$value) {
+        $result[0][$key] = stripslashes($value);
+    }
     
     $response = array('job_profile' => $result);
     header('Content-type: text/xml');

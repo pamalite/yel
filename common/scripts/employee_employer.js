@@ -225,6 +225,8 @@ function save_profile() {
                     if (proceed_copy) {
                         copy_fees(false);
                     }
+                } else {
+                    alert('Employer account successfully created.' + "\n\nRemember to fill up the Fees that will have been structured for this employer.");
                 }
                 
                 location.replace('employer.php?id=' + employer_id);

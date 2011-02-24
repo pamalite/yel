@@ -188,6 +188,8 @@ function save_profile() {
                 return false;
             }
             
+            alert('Candidate profile successfully saved.');
+            
             if (mode == 'create') {
                 location.replace('member.php?member_email_addr=' + $('email_addr').value);
                 return;
@@ -1425,7 +1427,7 @@ function close_job_profile_popup(_is_save) {
         
         var params = 'id=' + $('job_profile_id').value + '&action=save_job_profile';
         params = params + '&member=' + member_id;
-        params = params + '&specialization=' + $('specialization').value;
+        // params = params + '&specialization=' + $('specialization').value;
         params = params + '&position_title=' + $('position_title').value;
         params = params + '&superior_title=' + $('position_superior_title').value;
         params = params + '&organization_size=' + encodeURIComponent($('organization_size').value);
@@ -1434,6 +1436,8 @@ function close_job_profile_popup(_is_save) {
         params = params + '&employer=' + encodeURIComponent($('company').value);
         params = params + '&emp_desc=' + $('emp_desc').value;
         params = params + '&emp_specialization=' + $('emp_specialization').value;
+        
+        $('job_profile_id').value = '0';
         
         var uri = root + "/employees/member_action.php";
         var request = new Request({
