@@ -189,6 +189,11 @@ if ($_POST['action'] == 'get_jobs') {
 if ($_POST['action'] == 'save_notes') {
     $member = new Member($_POST['id']);
     
+    $notes = $_POST['notes'];
+    if (!empty($notes)) {
+        $notes .= "\n\n--- ". date('Y-m-d H:i'). " ---\n\n";
+    }
+    
     if ($member->saveNotes($_POST['notes']) === false) {
         echo 'ko';
         exit();
