@@ -194,7 +194,7 @@ if ($_POST['action'] == 'save_notes') {
         $notes .= "\n\n--- ". date('Y-m-d H:i'). " ---\n\n";
     }
     
-    if ($member->saveNotes($_POST['notes']) === false) {
+    if ($member->saveNotes($notes) === false) {
         echo 'ko';
         exit();
     }

@@ -425,6 +425,8 @@ function save_notes() {
                 alert('An error occured while saving notes.');
                 return false;
             }
+            
+            location.replace('member.php?member_email_addr=' + member_id + '&page=notes');
         },
         onRequest: function(instance) {
             set_status('Saving notes...');
