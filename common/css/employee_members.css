@@ -108,8 +108,8 @@ div.notes_form {
 }
 
 textarea.notes, textarea.progress_notes {
-    width: 98%;
-    height: 550px;
+    width: 95%;
+    height: 545px;
     font-size: 12pt;
 }
 

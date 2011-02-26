@@ -45,7 +45,7 @@ class MemberJobApplicationsPage extends Page {
         <?php
             if (empty($applications)) {
         ?>
-            <div class="empty_results">No jobs applied.</div>
+            <div class="empty_results">No jobs explored yet.</div>
         <?php
             } else {
                 $applications_table = new HTMLTable('applications_table', 'applications');

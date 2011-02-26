@@ -354,12 +354,14 @@ class MemberHomePage extends Page {
         $page = str_replace('%seeking%', $seeking_txt, $page);
         
         $page = str_replace('%expected_salary_currency%', $answers['expected_salary_currency'], $page);
-        $page = str_replace('%expected_salary%', number_format($answers['expected_salary'], 2, '.', ','), $page);
-        $page = str_replace('%expected_salary_end%', number_format($answers['expected_salary_end'], 2, '.', ','), $page);
+        $exp_sal_range = $answers['expected_salary'];
+        $exp_sal_range .= ($answers['expected_salary_end'] <= 0) ? '' : ' - '. $answers['expected_salary_end'];
+        $page = str_replace('%expected_salary_range%', $exp_sal_range, $page);
         
         $page = str_replace('%current_salary_currency%', $answers['current_salary_currency'], $page);
-        $page = str_replace('%current_salary%', number_format($answers['current_salary'], 2, '.', ','), $page);
-        $page = str_replace('%current_salary_end%', number_format($answers['current_salary_end'], 2, '.', ','), $page);
+        $cur_sal_range = $answers['current_salary'];
+        $cur_sal_range .= ($answers['current_salary_end'] <= 0) ? '' : ' - '. $answers['current_salary_end'];
+        $page = str_replace('%current_salary_range%', $cur_sal_range, $page);
         
         $page = str_replace('%pref_job_loc_1%', $answers['pref_job_location_1'], $page);
         $page = str_replace('%pref_job_loc_2%', $answers['pref_job_location_2'], $page);
@@ -440,8 +442,9 @@ class MemberHomePage extends Page {
             }
         }
         $page = str_replace('%expected_salary_currency_options%', $exp_currency_options_str, $page);
-        $page = str_replace('%expected_salary_txt%', number_format($answers['expected_salary'], 2), $page);
-        $page = str_replace('%expected_salary_end_txt%', number_format($answers['expected_salary_end'], 2), $page);
+        $page = str_replace('%expected_salary_txt%', $answers['expected_salary'], $page);
+        $exp_sal_end = ($answers['expected_salary_end'] <= 0) ? '' : $answers['expected_salary_end'];
+        $page = str_replace('%expected_salary_end_txt%', $exp_sal_end, $page);
         
         $cur_currency_options_str = '';
         foreach ($GLOBALS['currencies'] as $i=>$currency) {
@@ -452,8 +455,9 @@ class MemberHomePage extends Page {
             }
         }
         $page = str_replace('%current_salary_currency_options%', $cur_currency_options_str, $page);
-        $page = str_replace('%current_salary_txt%', number_format($answers['current_salary'], 2), $page);
-        $page = str_replace('%current_salary_end_txt%', number_format($answers['current_salary_end'], 2), $page);
+        $page = str_replace('%current_salary_txt%', $answers['current_salary'], $page);
+        $cur_sal_end = ($answers['current_salary_end'] <= 0) ? '' : $answers['current_salary_end'];
+        $page = str_replace('%current_salary_end_txt%', $cur_sal_end, $page);
         
         $page = str_replace('%pref_job_loc_1_select%', $this->generate_countries($answers['pref_job_loc_1'], 'pref_job_loc_1'), $page);
         $page = str_replace('%pref_job_loc_2_select%', $this->generate_countries($answers['pref_job_loc_2'], 'pref_job_loc_2'), $page);

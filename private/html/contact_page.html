@@ -3,13 +3,13 @@
         <tr>
             <td>
                 <div class="title">
-                    Contact Us
+                    Contact Us <span style="font-size: 9pt; font-style: italic;">(* indicates required field)</span>
                 </div>
                 <div class="form">
                     <form action="contact_us_action.php" method="post" onSubmit="return validate_form();">
                         <table class="form">
                             <tr>
-                                <td class="label"><label for="contact_name">Contact Name:</label></td>
+                                <td class="label"><label for="contact_name">* Contact Name:</label></td>
                                 <td>
                                     <input type="text" class="field" id="contact_name" name="contact_name" value="%contact_name%" />
                                 </td>
@@ -21,7 +21,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="label"><label for="email_addr">Email Address:</label></td>
+                                <td class="label"><label for="email_addr">* Email Address:</label></td>
                                 <td>
                                     <input type="text" class="field" id="email_addr" name="email_addr" value="%email_addr%"/>
                                 </td>
@@ -50,7 +50,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="label"><label for="message">Message:</label></td>
+                                <td class="label"><label for="message">* Message:</label></td>
                                 <td><textarea class="field" id="message" name="message">%message%</textarea></td>
                             </tr>
                             <tr>

@@ -63,8 +63,8 @@ foreach ($mail_lines as $line) {
     $message .= $line;
 }
 
-$message = str_replace('%member_name%', $member->get_name(), $message);
-$message = str_replace('%email_addr%', $member->id(), $message);
+$message = str_replace('%member_name%', $member->getFullName(), $message);
+$message = str_replace('%email_addr%', $member->getId(), $message);
 $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
 $message = str_replace('%root%', $GLOBALS['root'], $message);
 $subject = "Welcome to YellowElevator.com";
