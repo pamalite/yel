@@ -45,10 +45,10 @@ $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
 $headers .= 'Reply-To: ' . $reply_to. "\n";
 mail($send_to, $subject, $message, $headers);
 
-$handle = fopen('/tmp/email_to_'. $send_to. '_contactus.txt', 'w');
-fwrite($handle, 'Subject: '. $subject. "\n\n");
-fwrite($handle, $message);
-fclose($handle);
+// $handle = fopen('/tmp/email_to_'. $send_to. '_contactus.txt', 'w');
+// fwrite($handle, 'Subject: '. $subject. "\n\n");
+// fwrite($handle, $message);
+// fclose($handle);
 
 // 5. send confirmation to sender
 $confirm_msg = 'Hi '. $_POST['contact_name']. ", \n\n";
@@ -61,10 +61,10 @@ $subject = 'YellowElevator.com: Message Received';
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
 mail($_POST['email_addr'], $subject, $confirm_msg, $headers);
 
-$handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_confirm.txt', 'w');
-fwrite($handle, 'Subject: '. $subject. "\n\n");
-fwrite($handle, $confirm_msg);
-fclose($handle);
+// $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_confirm.txt', 'w');
+// fwrite($handle, 'Subject: '. $subject. "\n\n");
+// fwrite($handle, $confirm_msg);
+// fclose($handle);
 
 redirect_to('welcome.php');
 exit();
