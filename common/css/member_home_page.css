@@ -45,7 +45,6 @@
     padding-top: 5px;
     padding-bottom: 5px;
     text-align: right;
-    border-top: 1px solid #CCCCCC;
 }
 
 .census_form {
@@ -66,18 +65,20 @@
 .profile_completeness {
     width: 99%;
     text-align: center;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #FFFFFF;
     padding-bottom: 3px;
     margin-bottom: 15px;
 }
 
 .completeness_title {
     float: left;
-    font-size: 12pt;
-    font-weight: bold;
+    font-size: 13pt;
     color: #464545;
-    padding: 5px 3px 5px 3px;
-    background-color: #CCCCCC;
+    padding-top: 3px;
+    padding-left: 5px;
+    padding-right: 3px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #CCCCCC;
 }
 
 .progress {
@@ -113,16 +114,19 @@
 
 .profile {
     width: 99%;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #FFFFFF;
     margin-bottom: 15px;
 }
 
+.career_profile {
+    border-left: 1px solid #CCCCCC;
+}
+
 .profile_title {
-    font-size: 12pt;
-    font-weight: bold;
+    font-size: 13pt;
     color: #464545;
-    background-color: #CCCCCC;
     padding: 3px 3px 3px 3px;
+    border-bottom: 1px solid #CCCCCC;
 }
 
 .profile_form, 

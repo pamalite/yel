@@ -315,7 +315,13 @@ class MemberHomePage extends Page {
         // }
         
         // completeness
-        $page = str_replace('%completeness_percent%', $completeness_percent, $page);
+        $progress_percent = $completeness_percent;
+        if ($completeness_percent >= 100) {
+            // this is to make sure the progress bar does not touch the right edge
+            $progress_percent -= 1;
+        }
+        $page = str_replace('%completeness_percent%', $progress_percent, $page);
+        $page = str_replace('%lbl_completeness_percent%', $completeness_percent, $page);
         $page = str_replace('%next_step%', $next_step, $page);
         
         // photo

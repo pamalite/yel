@@ -1,97 +1,94 @@
 <div class="content">
     <table class="contact">
         <tr>
-            <td colspan="4" style="text-align: center; padding-bottom: 50px;">
-                <span style="font-weight: bold;">Technical Support, Password Reset &amp; Help:</span><br/><br/>
-                support@yellowelevator.com
-            </td>
-        </tr>
-        <tr>
-            <td rowspan="1">
-                <img src="%root%/common/images/flags/MY.gif" />
-            </td>
-            <td style="padding-right: 20px;">
-                <div>
-                    <span style="font-weight: bold;">Malaysia</span><br/>
-                    Yellow Elevator Sdn. Bhd.<br/>
-                    1-12B-9, Suntech @ Penang Cybercity,<br/>
-                    Lintang Mayang Pasir 3, <br/>
-                    11950 Penang, Malaysia.
-                </div>
-                <div style="padding-top: 10px;">
-                    <span style="font-weight: bold;">Tel:</span> +6 04 640 6363<br/>
-                    <span style="font-weight: bold;">Fax:</span> +6 04 640 6366<br/>
-                </div>
-                <div style="padding-top: 10px;">
-                    <span style="font-weight: bold;">E-mail addresses:</span>
-                    <ul style="margin-top: 3px; margin-left: -20px;">
-                        <li>
-                            <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
-                            sales.my@yellowelevator.com
-                        </li>
-                        <li>
-                            <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
-                            billing.my@yellowelevator.com
-                        </li>
-                    </ul>
-                </div>
-            </td>
-            <!-- td rowspan="1" style="padding-left: 20px; border-left: 1px dashed #CCCCCC;">
-                <img src="%root%/common/images/flags/AU.gif" />
-            </td>
             <td>
-                <div>
-                    <span style="font-weight: bold;">Australia</span><br/>
-                    Yellow Elevator Pty Ltd<br/>
-                    Suite 3, 22 Council St, <br/>
-                    Hawthorn East, <br/>
-                    VIC  3123, Australia.
+                <div class="title">
+                    Contact Us
                 </div>
-                <div style="padding-top: 10px;">
-                    <span style="font-weight: bold;">Tel:</span> +61 03 9882 7164<br/>
-                    <span style="font-weight: bold;">Fax:</span> +61 03 9882 9792<br/>
+                <div class="form">
+                    <form action="contact_us_action.php" method="post" onSubmit="return validate_form();">
+                        <table class="form">
+                            <tr>
+                                <td class="label"><label for="contact_name">Contact Name:</label></td>
+                                <td>
+                                    <input type="text" class="field" id="contact_name" name="contact_name" value="%contact_name%" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label"><label for="contact_company">Company Name:</label></td>
+                                <td>
+                                    <input type="text" class="field" id="company_name" name="company_name" value="%company_name%"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label"><label for="email_addr">Email Address:</label></td>
+                                <td>
+                                    <input type="text" class="field" id="email_addr" name="email_addr" value="%email_addr%"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label"><label for="phone_num">Telephone Number:</label></td>
+                                <td>
+                                    <input type="text" class="field" id="phone_num" name="phone_num" value="%phone_num%" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label"><label for="subject">Subject:</label></td>
+                                <td>
+                                    <input type="text" class="field" id="subject" name="subject" value="%subject%" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label"><label for="category">Kind:</label></td>
+                                <td>
+                                    <select class="field" id="category" name="category">
+                                        <option value="general" %general_selected%>General Sales Enquiry</option>
+                                        <option value="tech" %tech_selected%>Technical Support</option>
+                                        <option value="billing" %billing_selected%>Billing &amp; Payment</option>
+                                        <option value="others" %others_selected%>Others</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label"><label for="message">Message:</label></td>
+                                <td><textarea class="field" id="message" name="message">%message%</textarea></td>
+                            </tr>
+                            <tr>
+                                <td class="label">&nbsp;</td>
+                                <td class="field">
+                                    <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6LdwqsASAAAAAJuZpFkYJo6a0-QAJET_OafO3n6D">
+                                    </script>
+                                    <noscript>
+                                        <iframe src="http://www.google.com/recaptcha/api/noscript?k=6LdwqsASAAAAAJuZpFkYJo6a0-QAJET_OafO3n6D"
+                                             height="300" width="500" frameborder="0" id="recaptcha"></iframe><br>
+                                        <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+                                        <input type="hidden" name="recaptcha_response_field"value="manual_challenge">
+                                    </noscript>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="button">
+                                    <input type="submit" value="Send" />
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
                 </div>
-                <div style="padding-top: 10px;">
-                    <span style="font-weight: bold;">E-mail addresses:</span>
-                    <ul style="margin-top: 3px; margin-left: -20px;">
-                        <li>
-                            <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
-                            sales.au@yellowelevator.com
-                        </li>
-                        <li>
-                            <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
-                            billing.au@yellowelevator.com
-                        </li>
-                    </ul>
-                </div>
-            </td -->
-            <td rowspan="1">
-                <img src="%root%/common/images/flags/SG.gif" />
             </td>
-            <td style="padding-right: 20px;">
-                <div>
-                    <span style="font-weight: bold;">Singapore</span><br/>
-                    Yellow Elevator Sdn. Bhd.<br/>
+            <td rowspan="2" class="address">
+                <div class="title">
+                    Postal Address
+                </div>
+                <div class="address">
+                    <span style="font-weight: bold;">Yellow Elevator Sdn. Bhd.</span><br/>
                     1-12B-9, Suntech @ Penang Cybercity,<br/>
                     Lintang Mayang Pasir 3, <br/>
                     11950 Penang, Malaysia.
                 </div>
-                <div style="padding-top: 10px;">
-                    <span style="font-weight: bold;">Tel:</span> +6 04 640 6363<br/>
-                    <span style="font-weight: bold;">Fax:</span> +6 04 640 6366<br/>
-                </div>
-                <div style="padding-top: 10px;">
-                    <span style="font-weight: bold;">E-mail addresses:</span>
-                    <ul style="margin-top: 3px; margin-left: -20px;">
-                        <li>
-                            <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
-                            sales.sg@yellowelevator.com
-                        </li>
-                        <li>
-                            <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
-                            billing.sg@yellowelevator.com
-                        </li>
-                    </ul>
+                <div class="facebook">
+                    <a href="http://www.facebook.com/yellowelevator">
+                        <img src="%root%/common/images/find_us_on_facebook.jpg" />
+                    </a>
                 </div>
             </td>
         </tr>
