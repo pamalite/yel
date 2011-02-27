@@ -123,7 +123,7 @@ class SearchPage extends Page {
                                     echo $row['currency']. '$ '. number_format($potential_reward, 2, '.', ',');
                                 ?>
                                 <br/>
-                                Candidate's Cash Reward: 
+                                Candidate's Cash Bonus: 
                                 <?php 
                                     echo $row['currency']. '$ '. number_format($potential_token_reward, 2, '.', ',');
                                 ?>
