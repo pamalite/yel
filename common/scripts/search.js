@@ -105,32 +105,38 @@ function show_jobs() {
                 
                 var html = '';
                 for (var i=0; i < ids.length; i++) {
+                    var total_rewards = parseFloat(rewards[i].childNodes[0].nodeValue);
+                    var token_reward = total_rewards * 0.05;
+                    var potential_reward = total_rewards - token_reward;
+                    
                     var job_short_details = '<div class="job_short_details">' + "\n";
                     
+                    // job title
                     job_short_details = job_short_details + '<div class="job_title">' + "\n";
-                    job_short_details = job_short_details + '<span class="industry">' + industries[i].childNodes[0].nodeValue + '</span>' + "\n";
                     job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '">' + job_titles[i].childNodes[0].nodeValue + '</a>' + "\n";
                     job_short_details = job_short_details + '</div>' + "\n";
                     
+                    // employer
                     job_short_details = job_short_details + '<div class="employer">' + "\n";
                     job_short_details = job_short_details + employers[i].childNodes[0].nodeValue + "\n";
-                    job_short_details = job_short_details + '<span class="country">' + countries[i].childNodes[0].nodeValue + '</span>' + "\n";
+                    job_short_details = job_short_details + '<span class="country">' + countries[i].childNodes[0].nodeValue + '</span> | ' + '<span class="industry">' + industries[i].childNodes[0].nodeValue + '</span>' + "\n";
                     job_short_details = job_short_details + '</div>' + "\n";
                     
-                    job_short_details = job_short_details + '<div class="description">' + "\n";
-                    job_short_details = job_short_details + descriptions[i].childNodes[0].nodeValue + '...</div>' + "\n";
-                    
+                    // date and salary
                     job_short_details = job_short_details + '<div class="date_and_salary">' + "\n";
-                    job_short_details = job_short_details + '<span class="salary">' + currencies[i].childNodes[0].nodeValue + "$ \n";
+                    job_short_details = job_short_details + 'Monthly Salary Range: ' + currencies[i].childNodes[0].nodeValue + "$ \n";
                     if (salary_ends[i].childNodes.length > 0) {
                         job_short_details = job_short_details + salaries[i].childNodes[0].nodeValue + ' - ' + salary_ends[i].childNodes[0].nodeValue;
                     } else {
                         job_short_details = job_short_details + salaries[i].childNodes[0].nodeValue
                     }
-                    job_short_details = job_short_details + '</span>' + "\n";
-                    job_short_details = job_short_details + '&nbsp;<span class="reward">Potential Reward:' + currencies[i].childNodes[0].nodeValue + '$ ' + rewards[i].childNodes[0].nodeValue + '</span>' + "\n";
-                    job_short_details = job_short_details + '&nbsp;<span class="controls">' + "\n";
-                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '?refer=1">Refer Now</a> | <a href="./job/' + ids[i].childNodes[0].nodeValue + '?apply=1">Apply Now</a> | <a href="./job/' + ids[i].childNodes[0].nodeValue + '">View Details</a>' + '</span>' + "\n";
+                    job_short_details = job_short_details + '<br/>Recommender\'s Cash Reward:' + currencies[i].childNodes[0].nodeValue + '$ ' + potential_reward;
+                    job_short_details = job_short_details + '<br/>Candidate\'s Cash Bonus:' + currencies[i].childNodes[0].nodeValue + '$ ' + token_reward + '<br/><br/>' + "\n";
+                    
+                    job_short_details = job_short_details + '<span class="controls">' + "\n";
+                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '?refer=1">Recommend Someone</a> <span class="black">|</span> ';
+                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '?apply=1">Explore This Opportunity</a> <span class="black">|</span> ';
+                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '">View Details</a>' + '</span>' + "\n";
                     job_short_details = job_short_details + '</div>' + "\n";
                     
                     job_short_details = job_short_details + '<div class="expire_on">Expires on ' + expire_ons[i].childNodes[0].nodeValue + '</div>' + "\n";
