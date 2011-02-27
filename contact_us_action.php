@@ -5,13 +5,13 @@ require_once dirname(__FILE__). "/private/lib/recaptchalib.php";
 session_start();
 
 // 1. store into session
-$_SESSION['contact_name'] = $_POST['contact_name'];
-$_SESSION['company_name'] = $_POST['company_name'];
-$_SESSION['email_addr'] = $_POST['email_addr'];
-$_SESSION['phone_num'] = $_POST['phone_num'];
-$_SESSION['subject'] = $_POST['subject'];
-$_SESSION['message'] = $_POST['message'];
-$_SESSION['kind'] = $_POST['category'];
+$_SESSION['yel']['contact_us']['contact_name'] = $_POST['contact_name'];
+$_SESSION['yel']['contact_us']['company_name'] = $_POST['company_name'];
+$_SESSION['yel']['contact_us']['email_addr'] = $_POST['email_addr'];
+$_SESSION['yel']['contact_us']['phone_num'] = $_POST['phone_num'];
+$_SESSION['yel']['contact_us']['subject'] = $_POST['subject'];
+$_SESSION['yel']['contact_us']['message'] = $_POST['message'];
+$_SESSION['yel']['contact_us']['kind'] = $_POST['category'];
 
 // 2. check captcha
 $privatekey = '6LdwqsASAAAAAEJESjRalI-y5sjko4b82nMLC5mH';

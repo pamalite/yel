@@ -39,14 +39,14 @@ class ContactPage extends Page {
         $page = file_get_contents(dirname(__FILE__). '/../../../html/contact_page.html');
         $page = str_replace('%root%', $this->url_root, $page);
         
-        $page = str_replace('%contact_name%' , $_SESSION['contact_name'], $page);
-        $page = str_replace('%company_name%' , $_SESSION['company_name'], $page);
-        $page = str_replace('%email_addr%' , $_SESSION['email_addr'], $page);
-        $page = str_replace('%phone_num%' , $_SESSION['phone_num'], $page);
-        $page = str_replace('%subject%' , $_SESSION['subject'], $page);
-        $page = str_replace('%message%' , $_SESSION['message'], $page);
+        $page = str_replace('%contact_name%' , $_SESSION['yel']['contact_us']['contact_name'], $page);
+        $page = str_replace('%company_name%' , $_SESSION['yel']['contact_us']['company_name'], $page);
+        $page = str_replace('%email_addr%' , $_SESSION['yel']['contact_us']['email_addr'], $page);
+        $page = str_replace('%phone_num%' , $_SESSION['yel']['contact_us']['phone_num'], $page);
+        $page = str_replace('%subject%' , $_SESSION['yel']['contact_us']['subject'], $page);
+        $page = str_replace('%message%' , $_SESSION['yel']['contact_us']['message'], $page);
         
-        switch ($_SESSION['kind']) {
+        switch ($_SESSION['yel']['contact_us']['kind']) {
             case 'general':
                 $page = str_replace('%general_selected%' , 'selected', $page);
                 break;

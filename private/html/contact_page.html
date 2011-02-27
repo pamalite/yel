@@ -41,7 +41,7 @@
                             <tr>
                                 <td class="label"><label for="category">Kind:</label></td>
                                 <td>
-                                    <select class="field" id="category" name="category">
+                                    <select class="field" id="category" name="category" onChange="show_warning();">
                                         <option value="general" %general_selected%>General Sales Enquiry</option>
                                         <option value="tech" %tech_selected%>Technical Support</option>
                                         <option value="billing" %billing_selected%>Billing &amp; Payment</option>
@@ -77,13 +77,16 @@
             </td>
             <td rowspan="2" class="address">
                 <div class="title">
-                    Postal Address
+                    Mailing Address
                 </div>
                 <div class="address">
                     <span style="font-weight: bold;">Yellow Elevator Sdn. Bhd.</span><br/>
                     1-12B-9, Suntech @ Penang Cybercity,<br/>
                     Lintang Mayang Pasir 3, <br/>
                     11950 Penang, Malaysia.
+                </div>
+                <div class="address" style="text-align: center;">
+                    <a href="members/sign_up.php"><img src="%root%/common/images/get_connected_but_small.jpg" /></a>
                 </div>
                 <div class="facebook">
                     <a href="http://www.facebook.com/yellowelevator">

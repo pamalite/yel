@@ -95,6 +95,9 @@ class SearchPage extends Page {
                     <?php
                     } else {
                         foreach ($results as $i=>$row) {
+                            $total_potential_reward = $row['potential_reward'];
+                            $potential_token_reward = $total_potential_reward * 0.05;
+                            $potential_reward = $total_potential_reward - $potential_token_reward;
                     ?>
                         <div class="job_short_details">
                             <div class="job_title">
@@ -107,7 +110,7 @@ class SearchPage extends Page {
                                 <span class="country"><?php echo $row['country'] ?></span> | <span class="industry"><?php echo $row['industry'] ?></span>
                             </div>
                             <div class="date_and_salary">
-                                    Salary Range: 
+                                    Monthly Salary Range: 
                                 <?php 
                                     echo $row['currency']. '$ '. number_format($row['salary'], 2, '.', ',');
                                     if (!empty($row['salary_end']) && !is_null($row['salary_end'])) {
@@ -115,9 +118,14 @@ class SearchPage extends Page {
                                     }
                                 ?>
                                 <br/>
-                                Recommender's Cash Bonus: 
+                                Recommender's Cash Reward: 
                                 <?php 
-                                    echo $row['currency']. '$ '. number_format($row['potential_reward'], 2, '.', ',');
+                                    echo $row['currency']. '$ '. number_format($potential_reward, 2, '.', ',');
+                                ?>
+                                <br/>
+                                Candidate's Cash Reward: 
+                                <?php 
+                                    echo $row['currency']. '$ '. number_format($potential_token_reward, 2, '.', ',');
                                 ?>
                                 <br/>
                                 <br/>

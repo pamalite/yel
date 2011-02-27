@@ -17,6 +17,13 @@ function validate_form() {
     return true;
 }
 
+function show_warning() {
+    if ($('category').options[$('category').selectedIndex].value == 'others') {
+        var msg = "Thank you for your interest in Yellow Elevator!\n\nHowever, if you are interested in connecting with our consultants, please click the 'Get Connected' button on the right. We will not entertain any career exploration requests through this page.\n\nWe apologize for any inconvenience caused.";
+        alert(msg);
+    }
+}
+
 function onDomReady() {
     
 }
