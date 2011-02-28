@@ -39,7 +39,7 @@ class EmployerLoginPage extends Page {
                 We like to thank our clients for their support. We have grown & rebranded <br/>
                 our company recently. While you enjoy this video, please take note that our<br/>
                 current video will be rebranded very soon.<br/><br/>
-                <object width="487" height="300"><param name="movie" value="http://www.youtube.com/v/YzfEH0UPEBo?fs=1&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/YzfEH0UPEBo?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="487" height="300"></embed></object>
+                <object width="480" height="390"><param name="movie" value="http://www.youtube.com/v/iQ0eX90aylQ?fs=1&amp;hl=en_US&amp;rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/iQ0eX90aylQ?fs=1&amp;hl=en_US&amp;rel=0" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="390"></embed></object>
             </div>
             <div class="side">
                 <div class="login_form">
