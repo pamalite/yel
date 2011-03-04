@@ -27,7 +27,7 @@ foreach ($result as $i=>$row) {
 // 3. Insert into index
 $query = "INSERT INTO referral_index VALUES ";
 foreach ($sanitized_referrals as $i=>$referral) {
-    $query .= "(". $referral['id']. ", '". $referral['notes']. "', '". $referral['testimony']. "')";
+    $query .= "(". $referral['id']. ", '". $referral['testimony']. "')";
     if ($i < count($sanitized_referrals)-1) {
         $query .= ", ";
     }

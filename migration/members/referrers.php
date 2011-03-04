@@ -158,6 +158,15 @@ if (!is_null($result) && !empty($result)) {
         } else {
             echo 'success<br/>';
             $new_members[] = $recommender['email_addr'];
+            
+            // use the remarks as index
+            $query = "INSERT INTO member_index SET 
+                      member = '". $recommender['email_addr']. "', 
+                      notes = '". $recommender['remarks']. "'";
+            echo $query. '<br/>';
+            if ($mysqli->execute($query) === false) {
+                echo 'Cannot move recommender remarks to member_index: '. $recommender['email_addr']. '<br/><br/>';
+            }
         }
     }
     
@@ -195,8 +204,8 @@ $result = $mysqli->query($query);
 if (!is_null($result) && !empty($result)) {
     $recommenders = $result;
     foreach ($recommenders as $recommender) {
-        $query = "UPDATE members SET remarks = '". $recommender['remarks']. "' 
-                  WHERE email_addr = '". $recommender['email_addr']. "'";
+        $query = "UPDATE member_index SET notes = '". $recommender['remarks']. "' 
+                  WHERE member = '". $recommender['email_addr']. "'";
         echo $query. '<br/>';
         if ($mysqli->execute($query) === false) {
             echo 'failed<br/><br/>';
