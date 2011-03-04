@@ -72,6 +72,7 @@
 
 .completeness_title {
     float: left;
+    font-weight: bold;
     font-size: 13pt;
     color: #464545;
     padding-top: 3px;
@@ -124,6 +125,7 @@
 
 .profile_title {
     font-size: 13pt;
+    font-weight: bold;
     color: #464545;
     padding: 3px 3px 3px 3px;
     border-bottom: 1px solid #CCCCCC;
