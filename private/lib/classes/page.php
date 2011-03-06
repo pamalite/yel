@@ -236,30 +236,35 @@ class Page {
         <?php
     }
     
-    protected function menu($type, $page = '') {
+    protected function menu($type, $page = '', $_is_ye_connect_only = false) {
         $menu = '';
         $selected = '#CCCCCC';
         
         if ($type == 'employer') {
+            $ye_connect = '';
+            if ($_is_ye_connect_only) {
+                $ye_connect = 'display: none';
+            }
+            
             $menu = file_get_contents(dirname(__FILE__). '/../../html/menu_employers.html');
             $menu = str_replace('%root%', $this->url_root, $menu);
             
-            if ($page == 'resumes') {
-                $menu = str_replace('%employer_resumes%', $selected, $menu);
+            if ($page == 'candidates') {
+                $menu = str_replace('%employer_candidates%', $selected, $menu);
             } else {
-                $menu = str_replace('%employee_resumes%', 'none', $menu);
+                $menu = str_replace('%employer_candidates%', 'none', $menu);
             }
             
             if ($page == 'resumes') {
-                $menu = str_replace('%employer_resumes%', $selected, $menu);
+                $menu = str_replace('%employer_resumes%', $selected. '; '. $ye_connect, $menu);
             } else {
-                $menu = str_replace('%employee_resumes%', 'none', $menu);
+                $menu = str_replace('%employer_resumes%', 'none; '. $ye_connect, $menu);
             }
             
             if ($page == 'jobs') {
-                $menu = str_replace('%employer_jobs%', $selected, $menu);
+                $menu = str_replace('%employer_jobs%', $selected. '; '. $ye_connect, $menu);
             } else {
-                $menu = str_replace('%employee_jobs%', 'none', $menu);
+                $menu = str_replace('%employer_jobs%', 'none; '. $ye_connect, $menu);
             }
             
             if ($page == 'invoices') {
