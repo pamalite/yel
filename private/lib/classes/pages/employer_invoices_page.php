@@ -54,7 +54,7 @@ class EmployerInvoicesPage extends Page {
         $this->begin();
         $this->support($this->employer->getId());
         $this->top('Invoices &amp; Receipts');
-        $this->menu('employer', 'invoices');
+        $this->menu('employer', 'invoices', $this->employer->isYEConnectOnly());
         
         $invoices = $this->get_invoices();
         $receipts = $this->get_invoices(true);

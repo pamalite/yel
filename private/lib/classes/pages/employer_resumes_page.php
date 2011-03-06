@@ -104,7 +104,7 @@ class EmployerResumesPage extends Page {
         $this->begin();
         $this->support($this->employer->getId());
         $this->top('Resumes');
-        $this->menu('employer', 'resumes');
+        $this->menu('employer', 'resumes', $this->employer->isYEConnectOnly());
         
         $branch = $this->employer->getAssociatedBranch();
         $currency = $branch[0]['currency'];

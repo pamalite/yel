@@ -34,7 +34,7 @@ class EmployerJobsPage extends Page {
         $this->begin();
         $this->support($this->employer->getId());
         $this->top('Job Descriptions');
-        $this->menu('employer', 'jobs');
+        $this->menu('employer', 'jobs', $this->employer->isYEConnectOnly());
         
         $branch = $this->employer->getAssociatedBranch();
         $currency = $branch[0]['currency'];

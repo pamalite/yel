@@ -639,5 +639,19 @@ class Employer implements Model {
                   ". $order. " ". $limit;
         return $this->mysqli->query($query);
     }
+    
+    public function isYEConnectOnly() {
+        $query = "SELECT COUNT(employer_fees.id) AS has_fees, employers.is_ye_connect_enabled 
+                  FROM employers 
+                  LEFT JOIN employer_fees ON employer_fees.employer = employers.id 
+                  WHERE employers.id = '". $this->id. "' 
+                  GROUP BY employers.id";
+        
+        $result = $this->mysqli->query($query);
+        if ($result[0]['has_fees'] <= 0 && $result[0]['is_ye_connect_enabled'] == '1') {
+            return true;
+        }
+        return false;
+    }
 }
 ?>

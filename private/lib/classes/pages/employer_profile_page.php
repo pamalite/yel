@@ -57,7 +57,7 @@ class EmployerProfilePage extends Page {
         $this->begin();
         $this->support($this->employer->getId());
         $this->top('Company Profile');
-        $this->menu('employer', 'profile');
+        $this->menu('employer', 'profile', $this->employer->isYEConnectOnly());
         
         $branch = $this->employer->getAssociatedBranch();
         $profile = desanitize($this->employer->get());
