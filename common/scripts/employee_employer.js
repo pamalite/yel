@@ -941,6 +941,24 @@ function close_preview_window() {
     close_window('preview_window');
 }
 
+function show_credits_reminder() {
+    if ($('is_ye_connect_enabled').checked) {
+        alert('REMINDER: ' + "\n\nRemember to set the credits for this employer.");
+        
+        if (employer_id != '0') {
+            $('item_credits').setStyle('display', 'inline');
+        }
+    } else {
+        alert('WARNING: ' + "\n\nThis employer can no longer connect with our candidates.");
+        $('item_credits').setStyle('display', 'none');
+    }
+    
+    if (employer_id != '0') {
+        // TODO: automatically save
+        alert('saved');
+    }
+}
+
 function insert(_format) {
     var desc = $('job.description');
     desc.focus();

@@ -9,6 +9,9 @@ class EmployerResumesPage extends Page {
         parent::__construct();
         
         $this->employer = new Employer($_session['id'], $_session['sid']);
+        if ($this->employer->isYEConnectOnly()) {
+            redirect_to('profile.php');
+        }
     }
     
     public function insert_inline_css() {

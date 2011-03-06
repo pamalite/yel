@@ -189,6 +189,7 @@ class EmployeeEmployerPage extends Page {
             if (!$this->is_new) {
             ?>
                 <li id="item_fees" style="<?php echo ($this->current_page == 'fees') ? $style : ''; ?>"><a class="menu" onClick="show_fees();">Fees</a></li>
+                <li id="item_credits" style="display: none; <?php echo ($this->current_page == 'credits') ? $style : ''; ?>"><a class="menu" onClick="show_credits();">Credits</a></li>
                 <li id="item_subscriptions" style="<?php echo ($this->current_page == 'subscriptions') ? $style : ''; ?>"><a class="menu" onClick="show_subscriptions();">Subscriptions</a></li>
                 <li id="item_jobs" style="<?php echo  ($this->current_page == 'jobs') ? $style : ''; ?>"><a class="menu" onClick="show_jobs();">Jobs</a></li>
             <?php
@@ -212,6 +213,10 @@ class EmployeeEmployerPage extends Page {
                         <td class="label"><label for="business_license">Company/Business Registration No.:</label></td>
                         <td class="field"><input class="field" type="text" id="business_license" name="business_license" value="<?php echo $profile['license_num'] ?>" /></td>
                     </tr>
+                        <tr>
+                            <td class="label"><label for="ye_connect">Enable YE Connect:</label></td>
+                            <td class="field"><input type="checkbox" id="is_ye_connect_enabled" name="is_ye_connect_enabled" value="1" <?php echo ($profile['is_ye_connect_enabled'] == '1') ? 'checked' : '' ?> onClick="show_credits_reminder();" /></td>
+                        </tr>
                     <tr>
                         <td class="title" colspan="2">Sign In Details</td>
                     </tr>
