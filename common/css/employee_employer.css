@@ -59,17 +59,19 @@ textarea {
 }
 
 #employer_fees, #employer_jobs, 
-#employer_subscriptions, #job {
+#employer_subscriptions, #job, 
+#employer_credits {
     display: none;
 }
 
-#fees_table {
+#fees_table, #credits_table {
     margin: auto;
     width: 100%;
     border-collapse: collapse;
 }
 
-#fees_table td { 
+#fees_table td, 
+#credits_table td { 
     vertical-align: baseline;
 }
 
@@ -114,7 +116,8 @@ div.buttons_bar {
     padding: 3px 3px 3px 3px;
 }
 
-#fee_window {
+#fee_window, 
+#credit_window {
     display: none;
     width: 500px;
 }
@@ -204,4 +207,9 @@ table.subscription_form td div {
 
 div.toolbar {
     background-color: #CCCCCC;
+}
+
+span.tiny_note {
+    font-size: 9pt;
+    color: #ff0000;
 }

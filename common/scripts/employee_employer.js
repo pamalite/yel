@@ -164,11 +164,13 @@ function show_profile() {
     $('employer_jobs').setStyle('display', 'none');
     $('employer_subscriptions').setStyle('display', 'none');
     $('job').setStyle('display', 'none');
+    $('employer_credits').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '#CCCCCC');
     
     if (employer_id != '0') {
         $('item_fees').setStyle('background-color', '');
+        $('item_credits').setStyle('background', '');
         $('item_subscriptions').setStyle('background-color', '');
         $('item_jobs').setStyle('background-color', '');
     }
@@ -187,7 +189,7 @@ function save_profile() {
     var params = 'id=' + employer_id;
     params = params + '&action=save_profile';
     params = params + '&employee=' + user_id;
-    params = params + '&license_num=' + $('business_license').value
+    params = params + '&license_num=' + $('business_license').value;
     params = params + '&email_addr=' + $('email').value;
     params = params + '&name=' + $('name').value;
     params = params + '&contact_person=' + $('contact_person').value;
@@ -199,6 +201,12 @@ function save_profile() {
     params = params + '&zip=' + $('zip').value;
     params = params + '&country=' + $('country').options[$('country').selectedIndex].value;
     params = params + '&website_url=' + encodeURIComponent($('website_url').value);
+    
+    if ($('is_ye_connect_enabled').checked) {
+        params = params + '&is_ye_connect_enabled=1';
+    } else {
+        params = params + '&is_ye_connect_enabled=0';
+    }
     
     if (mode == 'create') {
         params = params + '&user_id=' + $('user_id').value;
@@ -280,8 +288,10 @@ function show_fees() {
     $('employer_jobs').setStyle('display', 'none');
     $('employer_subscriptions').setStyle('display', 'none');
     $('job').setStyle('display', 'none');
+    $('employer_credits').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
+    $('item_credits').setStyle('background', '');
     $('item_fees').setStyle('background-color', '#CCCCCC');
     $('item_jobs').setStyle('background-color', '');
     $('item_subscriptions').setStyle('background-color', '');
@@ -511,8 +521,10 @@ function show_subscriptions() {
     $('employer_jobs').setStyle('display', 'none');
     $('employer_subscriptions').setStyle('display', 'block');
     $('job').setStyle('display', 'none');
+    $('employer_credits').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
+    $('item_credits').setStyle('background', '');
     $('item_fees').setStyle('background-color', '');
     $('item_jobs').setStyle('background-color', '');
     $('item_subscriptions').setStyle('background-color', '#CCCCCC');
@@ -569,9 +581,11 @@ function show_jobs() {
     $('employer_jobs').setStyle('display', 'block');
     $('employer_subscriptions').setStyle('display', 'none');
     $('job').setStyle('display', 'none');
+    $('employer_credits').setStyle('display', 'none');
     
     $('item_profile').setStyle('background-color', '');
     $('item_fees').setStyle('background-color', '');
+    $('item_credits').setStyle('background', '');
     $('item_jobs').setStyle('background-color', '#CCCCCC');
     $('item_subscriptions').setStyle('background-color', '');
 }
@@ -942,20 +956,46 @@ function close_preview_window() {
 }
 
 function show_credits_reminder() {
+    var is_enabled = 0;
     if ($('is_ye_connect_enabled').checked) {
-        alert('REMINDER: ' + "\n\nRemember to set the credits for this employer.");
+        $('ye_connect_note').set('html', 'Remember to set Credits for this employer.');
         
         if (employer_id != '0') {
             $('item_credits').setStyle('display', 'inline');
+            is_enabled = 1;
         }
     } else {
-        alert('WARNING: ' + "\n\nThis employer can no longer connect with our candidates.");
-        $('item_credits').setStyle('display', 'none');
+        $('ye_connect_note').set('html', 'This employer cannot connect to our candidates.');
+        
+        if (employer_id != '0') {
+            $('item_credits').setStyle('display', 'none');
+        }
     }
     
     if (employer_id != '0') {
-        // TODO: automatically save
-        alert('saved');
+        var params = 'id=' + employer_id;
+        params = params + '&action=enable_ye_connect';
+        params = params + '&enabled=' + is_enabled;
+        
+        var uri = root + "/employees/employer_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                // set_status('<pre>' + txt + '</pre>');
+                // return;
+                set_status('');
+                if (txt == 'ko') {
+                    alert('An error occured while enabling YE Connect. Please try again later.');
+                    return false;
+                }
+            },
+            onRequest: function(instance) {
+                set_status('Enabling YE Connect...');
+            }
+        });
+
+        request.send(params);
     }
 }
 
@@ -1012,6 +1052,21 @@ function insert(_format) {
     } else {
         desc.selectRange(start_pos, start_pos + formatted_text.length);
     }
+}
+
+function show_credits() {
+    $('employer_profile').setStyle('display', 'none');
+    $('employer_fees').setStyle('display', 'none');
+    $('employer_jobs').setStyle('display', 'none');
+    $('employer_subscriptions').setStyle('display', 'none');
+    $('job').setStyle('display', 'none');
+    $('employer_credits').setStyle('display', 'block');
+    
+    $('item_profile').setStyle('background-color', '');
+    $('item_fees').setStyle('background-color', '');
+    $('item_credits').setStyle('background-color', '#CCCCCC');
+    $('item_jobs').setStyle('background-color', '');
+    $('item_subscriptions').setStyle('background-color', '');
 }
 
 function onDomReady() {

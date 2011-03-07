@@ -145,12 +145,16 @@ class EmployeeEmployerPage extends Page {
         
         $raw_data = array();
         $profile = array();
+        $credits = array();
         $fees = array();
         $jobs = array();
         if (!$this->is_new) {
             // get profile
             $raw_data = $this->employer->get();
             $profile = $raw_data[0];
+            
+            // get credits
+            $credits = $this->employer->getCredits();
             
             // get fees
             $fees = $this->employer->getFees();
@@ -187,9 +191,13 @@ class EmployeeEmployerPage extends Page {
                 <li id="item_profile" style="<?php echo ($this->current_page == 'profile') ? $style : ''; ?>"><a class="menu" onClick="show_profile();">Profile</a></li>
             <?php
             if (!$this->is_new) {
+                $show_credit_item = 'none';
+                if ($profile['is_ye_connect_enabled'] == '1') {
+                    $show_credit_item = 'inline';
+                }
             ?>
                 <li id="item_fees" style="<?php echo ($this->current_page == 'fees') ? $style : ''; ?>"><a class="menu" onClick="show_fees();">Fees</a></li>
-                <li id="item_credits" style="display: none; <?php echo ($this->current_page == 'credits') ? $style : ''; ?>"><a class="menu" onClick="show_credits();">Credits</a></li>
+                <li id="item_credits" style="display: <?php echo $show_credit_item; ?>; <?php echo ($this->current_page == 'credits') ? $style : ''; ?>"><a class="menu" onClick="show_credits();">Credits</a></li>
                 <li id="item_subscriptions" style="<?php echo ($this->current_page == 'subscriptions') ? $style : ''; ?>"><a class="menu" onClick="show_subscriptions();">Subscriptions</a></li>
                 <li id="item_jobs" style="<?php echo  ($this->current_page == 'jobs') ? $style : ''; ?>"><a class="menu" onClick="show_jobs();">Jobs</a></li>
             <?php
@@ -215,7 +223,7 @@ class EmployeeEmployerPage extends Page {
                     </tr>
                         <tr>
                             <td class="label"><label for="ye_connect">Enable YE Connect:</label></td>
-                            <td class="field"><input type="checkbox" id="is_ye_connect_enabled" name="is_ye_connect_enabled" value="1" <?php echo ($profile['is_ye_connect_enabled'] == '1') ? 'checked' : '' ?> onClick="show_credits_reminder();" /></td>
+                            <td class="field"><input type="checkbox" id="is_ye_connect_enabled" name="is_ye_connect_enabled" value="1" <?php echo ($profile['is_ye_connect_enabled'] == '1') ? 'checked' : '' ?> onClick="show_credits_reminder();" />&nbsp;<span class="tiny_note" id="ye_connect_note"><?php echo ($profile['is_ye_connect_enabled'] == '1') ? 'Remember to set Credits for this employer.' : 'This employer cannot connect to our candidates.' ?></span></td>
                         </tr>
                     <tr>
                         <td class="title" colspan="2">Sign In Details</td>
@@ -371,6 +379,40 @@ class EmployeeEmployerPage extends Page {
             </div>
             <div class="buttons_bar">
                 <input class="button" type="button" value="Add" onClick="add_new_fee();" />
+            </div>
+        </div>
+        
+        <div id="employer_credits">
+            <div class="buttons_bar">
+                <input class="button" type="button" value="Add" onClick="add_new_credit();" />
+            </div>
+            <div id="credits" class="fees">
+            <?php
+                if (is_null($credits) || empty($credits) || $credits === false) {
+            ?>
+                <div class="empty_results">There is no credit structure set for this employer yet.</div>
+            <?php
+                } else {
+                    $credits_table = new HTMLTable('credits_table', 'credits_table');
+
+                    $credits_table->set(0, 0, "Position Level", '', 'header');
+                    $credits_table->set(0, 1, "Credit Charge", '', 'header');
+                    $credits_table->set(0, 2, "&nbsp;", '', 'header action');
+
+                    foreach ($credits as $i=>$credit) {
+                        $credits_table->set($i+1, 0, number_format($credit['level'], 2, '.', ','), '', 'cell');
+                        $credits_table->set($i+1, 1, number_format($credit['credit'], 2, '.', ','), '', 'cell');
+                        $actions = '<input type="button" value="Delete" onClick="delete_credit('. $credit['id']. ');" />';
+                        $actions .= '<input type="button" value="Update" onClick="show_credit_window('. $credit['id']. ', \''. $credit['level']. '\', \''. $credit['credit']. '\');" />';
+                        $credits_table->set($i+1, 2, $actions, '', 'cell action');
+                    }
+
+                    echo $credits_table->get_html();
+                }
+            ?>
+            </div>
+            <div class="buttons_bar">
+                <input class="button" type="button" value="Add" onClick="add_new_credit();" />
             </div>
         </div>
         

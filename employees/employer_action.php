@@ -353,6 +353,7 @@ if ($_POST['action'] == 'save_profile') {
     
     $data = array();
     $data['license_num'] = $_POST['license_num'];
+    $data['is_ye_connect_enabled'] = $_POST['is_ye_connect_enabled'];
     $data['name'] = $_POST['name'];
     $data['phone_num'] = $_POST['phone_num'];
     $data['fax_num'] = $_POST['fax_num'];
@@ -775,6 +776,20 @@ if ($_POST['action'] == 'extend_job') {
 if ($_POST['action'] == 'preview_job_desc') {
     $_POST['desc'] = str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['desc']);
     echo format_job_description($_POST['desc']);
+    exit();
+}
+
+if ($_POST['action'] == 'enable_ye_connect') {
+    $data = array();
+    $data['is_ye_connect_enabled'] = $_POST['enabled'];
+    
+    $employer = new Employer($_POST['id']);
+    if (!$employer->update($data)) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
     exit();
 }
 ?>

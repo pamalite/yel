@@ -581,6 +581,11 @@ class Employer implements Model {
         return $this->mysqli->execute($query);
     }
     
+    public function getCredits() {
+        $query = "SELECT * FROM employer_credits WHERE employer = '". $this->id. "' ORDER BY level ASC";
+        return $this->mysqli->query($query);
+    }
+    
     public function getFees() {
         $query = "SELECT * FROM employer_fees WHERE employer = '". $this->id. "' ORDER BY salary_start ASC";
         return $this->mysqli->query($query);
