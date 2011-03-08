@@ -537,6 +537,21 @@ if ($_POST['action'] == 'save_fee') {
     exit();
 }
 
+if ($_POST['action'] == 'save_payment_terms') {
+    $data = array();
+    $data['working_months'] = $_POST['working_months'];
+    $data['payment_terms_days'] = $_POST['payment_terms_days'];
+    
+    $employer = new Employer($_POST['id']);
+    if (!$employer->update($data)) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
 if ($_POST['action'] == 'save_subscriptions') {
     $employer = new Employer($_POST['id']);
     

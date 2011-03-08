@@ -287,6 +287,44 @@ function show_fees() {
     $('item_subscriptions').setStyle('background-color', '');
 }
 
+function save_payment_terms() {
+    if (isEmpty($('working_months').value)) {
+        set_status('Working months cannot be empty.');
+        return false;
+    } else if (!isNumeric($('working_months').value)) {
+        set_status('Working months must be a number from 1-12.');
+        return false;
+    } else if (parseInt($('working_months').value) < 1 || parseInt($('working_months').value) > 12) {
+        set_status('Working months must be a number from 1 to 12.');
+        return false;
+    }
+    
+    var params = 'id=' + employer_id;
+    params = params + '&action=save_payment_terms';
+    params = params + '&working_months=' + $('working_months').value;
+    params = params + '&payment_terms_days=' + $('payment_terms_days').options[$('payment_terms_days').selectedIndex].value;
+    
+    var uri = root + "/employees/employer_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while saving payment terms. Please try again later.');
+                return false;
+            }            
+        },
+        onRequest: function(instance) {
+            set_status('Saving payment terms...');
+        }
+    });
+    
+    request.send(params);
+}
+
 function show_updated_fees() {
     var params = 'id=' + employer_id + '&action=get_fees';
     

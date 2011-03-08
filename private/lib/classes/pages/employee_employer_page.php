@@ -326,6 +326,11 @@ class EmployeeEmployerPage extends Page {
                             </select>
                         </td>
                     </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: right; border-top: 1px solid #CCCCCC;">
+                            <input class="button" type="button" value="Save" onClick="save_payment_terms();" />
+                        </td>
+                    </tr>
                 </table>
             </div>
             
