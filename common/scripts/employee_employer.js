@@ -143,19 +143,7 @@ function validate_profile_form() {
         return false;
     }
     
-    /*if (isEmpty($('working_months').value)) {
-        set_status('Working months cannot be empty.');
-        return false;
-    } else if (!isNumeric($('working_months').value)) {
-        set_status('Working months must be a number from 1-12.');
-        return false;
-    } else if (parseInt($('working_months').value) < 1 || parseInt($('working_months').value) > 12) {
-        set_status('Working months must be a number from 1-12.');
-        return false;
-    }*/
-    
     return true;
-    
 }
 
 function show_profile() {
@@ -295,6 +283,44 @@ function show_fees() {
     $('item_fees').setStyle('background-color', '#CCCCCC');
     $('item_jobs').setStyle('background-color', '');
     $('item_subscriptions').setStyle('background-color', '');
+}
+
+function save_payment_terms() {
+    if (isEmpty($('working_months').value)) {
+        set_status('Working months cannot be empty.');
+        return false;
+    } else if (!isNumeric($('working_months').value)) {
+        set_status('Working months must be a number from 1-12.');
+        return false;
+    } else if (parseInt($('working_months').value) < 1 || parseInt($('working_months').value) > 12) {
+        set_status('Working months must be a number from 1 to 12.');
+        return false;
+    }
+    
+    var params = 'id=' + employer_id;
+    params = params + '&action=save_payment_terms';
+    params = params + '&working_months=' + $('working_months').value;
+    params = params + '&payment_terms_days=' + $('payment_terms_days').options[$('payment_terms_days').selectedIndex].value;
+    
+    var uri = root + "/employees/employer_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while saving payment terms. Please try again later.');
+                return false;
+            }            
+        },
+        onRequest: function(instance) {
+            set_status('Saving payment terms...');
+        }
+    });
+    
+    request.send(params);
 }
 
 function show_updated_fees() {
@@ -999,6 +1025,100 @@ function show_credits_reminder() {
     }
 }
 
+function save_credits_amount() {
+    if (isEmpty($('credits_amount').value)) {
+        set_status('Credits amount cannot be empty.');
+        return false;
+    } else if (!isNumeric($('credits_amount').value)) {
+        set_status('Credits amount must be a number.');
+        return false;
+    }
+    
+    var params = 'id=' + employer_id;
+    params = params + '&action=save_credits_amount';
+    params = params + '&credits=' + $('credits_amount').value;
+    
+    var uri = root + "/employees/employer_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while saving credits. Please try again later.');
+                return false;
+            }
+            
+            var new_amount = parseInt($('lbl_credits_amount').get('html')) + parseInt($('credits_amount').value);
+            $('lbl_credits_amount').set('html', new_amount);
+        },
+        onRequest: function(instance) {
+            set_status('Saving credits...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function show_credit_window(_id, _level, _credit) {
+    $('credit_id').value = _id;
+    
+    if (_id != '0') {
+        $('charge').value = _credit;
+        for (var i=0; i < $('level').options.length; i++) {
+            if ($('level').options[i].value == _level) {
+                $('level').options[i].selected = true;
+                break;
+            }
+        }
+    } 
+    
+    show_window($('credit_window'));
+}
+
+function close_credit_window(_is_save) {
+    if (_is_save) {
+        if (isEmpty($('charge').value) || isNaN($('charge').value)) {
+            alert('Credit must be a number.');
+            return false;
+        }
+        
+        if (parseInt($('charge').value) <= 0) {
+            alert('Credit cannot be zero.');
+            return false;
+        }
+        
+        var params = 'id=' + employer_id;
+        params = params + '&action=save_credit_charge';
+        params = params + '&credit_id=' + $('credit_id').value;
+        params = params + '&level=' + $('level').options[$('level').selectedIndex].value;
+        params = params + '&credit=' + $('charge').value;
+        
+        var uri = root + "/employees/employer_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                // set_status('<pre>' + txt + '</pre>');
+                // return;
+                set_status('');
+                if (txt == 'ko') {
+                    alert('An error occured while saving credit. Please try again later.');
+                    return false;
+                }
+                
+                location.replace('employer.php?id=' + employer_id + '&page=credits');
+            }
+        });
+        
+        request.send(params);
+    } else {
+        close_window($('credit_window'));
+    }
+}
+
 function insert(_format) {
     var desc = $('job.description');
     desc.focus();
@@ -1073,8 +1193,11 @@ function onDomReady() {
     initialize_page();
     
     switch (current_page) {
+        case 'credits':
+            show_credits();
+            break;
         case 'fees':
-            show_fees()
+            show_fees();
             break;
         case 'subscriptions':
             show_subscriptions();

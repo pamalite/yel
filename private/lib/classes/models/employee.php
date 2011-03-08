@@ -390,6 +390,6 @@ class Employee implements Model {
         } 
         
         return false;
-    }    
+    }
 }
 ?>

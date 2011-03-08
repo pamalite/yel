@@ -339,6 +339,11 @@ class EmployeeEmployerPage extends Page {
                             </select>
                         </td>
                     </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: right; border-top: 1px solid #CCCCCC;">
+                            <input class="button" type="button" value="Save" onClick="save_payment_terms();" />
+                        </td>
+                    </tr>
                 </table>
             </div>
             
@@ -383,8 +388,26 @@ class EmployeeEmployerPage extends Page {
         </div>
         
         <div id="employer_credits">
+            <div class="payment_terms">
+                <table class="payment_terms_table">
+                    <tr>
+                        <td class="label">Credits Amount:</td>
+                        <td class="field"><span id="lbl_credits_amount"><?php echo $profile['credits_left']; ?></span></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="credits_amount">Add credits by:</label></td>
+                        <td class="field"><input class="field" type="text" id="credits_amount" name="credits_amount" value="0" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: right; border-top: 1px solid #CCCCCC;">
+                            <input class="button" type="button" value="Save" onClick="save_credits_amount();" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
             <div class="buttons_bar">
-                <input class="button" type="button" value="Add" onClick="add_new_credit();" />
+                <input class="button" type="button" value="Add" onClick="show_credit_window('0', 0, 0);" />
             </div>
             <div id="credits" class="fees">
             <?php
@@ -400,8 +423,8 @@ class EmployeeEmployerPage extends Page {
                     $credits_table->set(0, 2, "&nbsp;", '', 'header action');
 
                     foreach ($credits as $i=>$credit) {
-                        $credits_table->set($i+1, 0, number_format($credit['level'], 2, '.', ','), '', 'cell');
-                        $credits_table->set($i+1, 1, number_format($credit['credit'], 2, '.', ','), '', 'cell');
+                        $credits_table->set($i+1, 0, $credit['level'], '', 'cell');
+                        $credits_table->set($i+1, 1, $credit['credit'], '', 'cell');
                         $actions = '<input type="button" value="Delete" onClick="delete_credit('. $credit['id']. ');" />';
                         $actions .= '<input type="button" value="Update" onClick="show_credit_window('. $credit['id']. ', \''. $credit['level']. '\', \''. $credit['credit']. '\');" />';
                         $credits_table->set($i+1, 2, $actions, '', 'cell action');
@@ -412,7 +435,7 @@ class EmployeeEmployerPage extends Page {
             ?>
             </div>
             <div class="buttons_bar">
-                <input class="button" type="button" value="Add" onClick="add_new_credit();" />
+                <input class="button" type="button" value="Add" onClick="show_credit_window('0', 0, 0);" />
             </div>
         </div>
         
@@ -619,6 +642,40 @@ class EmployeeEmployerPage extends Page {
             <div id="preview_area"></div>
             <div class="popup_window_buttons_bar">
                 <input type="button" value="Close" onClick="close_preview_window();" />
+            </div>
+        </div>
+        
+        <div id="credit_window" class="popup_window">
+            <div class="popup_window_title">Credit Charge</div>
+            <div class="popup_fee">
+                <form id="service_fee_form" method="post" onSubmit="return false;">
+                    <input type="hidden" id="credit_id" name="credit_id" value="0" />
+                    <table class="service_fee_form">
+                        <tr>
+                            <td class="label"><label for="level">Level:</label></td>
+                            <td class="field">
+                                <select id="level" name="level">
+                                    <option value="1" selected>Level 1</option>
+                                <?php
+                                    for ($i=1; $i < 9; $i++) {
+                                ?>
+                                    <option value="<?php echo ($i+1); ?>">Level <?php echo ($i+1); ?></option>
+                                <?php
+                                    }
+                                ?>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="charge">Credit:</label></td>
+                            <td class="field"><input class="field" type="text" id="charge" name="charge" value="0.00" /></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Save &amp; Close" onClick="close_credit_window(true);" />
+                <input type="button" value="Close" onClick="close_credit_window(false);" />
             </div>
         </div>
         <?php

@@ -658,5 +658,54 @@ class Employer implements Model {
         }
         return false;
     }
+    
+    public function getCreditsAmount() {
+        $query = "SELECT credits_left FROM employers WHERE id = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        return $result[0]['credits_left'];
+    }
+    
+    public function addCreditsAmount($_amount = 0) {
+        $query = "UPDATE employers SET 
+                  credits_left = credits_left + ". $_amount. " 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
+    public function subtractCreditsAmount($_amount = 0) {
+        $query = "UPDATE employers SET 
+                  credits_left = credits_left - ". $_amount. " 
+                  WHERE id = '". $this->id. "'";
+        return $this->mysqli->execute($query);
+    }
+    
+    public function getCredit($_id) {
+        $query = "SELECT * FROM employer_credits WHERE id = ". $_id. " LIMIT 1";
+        $result = $this->mysqli->query($query);
+        return $result[0];
+    }
+    
+    public function saveCredit($_id = 0, $_level = 0, $_charge = 0) {
+        if ($_id == 0 && $_level == 0 && $_charge == 0) {
+            return false;
+        }
+        
+        $query = "";
+        if ($_id == 0) {
+            // new
+            $query = "INSERT INTO employer_credits SET 
+                      employer = '". $this->id. "', 
+                      level = ". $_level. ", 
+                      credit = ". $_charge;
+        } else {
+            // update
+            $query = "UPDATE employer_credits SET 
+                      level = ". $_level. ", 
+                      credit = ". $_charge. " 
+                      WHERE id = ". $_id;
+        }
+        
+        return $this->mysqli->execute($query);
+    }
 }
 ?>

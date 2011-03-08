@@ -102,7 +102,8 @@ textarea {
     background-color: #BBFCA1;
 }
 
-#fees_table tr:hover  {
+#fees_table tr:hover, 
+#credits_table tr:hover{
     background-color: #FFFF00;
 }
 
@@ -122,7 +123,8 @@ div.buttons_bar {
     width: 500px;
 }
 
-#fee_window .service_fee_form {
+#fee_window .service_fee_form, 
+#credit_window .service_fee_form {
     width: 99%;
     margin: auto;
 }

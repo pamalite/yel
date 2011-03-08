@@ -538,6 +538,21 @@ if ($_POST['action'] == 'save_fee') {
     exit();
 }
 
+if ($_POST['action'] == 'save_payment_terms') {
+    $data = array();
+    $data['working_months'] = $_POST['working_months'];
+    $data['payment_terms_days'] = $_POST['payment_terms_days'];
+    
+    $employer = new Employer($_POST['id']);
+    if (!$employer->update($data)) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
 if ($_POST['action'] == 'save_subscriptions') {
     $employer = new Employer($_POST['id']);
     
@@ -792,4 +807,39 @@ if ($_POST['action'] == 'enable_ye_connect') {
     echo 'ok';
     exit();
 }
+
+if ($_POST['action'] == 'save_credits_amount') {
+    $employer = new Employer($_POST['id']);
+    if (!$employer->addCreditsAmount($_POST['credits'])) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'get_credit_charge') {
+    $employer = new Employer($_POST['id']);
+    $credit = $employer->getCredit($_POST['credit_id']);
+    
+    if (is_null($credit) || empty($credit) || $credit === false) {
+        echo '';
+    }
+    
+    echo $credit['level']. '|'. $credit['credit'];
+    exit();
+}
+
+if ($_POST['action'] == 'save_credit_charge') {
+    $employer = new Employer($_POST['id']);
+    if ($employer->saveCredit($_POST['credit_id'], $_POST['level'], $_POST['credit']) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
 ?>
