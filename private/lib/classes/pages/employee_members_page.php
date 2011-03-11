@@ -6,7 +6,7 @@ require_once dirname(__FILE__). "/../../../config/job_profile.inc";
 class EmployeeMembersPage extends Page {
     private $employee = NULL;
     private $current_page = 'applications';
-    private $total_applicantions = 0;
+    private $total_applications = 0;
     private $total_members = 0;
     
     function __construct($_session) {
