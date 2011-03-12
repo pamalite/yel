@@ -204,15 +204,17 @@ div.footer p {
 
 /* --- <start> general top menu --- */
 div.menu {
+    padding-bottom: 12px;
     background-color: #EEEEEE;
 }
 
 ul.menu {
+    background-color: #EEEEEE;
     list-style-type: none;
     white-space: nowrap;
     padding: 6px 0px 6px 0px;
     margin-top: 0px;
-    overflow: auto;
+/*    overflow: auto;*/
 }
 
 ul.menu li {
