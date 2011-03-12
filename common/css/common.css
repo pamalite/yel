@@ -223,6 +223,11 @@ ul.menu li {
     display: inline;
 }
 
+ul.menu li.logout {
+    margin-right: 10px;
+    float: right;
+}
+
 ul.menu li:hover {
     background-color: #CCCCCC;
 }
