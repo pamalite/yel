@@ -41,7 +41,8 @@ function login() {
                     alert('First time login detected!' + "\n\nSince this is the first time you logged in, please change the password to prevent security breach.");
                     location.replace(root + '/employers/profile.php');
                 } else {
-                    location.replace(root + '/employers/resumes.php');
+                    // location.replace(root + '/employers/resumes.php');
+                    location.replace(root + '/employers/candidates.php');
                 }
                 
             }

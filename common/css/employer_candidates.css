@@ -14,6 +14,40 @@ a.menu {
     display: none;
 }
 
+#credits div.credits_left {
+    text-align: center;
+    margin: auto;
+    width: 30%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+#credits div.credits_left span.label {
+    text-align: right;
+    font-weight: bold;
+    font-size: 25pt;
+}
+
+#credits div.credits_left span.credits {
+    font-size: 25pt;
+}
+
+#credits div.credits_left span.green {
+    color: #078D16;
+}
+
+#credits div.credits_left span.red {
+    color: #ff0000;
+}
+
+#credits div.top_up {
+    text-align: center;
+    margin: auto;
+    width: 30%;
+    padding-top: 5px;
+}
+
 #members_table {
     margin: auto;
     width: 100%;

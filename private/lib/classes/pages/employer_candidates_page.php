@@ -5,7 +5,7 @@ require_once dirname(__FILE__). "/../../../config/job_profile.inc";
 
 class EmployerCandidatesPage extends Page {
     private $employer = NULL;
-    private $current_page = 'searchs';
+    private $current_page = 'search';
     private $total_applications = 0;
     private $total_members = 0;
     
@@ -28,7 +28,7 @@ class EmployerCandidatesPage extends Page {
     }
     
     public function insert_employer_candidates_scripts() {
-        $this->insert_scripts(array('flextable.js', 'list_box.js', 'employee_candidates.js'));
+        $this->insert_scripts(array('flextable.js', 'list_box.js', 'employer_candidates.js'));
     }
     
     public function insert_inline_scripts() {
@@ -154,6 +154,7 @@ class EmployerCandidatesPage extends Page {
         
         $employers = $this->get_employers();
         
+        $credits_left = $this->employer->getCreditsAmount();
         ?>
         <!-- submenu -->
         <div class="menu">
@@ -162,7 +163,7 @@ class EmployerCandidatesPage extends Page {
                 <li id="item_search_candidates" style="<?php echo ($this->current_page == 'search') ? $style : ''; ?>"><a class="menu" onClick="show_search_candidates();">Search Candidates</a></li>
                 <li id="item_shortlist" style="<?php echo ($this->current_page == 'shortlist') ? $style : ''; ?>"><a class="menu" onClick="show_shortlist();">Shortlist</a></li>
                 <li id="item_connections" style="<?php echo ($this->current_page == 'connections') ? $style : ''; ?>"><a class="menu" onClick="show_connections();">Candidates</a></li>
-                <li id="item_credits" style="<?php echo ($this->current_page == 'credits') ? $style : ''; ?>"><a class="menu" onClick="show_credits;">Credits</a></li>
+                <li id="item_credits" style="<?php echo ($this->current_page == 'credits') ? $style : ''; ?>"><a class="menu" onClick="show_credits();">Credits</a></li>
             </ul>
         </div>
         <!-- end submenu -->
@@ -233,16 +234,49 @@ class EmployerCandidatesPage extends Page {
                 </div>
                 <div id="div_members">
                     <div class="empty_results">
-                        No candidates to show.<br/>
-                        Please rephrase your search criteria and search again. 
+                        No candidates to show.
                     </div>
                 </div>
             </div>
         </div>
         
-        <form id="member_page_form" method="post" target="_new" action="member.php">
-            <input type="hidden" id="member_email_addr" name="member_email_addr" value="" />
-        </form>
+        <div id="shortlist">
+        </div>
+        
+        <div id="connections">
+        </div>
+        
+        <div id="credits">
+            <div class="credits_left">
+                <span class="label">Credits Left: </span>
+                <span class="credits <?php echo ($credits_left > 0) ? 'green' : 'red'; ?>">
+                    <?php echo number_format($credits_left, 2, '.', ','); ?>
+                </span>
+            </div>
+            <div class="top_up">
+            <?php
+                if ($credits_left > 0) {
+            ?>
+                Please <a href="../contact.php">Contact Us</a> to top-up your connections credits.
+            <?php
+                } else {
+                    $credits = $this->employer->getCredits();
+                    if (is_null($credits) || empty($credits)) {
+            ?>
+                In order for you to connect with our candidates, you need to <span style="font-weight: bold;">purchase</a> sufficient connection credits.<br/><br/>
+                Please <a href="../contact.php">Contact Us</a> for further information.
+            <?php
+                    } else {
+            ?>
+                Please <a href="../contact.php">Contact Us</a> to reload your connections credits.
+            <?php
+                    }
+            ?>
+            <?php
+                }
+            ?>
+            </div>
+        </div>
         
         <!-- popup windows goes here -->
         
