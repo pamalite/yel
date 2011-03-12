@@ -204,32 +204,33 @@ div.footer p {
 
 /* --- <start> general top menu --- */
 div.menu {
-    padding-top: 1px;
-    padding-bottom: 1px;
     background-color: #EEEEEE;
 }
 
-div.menu ul.menu {
+ul.menu {
     list-style-type: none;
     white-space: nowrap;
-    padding: 0px 0px 0px 0px;
-    margin-left: 10px;
+    padding: 6px 0px 6px 0px;
+    margin-top: 0px;
+    overflow: auto;
 }
 
 ul.menu li {
     padding: 5px 10px 5px 10px;
+    margin-left: 3px;
+    margin-right: 3px;
     font-size: 10pt;
     font-weight: bold;
     display: inline;
-}
-
-ul.menu li.logout {
-    margin-right: 10px;
-    float: right;
+    float: left;
 }
 
 ul.menu li:hover {
     background-color: #CCCCCC;
+}
+
+ul.menu li.logout {
+    float: right;
 }
 /* --- <end> general top menu --- */
 
