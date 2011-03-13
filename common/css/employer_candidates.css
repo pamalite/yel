@@ -48,14 +48,46 @@ a.menu {
     padding-top: 5px;
 }
 
-#members_table {
+#credits div.credits_structure {
+    padding-top: 25px;
+}
+
+#credits #credits_table {
+    margin: auto;
+    width: 50%;
+    border-collapse: collapse;
+}
+
+#credits #credits_table tr:hover {
+    background-color: #FFFF00;
+}
+
+#credits #credits_table td.center {
+    text-align: center;
+}
+
+#members_table, #profiles_table {
     margin: auto;
     width: 100%;
     border-collapse: collapse;
 }
 
-#members_table tr:hover  {
+#profiles_table {
+    height: 100%;
+    border: 1px solid #CCCCCC;
+}
+
+#members_table tr:hover {
     background-color: #FFFF00;
+}
+
+#profiles_table tr:hover {
+    background-color: #FFFFFF;
+}
+
+#members_table td.work_exp,
+#members_table td.job_resp {
+    width: 400px;
 }
 
 .header {

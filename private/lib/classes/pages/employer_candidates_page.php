@@ -214,7 +214,7 @@ class EmployerCandidatesPage extends Page {
                                 </table>
                             </td>
                             <td class="search_buttons">
-                                <input type="button" class="search_button" value="Search" onClick="update_members();" />
+                                <input type="button" class="search_button" value="Search" onClick="update_search_candidates();" />
                             </td>
                         </tr>
                     </table>
@@ -226,7 +226,7 @@ class EmployerCandidatesPage extends Page {
                 <div class="buttons_bar">
                     <div class="pagination">
                         Page
-                        <select id="members_pages" onChange="update_members();">
+                        <select id="members_pages" onChange="update_search_candidates();">
                             <option value="1" selected>1</option>
                         </select>
                         of <span id="total_members_pages">0</span>
@@ -255,12 +255,12 @@ class EmployerCandidatesPage extends Page {
             </div>
             <div class="top_up">
             <?php
+                $credits = $this->employer->getCredits();
                 if ($credits_left > 0) {
             ?>
                 Please <a href="../contact.php">Contact Us</a> to top-up your connections credits.
             <?php
                 } else {
-                    $credits = $this->employer->getCredits();
                     if (is_null($credits) || empty($credits)) {
             ?>
                 In order for you to connect with our candidates, you need to <span style="font-weight: bold;">purchase</a> sufficient connection credits.<br/><br/>
@@ -273,6 +273,23 @@ class EmployerCandidatesPage extends Page {
                     }
             ?>
             <?php
+                }
+            ?>
+            </div>
+            <div class="credits_structure">
+            <?php
+                if (!is_null($credits) && !empty($credits)) {
+                    $credits_table = new HTMLTable('credits_table', 'credits_table');
+
+                    $credits_table->set(0, 0, "Job Level", '', 'header center');
+                    $credits_table->set(0, 1, "Credits Charged", '', 'header center');
+                    
+                    foreach ($credits as $i=>$credit) {
+                        $credits_table->set($i+1, 0, $credit['level'], '', 'cell center');
+                        $credits_table->set($i+1, 1, number_format($credit['credit'], 2, '.', ','), '', 'cell center');
+                    }
+
+                    echo $credits_table->get_html();
                 }
             ?>
             </div>

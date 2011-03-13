@@ -446,6 +446,7 @@ if ($_POST['action'] == 'get_members') {
     $criteria['offset'] = $offset;
     
     $result = $member_search->search_using($criteria);
+    
     if (is_null($result) || count($result) <= 0) {
         echo '0';
         exit();

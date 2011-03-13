@@ -326,7 +326,7 @@ class MemberSearch {
         //     }
         // }
         
-        $columns = "members.email_addr, members.phone_num, members.active, 
+        $columns = "members.email_addr, members.phone_num, members.active, members.seeking, 
                     CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
                     DATE_FORMAT(members.updated_on, '%e %b, %Y') AS formatted_updated_on, 
                     members.is_active_seeking_job, COUNT(DISTINCT member_jobs.id) AS num_jobs_applied,
@@ -342,7 +342,7 @@ class MemberSearch {
         if (!empty($this->position) || !empty($this->employer) || 
             $this->specialization > 0 || $this->emp_specialization > 0 || 
             $this->emp_desc > 0) {
-            $joins .= "LEFT JOIN member_job_profiles ON member_job_profiles.member = members.email_addr";
+            $joins .= " LEFT JOIN member_job_profiles ON member_job_profiles.member = members.email_addr";
         }
         
         if (array_key_exists('seeking', $match_against)) {
@@ -555,17 +555,19 @@ class MemberSearch {
         }
         
         $this->query = $this->make_query();
-        
+        // return $this->query;
         $result = $this->mysqli->query($this->query);
         if (!is_null($result) && !empty($result)) {
             $this->total = count($result);
         }
         
         // paginate
-        $total_pages = ceil($this->total / $this->limit);
-        if ($total_pages <= 0) {
-            //echo $this->query;
-            return array();
+        if ($this->limit > 0) {
+            $total_pages = ceil($this->total / $this->limit);
+            if ($total_pages <= 0) {
+                //echo $this->query;
+                return array();
+            }
         }
         
         $start = microtime();
@@ -602,8 +604,10 @@ class MemberSearch {
             $result = $rows;
         } else {
             // just sort and paginate normally
-            $this->query = $this->make_query(true);
-            $result = $this->mysqli->query($this->query);
+            if ($this->limit > 0) {
+                $this->query = $this->make_query(true);
+                $result = $this->mysqli->query($this->query);
+            }
         }
         $end = microtime();
         

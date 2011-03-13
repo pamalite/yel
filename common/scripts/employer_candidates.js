@@ -752,7 +752,7 @@ function update_search_candidates() {
         selected_page = $('members_pages').options[selected_page_index].value;
     }
     
-    var params = 'id=0&order_by=' + members_order_by + ' ' + members_order;
+    var params = 'id=0&order_by=' + search_order_by + ' ' + search_order;
     params = params + '&action=get_members';
     params = params + '&page=' + selected_page;
     
@@ -782,7 +782,7 @@ function update_search_candidates() {
             
             if (txt == '0') {
                 set_status('');
-                $('div_members').set('html', '<div class="empty_results">No members to found with the search criteria.<br/>Please try again.</div>');
+                $('div_members').set('html', '<div class="empty_results">No candidates found with the search criteria.<br/>Please try again.</div>');
             } else {
                 var total_pages = xml.getElementsByTagName('total_pages');
                 
@@ -801,92 +801,89 @@ function update_search_candidates() {
                     $('members_pages').options[$('members_pages').length] = an_option;
                 }
                 
-                var emails = xml.getElementsByTagName('email_addr');
-                var members = xml.getElementsByTagName('member_name');
-                var phone_nums = xml.getElementsByTagName('phone_num');
-                var is_actives = xml.getElementsByTagName('active');
-                var updated_ons = xml.getElementsByTagName('formatted_updated_on');
-                var is_seeking_jobs = xml.getElementsByTagName('is_active_seeking_job');
-                var positions = xml.getElementsByTagName('position_title');
-                var employers = xml.getElementsByTagName('employer');
-                var work_froms = xml.getElementsByTagName('formatted_work_from');
-                var work_tos = xml.getElementsByTagName('formatted_work_to');
-                var applied_jobs = xml.getElementsByTagName('num_jobs_applied');
+                var ids = xml.getElementsByTagName('first_job_profile_id');
+                var updated_ons = xml.getElementsByTagName('updated_on');
+                var seekings = xml.getElementsByTagName('seeking');
+                var job_profiles = xml.getElementsByTagName('job_profiles');
                 
                 var members_table = new FlexTable('members_table', 'members');
 
                 var header = new Row('');
-                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.updated_on');\">Updated On</a>", '', 'header'));
-                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('members', 'members.lastname');\">Member</a>", '', 'header'));
-                header.set(2, new Cell('Current/Latest Position', '', 'header'));
-                header.set(3, new Cell('&nbsp;', '', 'header'));
-                header.set(4, new Cell('&nbsp;', '', 'header action'));
+                header.set(0, new Cell("Updated On", '', 'header'));
+                header.set(1, new Cell("Work Experiences", '', 'header work_exp'));
+                header.set(2, new Cell('Job Responsibilities', '', 'header job_resp'));
+                header.set(3, new Cell('&nbsp;', '', 'header action'));
                 members_table.set(0, header);
                 
-                for (var i=0; i < emails.length; i++) {
+                for (var i=0; i < ids.length; i++) {
                     var row = new Row('');
-                    
-                    // active seeking job?
-                    var is_active_seeking = true;
-                    if (is_seeking_jobs[i].childNodes[0].nodeValue == '0') {
-                        is_active_seeking = false;
-                    }
                     
                     // updated on
                     var updated_on = 'New Entry';
                     if (updated_ons[i].childNodes.length > 0) {
                         updated_on = updated_ons[i].childNodes[0].nodeValue;
                     }
-                    row.set(0, new Cell(updated_on, '', 'cell'));
+                    row.set(0, new Cell(updated_on, '', 'cell vtop'));
                     
-                    // member details
-                    var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_blank">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";
-                    
-                    if (!is_active_seeking) {
-                        short_desc = '<span style="color: #ff0000; font-weight: bold;">[!]</span> ' + short_desc;
-                    }
-                    
-                    var phone_num = '';
-                    if (phone_nums[i].childNodes.length > 0) {
-                        phone_num = phone_nums[i].childNodes[0].nodeValue;
-                    }
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Tel.:</span> ' + phone_num + '</div>' + "\n";
-                    
-                    short_desc = short_desc +  '<div class="small_contact"><span style="font-weight: bold;">Email:</span> <a href="mailto:' + emails[i].childNodes[0].nodeValue + '">' + emails[i].childNodes[0].nodeValue + '</a></div>' + "\n";
-                    row.set(1, new Cell(short_desc, '', 'cell'));
-                    
-                    // current/latest position details
-                    var pos_desc = 'N/A';
-                    if (positions[i].childNodes.length > 0) {
-                        pos_desc = '<span class="latest_title">' + positions[i].childNodes[0].nodeValue + '</span><br/>';
-                        pos_desc = pos_desc + '<span class="latest_employer">' + employers[i].childNodes[0].nodeValue + '</span><br/><br/>';
-                        pos_desc = pos_desc + '<div class="latest_period">' + work_froms[i].childNodes[0].nodeValue + ' to ';
-                        
-                        if (work_tos[i].childNodes.length > 0) {
-                            pos_desc = pos_desc + work_tos[i].childNodes[0].nodeValue;
-                        } else {
-                            pos_desc = pos_desc + 'present';
-                        }
-                    }
-                    row.set(2, new Cell(pos_desc, '', 'cell'));
+                    // work experiences
+                    if (job_profiles.length > 0) {
+                        var profiles_table = new FlexTable('profiles_table', 'profiles vtop');
 
-                    // apply job
-                    var job_count = '0 applied';
-                    if (applied_jobs[i].childNodes[0].nodeValue > 0) {
-                        job_count = applied_jobs[i].childNodes[0].nodeValue + ' applied';
-                    }
-                    job_count = '<span class="job_count">' + job_count + '</span>'
-                    row.set(3, new Cell('<input type="button" value="Apply Jobs" onClick="show_apply_jobs_popup(\'' + emails[i].childNodes[0].nodeValue + '\');" /><br/>' + job_count, '', 'cell action'));
-                    
-                    // admin shortcuts
-                    var actions = '';
-                    if (is_actives[i].childNodes[0].nodeValue == 'Y') {
-                        actions = '<input type="button" id="activate_button_' + i + '" value="De-activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                        actions = actions + '<input type="button" id="password_reset_' + i + '" value="Reset Password" onClick="reset_password(\'' + emails[i].childNodes[0].nodeValue + '\');" />';
+                        var profile_header = new Row('');
+                        profile_header.set(0, new Cell('From', '', 'header'));
+                        profile_header.set(1, new Cell('To', '', 'header'));
+                        profile_header.set(2, new Cell('Employer', '', 'header'));
+                        profile_header.set(3, new Cell('Position', '', 'header'));
+                        profiles_table.set(0, profile_header);
+
+                        var profiles = job_profiles[i].getElementsByTagName('job_profile');
+                        for (var j=0; j < profiles.length; j++) {
+                            var title = profiles[j].getElementsByTagName('position_title');
+                            var employer = profiles[j].getElementsByTagName('employer');
+                            var from = profiles[j].getElementsByTagName('from');
+                            var to = profiles[j].getElementsByTagName('to');
+
+                            var profile_row = new Row('');
+                            profile_row.set(0, new Cell(from[0].childNodes[0].nodeValue, '', 'cell'));
+
+                            var to_date = 'present';
+                            if (to[0].childNodes.length > 0) {
+                                to_date = to[0].childNodes[0].nodeValue;
+                            }
+                            profile_row.set(1, new Cell(to_date, '', 'cell'));
+
+                            var employer_name = 'not provided';
+                            if (employer[0].childNodes.length > 0) {
+                                employer_name = employer[0].childNodes[0].nodeValue;
+                            }
+                            profile_row.set(2, new Cell(employer_name, '', 'cell'));
+
+                            var job_title = 'not provided';
+                            if (title[0].childNodes.length > 0) {
+                                job_title = title[0].childNodes[0].nodeValue;
+                            }
+                            profile_row.set(3, new Cell(job_title, '', 'cell'));
+
+                            profiles_table.set((parseInt(j)+1), profile_row);
+                        }
+
+
+                        row.set(1, new Cell(profiles_table.get_html(), '', 'cell vtop'));
                     } else {
-                        actions = '<input type="button" id="activate_button_' + i + '" value="Activate" onClick="activate_member(\'' + emails[i].childNodes[0].nodeValue + '\', \'' + i + '\');" />';
-                    }                    
-                    row.set(4, new Cell(actions, '', 'cell action'));
+                        row.set(1, new Cell('not provided', '', 'cell vtop'));
+                    }
+                                        
+                    // job responsibilities
+                    var job_resp = 'not provided';
+                    if (seekings[i].childNodes.length > 0) {
+                        job_resp = seekings[i].childNodes[0].nodeValue;
+                    }
+                    row.set(2, new Cell(job_resp, '', 'cell vtop'));
+                    
+                    // actions
+                    var actions = '<input type="button" value="Request Update Profile" onClick="" />';
+                    actions = actions + '<input type="button" value="Connect" onClick="" />';
+                    row.set(3, new Cell(actions, '', 'cell action'));
                     
                     members_table.set((parseInt(i)+1), row);
                 }
@@ -897,7 +894,7 @@ function update_search_candidates() {
             }
         },
         onRequest: function(instance) {
-            set_status('Loading members...');
+            set_status('Loading candidates...');
         }
     });
     
