@@ -20,7 +20,7 @@ if (!isset($_SESSION['yel']['employer']) ||
 
 $home = new EmployerInvoicesPage($_SESSION['yel']['employer']);
 $home->header(array('root_dir' => '../', 
-                    'title' => 'Invoices'));
+                    'title' => 'Invoices & Receipts'));
 $home->insert_employer_invoices_css();
 $home->insert_employer_invoices_scripts();
 $home->insert_inline_scripts();

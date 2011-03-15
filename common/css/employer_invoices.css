@@ -1,8 +1,49 @@
-#div_new_invoices, #div_paid_invoices {
-    padding-top: 10px;
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
 }
 
-#div_paid_invoices {
+.payments {
+    margin: auto;
+    width: 99%;
+    border-collapse: collapse;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell_indicator, .pdf_download {
+    width: 20px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+#invoices_table tr:hover, 
+#receipts_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+#div_invoices, #div_receipts {
+    margin-top: -8px;
+}
+
+#div_receipts {
     display: none;
 }
 
@@ -23,42 +64,13 @@
     cursor: pointer;
 }
 
-#li_new {
-    border: 1px solid #CCCCCC;
+#li_invoices {
+    border: 1px solid #AAAAAA;
+    border-bottom: 1px solid #EEEEEE;
+    background-color: #EEEEEE;
 }
 
-#li_paid {
+#li_receipts {
     border: 1px solid #0000FF;
+    border-bottom: none;
 }
-
-td.expired {
-    text-align: center;
-    width: 20px;
-}
-
-td.type {
-    width: 150px;
-}
-
-td.invoice {
-    width: 150px;
-}
-
-td.date {
-    width: 150px;
-}
-
-span.sort {
-    color: #0000FF;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-span.sort:hover {
-    color: #FF0000;
-}
-
-img.warning {
-    vertical-align: middle;    
-}
-

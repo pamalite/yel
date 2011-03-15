@@ -1,3 +1,139 @@
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+.statistics {
+    padding-bottom: 10px;
+    text-align: right;
+}
+
+.results_table {
+    margin: auto;
+    width: 100%;
+}
+
+.results_table td {
+    vertical-align: top;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.results {
+    width: 75%;
+}
+
+.sort_and_filter {
+    border-left: 1px solid #CCCCCC;
+}
+
+.sorter {
+    border: 1px solid #8BB1EB;
+    margin-bottom: 15px;
+}
+
+.filter {
+    border: 1px solid #8BB1EB;
+}
+
+.sorter_title, .filter_title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-color: #8BB1EB;
+    padding-left: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.filter_options {
+    padding-left: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.filter_button {
+    width: 95%;
+    margin: auto;
+    text-align: right;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-top: 1px solid #CCCCCC;
+    
+}
+
+.job_short_details {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #EEEEEE;
+}
+
+.job_short_details .job_title {
+    font-size: 12pt;
+    font-weight: bold;
+    padding-bottom: 5px;
+}
+
+.job_short_details .employer {
+    font-style: italic;
+    padding-bottom: 5px
+}
+
+.job_short_details .industry {
+    font-style: normal;
+    font-size: 9pt;
+    font-weight: bold;
+    color: #078B21;
+    background-color: #F1F0BC;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.job_short_details .country {
+    font-style: normal;
+    font-weight: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.job_short_details .description {
+    color: #444444;
+    padding-bottom: 5px
+}
+
+.job_short_details .salary {
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: #DFE7E1;
+}
+
+.job_short_details .reward {
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: #FFC954;
+}
+
+.pagination {
+    padding-top: 10px;
+    text-align: center;
+    font-size: 12pt;
+}
+
+.page {
+    font-size: 12pt;
+}
+
+.expire_on {
+    padding-top: 5px;
+    font-style: italic;
+    font-size: 7pt;
+    color: #666666;
+}
+
+/* old CSS */
+
 div.filters, div.page_navigation {
     text-align: center;
     font-size: 9pt;
@@ -12,11 +148,11 @@ div.page_navigation {
     padding-bottom: 10px;
 }
 
-div.description {
+/*div.description {
     display: none;
     font-size: 10pt;
     padding: 10px 10px 10px 10px;
-}
+}*/
 
 td.match_percentage {
     width: 50px;
@@ -202,6 +338,155 @@ table.job_info div.job_description {
     font-size: 7pt;
     font-weight: bold;
 }
+
+p {
+	margin: 0;
+}
+.wrapper {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin-bottom:-162px;
+	/*border:1px red solid;	*/
+}
+.statistics {
+	padding-right:10px;
+}
+.sort_and_filter {
+	border-left: 1px solid #eeeeee;
+	width: 345px;
+	padding: 0 0 0 1px !important;
+}
+
+.results {
+	width: auto;
+}
+
+.sorter {
+	border: 0;
+}
+.sorter_title, .filter_title, .practice_title {
+	background-color: #f7f6f6;
+	color: #000000;
+	font-size: 14px;
+	padding-left: 18px;
+	font-weight: bold;
+	height: 23px;
+	line-height: 23px;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+.sorter_content {
+	padding-left: 13px;
+	padding-top: 15px;
+}
+.filter_options {
+	padding-left: 18px;
+	padding-bottom: 6px;
+}
+.filter_options label {
+	float: left;
+	padding-right: 6px;
+	padding-top:2px;
+}
+.filter_options .clear {
+	height: 4px;
+}
+/*.filter_button {
+    padding-top: 8px;
+    padding-right: 4px;
+}
+.filter_button input {
+    border: 1px #cccccc solid;
+    background: #f0f0f0;
+    padding: 0 5px;
+    height: 25px;
+}
+*/
+.filter {
+	border: 0;
+	padding-bottom: 19px;
+}
+
+.practice_content {
+	padding: 34px 40px 0 16px;
+}
+.pagination {
+	height: 25px;
+	margin: 0 auto 26px;
+}
+.pagination div {
+	font-size: 14px !important;
+}
+
+.results_table td {
+	padding-left: 17px;
+	padding-right: 30px;
+}
+.job_short_details {
+	border-bottom: 1px #eeeeee solid;
+	font-size: 14px !important;
+}
+.job_short_details a {
+	color: #fc8f02
+}
+.job_short_details .job_title {
+	font-size: 15px;
+	padding-bottom: 0px;
+	font-weight: bold;
+}
+.job_short_details .employer {
+	font-style: normal;
+	margin-bottom: 10px;
+	line-height: 1.3em;
+	font-size: 13px;
+}
+.job_short_details .employer .employer_name {
+	color: #fc8f02;
+}
+.black {
+	color: #000000;
+}
+.job_short_details .country {
+	padding-left: 0;
+	color: #000000;
+	font-weight: normal;
+	font-size: 13px;
+}
+.job_short_details .industry {
+	background: transparent;
+	color: #000000;
+	font-size: 10px;
+	font-weight: normal;
+	font-style: italic;
+}
+.job_short_details .description {
+	font-size: 14px;
+}
+.date_and_salary {
+	font-size: 13px;
+	color: #7f7f7f;
+	line-height: 1.3em;
+}
+.job_short_details .salary {
+	background-color: transparent;
+	color: #000000;
+	font-size: 14px;
+}
+.job_short_details .reward {
+	background-color: transparent;
+	color: #000000;
+	font-size: 14px;
+}
+.controls {
+	margin: 12px 0 10px;
+	display: block;
+}
+
+.push {
+	height: 162px;
+}
+
 
 /* For PRS search -start- */
 td.member {

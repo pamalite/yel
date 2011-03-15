@@ -1,0 +1,19 @@
+Hi %company%,
+
+You have received potential applicant for the following job positions:
+
+%jobs%
+
+A message from our consultant:
+
+%message%
+
+Please sign in to your account to view the candidate's resume, or 
+download the attached resume.
+
+To sign in, go to the following web address:
+
+%protocol%://%root%/employers
+
+Yellow Elevator
+Refer a job

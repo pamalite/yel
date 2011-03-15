@@ -99,7 +99,7 @@ function save() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_unapproved_photos_count();
     get_employee_rewards_count();
     get_employee_tokens_count();

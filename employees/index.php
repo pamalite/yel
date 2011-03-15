@@ -34,7 +34,7 @@ if (empty($_SESSION['yel']['employee']['uid']) ||
 // Check whether the employer is logged in
 $employee = new Employee($_SESSION['yel']['employee']['uid'], $_SESSION['yel']['employee']['sid']);
 
-if (!$employee->is_logged_in($_SESSION['yel']['employee']['hash'])) {
+if (!$employee->isLoggedIn($_SESSION['yel']['employee']['hash'])) {
     redirect_to('login.php');
 }
 

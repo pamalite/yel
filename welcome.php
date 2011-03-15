@@ -41,6 +41,7 @@ $welcome = new WelcomePage ();
 $welcome->header(array('title' => 'Welcome'));
 $welcome->insert_welcome_css();
 $welcome->insert_welcome_scripts();
+$welcome->insert_inline_scripts();
 $welcome->show();
 $welcome->footer();
 ?>

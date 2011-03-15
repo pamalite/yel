@@ -157,7 +157,7 @@ function disapprove_photo(_photo_id, _email_addr) {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_employee_rewards_count();
     get_employee_tokens_count();
     

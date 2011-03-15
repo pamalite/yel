@@ -2,12 +2,7 @@
 require_once dirname(__FILE__). "/../../utilities.php";
 
 class Currency {
-    /*
-     NOTE: All currencies are based on per EURO, as the forex feed is from 
-           European Central Bank.  
-    */
-    
-    private static function currency_exists($_symbol) {
+    private static function currencyExists($_symbol) {
         $_symbol = strtoupper(trim(sanitize($_symbol)));
         
         $query = "SELECT COUNT(*) AS exist FROM currencies WHERE 
@@ -21,7 +16,7 @@ class Currency {
         return false;
     }
     
-    public static function symbol_from_country_code($_country_code) {
+    public static function getSymbolFromCountryCode($_country_code) {
         $_country_code = strtoupper(trim(sanitize($_country_code)));
         $query = "SELECT symbol FROM currencies WHERE country_code = '". $_country_code. "' LIMIT 1";
 
@@ -33,32 +28,8 @@ class Currency {
         return "MYR";
     }
     
-    public static function symbol_from_country($_country) {
-        return self::symbol_from_country_code(Country::code_from_country($_country));
-    }
-    
-    public static function convert_amount_from_to($_from, $_to, $_amount) {
-        $_from = strtoupper(trim(sanitize($_from)));
-        $_to = strtoupper(trim(sanitize($_to)));
-        
-        if ($_from == $_to) {
-            return $_amount;
-        }
-        
-        $query = "SELECT symbol, rate FROM currencies WHERE symbol IN ('". $_from. "', '". $_to."')";
-        $mysqli = Database::connect();
-        $rate_from = 1;
-        $rate_to = 1;
-        if ($rates = $mysqli->query($query)) {
-            foreach ($rates as $rate) {
-                if ($rate['symbol'] == $_from) {
-                    $rate_from = $rate['rate'];
-                } else {
-                    $rate_to = $rate['rate'];
-                }
-            }
-        }
-        return $_amount * ($rate_to / $rate_from);
+    public static function getSymbolFromCountry($_country) {
+        return self::getSymbolFromCountryCode(Country::getCountryCodeFrom($_country));
     }
     
     public static function create($_symbol, $_country_code, $_rate) {
@@ -66,7 +37,7 @@ class Currency {
         $_symbol = trim(sanitize($_symbol));
         
         if (!empty($_country_code) && !empty($_symbol) && !empty($_rate)) {
-            if (self::currency_exists($_symbol)) {
+            if (self::currenyExists($_symbol)) {
                 return false;
             }
             
@@ -100,7 +71,7 @@ class Currency {
     public static function delete($_symbol) {
         $_symbol = trim(sanitize($_symbol));
         if (!empty($_symbol)) {
-            if (self::currency_exists($_symbol)) {
+            if (self::currenyExists($_symbol)) {
                 return false;
             }
             
@@ -112,41 +83,55 @@ class Currency {
         return false;
     }
     
-    public static function get_all() {
-        $mysqli = Database::connect();
-        $query = "SELECT currencies.symbol, currencies.currency, countries.country, currencies.rate 
-                  FROM currencies 
-                  LEFT JOIN countries ON countries.country_code = currencies.country_code";
-        
-        return $mysqli->query($query);
-    }
-    
-    public static function update_rates() {
-        $mysqli = Database::connect();
-        $new_rates = array();
-        $XMLContent = file($GLOBALS['forex_feed']);
-        foreach ($XMLContent as $line) {
-            if (ereg("currency='([[:alpha:]]+)'",$line,$currencyCode)) {
-                if (ereg("rate='([[:graph:]]+)'",$line,$rate)) {
-                    $new_rates[$currencyCode[1]] = $rate[1];
-                }
-            }
-        }
-        
-        $query = "SELECT DISTINCT symbol FROM currencies";
-        $symbols = $mysqli->query($query);
-        $query = '';
-        foreach ($symbols as $symbol) {
-            $query .= "UPDATE currencies SET 
-                      rate = ". $new_rates[$symbol['symbol']]. " 
-                      WHERE symbol = '". $symbol['symbol']. "'; ";
-        }
-        
-        if (!$mysqli->transact($query)) {
+    public static function find($_criteria) {
+        if (is_null($_criteria) || !is_array($_criteria)) {
             return false;
         }
         
-        return true;
+        $mysqli = Database::connect();
+        
+        $columns = '*';
+        $joins = '';
+        $order = '';
+        $group = '';
+        $limit = '';
+        $match = '';
+        
+        foreach ($_criteria as $key => $clause) {
+            switch (strtoupper($key)) {
+                case 'COLUMNS':
+                    $columns = trim($clause);
+                    break;
+                case 'JOINS':
+                    $conditions = explode(',', $clause);
+                    $i = 0;
+                    foreach ($conditions as $condition) {
+                        $joins .= "LEFT JOIN ". trim($condition);
+
+                        if ($i < count($conditions)-1) {
+                            $joins .= " ";
+                        }
+                        $i++;
+                    }
+                    break;
+                case 'ORDER':
+                    $order = "ORDER BY ". trim($clause);
+                    break;
+                case 'GROUP':
+                    $group = "GROUP BY ". trim($clause);
+                    break;
+                case 'LIMIT':
+                    $limit = "LIMIT ". trim($clause);
+                    break;
+                case 'MATCH':
+                    $match = "WHERE ". trim($clause);
+                    break;
+            }
+        }
+        
+        $query = "SELECT ". $columns. " FROM currencies ". $joins. 
+                  " ". $match. " ". $group. " ". $order. " ". $limit;
+        return $mysqli->query($query);
     }
 }
 ?>

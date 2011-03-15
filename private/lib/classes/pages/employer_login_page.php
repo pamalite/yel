@@ -8,15 +8,11 @@ class EmployerLoginPage extends Page {
     }
     
     public function insert_employer_login_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employer_login.css">'. "\n";
+        $this->insert_css('employer_login.css');
     }
     
     public function insert_employer_login_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employer_login.js"></script>'. "\n";
+        $this->insert_scripts('employer_login.js');
     }
     
     public function insert_inline_scripts() {
@@ -25,105 +21,178 @@ class EmployerLoginPage extends Page {
     
     public function show($_error = "") {
         $this->begin();
-        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Employers</span>");
+        $this->top('Employer Login');
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
-        <table class="content">
-            <tr>
-                <td class="content">
-                    <div class="content">
-                        <table class="description">
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/employer_login/01.jpg" /></td>
-                                <td>Create and manage your job ads</td>
-                            </tr>
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/employer_login/02.jpg" /></td>
-                                <td>Manage and track resumes of referred candidates</td>
-                            </tr>
-                            <tr>
-                                <td class="icons"><img style="border: none;" src="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/common/images/misc/employer_login/03.jpg" /></td>
-                                <td>Keep track of successful employments</td>
-                            </tr>
-                            <tr>
-                                <td style="padding-top: 25px;" colspan="2">&quot;Identifying better candidates for your organization through the power of job referrals.&quot;</td>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
-                <td class="login_form">
-                    <form method="post" id="login_form" onSubmit="return false">
-                        <div class="login">
-                            <table class="login">
-                                <tr>
-                                    <td class="title">Employer Sign In</td>
-                                </tr>
-                                <tr>
-                                    <td><label for="id">User ID:</label><br/>
-                                    <input type="text" id="id" name="id" value=""></td>
-                                </tr>
-                                <tr>
-                                    <td><label for="password">Password:</label><br/>
-                                    <input type="password" id="password" name="password"></td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <input type="submit" class="login" id="login" value="Sign In">
-                                        &nbsp;
-                                        <span class="forgot_password"><a href="<?php echo $GLOBALS['protocol'] ?>://<?php echo $GLOBALS['root'] ?>/contact.php">Forgot Password? Call Support.</a></span>
-                                    </td>
-                                </tr>
-                            </table>
+        
+        <!-- jasmine start -->
+        <div class="content">
+            <div class="main">
+                <h1><img src="<?php echo $this->url_root; ?>/common/images/login_welcome.jpg" /></h1>
+                
+                <div class="login-enquiry-box">
+                    <span>For enquiries, please email your name, designation, company name, and phone number to: <a href="mailto:sales@yellowelevator.com" style="color: #FDD501;">sales@yellowelevator.com</a> and we will contact you shortly.</span>
+                </div>
+                
+                We like to thank our clients for their support. We have grown & rebranded <br/>
+                our company recently. While you enjoy this video, please take note that our<br/>
+                current video will be rebranded very soon.<br/><br/>
+                <object width="480" height="390"><param name="movie" value="http://www.youtube.com/v/iQ0eX90aylQ?fs=1&amp;hl=en_US&amp;rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/iQ0eX90aylQ?fs=1&amp;hl=en_US&amp;rel=0" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="480" height="390"></embed></object>
+            </div>
+            <div class="side">
+                <div class="login_form">
+                    <img src="<?php echo $this->url_root; ?>/common/images/login_signin.jpg" style="margin-bottom:23px;" /><br/>
+                    <form method="post" onSubmit="return false;">
+                        <label for="id">User ID:</label><br/>
+                        <input type="text" id="id" name="id" value="" />
+                        <br/><br/>
+                        <label for="password">Password:</label><br/>
+        
+                        <input type="password" id="password" name="password" />
+                        <div class="button_bar left">
+                            <a href="../contact.php">Forgot Password? Call Support.</a>
+                        </div>
+                        <div class="button_bar right">
+                            <input type="submit" class="login" id="login" value="Login" />
                         </div>
                     </form>
-                    <div class="login">
-                        <table class="login">
+        
+                </div>
+                <div class="client-box">
+                    <img src="<?php echo $this->url_root; ?>/common/images/login_our_client.jpg" style="margin-bottom:23px;" /><br/>
+                    <div id="employers_carousel">
+                        <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td style="text-align: center; font-weight: bold; font-size: 12pt; padding-bottom: 5px;">
-                                    <a href="#" class="signup" onClick="show_contact_drop_form();"><img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/contact_sign_up.jpg" /></a>
+                                <td width="8"><a id="toggle_left" class="no_link"><img src="<?php echo $this->url_root; ?>/common/images/nav-logo-left.jpg" width="8" height="14" class="prev" /></a></td>
+                                <td class="nav-center" id="employer_tabs" width="250">
+                                    <div class="employer_logos" id="employers_0">
+                                        <table cellpadding="0" cellspacing="0" width="230" height="135">
+                                            <tr>
+                                                <td align="center">
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=MATTEL_M&keywords=">
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_mattel.jpg" alt="Mattel" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=wdc_m&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_wd.jpg" alt="Western Digital" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=digi&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_digi.jpg" alt="digi" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center">
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=altera&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_altera.jpg" alt="altera" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=entegris&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_entegris.jpg" alt="entegris" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                                <td align="center">
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=nuskin&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_nuskin.jpg" alt="nuskin" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+        
+                                    </div>
+                                    <div class="employer_logos" id="employers_1">
+                                        <table cellpadding="0" cellspacing="0" width="230" height="135">
+                                            <tr>
+                                                <td>
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=rstn_m&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_rstn.jpg" alt="RSTN" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=elawyer&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_el.jpg" alt="elawyers" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=exabytes&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_ex.jpg" alt="Exabytes" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=dsem&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_dsem.jpg" alt="dsem" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=silterra&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_silterra.jpg" alt="silterra" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <a href="https://yellowelevator.com/yel/search.php?industry=0&employer=ESS&keywords=" >
+                                                        <img src="<?php echo $this->url_root; ?>/common/images/logos/s_essence.jpg" alt="Essence" style="vertical-align: middle;" />
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
                                 </td>
+        
+                                <td width="14"><a id="toggle_right" class="no_link" style="margin-left:6px;"><img src="<?php echo $this->url_root; ?>/common/images/nav-logo-right.jpg" width="8" height="14" class="prev" /></a></td>
                             </tr>
                         </table>
                     </div>
-                </td>
-            </tr>
-        </table>
+                </div>
+            </div>
+            <div class="clear"></div>
+        </div>
+        <!-- jasmine end -->
         
-        <div id="div_blanket"></div>
-        <div id="div_contact_drop_form">
-            <form method="post" id="contact_drop_form" onSubmit="return false;">
+        <!-- popup goes here -->
+        <div id="contact_drop_form" class="popup_window">
+            <form method="post" onSubmit="return false;">
                 <table class="drop_contact">
                     <tr>
                         <td colspan="2" class="title">Drop Us Your Contact</td>
                     </tr>
                     <tr>
                         <td class="label"><label for="company">Company Name:</label></td>
-                        <td><input type="text" id="company" name="company" value=""></td>
+                        <td><input type="text" id="company" name="company" value="" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="phone">Contact Number:</label></td>
-                        <td><input type="text" id="phone" name="phone" value=""></td>
+                        <td><input type="text" id="phone" name="phone" value="" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="email">E-mail Address:</label></td>
-                        <td><input type="text" id="email" name="email" value=""></td>
+                        <td><input type="text" id="email" name="email" value="" /></td>
                     </tr>
                     <tr>
                         <td class="label"><label for="contact">Contact Person:</label></td>
-                        <td><input type="text" id="contact" name="contact" value=""></td>
+                        <td><input type="text" id="contact" name="contact" value="" /></td>
                     </tr>
                     <tr>
                         <td class="buttons" colspan="2">
-                            <input type="button" class="drop" onClick="close_contact_drop_form();" value="Cancel">
-                            &nbsp;
-                            <input type="button" class="drop" id="drop" value="Drop My Contact Now">
+                            <input type="button" class="drop" id="drop" value="Drop My Contact Now" />
+                            <input type="button" class="drop" onClick="close_contact_drop_form();" value="Cancel" />
                         </td>
                     </tr>
                 </table>
             </form>
         </div>
+        
+        <!--div id="div_blanket"></div>
+        <div id="div_contact_drop_form">
+            
+        </div-->
         <?php
     }
 }

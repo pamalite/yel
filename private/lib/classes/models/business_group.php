@@ -2,16 +2,14 @@
 require_once dirname(__FILE__). "/../../utilities.php";
 
 class BusinessGroup {
-    private $mysqli = NULL;
-    
-    public static function create($data) {
+    public static function create($_data) {
         $mysqli = Database::connect();
         
-        if (is_null($data) || !is_array($data)) {
+        if (is_null($_data) || !is_array($_data)) {
             return false;
         }
         
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $query = "INSERT INTO business_groups SET ";                
         $i = 0;
         foreach ($data as $key => $value) {
@@ -43,18 +41,18 @@ class BusinessGroup {
         return false;
     }
     
-    public static function update($data) {
+    public static function update($_data) {
         $mysqli = Database::connect();
         
-        if (is_null($data) || !is_array($data)) {
+        if (is_null($_data) || !is_array($_data)) {
             return false;
         }
         
-        if (!array_key_exists('id', $data)) {
+        if (!array_key_exists('id', $_data)) {
             return false;
         }
         
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $query = "UPDATE business_groups SET ";
         $i = 0;
         foreach ($data as $key => $value) {
@@ -86,7 +84,58 @@ class BusinessGroup {
         return $mysqli->execute($query);
     }
     
-    public static function get_security_clearance($_id) {
+    public static function find($_criteria) {
+        if (is_null($_criteria) || !is_array($_criteria)) {
+            return false;
+        }
+        
+        $mysqli = Database::connect();
+        
+        $columns = '*';
+        $joins = '';
+        $order = '';
+        $group = '';
+        $limit = '';
+        $match = '';
+        
+        foreach ($_criteria as $key => $clause) {
+            switch (strtoupper($key)) {
+                case 'COLUMNS':
+                    $columns = trim($clause);
+                    break;
+                case 'JOINS':
+                    $conditions = explode(',', $clause);
+                    $i = 0;
+                    foreach ($conditions as $condition) {
+                        $joins .= "LEFT JOIN ". trim($condition);
+
+                        if ($i < count($conditions)-1) {
+                            $joins .= " ";
+                        }
+                        $i++;
+                    }
+                    break;
+                case 'ORDER':
+                    $order = "ORDER BY ". trim($clause);
+                    break;
+                case 'GROUP':
+                    $group = "GROUP BY ". trim($clause);
+                    break;
+                case 'LIMIT':
+                    $limit = "LIMIT ". trim($clause);
+                    break;
+                case 'MATCH':
+                    $match = "WHERE ". trim($clause);
+                    break;
+            }
+        }
+        
+        $query = "SELECT ". $columns. " FROM business_groups ". $joins. 
+                  " ". $match. " ". $group. " ". $order. " ". $limit;
+        return $mysqli->query($query);
+    }
+    
+    public static function getSecurityClearance($_id) {
         $mysqli = Database::connect();
         $query = "SELECT security_clearance FROM business_groups WHERE id = ". $_id. " LIMIT 1";
         $result = $mysqli->query($query);
@@ -105,14 +154,7 @@ class BusinessGroup {
         return $mysqli->query($query);
     }
     
-    public static function get_all() {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM business_groups";
-        
-        return $mysqli->query($query);
-    }
-    
-    public static function add_employee_to_group($_employee, $_group) {
+    public static function addEmployeeToGroup($_employee, $_group) {
         if (empty($_employee) || empty($_group) || $_employee <= 0 || $_group <= 0) {
             return false;
         }
@@ -125,7 +167,7 @@ class BusinessGroup {
         return $mysqli->execute($query);
     }
     
-    public static function remove_employee_from_group($_employee, $_group) {
+    public static function removeEmployeeFromGroup($_employee, $_group) {
         if (empty($_employee) || empty($_group) || $_employee <= 0 || $_group <= 0) {
             return false;
         }

@@ -1,11 +1,9 @@
 <?php
 require_once "../private/lib/utilities.php";
 
-$xml_seed = new XMLDOM();
-$xml_seed->load_from_uri("http://localhost/yel2/employers/seed.php");
-$data = $xml_seed->get_assoc(array('id', 'seed'));
-$sid = $data[0]['id'];
-$seed = $data[0]['seed'];
+$data = Seed::generateSeed();
+$sid = $data['login']['id'];
+$seed = $data['login']['seed'];
 $uid = 'acme123';
 $password = 'acme123';
 $hash = sha1($uid. md5($password). $seed);
@@ -17,21 +15,22 @@ $employer = new Employer($uid, $sid);
 
 ?><p style="font-weight: bold;">Logging in... </p><p><?php
 
-if ($employer->is_registered($hash)) {
-    if ($employer->session_set($hash)) {
+if ($employer->isRegistered($hash)) {
+    if ($employer->setSessionWith($hash)) {
         echo "Success";
     }
 } 
 
-if (!$employer->is_logged_in($hash)) {
+if (!$employer->isLoggedIn($hash)) {
     echo "failed";
     exit();
 }
 
 ?></p><p style="font-weight: bold;">Update my details... </p><p><?php
+$old_data = $employer->get();
 echo "Before...<br><br>";
 echo "<pre>";
-print_r($employer->get());
+print_r($old_data);
 echo "</pre><br><br>";
 
 $data = array();
@@ -58,7 +57,42 @@ if ($employer->update($data)) {
 
 ?></p><p style="font-weight: bold;">Still logged in after a password change?</p><p><?php
 
-if (!$employer->is_logged_in($hash)) {
+if (!$employer->isLoggedIn($hash)) {
+    echo "failed";
+    exit();
+} else {
+    echo "Yup!";
+}
+
+?></p><p style="font-weight: bold;">Change back my details... </p><p><?php
+echo "Before...<br><br>";
+echo "<pre>";
+print_r($new_employer);
+echo "</pre><br><br>";
+
+$data = array();
+$data['password'] = $old_data[0]['password'];
+$data['name'] = $old_data[0]['name'];
+$data['phone_num'] = $old_data[0]['phone_num'];
+$data['address'] = $old_data[0]['address'];
+$data['zip'] = $old_data[0]['zip'];
+$data['state'] = $old_data[0]['state'];
+$data['website_url'] = $old_data[0]['website_url'];
+$data['about'] = $old_data[0]['about'];
+
+if ($employer->update($data)) {
+    echo "<pre>";
+    print_r($employer->get());
+    echo "</pre><br><br>";
+    $hash = sha1($uid. $old_data[0]['password']. $seed);
+} else {
+    echo "failed";
+    exit();
+}
+
+?></p><p style="font-weight: bold;">Still logged in after a password change?</p><p><?php
+
+if (!$employer->isLoggedIn($hash)) {
     echo "failed";
     exit();
 } else {
@@ -68,13 +102,33 @@ if (!$employer->is_logged_in($hash)) {
 ?></p><p style="font-weight: bold;">Display the fees I agreed...</p><p><?php
 
 echo "<pre>";
-print_r($employer->get_fees());
+print_r($employer->getFees());
 echo "</pre><br><br>";
 
-?></p><p style="font-weight: bold;">Display the extras I agreed...</p><p><?php
+?></p><p style="font-weight: bold;">Get all employers...</p><p><?php
+$criteria = array(
+    'columns' => 'id'
+);
+
+$result = $employer->find($criteria);
+$employers = array();
+foreach ($result as $row) {
+    $employers[] = new Employer($row['id']);
+}
+
+$employers_list = array();
+$i = 0;
+foreach ($employers as $emp) {
+    $employers_list[$i]['id'] = $emp->getId();
+    $employers_list[$i]['name'] = $emp->getName();
+    $branch = $emp->getAssociatedBranch();
+    $employers_list[$i]['branch'] = $branch[0]['country_name'];
+    
+    $i++;
+}
 
 echo "<pre>";
-print_r($employer->get_extras());
+print_r($employers_list);
 echo "</pre><br><br>";
 
 ?></p><?php

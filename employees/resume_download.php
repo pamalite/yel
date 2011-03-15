@@ -6,7 +6,7 @@ session_start();
 if ($GLOBALS['protocol'] == 'https') {
     if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off') {
         if (isset($GET['id'])) {
-            redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?id='. $_GET['id']);
+            redirect_to('http://'. $GLOBALS['root']. '/employees/resume.php?id='. $_GET['id']);
         } else {
             redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?job_id='. $_GET['job_id']. '&candidate_email='. $_GET['candidate_email']. '&referrer_email='. $_GET['referrer_email']);
         }
@@ -43,24 +43,20 @@ if (isset($_SESSION['yel']['employee']['dev'])) {
 }
 
 $resume = new Resume(0, $_GET['id']);
-$cover = $resume->get();
-
-if (!is_null($cover[0]['file_name'])) {
-    $file = $resume->get_file();
+$file = $resume->getFile();
+$filename_items = explode('.', $file['name']);
+$ext = $filename_items[1];
     
-    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-    header('Pragma: public');
-    header('Expires: -1');
-    header('Content-Description: File Transfer');
-    header('Content-Length: ' . $file['size']);
-    header('Content-Disposition: attachment; filename="' . $file['name'].'"');
-    header('Content-type: '. $file['type']);
-    ob_clean();
-    flush();
-    readfile($GLOBALS['resume_dir']. "/". $_GET['id']. ".". $file['hash']);
-} else {
-    redirect_to('https://'. $GLOBALS['root']. '/employees/resume.php?id='. $_GET['id']);
-}
+header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+header('Pragma: public');
+header('Expires: -1');
+header('Content-Description: File Transfer');
+header('Content-Length: ' . $file['size']);
+header('Content-Disposition: attachment; filename="' . $_GET['id']. '.'. $ext. '"');
+header('Content-type: '. $file['type']);
+ob_clean();
+flush();
+readfile($GLOBALS['resume_dir']. "/". $_GET['id']. ".". $file['hash']);
 
 exit();
 ?>

@@ -1386,7 +1386,7 @@ function set_mouse_events() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     set_mouse_events();
     get_employer_referrals_count();
     

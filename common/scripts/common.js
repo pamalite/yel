@@ -4,6 +4,43 @@ var root = "";
 // var paypal_ipn_url = 'http://60.50.27.9/yel/employers/slots_ipn_action.php';
 // var paypal_id = 'J77S5ZAUFN8SS';
 
+function initialize_page() {
+    set_root();
+    
+    if ($('mini_keywords') != undefined) {
+        var mini_keywords_overtext = new OverText($('mini_keywords'));
+        
+        if (typeof keywords != 'undefined') {
+            if (!isEmpty(keywords)) {
+                mini_keywords_overtext.hide();
+                $('mini_keywords').value = keywords;
+            }
+        }
+        
+        var suggest_url = root + '/common/php/search_suggest.php';
+        new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
+            'postVar': 'keywords',
+            'minLength' : 1,
+            'overflow' : true,
+            'delay' : 15
+        });
+    }
+    
+    if ($('keywords') != undefined) {
+        var keywords_overtext = new OverText($('keywords'));
+        
+        var suggest_url = root + '/common/php/search_suggest.php';
+        new Autocompleter.Ajax.Json('keywords', suggest_url, {
+            'postVar': 'keywords',
+            'minLength' : 1,
+            'overflow' : true,
+            'delay' : 15
+        });
+    }
+    
+    OverText.update();
+}
+
 function set_root() {
     root = location.protocol + "//" + location.hostname + "/yel";
 }
@@ -158,7 +195,7 @@ function isEmail(aString) {
             }
         }
     }
-
+    
     return true;
 }
 
@@ -224,6 +261,24 @@ function generate_random_string_of(length) {
     }
     
     return output;
+}
+
+function show_window(_id) {
+    // make the invisible layer appear for non-IE
+    if (!Browser.ie) {
+        $(_id).setStyle('display', 'block');
+    }
+    
+    $(_id).position();
+    
+    // make the invisible layer appear for IE
+    if (Browser.ie) {
+        $(_id).setStyle('display', 'block');
+    }
+}
+
+function close_window(_id) {
+    $(_id).setStyle('display', 'none');
 }
 
 function get_industries() {
@@ -800,6 +855,7 @@ function show_industries_in(placeholder) {
 function verify_mini() {
     if ($('mini_industry').options[$('mini_industry').selectedIndex].value == 0 && 
         $('mini_employer').options[$('mini_employer').selectedIndex].value == 0 && 
+        $('mini_country').options[$('mini_country').selectedIndex].value == '' && 
         ($('mini_keywords').value == 'Job title or keywords' || $('mini_keywords').value == '')) {
         alert('Please select an industry/sub-industry or enter the job title/keywords in order to do a search. You may choose to do all if you wish to do a more specific search');
         return false;
@@ -899,6 +955,17 @@ function list_available_industries(_industry) {
     });
     
     request.send(params);
+}
+
+function close_safari_connection() {
+    if (Browser.Engine.webkit && Browser.Platform.mac) {
+        var request = new Request({
+            url: root + "/safari_close.php",
+            method: 'post',
+            async: false
+        });
+        request.send();
+    }
 }
 
 // function post_to_paypal_with(_hash_value_pairs) {

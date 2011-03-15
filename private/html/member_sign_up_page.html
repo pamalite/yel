@@ -1,0 +1,191 @@
+<div id="div_status" class="status">
+    <span id="span_status" class="status"></span>
+</div>
+
+<div id="div_sign_up">
+    <form id="profile">
+        <table class="profile_form">
+            <tr>
+                <td class="instruction" colspan="2">Please fill up <span style="font-weight: bold; text-decoration: underline;">ALL</span> the fields.</td>
+            </tr>
+            <tr>
+                <td class="label"><label for="firstname">First Name:</label></td>
+                <td class="field"><input class="field" type="text" id="firstname" name="firstname" alt="Jane" /></td>
+            </tr>
+            <tr>
+                <td class="label"><label for="lastname">Last Name:</label></td>
+                <td class="field">
+                    <input class="field" type="text" id="lastname" name="lastname" alt="Doe" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="phone_num">Telephone Number:</label></td>
+                <td class="field"><input class="field" type="text" id="phone_num" name="phone_num" alt="123-1234 5678" /></td>
+            </tr>
+            <tr>
+                <td class="label"><label for="email_addr">E-mail Address:</label></td>
+                <td class="field">
+                    <input class="field" type="text" id="email_addr" name="email_addr" alt="jane.doe@acme.com" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="password">Password:</label></td>
+                <td class="field"><input class="field" type="password" id="password" name="password" alt="create a password" /></td>
+            </tr>
+            <tr>
+                <td class="label"><label for="password_confirm">Confirm Password:</label></td>
+                <td class="field"><input class="field" type="password" id="password_confirm" name="password_confirm" alt="type the password again" /></td>
+            </tr>
+            <tr>
+                <td class="label"><label for="forget_password_question">Password hint:</label></td>
+                <td class="field">
+                    %password_reset_questions%
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="forget_password_answer">Password hint answer:</label></td>
+                <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" /></td>
+            </tr>
+            <tr>
+                <td class="label">&nbsp;</td>
+                <td class="field">
+                    <script type="text/javascript" src="http://www.google.com/recaptcha/api/challenge?k=6LdwqsASAAAAAJuZpFkYJo6a0-QAJET_OafO3n6D">
+                    </script>
+                    <noscript>
+                        <iframe src="http://www.google.com/recaptcha/api/noscript?k=6LdwqsASAAAAAJuZpFkYJo6a0-QAJET_OafO3n6D"
+                             height="300" width="500" frameborder="0" id="recaptcha"></iframe><br>
+                        <textarea name="recaptcha_challenge_field" rows="3" cols="40"></textarea>
+                        <input type="hidden" name="recaptcha_response_field"value="manual_challenge">
+                    </noscript>
+                </td>
+            </tr>
+            <tr>
+                <td class="buttons_bar" colspan="2">
+                    <input type="checkbox" id="agreed_terms" name="agreed_terms" />&nbsp;<span style="font-size: 10pt;vertical-align: middle;"><label for="agreed_terms">I have read, understood and accepted the <a target="_new" href="%root%/terms.php">Terms of Use of Yellow Elevator</a>.</label></span>&nbsp;<input type="button" id="save" onClick="sign_up();" value="Sign Me Up!" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div id="div_job_profile">
+    <form id="job_profile">
+        <input type="hidden" id="member_email_addr" value="" />
+        <table class="job_profile_form">
+            <tr>
+                <td class="instruction" colspan="2">
+                    Congratulations! You are now signed up with YellowElevator.com. <br/>
+                    An activation email had been send to your email inbox. Please follow the instructions in the email to fully activate your account.<br/>
+                    In the mean time, please help our Recruitment Consultants identify suitable opportunities for you. <br/>
+                    <br/>
+                    Please fill up <span style="font-weight: bold; text-decoration: underline;">ALL</span> the fields to your best of knowledge.
+                </td>
+            </tr>
+            <tr>
+                <td class="section_title" colspan="2">
+                    Current Job Profile
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="position_title">Job Title:</label></td>
+                <td class="field">
+                    <input class="field" type="text" id="position_title" name="position_title" alt="eg: Finance Manager, Operations Director, etc." />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="position_superior_title">Reporting to:</label></td>
+                <td class="field">
+                    <input class="field" type="text" id="position_superior_title" name="position_superior_title" alt="eg: Financial Controller,  VP of Operations, etc." />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="organization_size">Positions reporting to you:</label></td>
+                <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" alt="eg: 2 Managers, 3 Specialists, and 5 Executives" /></td>
+            </tr>
+            <tr>
+                <td class="label"><label for="company">Current Company:</label></td>
+                <td class="field"><input class="field" type="text" id="company" name="company" /></td>
+            </tr>
+            <tr>
+                <td class="label"><label for="work_from_month">Duration at Current Company:</label></td>
+                <td class="field">
+                    %work_from_month%
+                    <input type="text" class="year" maxlength="4" id="work_from_year" alt="yyyy" />
+                    to
+                    <span id="work_to_dropdown">
+                        %work_to_month%
+                        <input type="text" class="year" maxlength="4" id="work_to_year" alt="yyyy" />
+                    </span>
+                    <input type="checkbox" id="work_to_present" onClick="toggle_work_to();" /> 
+                    <label for="work_to_present">Present</label>
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="emp_desc">Company Description:</label></td>
+                <td class="field">
+                    %emp_desc%
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="emp_specialization">Company Industry:</label></td>
+                <td class="field">
+                    %industries%
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="total_work_years">Total Years of Work Experience:</label></td>
+                <td class="field"><input class="field" type="text" id="total_work_years" name="total_work_years" /></td>
+            </tr>
+            <tr>
+                <td class="label"><label for="seeking">Job Responsibilities &amp; Experience:</label></td>
+                <td class="field">
+                    <textarea id="seeking" class="field" alt="Brief our Recruitment Consultants about your career goals and experiences, enough to help them identify suitable opportunities for your recommendation."></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td class="section_title" colspan="2">
+                    General Demographics (Optional)
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="gender">Gender:</label></td>
+                <td class="field">
+                    <select id="gender">
+                        <option value="">Please select one</option>
+                        <option value="" disabled>&nbsp;</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="ethnicity">Ethnicity:</label></td>
+                <td class="field">
+                    <select id="ethnicity">
+                        <option value="">Please select one</option>
+                        <option value="" disabled>&nbsp;</option>
+                        <option value="malay">Malay</option>
+                        <option value="chinese">Chinese</option>
+                        <option value="indian">Indian</option>
+                        <option value="caucasian">Caucasian</option>
+                        <option value="other">Other (please specify)</option>
+                    </select>
+                    <input type="text" id="ethnicity_txt" alt="specify only when Other is selected" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td class="label"><label for="birthdate_day">Birthdate:</label></td>
+                <td class="field">
+                    %birthdate_day% %birthdate_month% 
+                    <input type="text" class="year" id="birthdate_year" maxlength="4" value="" alt="yyyy"/>
+                </td>
+            </tr>
+            <tr>
+                <td class="buttons_bar" colspan="2">
+                    <input type="button" id="save" onClick="save_job_profile();" value="Finish" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+

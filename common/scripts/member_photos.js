@@ -90,7 +90,7 @@ function hide_show_banner() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_employers_for_mini();
     get_industries_for_mini();
     set_mini_keywords();

@@ -327,7 +327,7 @@ function set_mouse_events() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     set_mouse_events();
     get_unapproved_photos_count();
     get_employee_rewards_count();

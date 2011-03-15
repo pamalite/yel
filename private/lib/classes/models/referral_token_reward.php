@@ -2,24 +2,21 @@
 require_once dirname(__FILE__). "/../../utilities.php";
 
 class ReferralTokenReward {
-    private $mysqli = NULL;
-    
-    public static function create($data) {
-        $mysqli = Database::connect();
-        
-        if (is_null($data) || !is_array($data)) {
+    public static function create($_data) {
+        if (is_null($_data) || !is_array($_data)) {
             return false;
         }
         
-        if (!array_key_exists('referral', $data) || !array_key_exists('token', $data)) {
+        if (!array_key_exists('referral', $_data) || !array_key_exists('token', $_data)) {
             return false;
         }
         
-        $data = sanitize($data);
-        
+        $data = sanitize($_data);
         if ($data['token'] <= 0) {
             return false;
         }
+        
+        $mysqli = Database::connect();
         
         $query = "INSERT INTO referral_token_rewards SET ";                
         $i = 0;
@@ -52,18 +49,17 @@ class ReferralTokenReward {
         return false;
     }
     
-    public static function update($data) {
+    public static function update($_data) {
+        if (is_null($_data) || !is_array($_data)) {
+            return false;
+        }
+        
+        if (!array_key_exists('id', $_data)) {
+            return false;
+        }
+        
         $mysqli = Database::connect();
-        
-        if (is_null($data) || !is_array($data)) {
-            return false;
-        }
-        
-        if (!array_key_exists('id', $data)) {
-            return false;
-        }
-        
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $query = "UPDATE referral_token_rewards SET ";
         $i = 0;
         foreach ($data as $key => $value) {
@@ -95,14 +91,14 @@ class ReferralTokenReward {
          return $mysqli->execute($query);
     }
     
-    public static function get($_id) {
+    public static function getId($_id) {
         $mysqli = Database::connect();
         $query = "SELECT * FROM referral_token_rewards WHERE id = '". $_id. "' LIMIT 1";
         
         return $mysqli->query($query);
     }
     
-    public static function get_all_of_referral($_referral) {
+    public static function getAllForReferral($_referral) {
         if (empty($_referral)) {
             return false;
         }
@@ -113,14 +109,14 @@ class ReferralTokenReward {
         return $mysqli->query($query);
     }
     
-    public static function get_all() {
+    public static function getAll() {
         $mysqli = Database::connect();
         $query = "SELECT * FROM referral_token_rewards";
         
         return $mysqli->query($query);
     }
     
-    public static function get_sum_paid_of_referral($_referral) {
+    public static function getSumPaidForReferral($_referral) {
         if (empty($_referral)) {
             return false;
         }

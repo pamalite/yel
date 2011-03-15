@@ -4,10 +4,11 @@ require_once dirname(__FILE__). "/../../private/lib/utilities.php";
 $_POST['keywords'] = sanitize($_POST['keywords']);
 if (!empty($_POST['keywords'])) {
     $criteria = array();
-    $criteria['order_by'] = 'relevance desc';
+    $criteria['order_by'] = 'jobs.created_on DESC';
     $criteria['industry'] = 0;
     $criteria['employer'] = '';
     $criteria['country_code'] = '';
+    $criteria['country'] = $_POST['country'];
     $criteria['limit'] = $GLOBALS['default_results_per_page'];
     $criteria['offset'] = 0;
     $criteria['keywords'] = $_POST['keywords'];

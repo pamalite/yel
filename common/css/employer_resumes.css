@@ -1,0 +1,177 @@
+#div_resumes {
+    display: none;
+}
+
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+.referred_jobs {
+    margin: auto;
+    width: 99%;
+    border-collapse: collapse;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.resumes_column {
+    text-align: center;
+    font-weight: bolder;
+    font-size: 12pt;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+#referred_jobs_table tr:hover, 
+#resumes_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+.inline_job_desc {
+    margin: 10px 10px 10px 10px;
+    padding: 5px 5px 5px 5px;
+    border: 1px dashed #CCCCCC;
+    display: none;
+    overflow: auto;
+    height: 250px;
+}
+
+.resumes {
+    margin: auto;
+    width: 99%;
+    border-collapse: collapse;
+}
+
+.resumes_top {
+    text-align: center;
+    margin: auto;
+    padding: 5px 5px 5px 5px;
+}
+
+.back {
+    border: 1px solid #0000FF;
+    padding: 3px 3px 3px 3px;
+}
+
+.job_title {
+    text-align: center;
+    margin-top: 15px;
+    padding-bottom: 15px;
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+.actions_column {
+    text-align: center;
+}
+
+.remarks_column {
+    width: 450px;
+}
+
+.mini_contacts {
+    padding-top: 3px;
+    font-size: 8pt;
+    font-style: italic;
+}
+
+.testimony_link {
+    font-size: 8pt;
+    font-style: italic;
+}
+
+#job_description_window, 
+#testimony_window, 
+#remarks_window,
+#notify_window, 
+#employment_window {
+    display: none;
+    width: 800px;
+}
+
+#notify_window {
+    width: 550px;
+}
+
+#employment_window {
+    width: 395px;
+}
+
+#window_description, 
+#window_testimony, 
+.txt_remarks, 
+.txt_message {
+    width: 99%;
+    height: 550px;
+    margin: auto;
+    overflow: auto;
+}
+
+.employment_form {
+    width: 99%;
+    margin: auto;
+}
+
+.employment_form_table {
+    width: 100%;
+    margin: auto;
+}
+
+.txt_remarks, 
+.txt_message {
+    font-size: 10pt;
+}
+
+.txt_message {
+    height: 150px;
+}
+
+.message_options {
+    margin: auto;
+    text-align: center;
+    width: 99%;
+}
+
+.instructions_label {
+    width: 50%;
+    float: left;
+    vertical-align: middle;
+    font-size: 7pt;
+    color: #666666;
+}
+
+.reply_to_area {
+    width: 99%;
+    margin: auto;
+}
+
+.field {
+    width: 100%;
+}
+
+.salary_field {
+    width: 80%;
+}
+
+div.remarks_cell {
+    font-size: 9pt;
+    width: 98%;
+    height: 75px;
+    overflow: auto;
+}

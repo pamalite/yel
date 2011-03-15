@@ -20,7 +20,7 @@ if (!isset($_SESSION['yel']['employer']) ||
 
 
 $invoice = Invoice::get($_GET['id']);
-$items = Invoice::get_items_of($_GET['id']);
+$items = Invoice::getItems($_GET['id']);
 
 if (!$invoice) {
     echo "Invoice not found.";
@@ -28,8 +28,8 @@ if (!$invoice) {
 }
 
 $employer = new Employer($invoice[0]['employer']);
-$branch = $employer->get_branch();
-$currency = Currency::symbol_from_country_code($branch[0]['country']);
+$branch = $employer->getAssociatedBranch();
+$currency = $branch[0]['currency'];
 
 $amount_payable = 0.00;
 foreach($items as $i=>$item) {
@@ -103,7 +103,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
                                 <?php echo str_replace(array("\r\n", "\r", "\n"), '<br/>', $branch[0]['address']). ', <br/>'. 
                                            $branch[0]['zip']. ' '. 
                                            $branch[0]['state'], ', '. 
-                                           $branch[0]['country_name']. '.'; ?><br/>
+                                           $branch[0]['mailing_country_name']. '.'; ?><br/>
                             </td>
                         </tr>
                     </table>
@@ -153,7 +153,7 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
         </tr>
         <tr>
             <td class="value"><?php echo $invoice[0]['employer'] ?></td>
-            <td class="value" colspan="3"><?php echo $employer->get_name(); ?></td>
+            <td class="value" colspan="3"><?php echo $employer->getName(); ?></td>
         </tr>
     </table>
 </div>

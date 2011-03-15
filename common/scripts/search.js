@@ -1,10 +1,10 @@
-var order_by = 'relevance';
+var order_by = 'jobs.created_on';
 var order = 'desc';
-//var offset = 0;
-var current_page = 1;
-var total_pages = 1;
-var filter_by = '0';
-var candidates_list = new ListBox('candidates', 'candidates_list');
+var is_filter = false;
+
+function changed_country() {
+    // is_local = 0;
+}
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -14,130 +14,38 @@ function ascending_or_descending() {
     }
 }
 
-function show_candidates() {
-    $('candidates').set('html', '');
-    
-    var params = 'id=' + id + '&action=get_candidates';
-    params = params + '&filter_by=' + filter_by;
-    
-    var uri = root + "/search_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                alert('An error occured while loading candidates.');
-                return false;
-            }
-            
-            candidates_list.clear();
-            
-            var ids = xml.getElementsByTagName('id');
-            var referee_names = xml.getElementsByTagName('referee_name');
-            var referee_emails = xml.getElementsByTagName('referee');
-            
-            for (var i=0; i < ids.length; i++) {
-                candidates_list.add_item(referee_names[i].childNodes[0].nodeValue, referee_emails[i].childNodes[0].nodeValue);
-            }
-            
-            candidates_list.show();
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading referees...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function back_to_results() {
-    $('div_job_info').setStyle('display', 'none');
-    $('div_search_results').setStyle('display', 'block');
-    set_status('');
-}
-
-function show_pagination_dropdown() {
-    var html = '<select id="pagination_dropdown" name="page" onChange="go_to_page();">' + "\n";
-    for (var i = 1; i <= total_pages; i++) {
-        if (i == current_page) {
-            html = html + '<option value="' + i + '" selected>' + i + '</option>' + "\n";
-        } else {
-            html = html + '<option value="' + i + '">' + i + '</option>' + "\n";
-        }
-    }
-    html = html + '</select>' + "\n";
-    
-    $('current_page').set('html', html);
-    $('current_page_1').set('html', html);
-}
-
-function show_limit_dropdown() {
-    var html = '<select id="limit_dropdown" name="limit" onChange="filter_jobs();">' + "\n";
-    for (var i = 5; i <= 50; i += 5) {
-        if (i == limit) {
-            html = html + '<option value="' + i + '" selected>' + i + '</option>' + "\n";
-        } else {
-            html = html + '<option value="' + i + '">' + i + '</option>' + "\n";
-        }
-    }
-    html = html + '</select>' + "\n";
-    
-    $('filter_limit_dropdown').set('html', html);
+function sort_by(_column) {
+    order_by = _column;
+    ascending_or_descending();
+    show_jobs();
 }
 
 function filter_jobs() {
-    if ($('industry_dropdown').options[$('industry_dropdown').selectedIndex].value == 0 && 
-        $('country_dropdown').options[$('country_dropdown').selectedIndex].value == 0 && 
-        $('mini_employer').options[$('mini_employer').selectedIndex].value == 0 && 
-        isEmpty(keywords)) {
-        alert('Listing jobs in any industry from any country without prior entering keywords will slow down the system.\n\nPlease refine your search by using keywords in any available keywords field.');
-        
-        $('industry_dropdown').selectedIndex = industry;
-        $('country_dropdown').selectedIndex = country_code;
-        return false;
-    }
-    
-    industry = $('industry_dropdown').options[$('industry_dropdown').selectedIndex].value;
-    country_code = $('country_dropdown').options[$('country_dropdown').selectedIndex].value;
-    limit = $('limit_dropdown').options[$('limit_dropdown').selectedIndex].value;
-    
+    country_code = $('filter_country').options[$('filter_country').selectedIndex].value;
+    industry = $('filter_industry').options[$('filter_industry').selectedIndex].value;
+    employer = $('filter_employer').options[$('filter_employer').selectedIndex].value;
+    filter_salary = $('filter_salary').options[$('filter_salary').selectedIndex].value;
     offset = 0;
-    show_jobs();
-}
-
-function go_to_last_page() {
-    offset = (parseInt(total_pages) - 1) * parseInt(limit);
-    show_jobs();
-}
-
-function go_to_first_page() {
-    offset = 0;
-    show_jobs();
-}
-
-function go_to_next_page() {
-    offset = parseInt(offset) + parseInt(limit);
-    show_jobs();
-}
-
-function go_to_previous_page() {
-    offset = parseInt(offset) - parseInt(limit);
-    show_jobs();
-}
-
-function go_to_page() {
-    offset = (parseInt($('pagination_dropdown').options[$('pagination_dropdown').selectedIndex].value) - 1) * parseInt(limit);
+    is_filter = true;
     show_jobs();
 }
 
 function show_jobs() {
-    $('div_job_info').setStyle('display', 'none');
-    $('div_search_results').setStyle('display', 'block');
+    if ($('page') != null || !is_filter) {
+        offset = parseInt($('page').options[$('page').selectedIndex].value) * limit;
+    }
     
     var params = 'industry=' + industry;
     params = params + '&employer=' + employer;
     params = params + '&country_code=' + country_code;
+    params = params + '&country=' + country_code;
+    // params = params + '&is_local=' + is_local;
+    params = params + '&salary=' + filter_salary;
+    
+    if (parseInt(filter_salary_end) > 0) {
+        params = params + '&salary_end=' + filter_salary_end;
+    }
+    
     params = params + '&keywords=' + keywords;
     params = params + '&offset=' + offset;
     params = params + '&limit=' + limit;
@@ -149,228 +57,107 @@ function show_jobs() {
         method: 'post',
         onSuccess: function(txt, xml) {
             if (txt == 'ko') {
-                set_status('An error occured while searching jobs.');
+                alert('An error occured while searching jobs.');
                 return false;
             }
             
             if (txt == '0') {
-                set_status('No job found with the criteria.');
-                $('div_list').set('html', '');
-                $('current_page').set('html', '0');
-                $('total_page').set('html', '0');
-                $('current_page_1').set('html', '0');
-                $('total_page_1').set('html', '0');
-                show_limit_dropdown();
-                return false;
-            }
-            
-            var ids = xml.getElementsByTagName('id');
-            var matches = xml.getElementsByTagName('match_percentage');
-            var job_titles = xml.getElementsByTagName('title');
-            var industries = xml.getElementsByTagName('industry');
-            var countries = xml.getElementsByTagName('country');
-            var states = xml.getElementsByTagName('state');
-            var employers = xml.getElementsByTagName('name');
-            var currencies = xml.getElementsByTagName('currency');
-            var salaries = xml.getElementsByTagName('salary');
-            var salary_ends = xml.getElementsByTagName('salary_end');
-            var created_ons = xml.getElementsByTagName('formatted_created_on');
-            var rewards = xml.getElementsByTagName('potential_reward');
-            var total_results = xml.getElementsByTagName('total_results');
-            var current_pages = xml.getElementsByTagName('current_page');
-            var changed_country_code = xml.getElementsByTagName('changed_country_code');
-            
-            var total = total_results[0].childNodes[0].nodeValue;
-            total_pages = Math.ceil(total / limit);
-            current_page = current_pages[0].childNodes[0].nodeValue;
-            
-            var next_page_button_html = '';
-            if (current_page < total_pages) {
-                next_page_button_html = '<a class="no_link" onClick="go_to_next_page();"><img src="' + root + '/common/images/next_page.jpg" style="vertical-align: middle;" onMouseOver="this.src=root + \'/common/images/next_page_hover.jpg\'" onMouseOut="this.src=root + \'/common/images/next_page.jpg\'" /></a>&nbsp;&nbsp;';
-                next_page_button_html = next_page_button_html + '<a class="no_link" onClick="go_to_last_page();"><img src="' + root + '/common/images/last_page.jpg" style="vertical-align: middle;" onMouseOver="this.src=root + \'/common/images/last_page_hover.jpg\'" onMouseOut="this.src=root + \'/common/images/last_page.jpg\'" /></a>';
-            }
-            
-            var previous_page_button_html = '';
-            if (current_page > 1) {
-                previous_page_button_html = '<a class="no_link" onClick="go_to_first_page();"><img src="' + root + '/common/images/first_page.jpg" style="vertical-align: middle;" onMouseOver="this.src=root + \'/common/images/first_page_hover.jpg\'" onMouseOut="this.src=root + \'/common/images/first_page.jpg\'" /></a>&nbsp;&nbsp;';
-                previous_page_button_html = previous_page_button_html +  '<a class="no_link" onClick="go_to_previous_page();"><img src="' + root + '/common/images/previous_page.jpg" style="vertical-align: middle;" onMouseOver="this.src=root + \'/common/images/previous_page_hover.jpg\'" onMouseOut="this.src=root + \'/common/images/previous_page.jpg\'" /></a>';
-            }
-            
-            var html = '<table id="list" class="list">';
-            for (var i=0; i < ids.length; i++) {
-                var job_id = ids[i].childNodes[0].nodeValue;
+                $('statistics').set('html', 'Found 0 jobs in 0 seconds.');
+                $('pagination').set('html', 'Page 1 of 1');
+                $('results').set('html', '<div class="empty_results">No jobs with the criteria found.</div>');
+            } else {
+                var total_jobs = xml.getElementsByTagName('total');
+                var elapsed = xml.getElementsByTagName('elapsed');
                 
-                html = html + '<tr id="'+ job_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                html = html + '<td class="match_percentage"><img src="' + root + '/common/images/match_bar.jpg" style="height: 4px; width: ' + Math.floor(matches[i].childNodes[0].nodeValue / 100 * 50) + 'px; vertical-align: middle;" /></td>' + "\n";
-                html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '<td class="industry">' + industries[i].childNodes[0].nodeValue + '</td>' + "\n";
-                //html = html + '<td class="title"><a class="no_link" onClick="show_job(\'' + job_id + '\');">' + job_titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                html = html + '<td class="title"><a href="' + root + '/job/' + job_id + '">' + job_titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                //html = html + '<td class="date">' + created_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '<td class="country">' + countries[i].childNodes[0].nodeValue + '</td>' + "\n";
+                $('statistics').set('html', 'Found ' + total_jobs[0].childNodes[0].nodeValue + ' jobs in ' + elapsed[0].childNodes[0].nodeValue + ' seconds.');
                 
-                var state = 'n/a';
-                if (states[i].childNodes.length > 0) {
-                    state = states[i].childNodes[0].nodeValue;
+                if (is_filter) {
+                    if (parseInt(total_jobs[0].childNodes[0].nodeValue) <= limit) {
+                        $('pagination').set('html', 'Page 1 of 1');
+                    } else {
+                        var pages = Math.ceil(parseInt(total_jobs[0].childNodes[0].nodeValue) / parseInt(limit));
+                        var html = 'Page <select id="page" onChange="show_jobs();">' + "\n";
+
+                        for (var i=0; i < pages; i++) {
+                            if (i == 0) {
+                                html = html + '<option value="' + i + '" selected>' + (i+1) + '</option>' + "\n";
+                            } else {
+                                html = html + '<option value="' + i + '">' + (i+1) + '</option>' + "\n";
+                            }
+                        }
+
+                        html = html + '</select> of ' + pages + "\n";
+                        $('pagination').set('html', html);
+                    }
                 }
                 
-                html = html + '<td class="state">' + state + '</td>' + "\n";
+                var ids = xml.getElementsByTagName('id');
+                var job_titles = xml.getElementsByTagName('title');
+                var industries = xml.getElementsByTagName('industry');
+                var countries = xml.getElementsByTagName('country');
+                var descriptions = xml.getElementsByTagName('description');
+                var employers = xml.getElementsByTagName('employer');
+                var currencies = xml.getElementsByTagName('currency');
+                var salaries = xml.getElementsByTagName('salary');
+                var salary_ends = xml.getElementsByTagName('salary_end');
+                var expire_ons = xml.getElementsByTagName('formatted_expire_on');
+                var rewards = xml.getElementsByTagName('potential_reward');
                 
-                var salary_end = '';
-                if (salary_ends[i].childNodes.length > 0) {
-                    salary_end = '&nbsp;-&nbsp;' + salary_ends[i].childNodes[0].nodeValue;
-                }
-                html = html + '<td class="salary">' + currencies[i].childNodes[0].nodeValue + '$ ' + salaries[i].childNodes[0].nodeValue + salary_end + '</td>' + "\n";
-                if (rewards[i].childNodes.length > 0) {
-                    html = html + '<td class="potential_reward">' + currencies[i].childNodes[0].nodeValue + '$ ' + rewards[i].childNodes[0].nodeValue + '</td>' + "\n";
-                } else {
-                    html = html + '<td class="potential_reward">0.00</td>' + "\n";
+                var html = '';
+                for (var i=0; i < ids.length; i++) {
+                    var total_rewards = parseFloat(rewards[i].childNodes[0].nodeValue);
+                    var token_reward = total_rewards * 0.05;
+                    var potential_reward = total_rewards - token_reward;
+                    
+                    var job_short_details = '<div class="job_short_details">' + "\n";
+                    
+                    // job title
+                    job_short_details = job_short_details + '<div class="job_title">' + "\n";
+                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '">' + job_titles[i].childNodes[0].nodeValue + '</a>' + "\n";
+                    job_short_details = job_short_details + '</div>' + "\n";
+                    
+                    // employer
+                    job_short_details = job_short_details + '<div class="employer">' + "\n";
+                    job_short_details = job_short_details + employers[i].childNodes[0].nodeValue + "\n";
+                    job_short_details = job_short_details + '<span class="country">' + countries[i].childNodes[0].nodeValue + '</span> | ' + '<span class="industry">' + industries[i].childNodes[0].nodeValue + '</span>' + "\n";
+                    job_short_details = job_short_details + '</div>' + "\n";
+                    
+                    // date and salary
+                    job_short_details = job_short_details + '<div class="date_and_salary">' + "\n";
+                    job_short_details = job_short_details + 'Monthly Salary Range: ' + currencies[i].childNodes[0].nodeValue + "$ \n";
+                    if (salary_ends[i].childNodes.length > 0) {
+                        job_short_details = job_short_details + salaries[i].childNodes[0].nodeValue + ' - ' + salary_ends[i].childNodes[0].nodeValue;
+                    } else {
+                        job_short_details = job_short_details + salaries[i].childNodes[0].nodeValue
+                    }
+                    job_short_details = job_short_details + '<br/>Recommender\'s Cash Reward:' + currencies[i].childNodes[0].nodeValue + '$ ' + potential_reward;
+                    job_short_details = job_short_details + '<br/>Candidate\'s Cash Bonus:' + currencies[i].childNodes[0].nodeValue + '$ ' + token_reward + '<br/><br/>' + "\n";
+                    
+                    job_short_details = job_short_details + '<span class="controls">' + "\n";
+                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '?refer=1">Recommend Someone</a> <span class="black">|</span> ';
+                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '?apply=1">Explore This Opportunity</a> <span class="black">|</span> ';
+                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '">View Details</a>' + '</span>' + "\n";
+                    job_short_details = job_short_details + '</div>' + "\n";
+                    
+                    job_short_details = job_short_details + '<div class="expire_on">Expires on ' + expire_ons[i].childNodes[0].nodeValue + '</div>' + "\n";
+                    
+                    job_short_details = job_short_details + '</div>' + "\n";
+                    html = html + "\n" + job_short_details;
                 }
                 
-                html = html + '</tr>' + "\n";
+                $('results').set('html', html);
+                // window.scrollTo(0, 0);
+                
+                if ($('page') != null) {
+                    $('page').blur();
+                }
             }
-            html = html + '</table>';
             
-            $('div_list').set('html', html);
-            $('current_page').set('html', current_page);
-            $('total_page').set('html', total_pages);
-            $('current_page_1').set('html', current_page);
-            $('total_page_1').set('html', total_pages);
-            $('next_page').set('html', next_page_button_html);
-            $('next_page_1').set('html', next_page_button_html);
-            $('previous_page').set('html', previous_page_button_html);
-            $('previous_page_1').set('html', previous_page_button_html);
-            
-            show_pagination_dropdown();
-            show_limit_dropdown();
+            is_filter = false;
             set_status('');
-            
-            if (changed_country_code[0].childNodes[0].nodeValue == '1') {
-                country_code = '';
-                list_countries_in('', 'filter_country_dropdown', 'country_dropdown', 'country_dropdown', true, 'filter_jobs();');
-            }
         },
         onRequest: function(instance) {
             set_status('Searching jobs...');
-        }
-    });
-    
-    request.send(params);
-    
-    list_industries_in(industry, 'filter_industry_dropdown', 'industry_dropdown', 'industry_dropdown', true, 'filter_jobs();');
-    list_countries_in(country_code, 'filter_country_dropdown', 'country_dropdown', 'country_dropdown', true, 'filter_jobs();');
-}
-
-function show_job(job_id) {
-    $('div_job_info').setStyle('display', 'block');
-    $('div_search_results').setStyle('display', 'none');
-    $('job_id').value = job_id;
-    
-    var params = 'id=' + job_id;
-    params = params + '&action=get_job_info';
-    
-    var uri = root + "/search_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading job.');
-                return false;
-            } 
-            
-            var title = xml.getElementsByTagName('title');
-            var industry = xml.getElementsByTagName('full_industry');
-            var employer = xml.getElementsByTagName('employer_name');
-            var country = xml.getElementsByTagName('country_name');
-            var state = xml.getElementsByTagName('state');
-            var currency = xml.getElementsByTagName('currency_symbol');
-            var salary = xml.getElementsByTagName('salary');
-            var salary_end = xml.getElementsByTagName('salary_end');
-            var salary_negotiable = xml.getElementsByTagName('salary_negotiable');
-            var description = xml.getElementsByTagName('description');
-            var created_on = xml.getElementsByTagName('formatted_created_on');
-            var expire_on = xml.getElementsByTagName('formatted_expire_on');
-            var expired = xml.getElementsByTagName('expired');
-            var potential_reward = xml.getElementsByTagName('potential_reward');
-            
-            $('job.potential_reward').set('html', potential_reward[0].childNodes[0].nodeValue);
-            $('job.title').set('html', title[0].childNodes[0].nodeValue);
-            $('job.industry').set('html', industry[0].childNodes[0].nodeValue);
-            $('job.employer').set('html', employer[0].childNodes[0].nodeValue);
-            $('job.currency').set('html', currency[0].childNodes[0].nodeValue);
-            $('job.currency_1').set('html', currency[0].childNodes[0].nodeValue);
-            $('job.country').set('html', country[0].childNodes[0].nodeValue);
-            $('job.description').set('html', description[0].childNodes[0].nodeValue);
-            $('job.created_on').set('html', created_on[0].childNodes[0].nodeValue);
-            $('job.expire_on').set('html', expire_on[0].childNodes[0].nodeValue);
-            
-            if (state[0].childNodes.length <= 0) {
-                $('job.state').set('html', '<span style="font-style: italic;">(None provided.)</span>');
-            } else {
-                $('job.state').set('html', state[0].childNodes[0].nodeValue);
-            }
-            
-            if (salary[0].childNodes.length <= 0) {
-                $('job.salary').set('html', '<span style="font-style: italic;">(None provided.)</span>');
-            } else {
-                $('job.salary').set('html', salary[0].childNodes[0].nodeValue);
-            }
-            
-            if (salary_end[0].childNodes.length <= 0) {
-                $('job.salary_end').set('html', '');
-            } else {
-                $('job.salary_end').set('html', '-&nbsp;' + salary_end[0].childNodes[0].nodeValue);
-            }
-            
-            if (salary_negotiable[0].childNodes[0].nodeValue == 'Y') {
-                $('job.salary_negotiable').set('html', 'Negotiable');
-            } else {
-                $('job.salary_negotiable').set('html', 'Not Negotiable');
-            }
-            
-            var html = '';
-            if (id != '0') {
-                html = '<input class="button" type="button" id="save_job" name="save_job" value="Save Job" onClick="save_job();" />&nbsp;<input class="button" type="button" id="refer_job" name="refer_job" value="Refer Now" onClick="show_refer_job();" />';
-            }
-            
-            $('job_buttons').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading job...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function save_job() {
-    var params = 'id=' + $('job_id').value;
-    params = params + '&member=' + id;
-    params = params + '&action=save_job_to_bin';
-    
-    var uri = root + "/search_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while saving job.');
-                return false;
-            } 
-            
-            if (txt == '-1') {
-                alert('This job was previously saved.');
-                set_status('');
-                return true;
-            }
-            
-            alert('Job was successfully saved.');
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Saving job...');
         }
     });
     
@@ -583,97 +370,31 @@ function refer() {
 }
 
 function onDomReady() {
-    set_root();
-    get_employers_for_mini(employer);
-    get_industries_for_mini(industry);
-    set_mini_keywords();
-    get_referrals_count();
-    
-    $('candidates').addEvent('click', function() {
-        check_referred_already();
-    });
-    
-    if (isEmpty(keywords)) {
-        $('mini_keywords').value = 'Job title or keywords';
-    } else {
-        $('mini_keywords').value = keywords;
+    for (var i=0; i < $('mini_employer').options.length; i++) {
+        if ($('mini_employer').options[i].value == employer) {
+            $('mini_employer').selectedIndex = i;
+            break;
+        }
     }
     
-    $('testimony_answer_1').addEvent('keypress', function() {
-       update_word_count_of('word_count_q1', 'testimony_answer_1') 
-    });
+    for (var i=0; i < $('mini_industry').options.length; i++) {
+        if ($('mini_industry').options[i].value == industry) {
+            $('mini_industry').selectedIndex = i;
+            break;
+        }
+    }
+    
+    for (var i=0; i < $('mini_country').options.length; i++) {
+        if ($('mini_country').options[i].value == country_code) {
+            $('mini_country').selectedIndex = i;
+            break;
+        }
+    }
+}
 
-    $('testimony_answer_2').addEvent('keypress', function() {
-       update_word_count_of('word_count_q2', 'testimony_answer_2') 
-    });
-    
-    $('testimony_answer_3').addEvent('keypress', function() {
-       update_word_count_of('word_count_q3', 'testimony_answer_3') 
-    });
-    
-    $('sort_match_percentage').addEvent('click', function() {
-        order_by = 'relevance';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_industry').addEvent('click', function() {
-        order_by = 'industries.industry';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_title').addEvent('click', function() {
-        order_by = 'jobs.title';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_employer').addEvent('click', function() {
-        order_by = 'employers.name';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_salary').addEvent('click', function() {
-        order_by = 'jobs.salary';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    /*$('sort_created_on').addEvent('click', function() {
-        order_by = 'jobs.created_on';
-        ascending_or_descending();
-        show_jobs();
-    });*/
-    
-    $('sort_country').addEvent('click', function() {
-        order_by = 'countries.country';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_state').addEvent('click', function() {
-        order_by = 'jobs.state';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    $('sort_potential_reward').addEvent('click', function() {
-        order_by = 'jobs.potential_reward';
-        ascending_or_descending();
-        show_jobs();
-    });
-    
-    show_jobs();
-    
-    var suggest_url = root + '/common/php/search_suggest.php';
-    new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
-        'postVar': 'keywords',
-        'minLength' : 1,
-        'overflow' : true,
-        'delay' : 50
-    });
+function onLoaded() {
+    initialize_page();
 }
 
 window.addEvent('domready', onDomReady);
+window.addEvent('load', onLoaded);

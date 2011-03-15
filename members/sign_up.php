@@ -36,18 +36,7 @@ if (!isset($_SESSION['yel']['member'])) {
     //redirect_to('login.php');
 }
 
-$referred_referee = '';
-$referred_member = '';
-if (isset($_GET['referee']) && isset($_GET['member'])) {
-    $referred_member = $_GET['member'];
-    $referred_referee = $_GET['referee'];
-}
-
-$home = new MemberSignUpPage($referred_referee, $referred_member);
-
-if (isset($_GET['error'])) {
-    $home->set_error($_GET['error']);
-}
+$home = new MemberSignUpPage($referred_member);
 
 $home->header(array('root_dir' => '../', 
                     'title' => 'Member Sign Up'));

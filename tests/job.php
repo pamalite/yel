@@ -8,16 +8,15 @@ function print_array($array) {
 }
 
 ?><p style="font-weight: bold;">Get all jobs... </p><p><?php
-$jobs = Job::get_all();
+$job = new Job();
+$jobs = $job->find(array('columns' => 'id'));
 
 echo "There are ". count($jobs). " jobs in the database.<br><br>";
 
 ?></p><p style="font-weight: bold;">Add a new job... </p><p><?php
 $job = new Job();
 $date = date('Y-m-d H:i:s');
-$mysqli = Database::connect();
-$result = $mysqli->query("SELECT DATE_ADD('". $date. "', INTERVAL 30 DAY) AS expiry_date");
-$expiry_date = $result[0]['expiry_date'];
+$expiry_date = sql_date_add($date, 30, 'day');
 $data = array();
 $data['employer'] = 'acme124';
 $data['industry'] = '2';
@@ -25,14 +24,15 @@ $data['country'] = 'MY';
 $data['currency'] = 'MYR';
 $data['salary'] = '3200';
 $data['salary_negotiable'] = 'N';
-$data['potential_reward'] = '250';
 $data['created_on'] = $date;
 $data['expire_on'] = $expiry_date;
 $data['title'] = "Some lame job";
 $data['description'] = "blah blah... some job descriptions goes here";
 
+$first_job_id = 0;
 if ($job->create($data)) {
-    echo "This job gets the ID of <b>". $job->id(). "</b><br><br>";
+    $first_job_id = $job->getId();
+    echo "This job gets the ID of <b>". $job->getId(). "</b><br><br>";
     print_array($job->get());
 } else {
     echo "failed";
@@ -41,42 +41,40 @@ if ($job->create($data)) {
 ?></p><p style="font-weight: bold;">Add another new job... </p><p><?php
 $job = new Job();
 $date = date('Y-m-d H:i:s');
-$mysqli = Database::connect();
-$result = $mysqli->query("SELECT DATE_ADD('". $date. "', INTERVAL 30 DAY) AS expiry_date");
-$expiry_date = $result[0]['expiry_date'];
+$expiry_date = sql_date_add($date, 30, 'day');
 $data = array();
 $data['employer'] = 'acme123';
 $data['industry'] = '2';
 $data['country'] = 'SG';
-$data['currency'] = 'SGD';
+$data['currency'] = 'MYR';
 $data['salary'] = '3200';
 $data['salary_negotiable'] = 'N';
-$data['potential_reward'] = '250';
 $data['created_on'] = $date;
 $data['expire_on'] = $expiry_date;
 $data['title'] = "Some lame job";
 $data['description'] = "blahlelelll blah... some job descriptions goes here";
 
 if ($job->create($data)) {
-    echo "This job gets the ID of <b>". $job->id(). "</b><br><br>";
+    echo "This job gets the ID of <b>". $job->getId(). "</b><br><br>";
     print_array($job->get());
 } else {
     echo "failed";
     exit();
 }
+
 ?></p><p style="font-weight: bold;">Get all jobs... </p><p><?php
-$jobs = Job::get_all();
+$jobs = $job->find(array('columns' => 'id'));
 
 echo "There are ". count($jobs). " jobs in the database.<br><br>";
 
 ?></p><p style="font-weight: bold;">Update 1st job... </p><p><?php
-$job = new Job($jobs[0]['id']);
+echo $first_job_id. '<br/>';
+$job = new Job($first_job_id);
 $data = array();
 $data['country'] = 'HK';
 $data['currency'] = 'HKD';
 $data['salary'] = '5562';
 $data['salary_negotiable'] = 'Y';
-$data['potential_reward'] = '550';
 $data['description'] = "wllwh kwhhwf wpejf[w wopj blahlelelll blah... some job descriptions goes here";
 
 if ($job->update($data)) {

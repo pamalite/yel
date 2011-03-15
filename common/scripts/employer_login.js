@@ -1,3 +1,4 @@
+var employers_index = 0;
 var seed = "";
 var sid = "";
 
@@ -33,9 +34,16 @@ function login() {
             }
             
             var status = xml.getElementsByTagName('status');
+            var is_new = xml.getElementsByTagName('is_new');
             
             if (status[0].childNodes[0].nodeValue == 'ok') {
-                location.replace(root + '/employers/home.php');
+                if (is_new[0].childNodes[0].nodeValue == '1') {
+                    alert('First time login detected!' + "\n\nSince this is the first time you logged in, please change the password to prevent security breach.");
+                    location.replace(root + '/employers/profile.php');
+                } else {
+                    location.replace(root + '/employers/resumes.php');
+                }
+                
             }
         },
         onRequest: function(instance) {
@@ -126,40 +134,71 @@ function drop_contact_now() {
 }
 
 function close_contact_drop_form() {
-    $('div_contact_drop_form').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
+    close_window('contact_drop_form');
 }
 
 function show_contact_drop_form() {
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_contact_drop_form').getStyle('height'));
-    var div_width = parseInt($('div_contact_drop_form').getStyle('width'));
+    show_window('contact_drop_form');
+}
+
+function set_employers_mouse_events() {
+    var employers = new Array();
+    var number_of_tabs = 0;
     
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
-    } else {
-        window_height = document.documentElement.clientHeight;
+    for (var i=0; i < $('employer_tabs').childNodes.length; i++) {
+        if ($('employer_tabs').childNodes[i].nodeName == 'DIV') {
+            number_of_tabs++;
+        }
     }
     
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
+    for (var i=0; i < number_of_tabs; i++) {
+        var tab = 'employers_' + i;
+        employers[i] = new Fx.Tween(tab);
+        
+        if (i > 0) {
+            employers[i].set('display', 'none');
+        }
     }
     
-    $('div_contact_drop_form').setStyle('top', ((window_height - div_height) / 2));
-    $('div_contact_drop_form').setStyle('left', ((window_width - div_width) / 2));
+    $('toggle_right').addEvent('click', function(e) {
+        e.stop();
+        
+        employers[employers_index].start('opacity', '0');
+        employers[employers_index].set('display', 'none');
+        
+        employers_index++;
+        if (employers_index >= number_of_tabs) {
+            employers_index = 0;
+        }
+        
+        employers[employers_index].set('display', 'block');
+        employers[employers_index].set('opacity', '0');
+        employers[employers_index].start('opacity', '1');
+    });
     
-    $('div_blanket').setStyle('display', 'block');
-    $('div_contact_drop_form').setStyle('display', 'block');
+    $('toggle_left').addEvent('click', function(e) {
+        e.stop();
+        
+        employers[employers_index].start('opacity', '0');
+        employers[employers_index].set('display', 'none');
+        
+        employers_index--;
+        if (employers_index < 0) {
+            employers_index = number_of_tabs - 1;
+        }
+        
+        employers[employers_index].set('display', 'block');
+        employers[employers_index].set('opacity', '0');
+        employers[employers_index].start('opacity', '1');
+    });
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_seed();
     $('login').addEvent('click', login);
-    $('drop').addEvent('click', drop_contact_now);
+    // $('drop').addEvent('click', drop_contact_now);
+    set_employers_mouse_events();
 }
 
 window.addEvent('domready', onDomReady);

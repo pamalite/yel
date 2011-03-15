@@ -4,8 +4,12 @@ require_once dirname(__FILE__). "/../../utilities.php";
 class SearchPage extends Page {
     private $member = NULL;
     private $criterias = '';
+    private $job_search = '';
+    private $country_code = '';
     
     function __construct($_session = NULL, $_criterias = '') {
+        parent::__construct();
+        
         if (!is_null($_session)) {
             if (!empty($_session['id']) && !empty($_session['sid'])) {
                 $this->member = new Member($_session['id'], $_session['sid']);
@@ -13,6 +17,11 @@ class SearchPage extends Page {
         }
         
         $this->criterias = $_criterias;
+        if (!isset($this->criterias['salary'])) {
+            $this->criterias['salary'] = 0;
+        }
+        
+        $this->job_search = new JobSearch();
     }
     
     public function insert_inline_css() {
@@ -20,189 +29,312 @@ class SearchPage extends Page {
     }
     
     public function insert_search_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/list_box.css">'. "\n";
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/search.css">'. "\n";
+        $this->insert_css('search.css');
     }
     
     public function insert_search_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/list_box.js"></script>'. "\n";
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/search.js"></script>'. "\n";
+        $this->insert_scripts('search.js');
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
+        $script = '';
+        
         if (!is_null($this->member)) {
-            echo 'var id = "'. $this->member->id(). '";'. "\n";
+            $script .= 'var id = "'. $this->member->getId(). '";'. "\n";
             
-            $country_code = (isset($this->criterias['country_code'])) ? $this->criterias['country_code'] : $this->member->get_country_code();
-            echo 'var country_code = "'. $country_code. '";'. "\n";
+            $this->country_code = (isset($this->criterias['country'])) ? $this->criterias['country'] : $this->member->getCountry();
+            $script .= 'var country_code = "'. $this->country_code. '";'. "\n";
         } else {
-            echo 'var id = 0;'. "\n";
+            $script .= 'var id = 0;'. "\n";
             
-            $country_code = (isset($this->criterias['country_code'])) ? $this->criterias['country_code'] : $_SESSION['yel']['country_code'];
-            echo 'var country_code = "'. $country_code. '";'. "\n";
+            $this->country_code = (isset($this->criterias['country'])) ? $this->criterias['country'] : $_SESSION['yel']['country_code'];
+            $script .= 'var country_code = "'. $this->country_code. '";'. "\n";
         }
-        echo 'var industry = "'. $this->criterias['industry']. '";'. "\n";
-        echo 'var employer = "'. $this->criterias['employer']. '";'. "\n";
-        echo 'var keywords = "'. $this->criterias['keywords']. '";'. "\n";
+        $script .= 'var industry = "'. $this->criterias['industry']. '";'. "\n";
+        $script .= 'var employer = "'. $this->criterias['employer']. '";'. "\n";
+        $script .= 'var keywords = "'. $this->criterias['keywords']. '";'. "\n";
+        // echo 'var is_local = '. $this->criterias['is_local']. ';'. "\n";
+        $script .= 'var filter_salary = '. $this->criterias['salary']. ';'. "\n";
+        $script .= 'var filter_salary_end = '. ((isset($this->criterias['salary_end'])) ? $this->criterias['salary_end'] : 0). ';'. "\n";
         
         $limit = (isset($this->criterias['limit'])) ? $this->criterias['limit'] : $GLOBALS['default_results_per_page'];
-        echo 'var limit = "'. $limit. '";'. "\n";
+        $script .= 'var limit = "'. $limit. '";'. "\n";
         
         $offset = (isset($this->criterias['offset'])) ? $this->criterias['offset'] : 0;
-        echo 'var offset = "'. $offset. '";'. "\n";
-        echo '</script>'. "\n";
-    }
-    
-    private function generate_networks_list() {
-        $networks = $this->member->get_networks();
+        $script .= 'var offset = "'. $offset. '";'. "\n";
         
-        echo '<select id="network_filter" name="network_filter" onChange="set_filter();">'. "\n";
-        echo '<option value="0" selected>all my networks</option>'. "\n";
-        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
-        
-        foreach ($networks as $network) {
-            echo '<option value="'. $network['id']. '">'. $network['industry']. '</option>'. "\n";
-        }
-        
-        echo '</select>'. "\n";
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     public function show() {
         $this->begin();
-        if (is_null($this->member)) {
-            $this->top_search("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Job Search Results</span>");
-        } else {
-            $this->top_search($this->member->get_name(). " - Job Search Results");
+        $this->top_search("Searched Jobs");
+        
+        if ($this->member != NULL) {
             $this->menu('member');
         }
+        
+        $results = $this->job_search->search_using($this->criterias);
         
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
-        <div id="div_search_results">
-            <div class="filters">
-                Show all available jobs in <span id="filter_industry_dropdown"></span> from <span id="filter_country_dropdown"></span> with <span id="filter_limit_dropdown"></span> jobs in each page.
+        
+        <div class="content">
+            <div class="statistics" id="statistics">
+                Found <?php echo $this->job_search->total_results(); ?> jobs in <?php echo number_format($this->job_search->time_elapsed(), 6) ?> seconds.
             </div>
-            <div class="page_navigation">
-                <span id="previous_page"></span>&nbsp;&nbsp;&nbsp;Page <span id="current_page"></span> of <span id="total_page"></span>&nbsp;&nbsp;&nbsp;<span id="next_page"></span>
-            </div>
-            <table class="header">
+            <table class="results_table">
                 <tr>
-                    <td class="match_percentage"><span class="sort" id="sort_match_percentage">Match</span></td>
-                    <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
-                    <td class="industry"><span class="sort" id="sort_industry">Specialization</span></td>
-                    <td class="title"><span class="sort" id="sort_title">Job</span></td>
-                    <!--td class="date"><span class="sort" id="sort_created_on">Created On</span></td-->
-                    <td class="country"><span class="sort" id="sort_country">Country</span></td>
-                    <td class="state"><span class="sort" id="sort_state">State/Area</span></td>
-                    <td class="salary"><span class="sort" id="sort_salary">Monthly Salary</span></td>
-                    <td class="potential_reward"><span class="sort" id="sort_potential_reward">Potential Rewards</span></td>
+                    <td class="results" id="results">
+                    <?php
+                    if (is_null($results) || empty($results) || $results === false) {
+                    ?>
+                        <div class="empty_results">No jobs with the criteria found.</div>
+                    <?php
+                    } else {
+                        foreach ($results as $i=>$row) {
+                            $total_potential_reward = $row['potential_reward'];
+                            $potential_token_reward = $total_potential_reward * 0.05;
+                            $potential_reward = $total_potential_reward - $potential_token_reward;
+                    ?>
+                        <div class="job_short_details">
+                            <div class="job_title">
+                                <a href="./job/<?php echo $row['id']; ?>"><?php echo $row['title'] ?></a>
+                            </div>
+                            <div class="employer">
+                                <?php 
+                                    echo (!is_null($row['alternate_employer']) && !empty($row['alternate_employer'])) ? $row['alternate_employer'] : $row['employer'];
+                                ?>
+                                <span class="country"><?php echo $row['country'] ?></span> | <span class="industry"><?php echo $row['industry'] ?></span>
+                            </div>
+                            <div class="date_and_salary">
+                                    Monthly Salary Range: 
+                                <?php 
+                                    echo $row['currency']. '$ '. number_format($row['salary'], 2, '.', ',');
+                                    if (!empty($row['salary_end']) && !is_null($row['salary_end'])) {
+                                        echo ' - '. number_format($row['salary_end'], 2, '.', ',');
+                                    }
+                                ?>
+                                <br/>
+                                Recommender's Cash Reward: 
+                                <?php 
+                                    echo $row['currency']. '$ '. number_format($potential_reward, 2, '.', ',');
+                                ?>
+                                <br/>
+                                Candidate's Cash Bonus: 
+                                <?php 
+                                    echo $row['currency']. '$ '. number_format($potential_token_reward, 2, '.', ',');
+                                ?>
+                                <br/>
+                                <br/>
+                                <span class="controls">
+                                    <a href="./job/<?php echo $row['id'] ?>?refer=1">Recommend Someone</a>
+                                    <span class="black">|</span>
+                                    <a href="./job/<?php echo $row['id'] ?>?apply=1">Explore This Opportunity</a>
+                                    <span class="black">|</span>
+                                    <a href="./job/<?php echo $row['id']; ?>">View Details</a>
+                                </span>
+                            </div>
+                            <div class="expire_on">
+                                Expires on <?php echo $row['formatted_expire_on'] ?>
+                            </div>
+                        </div>
+                    <?php
+                        }
+                    }
+                    ?>
+                    </td>
+                    <td class="sort_and_filter">
+                        <div class="sorter">
+                            <div class="sorter_title">Sort By</div>
+                            <div>
+                                <input type="radio" name="sort_by" id="sort_by_job_title" onClick="sort_by('jobs.title');" /><label for="sort_by_job_title">Job Title</label><br/>
+                                <input type="radio" name="sort_by" id="sort_by_employer" onClick="sort_by('employers.name');" /><label for="sort_by_employer">Employer</label><br/>
+                                <input type="radio" name="sort_by" id="sort_by_salary" onClick="sort_by('jobs.salary');" /><label for="sort_by_salary">Monthly Salary Range</label><br/>
+                                <input type="radio" name="sort_by" id="sort_by_expiry" onClick="sort_by('jobs.expire_on');" checked /><label for="sort_by_expiry">Expiry Date</label><br/>
+                                <input type="radio" name="sort_by" id="sort_by_specialization" onClick="sort_by('industries.industry');" /><label for="sort_by_specialization">Specialization</label>
+                            </div>
+                        </div>
+                        
+                        <div class="filter">
+                            <div class="filter_title">Filter By</div>
+                            <div class="filter_options">
+                                <label for="filter_employer">Employer:</label>
+                                <select id="filter_employer">
+                                <?php
+                                if (empty($this->criterias['employer'])) {
+                                ?>
+                                    <option value="" selected>Any</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="">Any</option>
+                                <?php
+                                }
+                                ?>
+                                    <option value="" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($this->job_search->result_employers as $employer) {
+                                    if ($this->criterias['employer'] == $employer['id']) {
+                                ?>
+                                    <option value="<?php echo $employer['id'] ?>" selected><?php echo $employer['name'] ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $employer['id'] ?>"><?php echo $employer['name'] ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                                <br/>
+                                <label for="filter_industry">Specialization:</label>
+                                <select id="filter_industry">
+                                <?php
+                                if (empty($this->criterias['industry'])) {
+                                ?>
+                                    <option value="" selected>Any</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="">Any</option>
+                                <?php
+                                }
+                                ?>
+                                    <option value="" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($this->job_search->result_industries as $industry) {
+                                    if ($this->criterias['industry'] == $industry['id']) {
+                                ?>
+                                    <option value="<?php echo $industry['id'] ?>" selected><?php echo $industry['name'] ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $industry['id'] ?>"><?php echo $industry['name'] ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                                <br/>
+                                <label for="filter_country">Country:</label>
+                                <select id="filter_country" onChange="changed_country();">
+                                <?php
+                                if (empty($this->country_code) || $this->country_code <= 0) {
+                                ?>
+                                    <option value="" selected>Any</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="">Any</option>
+                                <?php
+                                }
+                                ?>
+                                    <option value="" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($this->job_search->result_countries as $country) {
+                                    if ($this->country_code == $country['id']) {
+                                ?>
+                                    <option value="<?php echo $country['id'] ?>" selected><?php echo $country['name'] ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $country['id'] ?>"><?php echo $country['name'] ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                                <br/>
+                                <label for="filter_salary">Salary from:</label>
+                                <select id="filter_salary">
+                                <?php
+                                if ($this->criterias['salary'] <= 0) {
+                                ?>
+                                    <option value="" selected>Any</option>
+                                <?php
+                                } else {
+                                ?>
+                                    <option value="">Any</option>
+                                <?php
+                                }
+                                ?>
+                                    <option value="" disabled>&nbsp;</option>
+                                <?php
+                                foreach ($this->job_search->result_salaries as $salary) {
+                                    if ($this->criterias['salary'] == $salary) {
+                                ?>
+                                    <option value="<?php echo $salary ?>" selected><?php echo $salary ?></option>
+                                <?php
+                                    } else {
+                                ?>
+                                    <option value="<?php echo $salary ?>"><?php echo $salary ?></option>
+                                <?php
+                                    }
+                                }
+                                ?>
+                                </select>
+                            </div>
+                            <div class="filter_button">
+                                <input type="button" value="Filter" onClick="filter_jobs();" />
+                            </div>
+                            <div class="practice">
+                                <div class="practice_title">Our Practice & Promise To You</div>
+                                <div class="practice_content"> 
+                                    <p>We always maintain confidentiality of our recommenders and will not disclose your name when you recommend someone to our consultants.</p><br/>
+
+                                    <p>We promise that you will receive your Cash Bonus within 2 weeks upon us receiving payment from our clients.</p>
+                                    <img src="<?php echo $this->url_root; ?>/common/images/shake_hand.jpg" />
+                                </div>
+                            </div>
+                        </div>
+                    </td>
                 </tr>
             </table>
-            <div id="div_list">
-            </div>
-            <div class="page_navigation">
-                <span id="previous_page_1"></span>&nbsp;&nbsp;&nbsp;Page <span id="current_page_1"></span> of <span id="total_page_1"></span>&nbsp;&nbsp;&nbsp;<span id="next_page_1"></span>
-            </div>
         </div>
         
-        <div id="div_job_info">
-            <input type="hidden" id="job_id" name="job_id" value="" />
-            <div class="back"><span class="back"><a class="no_link" onClick="back_to_results();">Back to Search Results</a></span></div>
-            <table id="job_info" class="job_info">
-                <tr>
-                    <td colspan="2" class="title"><span id="job.title">Loading</span></td>
-                </tr>
-                <tr>
-                    <td colspan="2" class="title_reward">Potential Reward of <span id="job.currency_1"></span>$&nbsp;<span id="job.potential_reward">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Industry:</td>
-                    <td class="field"><span id="job.industry">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Employer:</td>
-                    <td class="field"><span id="job.employer">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Country:</td>
-                    <td class="field"><span id="job.country">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">State/Province/Area:</td>
-                    <td class="field"><span id="job.state">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Monthly Salary:</td>
-                    <td class="field"><span id="job.currency"></span>$&nbsp;<span id="job.salary">Loading</span>&nbsp;<span id="job.salary_end">Loading</span>&nbsp;[<span id="job.salary_negotiable">Loading</span>]</td>
-                </tr>
-                <tr>
-                    <td class="label">Description:</td>
-                    <td class="field"><div class="job_description"><span id="job.description">Loading</span></div></td>
-                </tr>
-                <tr>
-                    <td class="label">&nbsp;</td>
-                    <td class="field">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td class="label">Created On:</td>
-                    <td class="field"><span id="job.created_on">Loading</span></td>
-                </tr>
-                <tr>
-                    <td class="label">Expires On:</td>
-                    <td class="field"><span id="job.expire_on">Loading</span></td>
-                </tr>
-                <tr>
-                    <td id="job_buttons" class="buttons" colspan="2"></td>
-                </tr>
-            </table>
+        <div class="pagination" id="pagination">
+        <?php
+        if ($this->job_search->total_results() <= $GLOBALS['default_results_per_page']) {
+        ?>
+            Page 1 of 1
+        <?php
+        } else {
+        ?>
+            Page 
+            <select id="page" onChange="show_jobs();">
+        <?php
+            $total_pages = ceil($this->job_search->total_results() / $GLOBALS['default_results_per_page']);
+            $current_page = '1';
+            if ($this->criterias['offset'] > 0) {
+                $current_page = ceil($this->criterias['offset'] / $GLOBALS['default_results_per_page']) + 1;
+            }
+            
+            for ($page=0; $page < $total_pages; $page++) {
+                if (($page+1) == $current_page) {
+            ?>
+                <option value="<?php echo $page; ?>" selected><?php echo ($page+1) ?></option>
+            <?php
+                } else {
+            ?>
+                <option value="<?php echo $page; ?>"><?php echo ($page+1) ?></option>
+            <?php
+                }
+            }
+        ?>
+            </select>
+            of <?php echo $total_pages ?>
+        <?php
+        }
+        ?>
         </div>
         
-        <div id="div_blanket"></div>
-        <div id="div_refer_form">
-            <form onSubmit="return false;">
-                <table class="refer_form">
-                    <tr>
-                        <td class="left">
-                            <p>You are about refer the job <span id="job_title" style="font-weight: bold;"></span> to a potential candidate. Please the candidate from either...</p>
-                            <table class="candidate_form">
-                                <tr>
-                                    <td class="radio"><input type="radio" id="from_list" name="candidate_from" value="list" checked /></td>
-                                    <td>
-                                        <label for="from_list">from your candidates list</label><br/>
-                                        <span class="filter">[ Show candidates from <?php (!is_null($this->member)) ? $this->generate_networks_list() : ''; ?> ]</span><br/>
-                                        <div class="candidates" id="candidates" name="candidates"></div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="radio"><input type="radio" id="from_email" name="candidate_from" value="email" /></td>
-                                    <td>
-                                        <label for="from_email">or e-mail address of a new candidate</label><br/>
-                                        <input type="text" class="mini_field" id="email_addr" name="email_addr" />
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td class="separator"></td>
-                        <td class="right">
-                            <p>1. How long have you known and how do you know <span id="candidate_name" style="font-weight: bold;">the potential candidate</span>? (<span id="word_count_q1">0</span>/50 words)</p>
-                            <p><textarea class="mini_field" id="testimony_answer_1"></textarea></p>
-                            <p>2. What makes <span id="candidate_name" style="font-weight: bold;">the potential candidate</span> suitable for <span id="job_title" style="font-weight: bold;">the job</span>?  (<span id="word_count_q2">0</span>/50 words)</p>
-                            <p><textarea class="mini_field" id="testimony_answer_2"></textarea></p>
-                            <p>3. Briefly, what are <span id="candidate_name" style="font-weight: bold;">the potential candidate</span>'s rooms for improvement?  (<span id="word_count_q3">0</span>/50 words)</p>
-                            <p><textarea class="mini_field" id="testimony_answer_3"></textarea></p>
-                        </td>
-                    </tr>
-                </table>
-                <p class="button"><input type="button" value="Cancel" onClick="close_refer_form();" />&nbsp;<input type="button" value="Refer Now" onClick="refer();" /></p>
-            </form>
-        </div>
+        <!-- popup windows goes here -->
+        
+        
+        
         <?php
     }
 }

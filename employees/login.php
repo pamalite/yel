@@ -25,12 +25,14 @@ if (isset($_SESSION['yel']['employer']) &&
     redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/employers/index.php');
 }
 
-if (!isset($_SESSION['yel']['employee'])) {
+if (!isset($_SESSION['yel']['employee']) || 
+    empty($_SESSION['yel']['employee']['uid'])) {
     $_SESSION['yel']['employee']['uid'] = "";
     $_SESSION['yel']['employee']['id'] = "";
     $_SESSION['yel']['employee']['sid'] = "";
     $_SESSION['yel']['employee']['hash'] = "";
-    //redirect_to('login.php');
+} else {
+    redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/employees/home.php');
 }
 
 $login = new EmployeeLoginPage();

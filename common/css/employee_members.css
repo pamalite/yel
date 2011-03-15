@@ -1,0 +1,488 @@
+.empty_results {
+    text-align: center;
+    color: #666666;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+a.menu {
+    cursor: pointer;
+}
+
+#applicants, #members {
+    display: none;
+}
+
+#new_applicants_table, 
+#applicants_table, 
+#members_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#new_applicants_table tr:hover, 
+#applicants_table tr:hover, 
+#members_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.action {
+    width: auto;
+    text-align: center;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+.cell_indicator {
+    width: 20px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.small_contact {
+    font-size: 9pt;
+    font-style: italic;
+    color: #666666;
+}
+
+.tiny_contact {
+    font-size: 9pt;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.progress_cell {
+    font-size: 9pt;
+    width: 275px;
+    height: 75px;
+    overflow: auto;
+}
+
+td.vtop {
+    vertical-align: top;
+}
+
+.member_link {
+    font-weight: bold;
+    font-size: 12pt;
+}
+
+.buttons_bar {
+    background-color: #CCCCCC;
+    text-align: right;
+    padding: 3px 3px 3px 3px;
+    height: 20px;
+}
+
+.member_form {
+    display: none;
+}
+
+#notes_window, #progress_notes_window, 
+#referrer_remarks_window {
+    width: 650px;
+    display: none;
+}
+
+div.notes_form {
+    padding-bottom: 10px;
+    width: 100%;
+    height: 550px;
+    text-align: center;
+}
+
+textarea.notes, textarea.progress_notes {
+    width: 95%;
+    height: 545px;
+    font-size: 12pt;
+}
+
+div.remarks {
+    border: 1px solid #CCCCCC;
+    margin: 5px 5px 5px 5px;
+    padding: 3px 3px 3px 3px;
+    width: 97%;
+    height: 400px;
+    overflow: auto;
+}
+
+#conflicts_window, 
+#new_application_window {
+    width: 650px;
+    display: none;
+}
+
+div.resolution_instructions {
+    text-align: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+table.conflicts, 
+table.new_application, 
+table.referrer_form {
+    border: none;
+    width: 100%;
+    margin: auto;
+}
+
+table.conflicts td, 
+table.new_application td, 
+table.referrer_form td {
+    padding: 3px 3px 3px 3px;
+}
+
+table.conflicts td.buffered, 
+table.conflicts td.existing, 
+table.new_application td.title {
+    text-align: center;
+    font-weight: bold;
+    background-color: #DDDDDD;
+    width: 50%;
+}
+
+table.conflicts td.label, 
+table.new_application td.label, 
+table.referrer_form td.label {
+    width: 15%;
+    font-weight: bold;
+    background-color: #DDDDDD;
+}
+
+table.conflicts td.resolution_button {
+    text-align: center;
+}
+
+table.new_application td.auto_fill {
+    text-align: center;
+}
+
+input.field {
+    font-size: 10pt;
+    width: 98%;
+}
+
+textarea.quick_notes {
+    width: 98%;
+    height: 100%;
+}
+
+.small_contact_edit {
+    font-style: normal;
+    font-size: 9pt;
+    font-weight: bold;
+}
+
+#referrer_window {
+    width: 350px;
+    display: none;
+}
+
+div.referrer_form {
+    padding-bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+#other_jobs_window {
+    width: 650px;
+    display: none;
+}
+
+div.other_jobs {
+    padding-bottom: 10px;
+    width: 100%;
+    height: 350px;
+    overflow: auto;
+    text-align: center;
+}
+
+div.search, 
+div.main_filter {
+    width: 100%;
+    height: 180px;
+    padding-top: 5px;
+    background-color: #DDDDDD;
+    border-collapse: collapse;
+}
+
+div.search {
+    height: auto;
+}
+
+#search_table, 
+#main_filter_table {
+    margin: auto;
+    width: 100%;
+}
+
+#main_filter_table td.filter_jobs_button, 
+#search_table td.search_button {
+    width: 50px;
+    text-align: center;
+}
+
+#main_filter_table td.employers_list, 
+#main_filter_table td.jobs_list {
+    width: 40%;
+}
+
+#main_filter_table td.jobs_list {
+    border: 1px dashed #888888;
+}
+
+#main_filter_table td.filter_buttons, 
+#search_table td.search_buttons {
+    vertical-align: top;
+    text-align: center;
+}
+
+#search_table td.search_form {
+    width: 85%;
+}
+
+input.main_filter_button, 
+input.search_button {
+    width: 85%;
+}
+
+select.employers, 
+select.jobs {
+    width: 100%;
+    height: 150px;
+}
+
+div.main_filter_warning {
+    text-align: center;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+#jobs_list_message_box {
+    text-align: center;
+    font-size: 12pt;
+    font-style: italic;
+}
+
+#jobs_list_placeholder {
+    display: none;
+}
+
+div.search_tip,
+div.main_filter_tip {
+    font-size: 9pt;
+    text-align: left;
+    font-style: italic;
+    color: #888888;
+    float: left;
+}
+
+div.search_toggle, 
+div.main_filter_toggle {
+    margin-top: 5px;
+    padding-right: 15px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    text-align: right;
+    background-color: #CCCCCC;
+}
+
+div.sub_filter {
+    text-align: right;
+}
+
+div.pagination {
+    float: left;
+}
+
+#other_jobs_table {
+    margin: auto;
+    width: 98%;
+    border-collapse: collapse;
+}
+
+#other_jobs_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+span.viewed {
+    font-weight: bold;
+    color: #0000FF;
+}
+
+span.employed {
+    font-weight: bold;
+    color: #0CA711;
+}
+
+span.rejected {
+    font-weight: bold;
+    color: #FF0000;
+}
+
+span.referred {
+    font-weight: bold;
+}
+
+#search_form_table {
+    width: 100%;
+    margin: auto;
+}
+
+#search_form_table td.label {
+    width: 17%;
+    text-align: right;
+}
+
+#search_form_table td input.field {
+    width: 98%;
+}
+
+#search_form_table td input.years {
+    width: 25px;
+}
+
+#search_form_table td input.salary {
+    width: 150px;
+}
+
+#search_form_table td textarea.field {
+    width: 98%;
+    height: 100px;
+}
+
+span.latest_title {
+    font-weight: bold;
+}
+
+span.latest_employer {
+    font-style: italic;
+}
+
+div.latest_period {
+    color: #666666;
+}
+
+span.job_count {
+    font-size: 9pt;
+    color: #666666;
+    font-weight: normal;
+}
+#apply_job_window {
+    width: 750px;
+    display: none;
+}
+
+#apply_job_window select.field {
+    width: 99%;
+}
+
+div.apply_job_form {
+    width: 99%;
+    height: 400px;
+    margin: auto;
+    overflow: auto;
+    padding-bottom: 3px;
+    padding-top: 3px;
+}
+
+table.jobs_selection {
+    width: 99%;
+    height: 100%;
+    margin: auto;
+}
+
+table.jobs_selection td {
+    vertical-align: top;
+}
+
+table.jobs_selection td.jobs_list {
+    width: 45%;
+    text-align: center;
+}
+
+table.jobs_selection td.separator {
+    width: 1px;
+    background-color: #CCCCCC;
+}
+
+#jobs_selector {
+    border: 1px solid #CCCCCC;
+    margin: auto;
+    padding: 5px 5px 5px 5px;
+    overflow: auto;
+    height: 90%;
+}
+
+#selected_job_counter {
+    color: #666666;
+}
+
+#job_description {
+    overflow: auto;
+    margin: auto;
+    width: 99%;
+    height: 100%;
+}
+
+.no_employers {
+    font-weight: bold; 
+    color: #ff0000;
+}
+
+.job_item {
+    font-weight: bold;
+}
+
+.job_industry_item {
+    font-style: italic;
+    font-size: 9pt;
+}
+
+.job_expiry_item {
+    font-size: 7pt;
+}
+
+span.tiny {
+    font-size: 9pt;
+    color: #666666;
+}
+
+#employment_window {
+    display: none;
+    width: auto;
+}
+
+#reminder_window {
+    display: none;
+    width: auto;
+}
+
+div.reminder_form {
+    text-align: center;
+    padding: 10px 10px 10px 10px;
+}
+
+span.remind {
+    font-weight: bold;
+}
+
+span.remind.warn {
+    color: #00CC00;
+}

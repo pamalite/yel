@@ -1,0 +1,39 @@
+Hi %employer%,
+
+This is a reminder of an invoice (#%invoice%) 
+issued on %issued_on% with the sum of %currency% $%amount% 
+is due on %payable_by%.
+
+Please find the invoice attached. Kindly settle as soon as possible 
+(within 30 days starting from the date of the invoice) to keep the 
+billing process clean and simple for all parties.
+
+The various acceptable payment methods and their respective payment details are as 
+follows:
+
+For Bank Transfer:
+------------------
+Payable To: Yellow Elevator Sdn Bhd
+Amount: %currency% $ %amount%
+Account Number: 730-114592-7
+Bank (Branch): OCBC Bank
+
+For Cheque/Money Order:
+-----------------------
+Payable To: Yellow Elevator (Sdn Bhd / Pty Ltd; depending on which branch you are
+sending the payment to.)
+Amount: %currency% $ %amount%
+Send it to the closest branches listed below:
+
+Malaysia / Singapore
+--------------------
+Yellow Elevator Sdn. Bhd.
+1-12B-9, Suntech @ Penang Cybercity,
+Lintang Mayang Pasir 3, 
+11950 Penang, Malaysia.
+
+
+Thank you for choosing Yellow Elevator.
+
+Yellow Elevator
+Refer a job

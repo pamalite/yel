@@ -217,7 +217,7 @@ function show_add_to_privileged_form(_job_id, _candidate_email, _referrer_email,
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     list_available_industries('0');
     
     $('sort_added_on').addEvent('click', function() {

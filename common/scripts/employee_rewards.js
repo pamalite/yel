@@ -1,19 +1,51 @@
-var selected_tab = 'li_new';
-var order_by = 'employed_on';
+var order_by = 'referrals.employed_on';
 var order = 'asc';
-var partially_paid_order_by = 'last_paid_on';
-var partially_paid_order = 'desc';
-var fully_paid_order_by = 'fully_paid_on';
-var fully_paid_order = 'desc';
-var payments_order_by = 'referral_rewards.paid_on';
-var payments_order = 'asc';
+var paid_order_by = 'invoices.paid_on';
+var paid_order = 'desc';
+var banks = new Array();
 
-var payments_referral = '0';
-var payments_reward = '0.00';
-var payments_member_id = '';
-var payments_job_title = '';
-var payments_employer_name = '';
-var payments_currency = '???';
+function Bank(_id, _bank, _account) {
+    this.id = _id;
+    this.bank = _bank;
+    this.account = _account;
+}
+
+function get_banks(_member_id) {
+    banks = new Array();
+    
+    var params = 'id=' + _member_id + '&action=get_banks';
+    
+    var uri = root + "/employees/rewards_action.php";
+    var request = new Request({
+        url: uri,
+        async: false,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (txt == '0') {
+                $('banks_list').set('html', 'No bank account stored.');
+                return;
+            }
+            
+            var ids = xml.getElementsByTagName('id');
+            var banks = xml.getElementsByTagName('bank');
+            var accounts = xml.getElementsByTagName('account');
+            
+            var html = '<select class="field" id="bank_account">';
+            for (var i=0; i < ids.length; i++) {
+                html = html + '<option value="' + ids[i].childNodes[0].nodeValue + '">' + banks[i].childNodes[0].nodeValue + ' (' + accounts[i].childNodes[0].nodeValue + ')</option>';
+            }
+            html = html + '</select>';
+            $('banks_list').set('html', html);
+            set_status('');
+            return true;
+        },
+        onRequest: function(instance) {
+            set_status('Loading banks...');
+        }
+    });
+    
+    request.send(params);
+}
 
 function ascending_or_descending() {
     if (order == 'desc') {
@@ -23,27 +55,26 @@ function ascending_or_descending() {
     }
 }
 
-function partially_paid_ascending_or_descending() {
-    if (partially_paid_order == 'desc') {
-        partially_paid_order = 'asc';
+function paid_ascending_or_descending() {
+    if (paid_order == 'desc') {
+        paid_order = 'asc';
     } else {
-        partially_paid_order = 'desc';
+        paid_order = 'desc';
     }
 }
 
-function fully_paid_ascending_or_descending() {
-    if (fully_paid_order == 'desc') {
-        fully_paid_order = 'asc';
-    } else {
-        fully_paid_order = 'desc';
-    }
-}
-
-function payments_ascending_or_descending() {
-    if (payments_order == 'desc') {
-        payments_order = 'asc';
-    } else {
-        payments_order = 'desc';
+function sort_by(_table, _column) {
+    switch (_table) {
+        case 'new_rewards':
+            order_by = _column;
+            ascending_or_descending();
+            update_new_rewards_list();
+            break;
+        case 'paid_rewards':
+            paid_order_by = _column;
+            paid_ascending_or_descending();
+            update_paid_rewards_list();
+            break;
     }
 }
 
@@ -55,229 +86,81 @@ function show_invoice_page(_invoice_id) {
     }
 }
 
-function display_member_name_in(placeholder, _member_id) {
-    var params = 'id=' + _member_id + '&action=get_member_name';
+function update_new_rewards_list() {
+    var params = 'id=0&action=get_new_rewards&order_by=' + order_by + ' ' + order;
     
     var uri = root + "/employees/rewards_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            
-            var names = xml.getElementsByTagName('fullname');
-            
-            $(placeholder).set('html', names[0].childNodes[0].nodeValue);
-        },
-        onRequest: function(instance) {
-            $(placeholder).set('html', 'Loading name...');
-        }
-    });
-     
-    request.send(params);
-}
-
-function list_accounts_in(placeholder, used_id, used_name, member) {
-    var params = 'id=' + member + '&action=get_banks';
-    
-    var uri = root + "/employees/rewards_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
+            //set_status('<pre>' + txt + '</pre>');
+            //return;
             if (txt == 'ko') {
-                alert('An error occured while retrieving bank accounts.');
+                alert('An error occured while loading new rewards.');
                 return false;
             }
-            
-            var html = '<select id="' + used_id + '" name="' + used_name + '">' + "\n";
-            html = html + '<option value="0" selected>Select a bank account</option>' + "\n";
-            html = html + '<option value="0" disabled>&nbsp;</option>' + "\n";
             
             if (txt == '0') {
-                alert('This member has not setup a bank account yet.');
+                $('div_new_rewards').set('html', '<div class="empty_results">No rewards being offered at this moment.</div>');
             } else {
-                var ids = xml.getElementsByTagName('id');
-                var banks = xml.getElementsByTagName('bank');
-                var accounts = xml.getElementsByTagName('account');
-                
-                for (var i = 0; i < ids.length; i++) {
-                    html = html + '<option value="' + ids[i].childNodes[0].nodeValue + '">' + banks[i].childNodes[0].nodeValue + ' (' + accounts[i].childNodes[0].nodeValue +  ')</option>' + "\n";
-                }
-            }
-            html = html + '</select>' + "\n";
-            
-            $(placeholder).set('html', html);
-        },
-        onRequest: function(instance) {
-            $(placeholder).set('html', 'Loading accounts...');
-        }
-    });
-     
-    request.send(params);
-}
-
-function confirm_payment() {
-    if ($('referral_id').value == '0' || isEmpty($('referral_id').value)) {
-        alert('This payment is corrupted');
-        return false;
-    }
-    
-    var tmp = $('reward').get('html');
-    var raw_reward = tmp.split(' ');
-    var calculated_reward = raw_reward[0];
-    if (isEmpty($('amount').value) || parseFloat($('amount').value) <= 0.00) {
-        alert('Amount cannot be empty or less than or equals to 0.');
-        return false;
-    } else if (parseFloat($('amount').value) > parseFloat(calculated_reward)) {
-        alert('Amount cannot be more than the calculated reward.');
-        return false;
-    }
-    
-    var payment_mode = $('payment_mode').options[$('payment_mode').selectedIndex].value;
-    var bank = $('accounts_dropdown').options[$('accounts_dropdown').selectedIndex].value;
-    
-    if ((payment_mode == 'IBT' || payment_mode == 'CDB') && bank == '0') {
-        alert('You have chosen bank transfer or bank on-behalf. However, you have not choose which bank account the reward was transferred into.');
-        return false;
-    }
-    
-    if (payment_mode == 'CHQ' && (isEmpty($('cheque').value) || $('cheque').value == '0')) {
-        alert('You have chosen cheque. However, you have not entered the cheque number used.');
-        return false;
-    }
-    
-    var params = 'id=' + $('referral_id').value + '&action=confirm_payment';
-    params = params + '&amount=' + $('amount').value;
-    params = params + '&payment_mode=' + payment_mode;
-    params = params + '&bank=' + bank;
-    params = params + '&cheque=' + $('cheque').value;
-    params = params + '&receipt=' + $('receipt').value;
-    
-    var uri = root + "/employees/rewards_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                alert('An error occured while confirming payment.');
-                return false;
-            }
-            
-            set_status('');
-            close_payment_form();
-            if (selected_tab == 'li_new') {
-                show_new_rewards();
-            } else if (selected_tab == 'li_partially_paid') {
-                show_partially_paid_rewards();
-            } else {
-                show_payments();
-            }
-        },
-        onRequest: function(instance) {
-            set_status('Confirming payment...');
-        }
-    });
-     
-    request.send(params);
-}
-
-function close_payment_form() {
-    $('referral_id').value = '0';
-    $('div_payment_form').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
-}
-
-function show_payment_form(_referral, _reward, _member_id, _currency) {
-    $('referral_id').value = _referral;
-    $('reward').set('html', _currency + ' ' + _reward);
-    $('payment_form.currency').set('html', _currency);
-    display_member_name_in('member', _member_id);
-    //$('member').set('html', _member);
-    
-    list_accounts_in('accounts_list', 'accounts_dropdown', 'accounts_dropdown', _member_id);
-    $('div_blanket').setStyle('display', 'block');
-    
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_payment_form').getStyle('height'));
-    var div_width = parseInt($('div_payment_form').getStyle('width'));
-    
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
-    } else {
-        window_height = document.documentElement.clientHeight;
-    }
-    
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
-    }
-    
-    $('div_payment_form').setStyle('top', ((window_height - div_height) / 2));
-    $('div_payment_form').setStyle('left', ((window_width - div_width) / 2));
-    $('div_payment_form').setStyle('display', 'block');
-}
-
-function show_new_rewards() {
-    selected_tab = 'li_new';
-    $(selected_tab).setStyle('border', '1px solid #CCCCCC');
-    $('li_partially_paid').setStyle('border', '1px solid #0000FF');
-    $('li_fully_paid').setStyle('border', '1px solid #0000FF');
-    $('div_partially_paid_rewards').setStyle('display', 'none');
-    $('div_fully_paid_rewards').setStyle('display', 'none');
-    $('div_new_rewards').setStyle('display', 'block');
-    $('div_payments').setStyle('display', 'none');
-    
-    var params = 'id=0&order_by=' + order_by + ' ' + order;
-    
-    var uri = root + "/employees/rewards_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading new rewards.');
-                return false;
-            }
-            
-            var html = '<table id="list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no new rewards at the moment.</div>';
-            } else {
-                var referrals = xml.getElementsByTagName('referral');
+                var ids = xml.getElementsByTagName('referral');
                 var invoices = xml.getElementsByTagName('invoice');
-                var padded_invoices = xml.getElementsByTagName('padded_invoice');
+                var padded_ids = xml.getElementsByTagName('padded_invoice');
                 var employers = xml.getElementsByTagName('employer');
-                var currencies = xml.getElementsByTagName('currency');
                 var member_ids = xml.getElementsByTagName('member_id');
-                var jobs = xml.getElementsByTagName('title');
                 var members = xml.getElementsByTagName('member');
+                var phone_nums = xml.getElementsByTagName('phone_num');
+                var total_rewards = xml.getElementsByTagName('total_reward');
+                var currencies = xml.getElementsByTagName('currency');
                 var employed_ons = xml.getElementsByTagName('formatted_employed_on');
-                var employed_on_timestamps = xml.getElementsByTagName('employed_on');
-                var coe_received_ons = xml.getElementsByTagName('formatted_contract_received_on');
-                var referee_confirmed_ons = xml.getElementsByTagName('formatted_referee_confirmed_on');
-                var rewards = xml.getElementsByTagName('total_reward');
+                var jobs = xml.getElementsByTagName('title');
                 
-                for (var i=0; i < referrals.length; i++) {
-                    var invoice = invoices[i].childNodes[0].nodeValue;
-                    var referral = referrals[i].childNodes[0].nodeValue;
+                var new_rewards_table = new FlexTable('new_rewards_table', 'new_rewards');
+
+                var header = new Row('');
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_rewards', 'referrals.employed_on');\">Employed On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_rewards', 'jobs.title');\">Job</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('new_rewards', 'members.lastname');\">Referrer</a>", '', 'header'));
+                header.set(3, new Cell('Receipt', '', 'header'));
+                header.set(4, new Cell('Reward', '', 'header'));
+                header.set(5, new Cell('Actions', '', 'header action'));
+                new_rewards_table.set(0, header);
+                
+                for (var i=0; i < ids.length; i++) {
+                    var row = new Row('');
                     
-                    html = html + '<tr id="'+ referral + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="invoice"><a class="no_link" onClick="show_invoice_page(\'' + invoice + '\')">' + padded_invoices[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title">' + jobs[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="member">' + members[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="date">' + employed_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="reward"><a class="no_link" onClick="show_payment_plan(\'' + rewards[i].childNodes[0].nodeValue + '\', \'' + employed_on_timestamps[i].childNodes[0].nodeValue + '\', \'' + employed_ons[i].childNodes[0].nodeValue + '\', \'' + currencies[i].childNodes[0].nodeValue + '\');">' + currencies[i].childNodes[0].nodeValue + ' ' + rewards[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="action"><a class="no_link" onClick="show_payment_form(\'' + referral + '\', \'' + rewards[i].childNodes[0].nodeValue + '\', \'' + member_ids[i].childNodes[0].nodeValue + '\', \'' + currencies[i].childNodes[0].nodeValue + '\');">Pay Referrer</a></td>' + "\n";
-                    html = html + '</tr>' + "\n";
+                    row.set(0, new Cell(employed_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    
+                    var job = jobs[i].childNodes[0].nodeValue;
+                    job = job + '<div class="small_contact"><span class="contact_label">Employer:</span> ' + employers[i].childNodes[0].nodeValue + '</div>';
+                    row.set(1, new Cell(job, '', 'cell'));
+                    
+                    var referrer = members[i].childNodes[0].nodeValue;
+                    if (member_ids[i].childNodes[0].nodeValue.substr(0, 5) == 'team' && 
+                        member_ids[i].childNodes[0].nodeValue.substr(7) == '@yellowelevator.com') {
+                        referrer = 'Yellow Elevator';
+                    } else {
+                        referrer = referrer + '<div class="small_contact"><span class="contact_label">Tel.:</span> ' + phone_nums[i].childNodes[0].nodeValue + '</div>';
+                        referrer = referrer +  '<div class="small_contact"><span class="contact_label">Email: </span><a href="mailto:' + member_ids[i].childNodes[0].nodeValue + '">' + member_ids[i].childNodes[0].nodeValue + '</a></div>';
+                    }
+                    row.set(2, new Cell(referrer, '', 'cell'));
+                    
+                    row.set(3, new Cell('<a class="no_link" onClick="show_invoice_page(' + invoices[i].childNodes[0].nodeValue + ');">' + padded_ids[i].childNodes[0].nodeValue + '</a>&nbsp;<a href="invoice_pdf.php?id=' + invoices[i].childNodes[0].nodeValue + '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell'));
+                    
+                    var amount = currencies[i].childNodes[0].nodeValue + '$&nbsp;' + total_rewards[i].childNodes[0].nodeValue;
+                    row.set(4, new Cell(amount, '', 'cell'));
+                    
+                    var actions = '';
+                    actions = '<input type="button" value="Award" onClick="show_award_popup(' + ids[i].childNodes[0].nodeValue + ');" />';                    
+                    row.set(6, new Cell(actions, '', 'cell action'));
+                    
+                    new_rewards_table.set((parseInt(i)+1), row);
                 }
-                html = html + '</table>';
+                
+                $('div_new_rewards').set('html', new_rewards_table.get_html());
+                set_status('');
             }
-            
-            $('div_new_rewards_list').set('html', html);
-            set_status('');
         },
         onRequest: function(instance) {
             set_status('Loading new rewards...');
@@ -287,569 +170,212 @@ function show_new_rewards() {
     request.send(params);
 }
 
-function show_partially_paid_rewards() {
-    selected_tab = 'li_partially_paid';
-    $(selected_tab).setStyle('border', '1px solid #CCCCCC');
-    $('li_new').setStyle('border', '1px solid #0000FF');
-    $('li_fully_paid').setStyle('border', '1px solid #0000FF');
-    $('div_partially_paid_rewards').setStyle('display', 'block');
-    $('div_fully_paid_rewards').setStyle('display', 'none');
-    $('div_new_rewards').setStyle('display', 'none');
-    $('div_payments').setStyle('display', 'none');
-    
-    var params = 'id=0&action=get_partially_paid&order_by=' + partially_paid_order_by + ' ' + partially_paid_order;
+function update_paid_rewards_list() {
+    var params = 'id=0&action=get_paid_rewards&order_by=' + paid_order_by + ' ' + paid_order;
     
     var uri = root + "/employees/rewards_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            //set_status('<pre>' + txt + '</pre>');
+            //return;
             if (txt == 'ko') {
-                set_status('An error occured while loading partially rewards.');
+                alert('An error occured while loading paid rewards.');
                 return false;
             }
             
-            var html = '<table id="list" class="list">';
             if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no partially paid rewards at the moment.</div>';
+                $('div_paid_rewards').set('html', '<div class="empty_results">No rewards awarded at this moment.</div>');
             } else {
-                var referrals = xml.getElementsByTagName('referral');
+                var ids = xml.getElementsByTagName('referral');
                 var invoices = xml.getElementsByTagName('invoice');
-                var padded_invoices = xml.getElementsByTagName('padded_invoice');
+                var padded_ids = xml.getElementsByTagName('padded_invoice');
                 var employers = xml.getElementsByTagName('employer');
-                var currencies = xml.getElementsByTagName('currency');
                 var member_ids = xml.getElementsByTagName('member_id');
-                var jobs = xml.getElementsByTagName('title');
                 var members = xml.getElementsByTagName('member');
-                var employed_ons = xml.getElementsByTagName('formatted_employed_on');
-                var employed_on_timestamps = xml.getElementsByTagName('employed_on');
-                var coe_received_ons = xml.getElementsByTagName('formatted_contract_received_on');
-                var referee_confirmed_ons = xml.getElementsByTagName('formatted_referee_confirmed_on');
-                var last_paid_ons = xml.getElementsByTagName('formatted_last_paid_on');
-                var paids = xml.getElementsByTagName('paid');
-                var rewards = xml.getElementsByTagName('total_reward');
-                
-                for (var i=0; i < referrals.length; i++) {
-                    var invoice = invoices[i].childNodes[0].nodeValue;
-                    var referral = referrals[i].childNodes[0].nodeValue;
-                    
-                    html = html + '<tr id="'+ referral + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="invoice"><a class="no_link" onClick="show_invoice_page(\'' + invoice + '\')">' + padded_invoices[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title">' + jobs[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="member">' + members[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="date">' + employed_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="date">' + last_paid_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="reward">' + currencies[i].childNodes[0].nodeValue + ' ' + paids[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="reward"><a class="no_link" onClick="show_payment_plan(\'' + rewards[i].childNodes[0].nodeValue + '\', \'' + employed_on_timestamps[i].childNodes[0].nodeValue + '\', \'' + employed_ons[i].childNodes[0].nodeValue + '\', \'' + currencies[i].childNodes[0].nodeValue + '\');">' + currencies[i].childNodes[0].nodeValue + ' ' + rewards[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="action"><a class="no_link" onClick="show_payments_with(\'' + referral + '\', \'' + rewards[i].childNodes[0].nodeValue + '\', \'' + member_ids[i].childNodes[0].nodeValue + '\', \'' + jobs[i].childNodes[0].nodeValue + '\', \'' + employers[i].childNodes[0].nodeValue + '\', \'' + currencies[i].childNodes[0].nodeValue + '\')">Payments</a></td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                }
-                html = html + '</table>';
-            }
-            
-            $('div_partially_paid_rewards_list').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading partially paid rewards...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function show_fully_paid_rewards() {
-    selected_tab = 'li_fully_paid';
-    $(selected_tab).setStyle('border', '1px solid #CCCCCC');
-    $('li_new').setStyle('border', '1px solid #0000FF');
-    $('li_partially_paid').setStyle('border', '1px solid #0000FF');
-    $('div_partially_paid_rewards').setStyle('display', 'none');
-    $('div_fully_paid_rewards').setStyle('display', 'block');
-    $('div_new_rewards').setStyle('display', 'none');
-    $('div_payments').setStyle('display', 'none');
-    
-    var params = 'id=0&action=get_fully_paid&order_by=' + fully_paid_order_by + ' ' + fully_paid_order;
-    
-    var uri = root + "/employees/rewards_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading fully rewards.');
-                return false;
-            }
-            
-            var html = '<table id="list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no fully paid rewards at the moment.</div>';
-            } else {
-                var referrals = xml.getElementsByTagName('referral');
-                var invoices = xml.getElementsByTagName('invoice');
-                var padded_invoices = xml.getElementsByTagName('padded_invoice');
-                var employers = xml.getElementsByTagName('employer');
+                var phone_nums = xml.getElementsByTagName('phone_num');
+                var total_rewards = xml.getElementsByTagName('total_reward');
                 var currencies = xml.getElementsByTagName('currency');
-                var member_ids = xml.getElementsByTagName('member_id');
-                var jobs = xml.getElementsByTagName('title');
-                var members = xml.getElementsByTagName('member');
-                var employed_ons = xml.getElementsByTagName('formatted_employed_on');
-                var employed_on_timestamps = xml.getElementsByTagName('employed_on');
-                var coe_received_ons = xml.getElementsByTagName('formatted_contract_received_on');
-                var referee_confirmed_ons = xml.getElementsByTagName('formatted_referee_confirmed_on');
-                var fully_paid_ons = xml.getElementsByTagName('formatted_fully_paid_on');
-                var paids = xml.getElementsByTagName('paid');
-                var rewards = xml.getElementsByTagName('total_reward');
-                
-                for (var i=0; i < referrals.length; i++) {
-                    var invoice = invoices[i].childNodes[0].nodeValue;
-                    var referral = referrals[i].childNodes[0].nodeValue;
-                    
-                    html = html + '<tr id="'+ referral + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="invoice"><a class="no_link" onClick="show_invoice_page(\'' + invoice + '\')">' + padded_invoices[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="employer">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title">' + jobs[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="member">' + members[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="date">' + employed_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="date">' + fully_paid_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="reward">' + currencies[i].childNodes[0].nodeValue + ' ' + paids[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="reward"><a class="no_link" onClick="show_payment_plan(\'' + rewards[i].childNodes[0].nodeValue + '\', \'' + employed_on_timestamps[i].childNodes[0].nodeValue + '\', \'' + employed_ons[i].childNodes[0].nodeValue + '\', \'' + currencies[i].childNodes[0].nodeValue + '\');">' + currencies[i].childNodes[0].nodeValue + ' ' + rewards[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="action"><a class="no_link" onClick="show_payments_with(\'' + referral + '\', \'' + rewards[i].childNodes[0].nodeValue + '\', \'' + member_ids[i].childNodes[0].nodeValue + '\', \'' + jobs[i].childNodes[0].nodeValue + '\', \'' + employers[i].childNodes[0].nodeValue + '\', \'' + currencies[i].childNodes[0].nodeValue + '\')">Payments</a></td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                }
-                html = html + '</table>';
-            }
-            
-            $('div_fully_paid_rewards_list').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading fully paid rewards...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function show_payments_with(_referral, _reward, _member_id, _job_title, _employer_name, _currency) {
-    payments_referral = _referral;
-    payments_reward = _reward;
-    payments_member_id = _member_id;
-    payments_job_title = _job_title;
-    payments_employer_name = _employer_name;
-    payments_currency = _currency;
-    
-    show_payments();
-}
-
-function show_payments() {
-    display_member_name_in('member_name', payments_member_id);
-    //$('member_name').set('html', _member);
-    $('total_reward').set('html', payments_currency + ' ' + payments_reward);
-    $('job_title').set('html', payments_job_title);
-    $('job_employer').set('html', payments_employer_name);
-    $('payment_info.currency').set('html', payments_currency);
-    $('payment_info.total_paid.currency').set('html', payments_currency);
-    $('total_amount').set('html', '0.00');
-    
-    selected_tab = 'div_payments';
-    $('div_partially_paid_rewards').setStyle('display', 'none');
-    $('div_fully_paid_rewards').setStyle('display', 'none');
-    $('div_new_rewards').setStyle('display', 'none');
-    $('div_payments').setStyle('display', 'block');
-    
-    var params = 'id=' + payments_referral + '&action=get_payment_history';
-    params = params + '&order_by=' + payments_order_by + ' ' + payments_order;
-    
-    var uri = root + "/employees/rewards_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading payment history.');
-                return false;
-            }
-            
-            var html = '<table id="list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no payments made yet.</div>';
-            } else {
-                var ids = xml.getElementsByTagName('id');
-                var rewards = xml.getElementsByTagName('reward');
                 var paid_ons = xml.getElementsByTagName('formatted_paid_on');
-                var payment_modes = xml.getElementsByTagName('paid_through');
-                var banks = xml.getElementsByTagName('bank');
-                var cheques = xml.getElementsByTagName('cheque');
-                var receipts = xml.getElementsByTagName('receipt');
-                var total_reward = 0.00;
+                var jobs = xml.getElementsByTagName('title');
+                var gifts = xml.getElementsByTagName('gift');
+                var paid_rewards = xml.getElementsByTagName('paid_reward');
+                
+                var paid_rewards_table = new FlexTable('paid_rewards_table', 'paid_rewards');
+
+                var header = new Row('');
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'referral_rewards.paid_on');\">Awarded On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'jobs.title');\">Job</a>", '', 'header'));
+                header.set(2, new Cell("<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'members.lastname');\">Referrer</a>", '', 'header'));
+                header.set(3, new Cell('Receipt', '', 'header'));
+                header.set(4, new Cell('Reward', '', 'header'));
+                header.set(5, new Cell('Given Award', '', 'header'));
+                paid_rewards_table.set(0, header);
                 
                 for (var i=0; i < ids.length; i++) {
-                    var id = ids[i].childNodes[0].nodeValue;
+                    var row = new Row('');
                     
-                    html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="date">' + paid_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
+                    row.set(0, new Cell(paid_ons[i].childNodes[0].nodeValue, '', 'cell'));
                     
-                    var payment_mode = 'Not Applicable';
-                    switch (payment_modes[i].childNodes[0].nodeValue) {
-                        case 'CSH':
-                            payment_mode = 'Cash';
-                            break;
-                        case 'CHQ':
-                            payment_mode = 'Cheque';
-                            break;
-                        case 'CDB':
-                            payment_mode = 'Bank on-behalf';
-                            break;
-                        case 'IBT':
-                            payment_mode = 'Bank Transfer';
-                            break;
+                    var job = jobs[i].childNodes[0].nodeValue;
+                    job = job + '<div class="small_contact"><span class="contact_label">Employer:</span> ' + employers[i].childNodes[0].nodeValue + '</div>';
+                    row.set(1, new Cell(job, '', 'cell'));
+                    
+                    var referrer = members[i].childNodes[0].nodeValue;
+                    if (member_ids[i].childNodes[0].nodeValue.substr(0, 5) == 'team' && 
+                        member_ids[i].childNodes[0].nodeValue.substr(7) == '@yellowelevator.com') {
+                        referrer = 'Yellow Elevator';
+                    } else {
+                        referrer = referrer + '<div class="small_contact"><span class="contact_label">Tel.:</span> ' + phone_nums[i].childNodes[0].nodeValue + '</div>';
+                        referrer = referrer +  '<div class="small_contact"><span class="contact_label">Email: </span><a href="mailto:' + member_ids[i].childNodes[0].nodeValue + '">' + member_ids[i].childNodes[0].nodeValue + '</a></div>';
                     }
+                    row.set(2, new Cell(referrer, '', 'cell'));
                     
-                    html = html + '<td class="mode">' + payment_mode + '</td>' + "\n";
+                    row.set(3, new Cell('<a class="no_link" onClick="show_invoice_page(' + invoices[i].childNodes[0].nodeValue + ');">' + padded_ids[i].childNodes[0].nodeValue + '</a>&nbsp;<a href="invoice_pdf.php?id=' + invoices[i].childNodes[0].nodeValue + '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell'));
                     
-                    var bank = 'Not Applicable';
-                    if (banks[i].childNodes.length > 0) {
-                        bank = banks[i].childNodes[0].nodeValue;
-                    }
-                    html = html + '<td class="bank">' + bank + '</td>' + "\n";
+                    var amount = currencies[i].childNodes[0].nodeValue + '$&nbsp;' + total_rewards[i].childNodes[0].nodeValue;
+                    row.set(4, new Cell(amount, '', 'cell'));
                     
-                    var cheque = 'Not Applicable';
-                    if (cheques[i].childNodes.length > 0) {
-                        cheque = cheques[i].childNodes[0].nodeValue;
-                    }
-                    html = html + '<td class="cheque">' + cheque + '</td>' + "\n";
+                    var award = amount;
+                    if (gifts[i].childNodes.length > 0) {
+                        award = gifts[i].childNodes[0].nodeValue;
+                    }                    
+                    row.set(6, new Cell(award, '', 'cell action'));
                     
-                    var receipt = 'Not Applicable';
-                    if (receipts[i].childNodes.length > 0) {
-                        receipt = receipts[i].childNodes[0].nodeValue;
-                    }
-                    html = html + '<td class="receipt">' + receipt + '</td>' + "\n";
-                    html = html + '<td class="reward">' + rewards[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                    
-                    total_reward = parseFloat(total_reward) + parseFloat(rewards[i].childNodes[0].nodeValue);
+                    paid_rewards_table.set((parseInt(i)+1), row);
                 }
-                html = html + '</table>';
                 
-                total_reward = (Math.round(total_reward * 100) / 100);
-                $('total_amount').set('html', total_reward);
+                $('div_paid_rewards').set('html', paid_rewards_table.get_html());
+                set_status('');
             }
-            
-            
-            var button = '<input type="button" value="Confirm New Payment" onClick="show_payment_form(\'' + payments_referral + '\', \'' + (Math.round((payments_reward - total_reward) * 100) / 100) + '\', \'' + payments_member_id + '\', \'' + payments_currency + '\')" />';
-            if (parseFloat(total_reward) >= parseFloat(payments_reward)) {
-                button = '<input type="button" value="Confirm New Payment" disabled />';
-            }
-            
-            $('payments_button').set('html', button);
-            $('payments_button_1').set('html', button);
-            $('div_payments_list').set('html', html);
-            set_status('');
         },
         onRequest: function(instance) {
-            set_status('Loading payment history...');
+            set_status('Loading paid rewards...');
         }
     });
     
     request.send(params);
 }
 
-function close_payment_plan() {
-    $('div_payment_plan').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
+function show_new_rewards() {
+    $('new_rewards').setStyle('display', 'block');
+    $('paid_rewards').setStyle('display', 'none');
+    
+    $('item_new_rewards').setStyle('background-color', '#CCCCCC');
+    $('item_paid_rewards').setStyle('background-color', '');
 }
 
-function show_payment_plan(_reward, _employed_on, _formatted_employed_on, _currency) {
-    $('div_blanket').setStyle('display', 'block');
-    $('payment_plan.currency').set('html', _currency);
+function show_paid_rewards() {
+    $('new_rewards').setStyle('display', 'none');
+    $('paid_rewards').setStyle('display', 'block');
     
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_payment_plan').getStyle('height'));
-    var div_width = parseInt($('div_payment_plan').getStyle('width'));
+    $('item_new_rewards').setStyle('background-color', '');
+    $('item_paid_rewards').setStyle('background-color', '#CCCCCC');
+}
+
+function show_award_popup(_referral_id) {
+    $('referral_id').value = _referral_id;
     
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
-    } else {
-        window_height = document.documentElement.clientHeight;
-    }
-    
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
-    }
-    
-    $('div_payment_plan').setStyle('top', ((window_height - div_height) / 2));
-    $('div_payment_plan').setStyle('left', ((window_width - div_width) / 2));
-    
-    var params = 'id=0&action=get_payment_plan';
-    params = params + '&total_reward=' + _reward + '&employed_on=' + _employed_on;
+    var params = 'id=' + _referral_id + '&action=get_reward_details';
     
     var uri = root + "/employees/rewards_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
+            //set_status('<pre>' + txt + '</pre>');
+            //return;
             if (txt == 'ko') {
-                set_status('An error occured while loading payment plan.');
+                alert('An error occured while loading reward details.');
                 return false;
             }
             
-            $('plan_reward').set('html', _currency + ' ' + _reward);
-            $('plan_employed_on').set('html', _formatted_employed_on);
+            var referrers = xml.getElementsByTagName('member');
+            var referrer_ids = xml.getElementsByTagName('member_id');
+            var total_rewards = xml.getElementsByTagName('total_reward');
+            var currencies = xml.getElementsByTagName('currency');
             
-            var due_days = xml.getElementsByTagName('due_day');
-            var due_ons = xml.getElementsByTagName('due_on');
-            var amounts = xml.getElementsByTagName('amount');
+            get_banks(referrer_ids[0].childNodes[0].nodeValue);
             
-            var html = '<table id="list" class="list">';
-            for (var i=0; i < due_days.length; i++) {
-                html = html + '<tr id="'+ i + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                html = html + '<td class="days">' + due_days[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '<td class="date">' + due_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '<td class="amount">' + amounts[i].childNodes[0].nodeValue + '</td>' + "\n";
-                html = html + '</tr>' + "\n";
-            }
-            html = html + '</table>';
+            $('lbl_referrer').set('html', referrers[0].childNodes[0].nodeValue);
             
-            $('payment_plan_list').set('html', html);
-            $('div_payment_plan').setStyle('display', 'block');
-            set_status('');
+            // var amount = currencies[0].childNodes[0].nodeValue + '$ ' + total_rewards[0].childNodes[0].nodeValue;
+            // $('lbl_reward').set('html', amount);
+            
+            $('lbl_reward_currency').set('html', currencies[0].childNodes[0].nodeValue);
+            $('amount').value = total_rewards[0].childNodes[0].nodeValue;
+            
+            show_window('award_window');
+            // window.scrollTo(0, 0);
         },
         onRequest: function(instance) {
-            set_status('Loading payment plan...');
+            set_status('Loading paid rewards...');
         }
     });
     
     request.send(params);
 }
 
-function set_mouse_events() {
-    $('li_new').addEvent('mouseover', function() {
-        $('li_new').setStyles({
-            'color': '#FF0000',
-            'text-decoration': 'underline'
+function close_award_popup(_is_award) {
+    if (_is_award) {
+        var params = 'id=' + $('referral_id').value + '&action=award';
+        
+        if ($('award_as_gift').checked) {
+            params = params + '&award_mode=gift';
+            params = params + '&gift=' + $('gift').value;
+        } else {
+            if (isNaN($('amount').value) || $('amount').value <= 0) {
+                alert('Reward amount must be a number and more then $0.00');
+                return;
+            }
+            
+            params = params + '&award_mode=money';
+            params = params + '&bank=' + $('bank_account').options[$('bank_account').selectedIndex].value;
+            params = params + '&payment_mode=' + $('payment_mode').options[$('payment_mode').selectedIndex].value;
+            params = params + '&receipt=' + $('receipt').value;
+            // params = params + '&amount=' + $('lbl_reward').get('html').substr(5);
+            params = params + '&amount=' + $('amount').value;
+        }
+        
+        var uri = root + "/employees/rewards_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                //set_status('<pre>' + txt + '</pre>');
+                //return;
+                if (txt == 'ko') {
+                    alert('An error occured while awarding reward.');
+                    return false;
+                }
+                
+                
+                
+                if ($('div_paid_rewards') == null) {
+                    location.replace('rewards.php');
+                } else {
+                    update_new_rewards_list();
+                    update_paid_rewards_list();
+                }
+                
+                close_window('award_window');
+                set_status('');
+            },
+            onRequest: function(instance) {
+                set_status('Loading paid rewards...');
+            }
         });
-    });
-    
-    $('li_new').addEvent('mouseout', function() {
-        $('li_new').setStyles({
-            'color': '#000000',
-            'text-decoration': 'none'
-        });
-    });
-    
-    $('li_partially_paid').addEvent('mouseover', function() {
-        $('li_partially_paid').setStyles({
-            'color': '#FF0000',
-            'text-decoration': 'underline'
-        });
-    });
-    
-    $('li_partially_paid').addEvent('mouseout', function() {
-        $('li_partially_paid').setStyles({
-            'color': '#000000',
-            'text-decoration': 'none'
-        });
-    });
-    
-    $('li_fully_paid').addEvent('mouseover', function() {
-        $('li_fully_paid').setStyles({
-            'color': '#FF0000',
-            'text-decoration': 'underline'
-        });
-    });
-    
-    $('li_fully_paid').addEvent('mouseout', function() {
-        $('li_fully_paid').setStyles({
-            'color': '#000000',
-            'text-decoration': 'none'
-        });
-    });
+
+        request.send(params);
+        
+    } else {
+        close_window('award_window');
+    }
 }
 
 function onDomReady() {
-    set_root();
-    set_mouse_events();
-    get_unapproved_photos_count();
-    get_employee_rewards_count();
-    get_employee_tokens_count();
-    
-    $('li_new').addEvent('click', show_new_rewards);
-    $('li_partially_paid').addEvent('click', show_partially_paid_rewards);
-    $('li_fully_paid').addEvent('click', show_fully_paid_rewards);
-    
-    $('sort_invoice').addEvent('click', function() {
-        order_by = 'invoice';
-        ascending_or_descending();
-        show_new_rewards();
-    });
-    
-    $('sort_employer').addEvent('click', function() {
-        order_by = 'employer';
-        ascending_or_descending();
-        show_new_rewards();
-    });
-    
-    $('sort_title').addEvent('click', function() {
-        order_by = 'title';
-        ascending_or_descending();
-        show_new_rewards();
-    });
-    
-    $('sort_member').addEvent('click', function() {
-        order_by = 'member';
-        ascending_or_descending();
-        show_new_rewards();
-    });
-    
-    $('sort_employed_on').addEvent('click', function() {
-        order_by = 'employed_on';
-        ascending_or_descending();
-        show_new_rewards();
-    });
-    
-    $('sort_reward').addEvent('click', function() {
-        order_by = 'total_reward';
-        ascending_or_descending();
-        show_new_rewards();
-    });
-    
-    $('sort_partially_paid_invoice').addEvent('click', function() {
-        partially_paid_order_by = 'invoice';
-        partially_paid_ascending_or_descending();
-        show_partially_paid_rewards();
-    });
-    
-    $('sort_partially_paid_employer').addEvent('click', function() {
-        partially_paid_order_by = 'employer';
-        partially_paid_ascending_or_descending();
-        show_partially_paid_rewards();
-    });
-    
-    $('sort_partially_paid_title').addEvent('click', function() {
-        partially_paid_order_by = 'title';
-        partially_paid_ascending_or_descending();
-        show_partially_paid_rewards();
-    });
-    
-    $('sort_partially_paid_member').addEvent('click', function() {
-        partially_paid_order_by = 'member';
-        partially_paid_ascending_or_descending();
-        show_partially_paid_rewards();
-    });
-    
-    $('sort_partially_paid_employed_on').addEvent('click', function() {
-        partially_paid_order_by = 'employed_on';
-        partially_paid_ascending_or_descending();
-        show_partially_paid_rewards();
-    });
-    
-    $('sort_partially_paid_reward').addEvent('click', function() {
-        partially_paid_order_by = 'total_reward';
-        partially_paid_ascending_or_descending();
-        show_partially_paid_rewards();
-    });
-    
-    $('sort_partially_paid_paid').addEvent('click', function() {
-        partially_paid_order_by = 'paid';
-        partially_paid_ascending_or_descending();
-        show_partially_paid_rewards();
-    });
-    
-    $('sort_partially_paid_last_paid_on').addEvent('click', function() {
-        partially_paid_order_by = 'last_paid_on';
-        partially_paid_ascending_or_descending();
-        show_partially_paid_rewards();
-    });
-    
-    $('sort_fully_paid_invoice').addEvent('click', function() {
-        fully_paid_order_by = 'invoice';
-        fully_paid_ascending_or_descending();
-        show_fully_paid_rewards();
-    });
-    
-    $('sort_fully_paid_employer').addEvent('click', function() {
-        fully_paid_order_by = 'employer';
-        fully_paid_ascending_or_descending();
-        show_fully_paid_rewards();
-    });
-    
-    $('sort_fully_paid_title').addEvent('click', function() {
-        fully_paid_order_by = 'title';
-        fully_paid_ascending_or_descending();
-        show_fully_paid_rewards();
-    });
-    
-    $('sort_fully_paid_member').addEvent('click', function() {
-        fully_paid_order_by = 'member';
-        fully_paid_ascending_or_descending();
-        show_fully_paid_rewards();
-    });
-    
-    $('sort_fully_paid_employed_on').addEvent('click', function() {
-        fully_paid_order_by = 'employed_on';
-        fully_paid_ascending_or_descending();
-        show_fully_paid_rewards();
-    });
-    
-    $('sort_fully_paid_reward').addEvent('click', function() {
-        fully_paid_order_by = 'total_reward';
-        fully_paid_ascending_or_descending();
-        show_fully_paid_rewards();
-    });
-    
-    $('sort_fully_paid_paid').addEvent('click', function() {
-        fully_paid_order_by = 'paid';
-        fully_paid_ascending_or_descending();
-        show_fully_paid_rewards();
-    });
-    
-    $('sort_fully_paid_fully_paid_on').addEvent('click', function() {
-        fully_paid_order_by = 'fully_paid_on';
-        fully_paid_ascending_or_descending();
-        show_fully_paid_rewards();
-    });
-    
-    $('sort_payments_paid_on').addEvent('click', function() {
-        payments_order_by = 'referral_rewards.paid_on';
-        payments_ascending_or_descending();
-        show_payments();
-    });
-    
-    $('sort_payments_paid_on').addEvent('click', function() {
-        payments_order_by = 'referral_rewards.paid_on';
-        payments_ascending_or_descending();
-        show_payments();
-    });
-    
-    $('sort_payments_payment_mode').addEvent('click', function() {
-        payments_order_by = 'referral_rewards.paid_through';
-        payments_ascending_or_descending();
-        show_payments();
-    });
-    
-    $('sort_payments_bank').addEvent('click', function() {
-        payments_order_by = 'bank';
-        payments_ascending_or_descending();
-        show_payments();
-    });
-    
-    $('sort_payments_cheque').addEvent('click', function() {
-        payments_order_by = 'referral_rewards.cheque';
-        payments_ascending_or_descending();
-        show_payments();
-    });
-    
-    $('sort_payments_receipt').addEvent('click', function() {
-        payments_order_by = 'referral_rewards.receipt';
-        payments_ascending_or_descending();
-        show_payments();
-    });
-    
-    show_new_rewards();
+    initialize_page();
 }
 
 window.addEvent('domready', onDomReady);

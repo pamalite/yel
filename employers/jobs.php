@@ -20,7 +20,7 @@ if (!isset($_SESSION['yel']['employer']) ||
 
 $home = new EmployerJobsPage($_SESSION['yel']['employer']);
 $home->header(array('root_dir' => '../', 
-                    'title' => 'Jobs'));
+                    'title' => 'Job Postings'));
 $home->insert_employer_jobs_css();
 $home->insert_employer_jobs_scripts();
 $home->insert_inline_scripts();

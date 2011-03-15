@@ -1,13 +1,14 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
+require_once dirname(__FILE__). "/../htmltable.php";
 
 class EmployeeRewardsPage extends Page {
     private $employee = NULL;
-    private $clearances = array();
     
     function __construct($_session) {
+        parent::__construct();
+        
         $this->employee = new Employee($_session['id'], $_session['sid']);
-        $this->clearances = $_session['security_clearances'];
     }
     
     public function insert_inline_css() {
@@ -15,203 +16,262 @@ class EmployeeRewardsPage extends Page {
     }
     
     public function insert_employee_rewards_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/employee_rewards.css">'. "\n";
+        $this->insert_css('employee_rewards.css');
     }
     
     public function insert_employee_rewards_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/employee_rewards.js"></script>'. "\n";
+        $this->insert_scripts(array('flextable.js', 'employee_rewards.js'));
     }
     
     public function insert_inline_scripts() {
-        echo '<script type="text/javascript">'. "\n";
-        echo 'var id = "'. $this->employee->id(). '";'. "\n";
-        echo 'var user_id = "'. $this->employee->get_user_id(). '";'. "\n";
-        echo '</script>'. "\n";
+        $script = 'var id = "'. $this->employee->getId(). '";'. "\n";
+        $script .= 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
-    private function generate_year_list() {
-        $year = date('Y');
-        echo '<select class="field_year" id="year" name="year">'. "\n";
-        echo '<option value="'. ($year-1). '">'. ($year-1). '</option>'. "\n";
-        echo '<option value="'. $year. '" selected>'. $year. '</option>'. "\n";
-        echo '</select>'. "\n";
+    private function get_rewards($_is_paid = false) {
+        $criteria = array(
+            'columns' => "invoices.id AS invoice, referrals.id AS referral, referrals.total_reward,
+                          referrals.job AS job_id, currencies.symbol AS currency, jobs.title, 
+                          referrals.member AS member_id, referrals.employed_on, 
+                          employers.name AS employer, members.phone_num, 
+                          CONCAT(members.lastname, ', ', members.firstname) AS member, 
+                          DATE_FORMAT(referrals.employed_on, '%e %b, %Y') AS formatted_employed_on, 
+                          (SUM(referral_rewards.reward) / 3) AS paid_reward", 
+            'joins' => "invoice_items ON invoice_items.item = referrals.id, 
+                        invoices ON invoices.id = invoice_items.invoice, 
+                        referral_rewards ON referral_rewards.referral = referrals.id, 
+                        jobs ON jobs.id = referrals.job, 
+                        members ON members.email_addr = referrals.member, 
+                        employers ON employers.id = jobs.employer, 
+                        currencies ON currencies.country_code = employers.country",
+            'match' => "invoices.type = 'R' AND 
+                        (invoices.paid_on IS NOT NULL AND invoices.paid_on <> '0000-00-00 00:00:00') AND 
+                        (referrals.employed_on IS NOT NULL AND referrals.employed_on <> '0000-00-00 00:00:00') AND 
+                        (referrals.employer_removed_on IS NULL OR referrals.employer_removed_on = '0000-00-00 00:00:00') AND 
+                        (referrals.referee_rejected_on IS NULL OR referrals.referee_rejected_on = '0000-00-00 00:00:00') AND 
+                        (referrals.replacement_authorized_on IS NULL OR referrals.replacement_authorized_on = '0000-00-00 00:00:00') AND 
+                        (referrals.guarantee_expire_on <= CURDATE() OR referrals.guarantee_expire_on IS NULL)                        ", 
+            'group' => "referrals.id", 
+            'order' => "referrals.employed_on",
+            'having' => "(paid_reward < referrals.total_reward OR paid_reward IS NULL)"
+        );
+        
+        if ($_is_paid) {
+            $criteria['columns'] .= ", referral_rewards.gift, DATE_FORMAT(MAX(referral_rewards.paid_on), '%e %b, %Y') AS formatted_paid_on";
+            $criteria['having'] = "(paid_reward >= referrals.total_reward OR referral_rewards.gift IS NOT NULL)";
+        } else {
+            $criteria['match'] .= "AND (referral_rewards.gift IS NULL OR referral_rewards.gift = '')";
+        }
+        
+        $referral = new Referral();
+        return $referral->find($criteria);
     }
     
     public function show() {
         $this->begin();
-        $this->top_employee($this->employee->get_name(). " - Rewards");
-        $this->menu_employee($this->clearances, 'rewards');
+        $branch = $this->employee->getBranch();
+        $this->top('Rewards - '. $branch[0]['country']);
+        $this->menu_employee('rewards');
         
-        $query = "SELECT currencies.symbol 
-                  FROM employees 
-                  LEFT JOIN branches ON branches.id = employees.branch 
-                  LEFT JOIN currencies ON currencies.country_code = branches.country 
-                  WHERE employees.id = ". $this->employee->id(). " LIMIT 1";
-        $mysqli = Database::connect();
-        $result = $mysqli->query($query);
-        $currency = '??? $';
-        if ($result !== false) {
-            $currency = $result[0]['symbol'];
+        $new_rewards = $this->get_rewards();
+        foreach ($new_rewards as $i=>$row) {
+            $new_rewards[$i]['member'] = htmlspecialchars_decode(stripslashes($row['member']));
+            $new_rewards[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
+            $new_rewards[$i]['title'] = htmlspecialchars_decode(stripslashes($row['title']));
+            $new_rewards[$i]['padded_invoice'] = pad($row['invoice'], 11, '0');
+            $new_rewards[$i]['total_reward'] = number_format($row['total_reward'], 2, '.', ', ');
+            $new_rewards[$i]['paid_reward'] = number_format($row['paid_reward'], 2, '.', ', ');
+        }
+        
+        $paid_rewards = $this->get_rewards(true);
+        foreach ($paid_rewards as $i=>$row) {
+            $paid_rewards[$i]['member'] = htmlspecialchars_decode(stripslashes($row['member']));
+            $paid_rewards[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
+            $paid_rewards[$i]['title'] = htmlspecialchars_decode(stripslashes($row['title']));
+            $paid_rewards[$i]['padded_invoice'] = pad($row['invoice'], 11, '0');
+            $paid_rewards[$i]['total_reward'] = number_format($row['total_reward'], 2, '.', ', ');
+            $paid_rewards[$i]['paid_reward'] = number_format($row['paid_reward'], 2, '.', ', ');
+            $paid_rewards[$i]['gift'] = htmlspecialchars_decode(stripslashes($row['gift']));
         }
         
         ?>
-        <div class="banner">
-            An administration fee of <?php echo $currency ?> 2.00 will be charged to the referrers for every transfer of rewards into their bank accounts. <br/><br/>Always remember to ensure that the <?php echo $currency ?> 2.00 administration fee is taken into considration when making an online bank transaction.
+        <!-- submenu -->
+        <div class="menu">
+            <ul class="menu">
+                <li id="item_new_rewards" style="background-color: #CCCCCC;"><a class="menu" onClick="show_new_rewards();">New</a></li>
+                <li id="item_paid_rewards"><a class="menu" onClick="show_paid_rewards();">Paid</a></li>
+            </ul>
         </div>
+        <!-- end submenu -->
+        
+        <!-- div class="banner">
+            An administration fee of <?php //echo $currency ?> 2.00 will be charged to the referrers for every transfer of rewards into their bank accounts. <br/><br/>Always remember to ensure that the <?php // echo $currency ?> 2.00 administration fee is taken into considration when making an online bank transaction.
+        </div -->
+        
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>
         </div>
-        <div id="div_tabs">
-            <ul>
-                <li id="li_new">New</li>
-                <li id="li_partially_paid">Partially Paid</li>
-                <li id="li_fully_paid">Fully Paid</li>
-            </ul>
-        </div>
         
-        <div id="div_new_rewards">
-            <table class="header">
-                <tr>
-                    <td class="invoice"><span class="sort" id="sort_invoice">Receipt</span></td>
-                    <td class="employer"><span class="sort" id="sort_employer">Employer</span></td>
-                    <td class="title"><span class="sort" id="sort_title">Job</span></td>
-                    <td class="member"><span class="sort" id="sort_member">Referrer</span></td>
-                    <td class="date"><span class="sort" id="sort_employed_on">Employed On</span></td>
-                    <td class="reward_title"><span class="sort" id="sort_reward">Total Reward</span></td>
-                    <td class="action">&nbsp;</td>
-                </tr>
-            </table>
-            <div id="div_new_rewards_list">
+        <div id="new_rewards">
+        <?php
+        if (is_null($new_rewards) || count($new_rewards) <= 0 || $new_rewards === false) {
+        ?>
+            <div class="empty_results">No rewards being offered at this moment.</div>
+        <?php
+        } else {
+        ?>
+            <div id="div_new_rewards">
+            <?php
+                $new_rewards_table = new HTMLTable('new_rewards_table', 'new_rewards');
+
+                $new_rewards_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('new_rewards', 'referrals.employed_on');\">Employed On</a>", '', 'header');
+                $new_rewards_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('new_rewards', 'jobs.title');\">Job</a>", '', 'header');
+                $new_rewards_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('new_rewards', 'members.lastname');\">Referrer</a>", '', 'header');
+                $new_rewards_table->set(0, 3, "Receipt", '', 'header');
+                $new_rewards_table->set(0, 4, "Reward", '', 'header');
+                $new_rewards_table->set(0, 5, 'Actions', '', 'header action');
+                
+                foreach ($new_rewards as $i=>$new_reward) {
+                    $new_rewards_table->set($i+1, 0, $new_reward['formatted_employed_on'], '', 'cell');
+                    
+                    $job =  htmlspecialchars_decode(stripslashes($new_reward['title'])). '</span>'. "\n";
+                    $job .= '<div class="small_contact"><span class="contact_label">Employer:</span> '. $new_reward['employer']. '</div>'. "\n";
+                    $new_rewards_table->set($i+1, 1, $job, '', 'cell');
+                    
+                    $referrer_short_details = '';
+                    if (substr($new_reward['member_id'], 0, 5) == 'team.' && 
+                        substr($new_reward['member_id'], 7) == '@yellowelevator.com') {
+                        $referrer_short_details = 'Yellow Elevator';
+                    } else {
+                        $referrer_short_details =  htmlspecialchars_decode(stripslashes($new_reward['member'])). "\n";
+                        $referrer_short_details .= '<div class="small_contact"><span class="contact_label">Tel.:</span> '. $new_reward['phone_num']. '</div>'. "\n";
+                        $referrer_short_details .= '<div class="small_contact"><span class="contact_label">Email: </span><a href="mailto:'. $new_reward['member_id']. '">'. $new_reward['member_id']. '</a></div>'. "\n";
+                    }
+                    $new_rewards_table->set($i+1, 2, $referrer_short_details, '', 'cell');
+                    
+                    $new_rewards_table->set($i+1, 3, '<a class="no_link" onClick="show_invoice_page('. $new_reward['invoice']. ');">'. $new_reward['padded_invoice']. '</a>&nbsp;<a href="invoice_pdf.php?id='. $new_reward['invoice']. '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell');
+                    $new_rewards_table->set($i+1, 4, $new_reward['currency']. '$ '. $new_reward['total_reward'], '', 'cell');
+                    
+                    $actions = '<input type="button" value="Award" onClick="show_award_popup('. $new_reward['referral']. ');" />';
+                    $new_rewards_table->set($i+1, 5, $actions, '', 'cell action');
+                }
+
+                echo $new_rewards_table->get_html();
+            ?>
             </div>
+        <?php
+        }
+        ?>
         </div>
         
-        <div id="div_partially_paid_rewards">
-            <table class="header">
-                <tr>
-                    <td class="invoice"><span class="sort" id="sort_partially_paid_invoice">Receipt</span></td>
-                    <td class="employer"><span class="sort" id="sort_partially_paid_employer">Employer</span></td>
-                    <td class="title"><span class="sort" id="sort_partially_paid_title">Job</span></td>
-                    <td class="member"><span class="sort" id="sort_partially_paid_member">Referrer</span></td>
-                    <td class="date"><span class="sort" id="sort_partially_paid_employed_on">Employed On</span></td>
-                    <td class="date"><span class="sort" id="sort_partially_paid_last_paid_on">Last Paid On</span></td>
-                    <td class="reward_title"><span class="sort" id="sort_partially_paid_paid">Amount Paid</span></td>
-                    <td class="reward_title"><span class="sort" id="sort_partially_paid_reward">Total Reward</span></td>
-                    <td class="action">&nbsp;</td>
-                </tr>
-            </table>
-            <div id="div_partially_paid_rewards_list">
+        <div id="paid_rewards">
+        <?php
+        if (is_null($paid_rewards) || count($paid_rewards) <= 0 || $paid_rewards === false) {
+        ?>
+            <div class="empty_results">No rewards awarded at this moment.</div>
+        <?php
+        } else {
+        ?>
+            <div id="div_paid_rewards">
+            <?php
+                $paid_rewards_table = new HTMLTable('paid_rewards_table', 'paid_rewards');
+
+                $paid_rewards_table->set(0, 0, "<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'referral_rewards.paid_on');\">Awarded On</a>", '', 'header');
+                $paid_rewards_table->set(0, 1, "<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'jobs.title');\">Job</a>", '', 'header');
+                $paid_rewards_table->set(0, 2, "<a class=\"sortable\" onClick=\"sort_by('paid_rewards', 'members.lastname');\">Referrer</a>", '', 'header');
+                $paid_rewards_table->set(0, 3, "Receipt", '', 'header');
+                $paid_rewards_table->set(0, 4, "Total Reward", '', 'header');
+                $paid_rewards_table->set(0, 5, 'Given Reward', '', 'header');
+                
+                foreach ($paid_rewards as $i=>$paid_reward) {
+                    $paid_rewards_table->set($i+1, 0, $paid_reward['formatted_paid_on'], '', 'cell');
+                    
+                    $job =  htmlspecialchars_decode(stripslashes($paid_reward['title'])). '</span>'. "\n";
+                    $job .= '<div class="small_contact"><span class="contact_label">Employer:</span> '. $paid_reward['employer']. '</div>'. "\n";
+                    $paid_rewards_table->set($i+1, 1, $job, '', 'cell');
+                    
+                    $referrer_short_details = '';
+                    if (substr($paid_reward['member_id'], 0, 5) == 'team.' && 
+                        substr($paid_reward['member_id'], 7) == '@yellowelevator.com') {
+                        $referrer_short_details = 'Yellow Elevator';
+                    } else {
+                        $referrer_short_details =  htmlspecialchars_decode(stripslashes($paid_reward['member'])). "\n";
+                        $referrer_short_details .= '<div class="small_contact"><span class="contact_label">Tel.:</span> '. $paid_reward['phone_num']. '</div>'. "\n";
+                        $referrer_short_details .= '<div class="small_contact"><span class="contact_label">Email: </span><a href="mailto:'. $paid_reward['member_id']. '">'. $paid_reward['member_id']. '</a></div>'. "\n";
+                    }
+                    $paid_rewards_table->set($i+1, 2, $referrer_short_details, '', 'cell');
+                    
+                    $paid_rewards_table->set($i+1, 3, '<a class="no_link" onClick="show_invoice_page('. $paid_reward['invoice']. '">'. $paid_reward['padded_invoice']. '</a>&nbsp;<a href="invoice_pdf.php?id='. $paid_reward['invoice']. '"><img src="../common/images/icons/pdf.gif" /></a>', '', 'cell');
+                    $paid_rewards_table->set($i+1, 4, $paid_reward['currency']. '$ '. $paid_reward['total_reward'], '', 'cell');
+                    
+                    $rewarded = $paid_reward['currency']. '$ '. $paid_reward['paid_reward'];
+                    if ($paid_reward['paid_reward'] <= 0 && !is_null($paid_reward['gift'])) {
+                        $rewarded = $paid_reward['gift'];
+                    }
+                    $paid_rewards_table->set($i+1, 5, $rewarded, '', 'cell');
+                }
+
+                echo $paid_rewards_table->get_html();
+            ?>
             </div>
+        <?php
+        }
+        ?>
         </div>
         
-        <div id="div_fully_paid_rewards">
-            <table class="header">
-                <tr>
-                    <td class="invoice"><span class="sort" id="sort_fully_paid_invoice">Receipt</span></td>
-                    <td class="employer"><span class="sort" id="sort_fully_paid_employer">Employer</span></td>
-                    <td class="title"><span class="sort" id="sort_fully_paid_title">Job</span></td>
-                    <td class="member"><span class="sort" id="sort_fully_paid_member">Referrer</span></td>
-                    <td class="date"><span class="sort" id="sort_fully_paid_employed_on">Employed On</span></td>
-                    <td class="date"><span class="sort" id="sort_fully_paid_fully_paid_on">Fully Paid On</span></td>
-                    <td class="reward_title"><span class="sort" id="sort_fully_paid_paid">Amount Paid</span></td>
-                    <td class="reward_title"><span class="sort" id="sort_fully_paid_reward">Total Reward</span></td>
-                    <td class="action">&nbsp;</td>
-                </tr>
-            </table>
-            <div id="div_fully_paid_rewards_list">
-            </div>
-        </div>
-        
-        <div id="div_payments">
-            <div class="payment_info">
-                Payments history for member <span id="member_name" style="font-weight: bold;"></span><br/>referring the job <span id="job_title" style="font-weight: bold;"></span> (<span id="job_employer" style="font-weight: bold;"></span>)<br/>with the total reward of <span id="total_reward" style="font-weight: bold;"></span> to be paid.
-            </div>
-            <div id="payments_button" class="button"></div>
-            <table class="header">
-                <tr>
-                    <td class="date"><span class="sort" id="sort_payments_paid_on">Paid On</span></td>
-                    <td class="mode"><span class="sort" id="sort_payments_payment_mode">Payment Mode</span></td>
-                    <td class="bank"><span class="sort" id="sort_payments_bank">Bank Account</span></td>
-                    <td class="cheque"><span class="sort" id="sort_payments_cheque">Cheque</span></td>
-                    <td class="receipt"><span class="sort" id="sort_payments_receipt">Receipt</span></td>
-                    <td class="reward_title">Amount Paid (<span id="payment_info.currency"></span>)</td>
-                </tr>
-            </table>
-            <div id="div_payments_list">
-            </div>
-            <table class="total_amount">
-                <tr>
-                    <td class="date">&nbsp;</td>
-                    <td class="mode">&nbsp;</td>
-                    <td class="bank">&nbsp;</td>
-                    <td class="cheque">&nbsp;</td>
-                    <td class="receipt">&nbsp;</td>
-                    <td class="reward_title">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td colspan="5" class="label">Total Paid (<span id="payment_info.total_paid.currency"></span>)</td>
-                    <td class="reward"><span id="total_amount">0.00</span></td>
-                </tr>
-            </table>
-            <div id="payments_button_1" class="button"></div>
-        </div>
-        
-        <div id="div_blanket"></div>
-        <div id="div_payment_form">
-            <form method="post" onSubmit="return false;">
-                <input type="hidden" id="referral_id" name="referral_id" value="0" />
-                <p class="instructions">Please enter the following fields to confirm payment of <span id="reward" style="font-weight: bold;"></span> to <span id="member" style="font-weight: bold;"></span>.</p>
-                <table id="payment_form" class="payment_form">
-                    <tr>
-                        <td class="label"><label for="amount">Amount (<span id="payment_form.currency"></span>):</label></td>
-                        <td class="field"><input class="field" type="text" id="amount" name="amount" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="payment_mode">Payment mode:</label></td>
-                        <td class="field">
-                            <select id="payment_mode" name="payment_mode">
-                                <option value="IBT" selected>Bank Transfer</option>
-                                <option value="CSH">Cash</option>
-                                <option value="CHQ">Cheque</option>
-                                <option value="CDB">Bank on-behalf</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="accounts_dropdown">Account:</label></td>
-                        <td class="field"><span id="accounts_list"></span></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="cheque">Cheque:</label></td>
-                        <td class="field"><input class="field" type="text" id="cheque" name="cheque" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="receipt">Receipt:</label></td>
-                        <td class="field"><input class="field" type="text" id="receipt" name="receipt" /></td>
-                    </tr>
-                </table>
-                <p class="button"><input class="button" type="button" value="Cancel" onClick="close_payment_form();" />&nbsp;<input class="button" type="button" id="save_bank" name="save_bank" value="Confirm Payment" onClick="confirm_payment();" /></p>
-            </form>
-        </div>
-        
-        <div id="div_payment_plan">
-            <div style="padding-left: 5px; padding-right: 5px;">
-                <p class="instructions">Payment plan of <span id="plan_reward" style="font-weight: bold;"></span> beginning from <span id="plan_employed_on" style="font-weight: bold;"></span> for every 30 days in 180 days (or 6 months).</p>
-                <table class="header">
-                    <tr>
-                        <td class="days">Days</td>
-                        <td class="date">Due On</td>
-                        <td class="amount_title">Amount (<span id="payment_plan.currency"></span>)</td>
-                    </tr>
-                </table>
-                <div id="payment_plan_list">
+        <!-- popup windows goes here -->
+        <div id="award_window" class="popup_window">
+            <div class="popup_window_title">Award</div>
+            <form onSubmit="return false;">
+                <input type="hidden" id="referral_id" value="" />
+                <div class="award_form">
+                    <table class="award_form">
+                        <tr>
+                            <td class="label">Referrer:</td>
+                            <td class="field"><span id="lbl_referrer"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Total Reward:</td>
+                            <td class="field">
+                                <!-- span id="lbl_reward"></span -->
+                                <span id="lbl_reward_currency"></span>$ <input type="text" id="amount" value="1.00" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Award as:</td>
+                            <td class="field">
+                                <div class="award_field">
+                                    <input type="radio" name="award_as" id="award_as_money" checked />Monetary Incentive<br/>
+                                    Payment Mode:
+                                    <select id="payment_mode" name="payment_mode">
+                                        <option value="IBT" selected>Bank Transfer</option>
+                                        <option value="CSH">Cash</option>
+                                        <option value="CHQ">Cheque</option>
+                                        <option value="CDB">Bank on-behalf</option>
+                                    </select><br/>
+                                    Bank Account:
+                                    <span id="banks_list"></span><br/>
+                                    Receipt #:
+                                    <input type="text" id="receipt" value="" />
+                                </div>
+                                <br/>
+                                <div class="award_field">
+                                    <input type="radio" name="award_as" id="award_as_gift" />Gift: 
+                                    <input type="text" id="gift" value="" />
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
+            </form>
+            <div class="popup_window_buttons_bar">
+                <input type="button" value="Confirm" onClick="close_award_popup(true);" />
+                <input type="button" value="Cancel" onClick="close_award_popup(false);" />
             </div>
-            <p class="button"><input class="button" type="button" value="Close" onClick="close_payment_plan();" /></p>
         </div>
+        
         <?php
     }
 }

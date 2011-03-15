@@ -12,23 +12,33 @@ if (!isset($_SESSION['yel']['employer']) ||
 }
 
 $resume = new Resume(0, $_GET['id']);
-$cover = $resume->get();
+$resume_file = $resume->getFileInfo();
+$file = $GLOBALS['resume_dir']. "/". $_GET['id']. ".". $resume_file['file_hash'];
 
-if (!is_null($cover[0]['file_name'])) {
-    $file = $resume->get_file();
+if (file_exists($file)) {
+    $filename_items = explode('.', $resume_file['file_name']);
+    $ext = $filename_items[1];
     
     header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
     header('Pragma: public');
     header('Expires: -1');
     header('Content-Description: File Transfer');
-    header('Content-Length: ' . $file['size']);
-    header('Content-Disposition: attachment; filename="' . $file['name'].'"');
-    header('Content-type: '. $file['type']);
+    header('Content-Length: ' . $resume_file['file_size']);
+    header('Content-Disposition: attachment; filename="' . $_GET['id']. '.'. $ext. '"');
+    header('Content-type: '. $resume_file['file_type']);
     ob_clean();
     flush();
-    readfile($GLOBALS['resume_dir']. "/". $_GET['id']. ".". $file['hash']);
+    readfile($file);
 } else {
-    redirect_to('https://'. $GLOBALS['root']. '/employers/resume.php?id='. $_GET['id']);
+    ?>
+    <html>
+    <body>
+    <?php
+    echo 'Sorry, the resume file seemed to be missing. Please contact us at <a href="mailto: support@yellowelevator.com">support@yellowelevator.com</a>.';
+    ?>
+    </body>
+    </html>
+    <?php
 }
 
 exit();

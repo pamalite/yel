@@ -34,7 +34,7 @@ if (!isset($_SESSION['yel']['employer'])) {
 
 $login = new EmployerLoginPage();
 $login->header(array('root_dir' => '../', 
-                     'title' => 'Employer Login'));
+                     'title' => 'Employer Sign In'));
 $login->insert_employer_login_css();
 $login->insert_employer_login_scripts();
 if (isset($_GET['invalid'])) {

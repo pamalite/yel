@@ -1,0 +1,12 @@
+Hi %employer%,
+
+This is to acknowledge the payment for invoice #%invoice% 
+issued on %issued_on% with the sum of %currency% $%amount% 
+was received on %paid_on%.
+
+Please find the receipt attached. 
+
+Thank you for choosing Yellow Elevator.
+
+Yellow Elevator
+Refer a job

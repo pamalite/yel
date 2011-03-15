@@ -20,7 +20,7 @@ if (!isset($_SESSION['yel']['employer']) ||
 
 $home = new EmployerProfilePage($_SESSION['yel']['employer']);
 $home->header(array('root_dir' => '../', 
-                    'title' => 'Employer Profile'));
+                    'title' => 'Profile'));
 $home->insert_employer_profile_css();
 $home->insert_employer_profile_scripts();
 $home->insert_inline_scripts();

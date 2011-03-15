@@ -101,7 +101,7 @@ function toggle_description(job_id) {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     get_employer_referrals_count();
     
     $('sort_industry').addEvent('click', function() {

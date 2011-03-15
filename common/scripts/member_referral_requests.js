@@ -115,7 +115,7 @@ function show_testimony_form(_request_id, _candidate_index, _candidate_id, _job_
     if (window_height <= div_height) {
         $('div_testimony_form').setStyle('height', window_height);
         $('div_testimony_form').setStyle('top', 0);
-        window.scrollTo(0, 0);
+        // window.scrollTo(0, 0);
     } else {
         $('div_testimony_form').setStyle('top', ((window_height - div_height) / 2));
     }
@@ -568,7 +568,7 @@ function set_mouse_events() {
 }
 
 function onDomReady() {
-    set_root();
+    initialize_page();
     set_mouse_events();
     get_employers_for_mini();
     get_industries_for_mini();

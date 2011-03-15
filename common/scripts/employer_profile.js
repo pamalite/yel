@@ -1,84 +1,103 @@
-function validate() {
-    if ($('email').value == '') {
-        set_status('Email address cannot be empty.');
-        return false;
-    } else {
-        if (!isEmail($('email').value)) {
-            set_status('You will need to provide us a valid email address.');
-            return false;
-        }
-    } 
-    
-    if ($('name').value == '') {
-        set_status('Business name cannot be empty.');
-        return false;
+function save_password() {
+    if (isEmpty($('password').value) || isEmpty($('password2').value)) {
+        alert('Password cannot be empty.');
+        return;
     }
     
-    if ($('contact_person').value == '') {
-        set_status('Contact person cannot be empty.');
-        return false;
+    if ($('password').value != $('password2').value) {
+        alert('The passwords entered do not match.');
+        return;
     }
     
-    if ($('phone_num').value == '') {
-        set_status('Telephone number cannot be empty.');
-        return false;
-    }
-    
-    if ($('zip').value == '') {
-        set_status('Zip/Postal code cannot be empty.');
-        return false;
-    }
-    
-    if ($('password').value != '') {
-        if ($('password').value != $('password_confirm').value) {
-            set_status('The passwords you entered do not match.');
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-function save() {
-    if (!validate()) {
-        return false;
-    }
-    
-    var password = '';
-    if ($('password').value != '' && $('password_confirm').value != '') {
-        password = md5($('password').value);
-    }
-    
-    var params = 'id=' + id;
-    params = params + '&name=' + $('name').value;
-    params = params + '&phone_num=' + $('phone_num').value;
-    params = params + '&fax_num=' + $('fax_num').value;
-    params = params + '&email_addr=' + $('email').value;
-    params = params + '&contact_person=' + $('contact_person').value;
-    params = params + '&address=' + $('address').value;
-    params = params + '&state=' + $('state').value;
-    params = params + '&zip=' + $('zip').value;
-    params = params + '&country=' + $('country').value;
-    params = params + '&website_url=' + $('website_url').value;
-    params = params + '&about=' + $('about').value;
-    
-    if (password != '') {
-        params = params + '&password=' + password;
-    }
+    var params = 'id=' + id + '&action=save_password&password=' + md5($('password').value);
     
     var uri = root + "/employers/profile_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            if (txt == 'ok') {
-                set_status('Your profile was successfully saved and updated.');
-            } else {
-                set_status('Sorry! We are not able to save and update your profile at the moment. Please try again later.');
+            set_status('');
+            
+            if (txt == 'ko') {
+                alert('An error occured while trying to save password. Please try again later.');
+                return false;
+            }
+            
+            alert('Password saved successfully!');
+            $('password').value = '';
+            $('password2').value = '';    
+        },
+        onRequest: function(instance) {
+            set_status('Saving password...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function validate_profile_form() {
+    if (!isEmail($('email_addr').value)) {
+        alert('Please provide a valid e-mail address.');
+        return false;
+    }
+    
+    if (isEmpty($('contact_person').value)) {
+        alert('Contact person cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('phone_num').value)) {
+        alert('Telephone number cannot be empty.');
+        return false;
+    }
+    
+    if (isEmpty($('zip').value)) {
+        alert('Zip/Postal code cannot be empty.');
+        return false;
+    }
+    
+    if ($('country').options[$('country').selectedIndex].value == '0') {
+        alert('You need to select a country where you are located.');
+        return false;
+    }
+    
+    return true;
+    
+}
+
+function save_profile() {
+    if (!validate_profile_form()) {
+        return false;
+    }
+    
+    var params = 'id=' + id;
+    params = params + '&action=save_profile';
+    params = params + '&email_addr=' + $('email_addr').value;
+    params = params + '&contact_person=' + $('contact_person').value;
+    params = params + '&phone_num=' + $('phone_num').value;
+    params = params + '&fax_num=' + $('fax_num').value;
+    params = params + '&address=' + encodeURIComponent($('address').value);
+    params = params + '&state=' + $('state').value;
+    params = params + '&zip=' + $('zip').value;
+    params = params + '&country=' + $('country').options[$('country').selectedIndex].value;
+    params = params + '&website_url=' + encodeURIComponent($('website_url').value);
+    params = params + '&summary=' + encodeURIComponent($('summary').value);
+    
+    var uri = root + "/employers/profile_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            // set_status('<pre>' + txt + '</pre>');
+            // return;
+            set_status('');
+            if (txt == 'ko') {
+                alert('An error occured while saving contact details. Please try again later.');
+                return false;
             }
         },
         onRequest: function(instance) {
-            set_status('Saving and updating...');
+            set_status('Saving...');
         }
     });
     
@@ -86,12 +105,7 @@ function save() {
 }
 
 function onDomReady() {
-    set_root();
-    get_employer_referrals_count();
-    
-    $('save').addEvent('click', save);
-    $('save_1').addEvent('click', save);
-    
+    initialize_page();
 }
 
 window.addEvent('domready', onDomReady);

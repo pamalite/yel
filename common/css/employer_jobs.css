@@ -1,247 +1,119 @@
-p.note {
-    font-size: 9pt;
+.empty_results {
+    text-align: center;
     color: #666666;
+    font-size: 12pt;
     font-style: italic;
 }
 
-#div_tabs, #div_tabs_1 {
-    text-align: center;
-}
-
-#div_tabs ul, #div_tabs_1 ul {
-    padding: none;
-    margin: none;
-    list-style-type: none;
-    white-space: nowrap;
-}
-
-#div_tabs li, #div_tabs_1 li {
-    padding: 5px 5px 5px 5px;
-    display: inline;
-    cursor: pointer;
-}
-
-#li_open, #div_tabs_1 #li_back {
-    border: 1px solid #CCCCCC;
-}
-
-#div_tabs_1 {
-    padding-bottom: 5px;
-}
-
-#li_closed, #li_back_arrow {
-    border: 1px solid #0000FF;
-}
-
-#open_back_arrow, #closed_back_arrow {
-    display: none;
-}
-
-#div_open, #div_closed {
-    padding-top: none;
-}
-
-#div_closed {
-    display: none;
-}
-
-table.buttons {
-    width: 100%;
+.jobs {
     margin: auto;
-    background-color: #CCCCCC;
-}
-
-table.buttons td.left {
-    text-align: left;
-}
-
-table.buttons td.right {
-    text-align: right;
-}
-
-input.button {
-    font-size: 10pt;
-}
-
-input.mini_button {
-    font-size: 9pt;
-}
-
-td.checkbox {
-    width: 10px;
-}
-
-td.id {
-    width: 35px;
-}
-
-td.industry {
-    width: 150px;
-}
-
-td.date {
-    width: 100px;
-}
-
-td.new_from {
-    width: 150px;
-    text-align: center;
-}
-
-span.sort {
-    color: #0000FF;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-span.sort:hover {
-    color: #FF0000;
-}
-
-#div_job_form, #div_job_info {
-    text-align: center;
-    display: none;
-    padding-top: 10px;
-}
-
-table.job_form, table.job_info {
-    width: 65%;
-    margin: auto;
+    width: 99%;
     border-collapse: collapse;
 }
 
-table.job_form td.label, table.job_info td.label {
-    width: 25%;
-    text-align: right;
-    padding-right: 20px;
+.header {
+    padding: 5px 5px 5px 5px;
+    font-weight: bold;
+    background-color: #EEEEEE;
+    border-top: 1px solid #AAAAAA;
+    border-bottom: 1px solid #AAAAAA;
+}
+
+.cell {
+    padding: 5px 5px 5px 5px;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+.cell:hover {
+    background-color: #BBFCA1;
+}
+
+#jobs_table tr:hover  {
+    background-color: #FFFF00;
+}
+
+.top_banner {
+    padding-top: 15px;
+    margin: auto;
+    width: 80%;
+    color: #666666;
+}
+
+.top_banner td {
     vertical-align: top;
 }
 
-table.job_form td.title, table.job_info td.title {
-    text-align: center;
+.top_banner td.item {
     border: 1px solid #CCCCCC;
-    font-weight: bold;
+    background-color: #EEEEEE;
 }
 
-option.main_industry {
-    font-weight: bold;
-}
-
-#div_job_form input.field, #div_job_form select.field {
-    width: 98%;
-    font-size: 10pt;
-}
-
-#div_job_form input.carbon_copy {
-    width: 93%;
-    font-size: 10pt;
-}
-
-#div_job_form input.salary {
-    width: 43%;
-    font-size: 10pt;
-}
-
-textarea {
-    font-size: 10pt;
-    width: 99%;
-    height: 250px;
-}
-
-div.description_field {
-    font-size: 10pt;
-    width: 100%;
-    height: 250px;
-}
-
-table.job_form td.buttons_left, table.job_form td.buttons_right {
-    background-color: #CCCCCC;
-}
-
-table.job_form td.buttons_right {
-    text-align: right;
-}
-
-#job_extend_note {
-    font-size: 9pt;
-    font-style: italic;
-    border: 1px dashed #FF0000;
+.jobs_publishing_instructions {
+    padding-left: 3px;
+    padding-top: 5px;
 }
 
 /* subscriptions*/
-#div_subscriptions_info {
-    margin: 10px 10px 25px 10px;
+.subscriptions_details {
+    padding-top: 5px;
+}
+
+.subscriptions_info {
+    width: 99%;
+    margin: auto;
+}
+
+.subscriptions_info td.label {
+    width: 60%;
+}
+
+.buy {
     padding-top: 5px;
     padding-bottom: 5px;
+    text-align: center;
+    margin-top: 15px;
+    border: 1px dashed #CCCCCC;
+}
+
+.back {
+    margin: auto;
+    width: 200px;
+    text-align: center;
+    padding: 5px 5px 5px 5px;
+    border: 1px solid #0000FF;
+}
+
+.job_desc {
+    display: none;
+}
+
+.job {
+    margin: auto;
+    width: 80%;
+    padding-top: 10px;
+}
+
+.job td {
+    padding: 5px 5px 5px 5px;
+}
+
+.job td.title {
+    text-align: center;
+    font-weight: bold;
     background-color: #EEEEEE;
     border: 1px solid #CCCCCC;
 }
 
-table.subscriptions_info {
-    width: 97%;
-    margin: auto;
-}
-
-table.subscriptions_info td.info {
-    width: 90%;
-}
-
-table.subscriptions_info td.buy {
-    text-align: center;
-}
-
-div.subscriptions_details {
-    color: #666666;
-}
-
-#div_blanket {
-    display: none;
-    background-color: #000000;
-    opacity: 0.5;
-    filter : alpha(opacity=50); /* for IE */
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#div_buy_subscriptions_form {
-    margin: 10px 10px 10px 10px;
-    display: none;
-    background-color: #FFFFFF;
-    border: 3px solid #0000FF;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 450px;
-    height: 140px;
-    overflow: auto;
-}
-
-#div_buy_subscriptions_form input.field {
+.job td.label {
+    text-align: right;
+    font-weight: bold;
     width: 20%;
 }
 
-#div_buy_subscriptions_form p.button {
-    background-color: #CCCCCC;
-    padding-top: 3px;
-    padding-bottom: 3px;
-    text-align: center;
-}
-
-#div_buy_subscriptions_form table.buy_subscriptions_form {
+.job_description {
     width: 99%;
-    margin: auto;
-    border-collapse: collapse;
-}
-
-#div_buy_subscriptions_form table.buy_subscriptions_form td {
     padding: 5px 5px 5px 5px;
-    font-size: 10pt;
-}
-
-#div_buy_subscriptions_form table.buy_subscriptions_form td.label {
-    text-align: right;
-    width: 35%;
+    height: 500px;
+    overflow: auto;
+    border: 1px solid #CCCCCC;
 }

@@ -24,7 +24,7 @@ $_SESSION['yel']['employee']['hash'] = $hash;
 $_SESSION['yel']['employee']['sid'] = $sid;
 
 $employee = new Employee($id, $sid);
-if (!$employee->is_registered($hash)) {
+if (!$employee->isRegistered($hash)) {
     $_SESSION['yel']['employee']['hash'] = "";
     $response['errors'] = array(
         'error' => 'The provided credentials are invalid. Please try again.'
@@ -34,7 +34,7 @@ if (!$employee->is_registered($hash)) {
     //redirect_to('login.php?invalid=1');
 } 
 
-if (!$employee->session_set($hash)) {
+if (!$employee->setSessionWith($hash)) {
     $_SESSION['yel']['employee']['hash'] = "";
     $response['errors'] = array(
         'error' => 'bad_login'
@@ -44,12 +44,12 @@ if (!$employee->session_set($hash)) {
     //redirect_to('../errors/failed_login.php?dir=employers');
 }
 
-$branch_datas = $employee->get_branch();
+$branch_datas = $employee->getBranch();
 foreach ($branch_datas[0] as $key=>$value) {
     $_SESSION['yel']['employee']['branch'][$key] = $value;
 }
 
-$business_groups = $employee->get_business_groups();
+$business_groups = $employee->getBusinessGroups();
 foreach ($business_groups as $i=>$group) {
     $_SESSION['yel']['employee']['business_groups'][$i] = array();
     foreach ($group as $key=>$value) {
@@ -58,7 +58,7 @@ foreach ($business_groups as $i=>$group) {
 }
 
 foreach ($_SESSION['yel']['employee']['business_groups'] as $i=>$group) {
-    $clearances = BusinessGroup::get_security_clearance($group['security_clearance']);
+    $clearances = BusinessGroup::getSecurityClearance($group['security_clearance']);
     $_SESSION['yel']['employee']['security_clearances'][$i] = array();
     foreach ($clearances[0] as $key=>$value) {
         $_SESSION['yel']['employee']['security_clearances'][$i][$key] = $value;

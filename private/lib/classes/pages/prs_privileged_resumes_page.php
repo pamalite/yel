@@ -37,7 +37,7 @@ class PrsPrivilegedResumesPage extends Page {
     }
     
     private function generateCountries($_for_profile = false, $selected = '') {
-        $countries = Country::get_all();
+        $countries = Country::getAll();
         
         if ($_for_profile) {
             echo '<select class="field" id="profile.country" name="profile.country">'. "\n";

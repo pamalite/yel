@@ -23,7 +23,7 @@ $_SESSION['yel']['employer']['hash'] = $hash;
 $_SESSION['yel']['employer']['sid'] = $sid;
 
 $employer = new Employer($id, $sid);
-if (!$employer->is_active()) {
+if (!$employer->isActive()) {
     $_SESSION['yel']['employer']['hash'] = "";
     $response['errors'] = array(
         'error' => 'The provided credentials are marked as inactive or suspended.&nbsp;<br/>&nbsp;Please contact your account manager for further assistance.'
@@ -33,7 +33,7 @@ if (!$employer->is_active()) {
     //redirect_to('login.php?invalid=1');
 }
 
-if (!$employer->is_registered($hash)) {
+if (!$employer->isRegistered($hash)) {
     $_SESSION['yel']['employer']['hash'] = "";
     $response['errors'] = array(
         'error' => 'The provided credentials are invalid. Please try again.'
@@ -43,7 +43,7 @@ if (!$employer->is_registered($hash)) {
     //redirect_to('login.php?invalid=1');
 } 
 
-if (!$employer->session_set($hash)) {
+if (!$employer->setSessionWith($hash)) {
     $_SESSION['yel']['employer']['hash'] = "";
     $response['errors'] = array(
         'error' => 'bad_login'
@@ -53,7 +53,14 @@ if (!$employer->session_set($hash)) {
     //redirect_to('../errors/failed_login.php?dir=employers');
 }
 
+// is new?
 $response['login'] = array('status' => 'ok');
+if ($employer->isNew()) {
+    $response['login']['is_new'] = '1';
+} else {
+    $response['login']['is_new'] = '0';
+}
+
 echo $xml_dom->get_xml_from_array($response);
 //redirect_to('home.php');
 ?>

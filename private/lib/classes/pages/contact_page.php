@@ -1,132 +1,74 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
 
+session_start();
+
 class ContactPage extends Page {
+    private $has_captcha_error = false;
+    
+    function __construct($_has_captcha_error = false) {
+        parent::__construct();
+        $this->has_captcha_error = $_has_captcha_error;
+    }
     
     public function insert_inline_css() {
         // TODO: Any inline CSS for welcome page goes here.
     }
     
     public function insert_contact_css() {
-        $this->insert_css();
-        
-        echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/css/contact.css">'. "\n";
+        $this->insert_css('contact.css');
     }
     
     public function insert_contact_scripts() {
-        $this->insert_scripts();
-        
-        echo '<script type="text/javascript" src="'. $GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/scripts/contact.js"></script>'. "\n";
+        $this->insert_scripts('contact_page.js');
     }
     
     public function insert_inline_scripts() {
-        // TODO: Any inline scripts for welcome page goes here.
+        $script = 'var has_captcha_error = false;'. "\n";
+        if ($this->has_captcha_error) {
+            $script = 'var has_captcha_error = true;'. "\n";
+        }
+        
+        $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
     
     public function show() {
         $this->begin();
-        $this->top("Yellow Elevator&nbsp;&nbsp;<span style=\"color: #FC8503;\">Contact Us</span>");
-        ?>
-        <div class="content">
-            <table class="contact">
-                <tr>
-                    <td colspan="4" style="text-align: center; padding-bottom: 50px;">
-                        <span style="font-weight: bold;">Technical Support, Password Reset &amp; Help:</span><br/><br/>
-                        support@yellowelevator.com
-                    </td>
-                </tr>
-                <tr>
-                    <td rowspan="1">
-                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/MY.gif" />
-                    </td>
-                    <td style="padding-right: 20px;">
-                        <div>
-                            <span style="font-weight: bold;">Malaysia</span><br/>
-                            Yellow Elevator Sdn. Bhd.<br/>
-                            1-12B-9, Suntech @ Penang Cybercity,<br/>
-                            Lintang Mayang Pasir 3, <br/>
-                            11950 Penang, Malaysia.
-                        </div>
-                        <div style="padding-top: 10px;">
-                            <span style="font-weight: bold;">Tel:</span> +6 04 640 6363<br/>
-                            <span style="font-weight: bold;">Fax:</span> +6 04 640 6366<br/>
-                        </div>
-                        <div style="padding-top: 10px;">
-                            <span style="font-weight: bold;">E-mail addresses:</span>
-                            <ul style="margin-top: 3px; margin-left: -20px;">
-                                <li>
-                                    <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
-                                    sales.my@yellowelevator.com
-                                </li>
-                                <li>
-                                    <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
-                                    billing.my@yellowelevator.com
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-                    <!-- td rowspan="1" style="padding-left: 20px; border-left: 1px dashed #CCCCCC;">
-                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/AU.gif" />
-                    </td>
-                    <td>
-                        <div>
-                            <span style="font-weight: bold;">Australia</span><br/>
-                            Yellow Elevator Pty Ltd<br/>
-                            Suite 3, 22 Council St, <br/>
-                            Hawthorn East, <br/>
-                            VIC  3123, Australia.
-                        </div>
-                        <div style="padding-top: 10px;">
-                            <span style="font-weight: bold;">Tel:</span> +61 03 9882 7164<br/>
-                            <span style="font-weight: bold;">Fax:</span> +61 03 9882 9792<br/>
-                        </div>
-                        <div style="padding-top: 10px;">
-                            <span style="font-weight: bold;">E-mail addresses:</span>
-                            <ul style="margin-top: 3px; margin-left: -20px;">
-                                <li>
-                                    <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
-                                    sales.au@yellowelevator.com
-                                </li>
-                                <li>
-                                    <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
-                                    billing.au@yellowelevator.com
-                                </li>
-                            </ul>
-                        </div>
-                    </td -->
-                    <td rowspan="1">
-                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/flags/SG.gif" />
-                    </td>
-                    <td style="padding-right: 20px;">
-                        <div>
-                            <span style="font-weight: bold;">Singapore</span><br/>
-                            Yellow Elevator Sdn. Bhd.<br/>
-                            1-12B-9, Suntech @ Penang Cybercity,<br/>
-                            Lintang Mayang Pasir 3, <br/>
-                            11950 Penang, Malaysia.
-                        </div>
-                        <div style="padding-top: 10px;">
-                            <span style="font-weight: bold;">Tel:</span> +6 04 640 6363<br/>
-                            <span style="font-weight: bold;">Fax:</span> +6 04 640 6366<br/>
-                        </div>
-                        <div style="padding-top: 10px;">
-                            <span style="font-weight: bold;">E-mail addresses:</span>
-                            <ul style="margin-top: 3px; margin-left: -20px;">
-                                <li>
-                                    <span style="font-weight: bold; font-size: 8pt;">Sales &amp; Enquiries</span><br/>
-                                    sales.sg@yellowelevator.com
-                                </li>
-                                <li>
-                                    <span style="font-weight: bold; font-size: 8pt;">Billing Information</span><br/>
-                                    billing.sg@yellowelevator.com
-                                </li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <?php
+        $this->top("Contact Us");
+        
+        $page = file_get_contents(dirname(__FILE__). '/../../../html/contact_page.html');
+        $page = str_replace('%root%', $this->url_root, $page);
+        
+        $page = str_replace('%contact_name%' , $_SESSION['yel']['contact_us']['contact_name'], $page);
+        $page = str_replace('%company_name%' , $_SESSION['yel']['contact_us']['company_name'], $page);
+        $page = str_replace('%email_addr%' , $_SESSION['yel']['contact_us']['email_addr'], $page);
+        $page = str_replace('%phone_num%' , $_SESSION['yel']['contact_us']['phone_num'], $page);
+        $page = str_replace('%subject%' , $_SESSION['yel']['contact_us']['subject'], $page);
+        $page = str_replace('%message%' , $_SESSION['yel']['contact_us']['message'], $page);
+        
+        switch ($_SESSION['yel']['contact_us']['kind']) {
+            case 'general':
+                $page = str_replace('%general_selected%' , 'selected', $page);
+                break;
+            case 'tech':
+                $page = str_replace('%tech_selected%' , 'selected', $page);
+                break;
+            case 'billing':
+                $page = str_replace('%billing_selected%' , 'selected', $page);
+                break;
+            case 'others':
+                $page = str_replace('%others_selected%' , 'selected', $page);
+                break;
+            default:
+                $page = str_replace('%general_selected%' , 'selected', $page);
+                break;
+        }
+        $page = str_replace('%general_selected%' , '', $page);
+        $page = str_replace('%tech_selected%' , '', $page);
+        $page = str_replace('%billing_selected%' , '', $page);
+        $page = str_replace('%others_selected%' , '', $page);
+        
+        echo $page;
     }
 }
 ?>

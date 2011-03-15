@@ -38,7 +38,7 @@ if (isset($_GET['job'])) {
 }
 $login = new MemberLoginPage($job);
 $login->header(array('root_dir' => '../', 
-                     'title' => 'Members Login'));
+                     'title' => 'Members Sign In'));
 $login->insert_member_login_css();
 $login->insert_member_login_scripts();
 if (isset($_GET['invalid'])) {

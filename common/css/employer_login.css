@@ -1,89 +1,33 @@
-table.content {
-    border: none;
-    width: 98%;
+.login_form {
+    width: 500px;
     margin: auto;
-    padding-top: 25px;
-    padding-bottom: 5px;
-}
-
-table.content td {
-    vertical-align: top;
-}
-
-table.content td.content {
-    width: 70%;
-}
-
-div.content {
-    font-size: 10pt;
-    text-align: center;
-}
-
-div.content p {
-    margin-left: 25px;
-    margin-right: 15px;
-    font-size: 10pt;
-}
-
-table.description {
-    border: none;
-    margin: auto;
-    width: 75%;
-}
-
-table.description td {
-    vertical-align: middle;
-    color: #666666;
-    font-size: 10pt;
-}
-
-table.description td.icons {
-    text-align: center;
-    padding-right: 25px;
-}
-
-#div_blanket {
-    display: none;
-    background-color: #000000;
-    opacity: 0.5;
-    filter : alpha(opacity=50); /* for IE */
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#div_contact_drop_form {
-    margin: 10px 10px 10px 10px;
-    display: none;
-    background-color: #FFFFFF;
-    border: 3px solid #0000FF;
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 640px;
-    height: 235px;
-    overflow: auto;
-    text-align: center;
-}
-
-div.login {
-    text-align: center;
-    padding-top: 5px;
-}
-
-table.login {
-    /*border: 1px solid #6699FF;*/
     border: 1px solid #CCCCCC;
-    width: 95%;
-    margin: auto;
-    border-collapse: collapse;
+    padding: 5px 3px 35px 5px;
 }
 
-table.login td {
+.contact_drop {
+    margin-top: 10px;
+    text-align: center;
     padding: 5px 5px 5px 5px;
-    vertical-align: middle;
+}
+
+.button_bar {
+    margin-top: 5px;
+    width: 50%;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+    text-align: right;
+}
+
+#contact_drop_form {
+    display: none;
+    width: 500px;
 }
 
 table.drop_contact {
@@ -94,15 +38,6 @@ table.drop_contact {
     margin: auto;
 }
 
-input.login, input.drop {
-    font-size: 12pt;
-    /*height: 23px;*/
-}
-
-td.id, td.password {
-    text-align: right;
-    width: 15%;
-}
 
 td.title {
     text-align: center;
@@ -138,8 +73,8 @@ td.label {
 }
 
 td.buttons {
-    text-align: center;
-    background-color: #CCCCCC;
+    text-align: right;
+    border-top: 1px solid #CCCCCC;
     padding-top: 3px;
     padding-bottom: 3px;
 }
@@ -149,4 +84,112 @@ td.buttons {
     font-size: 10pt;
     width: 99%;
     height: 23px;
+}
+
+label {
+    font-size: 12pt;
+}
+
+/* jasmine start */
+.wrapper {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	margin-bottom:-162px;
+	/*border:1px red solid;	*/
+}
+
+.content {
+    width: 780px;
+    margin: 0 auto 50px;
+    padding-top: 35px;
+}
+.content .main {
+    width: 523px;
+    float: left;
+}
+.content .side {
+    width: 234px;
+    float: right;
+    padding-left: 22px;
+    border-left: 1px #d9d9d9 solid;
+    padding-top: 65px;
+    padding-bottom: 50px;
+}
+.content .side .login_form {
+    width: auto;
+    border: 0;
+    border-bottom: 1px #d9d9d9 solid;
+    padding-bottom: 54px;
+}
+.content .side .login_form #id, .content .side .login_form #password {
+    width: 217px;
+    height: 22px;
+/*    border: 1px #abadb3 solid;*/
+    font-size: 12px;
+    margin-top: 3px;
+}
+.content .side .login_form label {
+    font-size: 12px;
+}
+.content .side .login_form .left {
+    float: none;
+    width: auto;
+}
+.content .side .login_form .right {
+    width: auto;
+    padding-right: 5px;
+    padding-top: 10px;
+}
+/*.content .side .login_form .right input {
+    border: 1px #cccccc solid;
+    background: #f0f0f0;
+    width: 55px;
+    height: 25px;
+    padding-bottom: 3px;
+    text-align: center;
+}
+.content .side .login_form a {
+    color: #ff8e00;
+    font-weight: normal;
+    font-size: 13px;
+}
+*/
+.content .login-enquiry-box {
+    background: url('../images/login_enquiry_box.jpg') no-repeat center;
+    width: 496px;
+    height: 85px;
+    margin-bottom: 30px;
+    color: #ffffff;
+    margin-left: -5px;
+}
+.content .login-enquiry-box span {
+    display: block;
+    padding: 27px 0 0 30px;
+}
+.content .login-enquiry-box a {
+    color: #fc8f02;
+    font-weight: bold;
+}
+.clear {
+    clear: both;
+}
+.client-box {
+    padding-top: 28px;
+    padding-left: 5px;
+}
+.client-box .employer_logos {
+    width: 230px;
+}
+#employers_carousel {
+    margin-left:-10px;
+}
+div.status {
+    position: absolute;
+    width: 100%;
+}
+
+
+.push{
+	height: 162px;	
 }

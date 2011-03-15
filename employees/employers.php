@@ -41,7 +41,7 @@ if (isset($_SESSION['yel']['employee']['dev'])) {
 
 $home = new EmployeeEmployersPage($_SESSION['yel']['employee']);
 $home->header(array('root_dir' => '../', 
-                    'title' => 'My Employers'));
+                    'title' => 'Employers'));
 $home->insert_employee_employers_css();
 $home->insert_employee_employers_scripts();
 $home->insert_inline_scripts();

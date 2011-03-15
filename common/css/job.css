@@ -1,287 +1,158 @@
-div.description {
-    display: none;
-    font-size: 10pt;
-    padding: 10px 10px 10px 10px;
+.job_title {
+    font-size: 21pt;
+    font-weight: bold;
+    width: 98%;
+    margin: auto;
+    padding-left: 3px;
 }
 
-div.back {
-    padding-top: 5px;
-    padding-bottom: 15px;
-    text-align: center;
-    font-size: 10pt;
+.employer_country {
+    font-style: italic;
+    font-size: 12pt;
+    width: 98%;
+    margin: auto;
+    padding-left: 3px;
 }
 
-span.back {
-    border: 1px solid #0000FF;
-    padding: 5px 5px 5px 5px;
+.country {
+    font-weight: bold;
+    font-style: normal;
 }
 
-#div_job_info {
-    text-align: center;
+.details_table {
+    width: 99%;
+    margin: auto;
     padding-top: 10px;
 }
 
-table.job_info {
-    width: 85%;
-    margin: auto;
-}
-
-table.job_info td.label {
-    width: 175px;
-    text-align: right;
-    padding-right: 20px;
+.details_table td {
     vertical-align: top;
-    font-weight: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
 }
 
-table.job_info td.title {
-    text-align: center;
-    border: 1px solid #CCCCCC;
-    font-weight: bold;
+.description {
+    width: 75%;
 }
 
-table.job_info td.title_reward {
-    /*text-align: center;
-    font-weight: bold;
-    font-style: italic;*/
-    vertical-align: top;
-    font-weight: bold;
-    width: 150px;
-    padding-right: 10px;
-}
-
-table.job_info td.buttons {
-    background-color: #CCCCCC;
-    text-align: center;
-}
-
-input.button {
-    font-size: 10pt;
-}
-
-table.job_info div.job_description {
-    width: 100%;
-    /*height: 300px;*/
-    /*overflow: auto;*/
-}
-
-#div_blanket {
-    display: none;
-    background-color: #000000;
-    opacity: 0.5;
-    filter : alpha(opacity=50); /* for IE */
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-}
-
-#div_refer_options {
-    display: none;
-    background-color: #FFFFFF;
-    position: fixed;
-    border: 3px solid #0000FF;
-    text-align: center;
-    width: 675px;
-    height: 468px;
-    overflow: auto;
-}
-
-#div_refer_me_ad {
-    display: none;
-    background-color: #FFFFFF;
-    position: fixed;
-    border: 3px solid #0000FF;
-    text-align: center;
-    width: 500px;
-    height: 140px;
-    overflow: auto;
-}
-
-#div_refer_options table.refer_options td {
-    width: 30%;
-    vertical-align: top;
-    border: 1px solid #CCCCCC;
-}
-
-#div_refer_form {
-    display: none;
-    background-color: #FFFFFF;
-    position: fixed;
-    border: 3px solid #0000FF;
-    text-align: center;
-    width: 675px;
-    height: 430px;
-    overflow: auto;
-}
-
-#div_refer_options table.refer_options {
-    width: 95%;
-    margin: auto;
-    padding-top: 5px;
-}
-
-#div_refer_form table.refer_form, 
-#div_acknowledge_form table.request_form, 
-#div_quick_refer_form table.quick_refer_form, 
-#div_quick_upload_form table.quick_upload_form  {
-    width: 95%;
-    margin: auto;
-}
-
-#div_refer_form table.refer_form td.separator, 
-#div_acknowledge_form table.request_form td.separator, 
-#div_quick_refer_form table.quick_refer_form td.separator,
-#div_quick_upload_form table.quick_upload_form td.separator  {
-    width: 1px;
+.rest {
     border-left: 1px solid #CCCCCC;
-    /*background-color: #CCCCCC;*/
 }
 
-#div_refer_form table.refer_form td,
-#div_acknowledge_form table.request_form td, 
-#div_quick_refer_form table.quick_refer_form td,
-#div_quick_upload_form table.quick_upload_form td {
-    vertical-align: top;
-    font-size: 10pt;
-}
-
-#div_refer_form table.refer_form td.right,
-#div_quick_refer_form table.quick_refer_form td.right, 
-#div_quick_upload_form table.quick_upload_form td.right {
-    width: 50%;
-}
-
-#div_refer_form textarea.mini_field, 
-#div_quick_refer_form textarea.mini_field {
-    width: 99%;
-    height: 100px;
-}
-
-#div_refer_form input.mini_field,
-#div_quick_refer_form input.mini_field, 
-#div_quick_refer_form select.mini_field,
-#div_quick_upload_form input.mini_field, 
-#div_quick_upload_form select.mini_field {
-    width: 99%;
-}
-
-#div_refer_form table.candidate_form, 
-#div_quick_refer_form table.qr_candidate_form, 
-#div_quick_upload_form table.qu_candidate_form {
-    width: 95%;
-    margin: auto;
-}
-
-#div_quick_refer_form table.qr_candidate_form td.label, 
-#div_quick_upload_form table.qu_candidate_form td.label {
-    width: 20%;
-    text-align: right;
-}
-
-#div_refer_form div.candidates, 
-#div_acknowledge_form div.referrers {
-    width: 100%;
-    height: 295px;
-    overflow: auto;
-    border: 1px solid #CCCCCC;
-}
-
-#div_refer_options p, 
-#div_refer_me_ad p, 
-#div_refer_form p, 
-#div_quick_refer_form p,
-#div_quick_upload_form p {
-    font-size: 10pt;
-    margin: 3px 3px 3px 3px;
-}
-
-#div_refer_options p.button, 
-#div_refer_me_ad p.button, 
-#div_refer_form p.button, 
-#div_quick_refer_form p.button, 
-#div_quick_upload_form p.button {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    text-align: center;
-    background-color: #CCCCCC;
-}
-
-#div_refer_form span.filter,
-#div_acknowledge_form span.filter {
-    font-size: 7pt;
+.label {
     font-weight: bold;
 }
 
-#div_acknowledge_form {
-    margin: 10px 10px 10px 10px;
-    display: none;
-    background-color: #FFFFFF;
-    border: 3px solid #0000FF;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 950px;
-    height: 450px;
-    overflow: auto;
+.salary, .expires_on {
+    padding-top: 10px;
 }
 
-#div_acknowledge_form p {
-    text-align: center;
+.negotiable {
+    font-size: 9pt;
+    font-style: italic;
 }
 
-#div_acknowledge_form p.button {
-    background-color: #CCCCCC;
-    padding-top: 3px;
-    padding-bottom: 3px;
+.rewards_section {
+    margin-top: 10px;
+    background-color: #EEEEEE; 
+    padding: 5px 5px 5px 5px;
 }
 
-#div_acknowledge_form select.field {
+.reward_label {
+    padding: 3px 3px 3px 3px;
+    color: #28688A;
+    font-weight: bold;
     font-size: 12pt;
 }
 
-#div_refer_form table.candidate_form td.radio,
-#div_acknowledge_form table.request_form td.radio {
-    width: 5px;
-}
-
-#div_acknowledge_form table.request_form td.option {
-    width: 30%;
-}
-
-#div_acknowledge_form table.request_form textarea, 
-#div_refer_form table.refer_form textarea  {
-    width: 98%;
-    height: 290px;
-}
-
-#div_quick_refer_form, 
-#div_quick_upload_form {
-    display: none;
-    background-color: #FFFFFF;
-    position: fixed;
-    border: 3px solid #0000FF;
-    text-align: center;
-    width: 875px;
-    height: 530px;
-    overflow: auto;
-}
-
-#div_quick_upload_form {
-    height: 385px;
-}
-
-#div_quick_refer_form div.upload_note, 
-#div_quick_upload_form div.upload_note {
-    width: 75%;
+.reward_amount {
+    width: 95%;
     margin: auto;
-    text-align: center;
+    padding: 3px 3px 3px 3px;
+    font-weight: bold;
+    border: 2px solid #777777; 
+    background-color: #FFFFFF;
+}
+
+.actions {
+    margin-top: 10px;
+    padding: 5px 5px 0px 5px;
+    border: 1px solid #CCCCCC;
+}
+
+.action_item {
+    padding-bottom: 10px;
+}
+
+#refer_window, #apply_window {
+    display: none;
+    width: 800px;
+}
+
+#refer_window textarea.field {
+    width: 98%;
+    height: 195px;
+}
+
+#apply_window {
+    width: 550px;
+}
+
+.refer_form, .apply_form {
+    width: 99%;
+    margin: auto;
+}
+
+.refer_form td, 
+.apply_form td {
+    padding: 3px 3px 3px 3px;
+    vertical-align: top;
+}
+
+.refer_form td.referrer {
+    width: 50%;
+    border-right: 1px solid #CCCCCC;
+}
+
+.referrer, .candidate {
+    width: 100%;
+    margin: auto;
+}
+
+.referrer input.field, 
+.candidate input.field, 
+.apply_form input.field {
+    width: 97%;
+    font-size: 10pt;
+}
+
+.referrer td.label, 
+.candidate td.label {
+    width: 35%;
+}
+
+.referrer td.title,
+.candidate td.title {
+    background-color: #EEEEEE;
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+.note {
     font-style: italic;
     font-size: 9pt;
+    text-align: center;
+    color: #AAAAAA;
+    margin-top: 5px;
 }
 
-#div_quick_refer_form #qr_upload_progress, 
-#div_quick_upload_form #qu_upload_progress {
+#refer_progress, #apply_progress {
     display: none;
+    text-align: center; 
+    width: 99%; 
+    margin: auto;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }

@@ -1,71 +1,44 @@
 <?php
 require_once dirname(__FILE__). "/../../utilities.php";
 
-class Job {
+class Job implements Model {
     private $id = 0;
     private $mysqli = NULL;
     
     function __construct($_id = "") {
-        $this->mysqli = Database::connect();
-        $this->id = 0;
+        if (!is_a($this->mysqli, "MySQLi")) {
+            $this->mysqli = Database::connect();
+        }
         
+        $this->id = 0;
         if (!empty($_id)) {
             $this->id = sanitize($_id);
         }
     }
     
-    public function id() {
-        return $this->id;
-    }
+    // function __destruct() {
+    //     $this->mysqli->close();
+    // }
     
-    public function get() {
-        $query = "SELECT * FROM jobs WHERE id = '". $this->id. "' LIMIT 1";
-        
-        return $this->mysqli->query($query);
-    }
-    
-    public function add_view_count() {
-        $query = "UPDATE jobs SET views_count = (views_count + 1) 
-                  WHERE id = ". $this->id;
-                  
-        return $this->mysqli->execute($query);
-    }
-    
-    public static function get_all() {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM jobs";
-        
-        return $mysqli->query($query);
-    }
-    
-    public static function get_all_with_limit($limit, $offset = 0) {
-         if (empty($limit) || $limit <= 0) {
-                return false;
-            }
-
-            $mysqli = Database::connect();
-            $query = "SELECT * FROM jobs ";
-
-            if ($offset > 0) {
-                $query .= "LIMIT ". $offset. ", ". $limit;
-            } else {
-                $query .= "LIMIT ". $limit;
-            }
-
-            return $mysqli->query($query);
-    }
-    
-    public function create($data) {
-        if (is_null($data) || !is_array($data)) {
+    private function hasData($_data) {
+        if (is_null($_data) || !is_array($_data)) {
             return false;
         }
         
-        if (!array_key_exists('employer', $data)) {
+        return true;
+    }
+    
+    public function create($_data) {
+        if (!$this->hasData($_data)) {
             return false;
         }
         
-        $description_no_gloss = sanitize(strip_tags($data['description']));
-        $data = sanitize($data);
+        if (!array_key_exists('employer', $_data)) {
+            return false;
+        }
+        
+        $description_no_gloss = sanitize(strip_tags($_data['description']));
+        $data = sanitize($_data);
         $query = "INSERT INTO jobs SET ";
         $i = 0;
         foreach ($data as $key => $value) {
@@ -93,6 +66,14 @@ class Job {
         if (($id = $this->mysqli->execute($query, true)) > 0) {
             $this->id = $id;
             
+            // get potential reward
+            $potential_reward = $this->getPotentialReward();
+            $query = "UPDATE jobs SET 
+                      potential_reward = ". $potential_reward. " 
+                      WHERE id = ". $this->id;
+            $this->mysqli->execute($query);
+            
+            // index the job
             $query = "INSERT INTO job_index SET 
                       job = ". $this->id. ", 
                       country = '". $data['country']. "', 
@@ -111,17 +92,17 @@ class Job {
         return false;
     }
     
-    public function update($data) {
-        if (is_null($data) || !is_array($data)) {
+    public function update($_data) {
+        if (!$this->hasData($_data)) {
             return false;
         }
         
         $description_no_gloss = "";
-        if (array_key_exists('description', $data)) {
-            $description_no_gloss = sanitize(strip_tags($data['description']));
+        if (array_key_exists('description', $_data)) {
+            $description_no_gloss = sanitize(strip_tags($_data['description']));
         }
         
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $query = "UPDATE jobs SET ";
         $i = 0;
         foreach ($data as $key => $value) {
@@ -151,6 +132,14 @@ class Job {
         $query .= "WHERE id = '". $this->id. "'";
         
         if ($this->mysqli->execute($query)) {
+            // re-calculate potential reward
+            $potential_reward = $this->getPotentialReward();
+            $query = "UPDATE jobs SET 
+                      potential_reward = ". $potential_reward. " 
+                      WHERE id = ". $this->id;
+            $this->mysqli->execute($query);
+            
+            // re-index the job
             $need_update = false;
             $query = "UPDATE job_index SET "; 
             
@@ -168,15 +157,6 @@ class Job {
                     $query .= ", country = '". $data['country']. "'";
                 } else {
                     $query .= "country = '". $data['country']. "'";
-                    $need_update = true;
-                }
-            }
-            
-            if (array_key_exists('currency', $data)) {
-                if ($need_update) {
-                    $query .= ", currency = '". $data['currency']. "'";
-                } else {
-                    $query .= "currency = '". $data['currency']. "'";
                     $need_update = true;
                 }
             }
@@ -209,94 +189,153 @@ class Job {
     }
     
     public function delete() {
-        // TODO: Check all dependencies before deleting the entry
+        $query = "UPDATE jobs SET deleted = TRUE WHERE id = ". $this->id;
+        return $this->mysqli->execute($query);
     }
     
-    public static function find($criteria, $db = "") {
-        if (is_null($criteria) || !is_array($criteria)) {
+    public function find($_criteria) {
+        if (!$this->hasData($_criteria)) {
             return false;
         }
         
-        $columns = "*";
-        if (array_key_exists('columns', $criteria)) {
-            $columns = trim($criteria['columns']);
-        }
+        $columns = '*';
+        $joins = '';
+        $order = '';
+        $group = '';
+        $limit = '';
+        $match = '';
         
-        $joins = "";
-        if (array_key_exists('joins', $criteria)) {
-            $conditions = explode(",", $criteria['joins']);
-            $i = 0;
-            foreach ($conditions as $condition) {
-                $joins .= "LEFT JOIN ". trim($condition);
-                
-                if ($i < count($conditions)-1) {
-                    $joins .= " ";
-                }
-                $i++;
+        foreach ($_criteria as $key => $clause) {
+            switch (strtoupper($key)) {
+                case 'COLUMNS':
+                    $columns = trim($clause);
+                    break;
+                case 'JOINS':
+                    $conditions = explode(',', $clause);
+                    $i = 0;
+                    foreach ($conditions as $condition) {
+                        $joins .= "LEFT JOIN ". trim($condition);
+
+                        if ($i < count($conditions)-1) {
+                            $joins .= " ";
+                        }
+                        $i++;
+                    }
+                    break;
+                case 'ORDER':
+                    $order = "ORDER BY ". trim($clause);
+                    break;
+                case 'GROUP':
+                    $group = "GROUP BY ". trim($clause);
+                    break;
+                case 'LIMIT':
+                    $limit = "LIMIT ". trim($clause);
+                    break;
+                case 'MATCH':
+                    $match = "WHERE ". trim($clause);
+                    break;
             }
-        }
-        
-        $order = "";
-        if (array_key_exists('order', $criteria)) {
-            $order = "ORDER BY ". trim($criteria['order']);
-        }
-        
-        $group = "";
-        if (array_key_exists('group', $criteria)) {
-            $order = "GROUP BY ". trim($criteria['group']);
-        }
-        
-        $limit = "";
-        if (array_key_exists('limit', $criteria)) {
-            $limit = "LIMIT ". trim($criteria['limit']);
-        }
-        
-        $match = "";
-        if (array_key_exists('match', $criteria)) {
-            $match = "WHERE ". trim($criteria['match']);
         }
         
         $query = "SELECT ". $columns. " FROM jobs ". $joins. 
                   " ". $match. " ". $group. " ". $order. " ". $limit;
-        $mysqli = Database::connect();
-        return $mysqli->query($query);
+        return $this->mysqli->query($query);
     }
     
-    public static function calculate_potential_reward_from($_salary, $_employer) {
-        if (empty($_salary) || $_salary < 0 || empty($_employer)) {
+    public function get() {
+        $query = "SELECT * FROM jobs WHERE id = '". $this->id. "' LIMIT 1";
+        return $this->mysqli->query($query);
+    }
+    
+    public function getTitle() {
+        $query = "SELECT title FROM jobs WHERE id = '". $this->id. "' LIMIT 1";
+        $result = $this->mysqli->query($query);
+        if ($result !== false) {
+            return $result[0]['title'];
+        }
+        
+        return false;
+    }
+    
+    public function getId() {
+        return $this->id;
+    }
+    
+    public function incrementViewCount() {
+        $query = "UPDATE jobs SET views_count = (views_count + 1) 
+                  WHERE id = ". $this->id;
+        return $this->mysqli->execute($query);
+    }
+    
+    public function getPotentialReward() {
+        if ($this->id == 0 || is_null($this->id) || empty($this->id)) {
             return false;
         }
         
-        $_salary = $_salary * 12;
+        $query = "SELECT employer, salary, salary_end 
+                  FROM jobs 
+                  WHERE id = ". $this->id. " LIMIT 1";
+        $result = $this->mysqli->query($query);
+
+        $salary = $result[0]['salary'];
+        if (!is_null($result[0]['salary_end']) && 
+            !empty($result[0]['salary_end']) && 
+            $result[0]['salary_end'] > 0) {
+            $salary = $result[0]['salary_end'];
+        }
         
-        $mysqli = Database::connect();
-        $query = "SELECT service_fee, premier_fee, reward_percentage, discount FROM employer_fees 
-                  WHERE employer = '". $_employer. "' AND 
-                  salary_start <= ". $_salary. " AND (salary_end >= ". $_salary. " OR (salary_end = 0 OR salary_end IS NULL)) LIMIT 1";
-        $fees = $mysqli->query($query);
-        $query = "SELECT SUM(charges) AS extras FROM employer_extras WHERE employer = '". $_employer. "'";
-        $extras = $mysqli->query($query);
+        if ($salary <= 0) {
+            return false;
+        }
+        
+        $salary = $salary * 12;
+        $employer = $result[0]['employer'];
+        $query = "SELECT service_fee, premier_fee, reward_percentage, discount 
+                  FROM employer_fees 
+                  WHERE employer = '". $employer. "' AND 
+                  salary_start <= ". $salary. " AND 
+                  (salary_end >= ". $salary. " OR (salary_end = 0 OR salary_end IS NULL)) LIMIT 1";
+        $fees = $this->mysqli->query($query);
         
         $total_fees = $discount = $reward_percentage = 0;
         if (!$fees || empty($fees)) {
             return false;
         } else {
-            //$total_fees = (($fees[0]['service_fee'] + $fees[0]['premier_fee']) / 100);
             $total_fees = ($fees[0]['service_fee'] / 100);
             $discount = (1.00 - ($fees[0]['discount'] / 100));
             $reward_percentage = ($fees[0]['reward_percentage'] / 100);
         }
         
-        $charges = 0;
-        if ($extras === false) {
+        return ((($salary * $total_fees) * $discount) * $reward_percentage);
+    }
+    
+    public function extend() {
+        $query = "INSERT INTO job_extensions 
+                  SELECT 0, id, created_on, expire_on, for_replacement, invoiced 
+                  FROM jobs 
+                  WHERE id = ". $this->id;
+        if ($this->mysqli->execute($query) === false) {
             return false;
-        } else {
-            if (!empty($extras)) {
-                $charges = $extras[0]['extras'];
-            }
         }
         
-        return ((((($_salary * $total_fees) * $discount)) + $charges) * $reward_percentage);
+        $query = "SELECT expire_on FROM jobs 
+                  WHERE id = ". $this->id. " LIMIT 1";
+        $result = $this->mysqli->query($query);
+        $is_expired = (sql_date_diff($result[0]['expire_on'], now()) <= 0) ? true : false;
+        $expire_on = $result[0]['expire_on'];
+        if ($is_expired) {
+            $expire_on = now();
+        }
+
+        $data = array();
+        $data['created_on'] = $expire_on;
+        $data['expire_on'] = sql_date_add($data['created_on'], 30, 'day');
+        $data['closed'] = 'N';
+        if ($this->update($data) == false) {
+            return false;
+        }
+        
+        return true;
     }
 }
 ?>

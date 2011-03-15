@@ -1,182 +1,82 @@
-table.content {
-    border: none;
-    width: 98%;
+.login_form {
+    width: 500px;
     margin: auto;
-    padding-top: 25px;
-    padding-bottom: 5px;
+    margin-top: 25px;
+    padding: 5px 5px 35px 5px;
 }
 
-table.content td {
-    vertical-align: top;
-}
-
-table.content td.content {
-    width: 70%;
-}
-
-div.content {
-    font-size: 10pt;
-}
-
-div.content p {
-    margin-left: 25px;
-    margin-right: 15px;
-    font-size: 10pt;
-}
-
-table.description {
-    border: none;
-    margin: auto;
-    width: 75%;
-}
-
-table.description td {
-    vertical-align: middle;
-    color: #666666;
-    font-size: 10pt;
-}
-
-table.description td.icons {
+.contact_drop {
+    margin-top: 10px;
     text-align: center;
-    padding-right: 25px;
-}
-
-div.banner {
-    text-align: center;
-    font-size: 10pt;
-}
-
-div.sign_up {
-    padding-top: 15px;
-    padding-bottom: 5px;
-    text-align: center;
-}
-
-div.login {
-    text-align: center;
-    padding-bottom: 5px;
-}
-
-table.login {
-    /*border: 1px solid #6699FF;*/
-    border: 1px solid #CCCCCC;
-    width: 95%;
-    margin: auto;
-    border-collapse: collapse;
-}
-
-table.login td {
     padding: 5px 5px 5px 5px;
-    vertical-align: middle;
 }
 
-td.id, td.password {
+.button_bar {
+    margin-top: 5px;
+    width: 50%;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
     text-align: right;
-    width: 15%;
-}
-
-span.forgot_password {
-    font-size: 10pt;
-}
-
-td.login {
-    text-align: right;
-    background-color: #6699FF;
-}
-
-td.title {
-    text-align: center;
-    /*background-color: #6699FF;*/
-    background-color: #CCCCCC;
-    font-size: 10pt;
-    font-weight: bold;
-    padding-top: 3px;
-    padding-bottom: 3px;
 }
 
 #id, #password {
     font-family: verdana, tahoma, arial;
     font-size: 12pt;
     width: 97%;
-    /*height: 23px;*/
 }
 
-input.login {
-    font-size: 12pt;
-    /*height: 23px;*/
-}
-
-td.login_status {
-    text-align: center;
-    font-size: 10pt;
-    font-weight: bold;
-}
-
-#div_blanket {
+#div_password_reset_window {
+    width: 450px;
     display: none;
-    background-color: #000000;
-    opacity: 0.5;
-    filter : alpha(opacity=50); /* for IE */
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
 }
 
-#div_get_password_hint_form, #div_reset_password_form {
-    display: none;
-    background-color: #FFFFFF;
-    position: absolute;
-    border: 3px solid #0000FF;
-    text-align: center;
-    width: 480px;
-    height: 100px;
-    overflow: auto;
-}
-
-table.get_password_hint_form, table.reset_password_form {
-    width: 100%;
-    height: 65px;
-    overflow: auto;
-}
-
-table.reset_password_form {
-    height: 100px;
-}
-
-table.get_password_hint_form td.label {
-    width: 35%;
-    text-align: right;
-    padding-right: 20px;
-    vertical-align: middle;
-}
-
-table.get_password_hint_form input.field {
-    width: 98%;
-    font-size: 10pt;
-    vertical-align: middle;
-}
-
-table.reset_password_form td.question {
-    text-align: center;
-    height: 95px;
-    vertical-align: middle;
-}
-
-textarea.field {
+input.field {
     width: 99%;
-    height: 100px;
+    font-size: 12pt;
 }
 
-#div_get_password_hint_form p, #div_reset_password_form p {
-    font-size: 10pt;
-    margin: 3px 3px 3px 3px;
+td.label {
+    width: 25%;
 }
 
-#div_get_password_hint_form p.button, #div_reset_password_form p.button {
+td.buttons {
+    text-align: right;
+    border-top: 1px solid #CCCCCC;
     padding-top: 3px;
     padding-bottom: 3px;
+}
+
+.window_title {
     text-align: center;
     background-color: #CCCCCC;
+    font-size: 10pt;
+    font-weight: bold;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#div_password_reset_form {
+    display: none;
+}
+
+.password_hint_form, .password_reset_form {
+    margin: auto;
+    width: 100%;
+}
+
+.question {
+    text-align: center;
+    font-size: 12pt;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+label {
+    font-size: 12pt;
 }

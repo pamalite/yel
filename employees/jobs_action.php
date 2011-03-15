@@ -421,7 +421,7 @@ if ($_POST['action'] == 'extend') {
 if ($_POST['action'] == 'get_currency') {
     $employer = new Employer($_POST['id']);
     $branch = $employer->get_branch();
-    echo Currency::symbol_from_country_code($branch[0]['country']);
+    echo Currency::getSymbolFromCountryCode($branch[0]['country']);
     exit();
 }
 ?>

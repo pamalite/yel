@@ -25,7 +25,7 @@ class CreditNote extends FPDF {
     
     function Header()   {
         //Logo
-        $this->Image($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/common/images/logos/top_letterhead_pdf.png', 10, 8);
+        $this->Image(dirname(__FILE__). '/../common/images/logos/top_letterhead_pdf.png', 10, 8);
         //Arial bold 15
         $this->SetFont('Arial', 'B', 15);
         //Move to the right

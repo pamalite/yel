@@ -23,8 +23,13 @@ if (isset($_GET['job'])) {
 }
 
 $home = new MemberHomePage($_SESSION['yel']['member']);
+
+if (isset($_GET['error'])) {
+    $home->set_error($_GET['error']);
+}
+
 $home->header(array('root_dir' => '../', 
-                     'title' => 'Member Home'));
+                     'title' => 'Home'));
 $home->insert_member_home_css();
 $home->insert_member_home_scripts();
 $home->insert_inline_scripts();

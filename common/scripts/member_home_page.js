@@ -1,671 +1,3 @@
-var jobs_order_by = 'referrals.referred_on';
-var jobs_order = 'desc';
-var rewards_order_by = 'referrals.employed_on';
-var rewards_order = 'desc';
-var approvals_order_by = 'member_referees.referred_on';
-var approvals_order = 'desc';
-var acknowledgements_order_by = 'member_referees.referred_on';
-var acknowledgements_order = 'desc';
-
-var referral = 0;
-
-function verify() {
-    if ($('mini_keywords').value == 'Job title or keywords' ||
-        $('mini_keywords').value == '') {
-        alert('You need to enter at least a keyword to begin searching.');
-        return false;
-    }
-    
-    return true;
-}
-
-function jobs_ascending_or_descending() {
-    if (jobs_order == 'desc') {
-        jobs_order = 'asc';
-    } else {
-        jobs_order = 'desc';
-    }
-}
-
-function approvals_ascending_or_descending() {
-    if (approvals_order == 'desc') {
-        approvals_order = 'asc';
-    } else {
-        approvals_order = 'desc';
-    }
-}
-
-function rewards_ascending_or_descending() {
-    if (rewards_order == 'desc') {
-        rewards_order = 'asc';
-    } else {
-        rewards_order = 'desc';
-    }
-}
-
-function acknowledgements_ascending_or_descending() {
-    if (acknowledgements_order == 'desc') {
-        acknowledgements_order = 'asc';
-    } else {
-        acknowledgements_order = 'desc';
-    }
-}
-
-function show_guide_page(_guide_page) {
-    if (!isEmpty(_guide_page)) {
-        var popup = window.open('guides/' + _guide_page, '', 'width=800px, height=600px, scrollbars');
-
-        if (!popup) {
-            alert('Popup blocker was detected. Please allow pop-up windows for YellowElevator.com and try again.');
-        }
-    }
-}
-
-function show_resume_page(resume_id) {
-    var popup = window.open('../members/resume.php?id=' + resume_id, '', 'scrollbars');
-    
-    if (!popup) {
-        alert('Popup blocker was detected. Please allow pop-up windows for YellowElevator.com and try again.');
-    }
-}
-
-function close_job_info() {
-    $('div_job_info').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
-}
-
-function show_job_info(job_id) {
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_job_info').getStyle('height'));
-    var div_width = parseInt($('div_job_info').getStyle('width'));
-    
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
-    } else {
-        window_height = document.documentElement.clientHeight;
-    }
-    
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
-    }
-    
-    $('div_job_info').setStyle('top', ((window_height - div_height) / 2));
-    $('div_job_info').setStyle('left', ((window_width - div_width) / 2));
-    
-    var params = 'id=' + job_id;
-    params = params + '&action=get_job_info';
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while retrieving job_info.');
-                return;
-            }
-            
-            var titles = xml.getElementsByTagName('title');
-            var descriptions = xml.getElementsByTagName('description');
-            var industries = xml.getElementsByTagName('industry');
-            var employers = xml.getElementsByTagName('employer');
-            var currencies = xml.getElementsByTagName('currency');
-            var countries = xml.getElementsByTagName('country_name');
-            var states = xml.getElementsByTagName('state');
-            var potential_rewards = xml.getElementsByTagName('potential_reward');
-            var salaries = xml.getElementsByTagName('salary');
-            var salary_ends = xml.getElementsByTagName('salary_end');
-            var salary_negotiables = xml.getElementsByTagName('salary_negotiable');
-            var created_ons = xml.getElementsByTagName('created_on');
-            var expire_ons = xml.getElementsByTagName('expire_on');
-            
-            $('job.title').set('html', titles[0].childNodes[0].nodeValue);
-            $('job.currency').set('html', currencies[0].childNodes[0].nodeValue);
-            $('job.currency_1').set('html', currencies[0].childNodes[0].nodeValue);
-            $('job.potential_reward').set('html', potential_rewards[0].childNodes[0].nodeValue);
-            $('job.industry').set('html', industries[0].childNodes[0].nodeValue);
-            $('job.employer').set('html', employers[0].childNodes[0].nodeValue);
-            $('job.country').set('html', countries[0].childNodes[0].nodeValue);
-            
-            var state = 'n/a';
-            if (states[0].childNodes.length > 0) {
-                state = states[0].childNodes[0].nodeValue;
-            }
-            $('job.state').set('html', state);
-            $('job.salary').set('html', salaries[0].childNodes[0].nodeValue);
-            
-            if (salary_ends[0].childNodes.length <= 0) {
-                $('job.salary_end').set('html', '');
-            } else {
-                $('job.salary_end').set('html', '-&nbsp;' + salary_ends[0].childNodes[0].nodeValue);
-            }
-            
-            var negotiable = 'Not Negotiable';
-            if (salary_negotiables[0].childNodes[0].nodeValue == 'Y') {
-                negotiable = 'Negotiable';
-            }
-            
-            $('job.salary_negotiable').set('html', negotiable);
-            $('job.description').set('html', descriptions[0].childNodes[0].nodeValue);
-            $('job.created_on').set('html', created_ons[0].childNodes[0].nodeValue);
-            $('job.expire_on').set('html', expire_ons[0].childNodes[0].nodeValue);
-            
-            $('div_blanket').setStyle('display', 'block');
-            $('div_job_info').setStyle('display', 'block');
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading job_info...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function close_acknowledge_form() {
-    $('div_acknowledge_form').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
-    referral = 0;
-}
-
-function show_acknowledge_form(referral_id, job_title, _resume_id) {
-    if ($('resume') == null) {
-        alert('You have yet to create a resume. You need to have a resume before you can accept a job referral. Please create/upload one in \'Resumes\'.');
-        return false;
-    }
-    
-    referral = referral_id;
-    $('resume').disabled = false;
-    
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_acknowledge_form').getStyle('height'));
-    var div_width = parseInt($('div_acknowledge_form').getStyle('width'));
-    
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
-    } else {
-        window_height = document.documentElement.clientHeight;
-    }
-    
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
-    }
-    
-    $('div_acknowledge_form').setStyle('top', ((window_height - div_height) / 2));
-    $('div_acknowledge_form').setStyle('left', ((window_width - div_width) / 2));
-    
-    $('job_title').set('html', job_title);
-    $('div_blanket').setStyle('display', 'block');
-    $('div_acknowledge_form').setStyle('display', 'block');
-    
-    if (_resume_id > 0) {
-        var options = $('resume').options;
-        for (var i=0; i < options.length; i++) {
-            if (options[i].value == _resume_id) {
-                $('resume').options[i].selected = true;
-                $('resume').disabled = true;
-                break;
-            }
-        }
-    }
-}
-
-function acknowledge() {
-    if ($('resume').options[$('resume').selectedIndex].value == '0') {
-        alert('Please choose a resume to proceed.');
-        return false;
-    }
-    
-    var params = 'id=' + referral + '&resume=' + $('resume').options[$('resume').selectedIndex].value;
-    params = params + '&action=acknowledge_job';
-    
-    if ($('resume').disabled) {
-        params = params + '&resume_attached=1';
-    }
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                alert('An error occured while acknowledging the referred job.');
-                return false;
-            }
-            
-            set_status('');
-            if (txt == '-1') {
-                alert('Sorry, this job only accepts resumes created online.');
-                return false;
-            } else if (txt == '-2') {
-                alert('Sorry, this job only accepts uploaded file resumes.');
-                return false;
-            }
-            
-            close_acknowledge_form();
-            show_referred_jobs();
-        },
-        onRequest: function(instance) {
-            set_status('Acknowledging referred job...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function reject_job(referral_id, job_title) {
-    var sure = confirm('Clicking \'OK\' will remove "' + job_title + '" from this section permanently. Do you wish to continue?');
-    
-    if (!sure) {
-        return false;
-    }
-    
-    var params = 'id=' + referral_id;
-    params = params + '&action=reject_job';
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                alert('An error occured while ignoring the referred job.');
-                return false;
-            }
-            
-            set_status('');
-            show_referred_jobs();
-        },
-        onRequest: function(instance) {
-            set_status('Ignoring referred job...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function show_referred_jobs() {
-    $('div_jobs').setStyle('display', 'block');
-    //$('div_rewards').setStyle('display', 'none');
-    $('div_approvals').setStyle('display', 'none');
-    //$('div_acknowledgements').setStyle('display', 'none');
-    $('li_jobs').setStyle('border', '1px solid #CCCCCC');
-    //$('li_rewards').setStyle('border', '1px solid #0000FF');
-    $('li_approvals').setStyle('border', '1px solid #0000FF');
-    //$('li_acknowledgements').setStyle('border', '1px solid #0000FF');
-    
-    var params = 'id=' + id + '&action=get_recent_referred_jobs';
-    params = params + '&order_by=' + jobs_order_by + ' ' + jobs_order;
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading referred jobs.');
-                return false;
-            }
-            
-            var html = '<table id="list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">You are not referred to any jobs at the moment.</div>';
-                
-                $('referred_count').set('html', '');
-            } else {
-                var ids = xml.getElementsByTagName('id');
-                var jobs = xml.getElementsByTagName('job_id');
-                var industries = xml.getElementsByTagName('industry');
-                var titles = xml.getElementsByTagName('title');
-                var referrers = xml.getElementsByTagName('referrer');
-                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
-                var employers = xml.getElementsByTagName('employer');
-                var resume_ids = xml.getElementsByTagName('resume_id');
-                var resume_labels = xml.getElementsByTagName('resume_label');
-                var resume_file_hashes = xml.getElementsByTagName('file_hash');
-                
-                for (var i=0; i < ids.length; i++) {
-                    var referral_id = ids[i].childNodes[0].nodeValue;
-                    var job_id = jobs[i].childNodes[0].nodeValue;
-
-                    html = html + '<tr id="'+ referral_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-
-                    html = html + '<td class="industry">' + industries[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title"><a class="no_link" onClick="show_job_info(\'' + job_id + '\');">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="title">' + referrers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="date">' + referred_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    
-                    var resume_id = 0;
-                    if (resume_file_hashes[i].childNodes.length > 0) {
-                        resume_id = resume_ids[i].childNodes[0].nodeValue;
-                        html = html + '<td><a class="no_link" onClick="show_resume_page(' + resume_id + ')">' + resume_labels[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    } else {
-                        html = html + '<td><span style="font-size: 7pt; color: #CCCCCC;">N/A</span></td>' + "\n";
-                    }
-                    
-                    html = html + '<td class="acknowledge"><a class="no_link" onClick="show_acknowledge_form(\'' + referral_id + '\', \'' + titles[i].childNodes[0].nodeValue + '\', ' + resume_id + ');">Accept</a>&nbsp;|&nbsp;<a class="no_link" onClick="reject_job(\'' + referral_id + '\', \'' + titles[i].childNodes[0].nodeValue + '\');">Ignore</a></td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                }
-                html = html + '</table>';
-                
-                $('referred_count').set('html', ' (' + ids.length + ')');
-            }
-            
-            $('div_referred_jobs_list').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading currently referred jobs...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function approve_contact(referee_id, contact_email) {
-    var params = 'id=' + referee_id + '&member=' + id + '&contact=' + contact_email;
-    params = params + '&action=approve_contact';
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                alert('An error occured while approving contact.');
-                return false;
-            }
-            
-            set_status('');
-            // show_approvals();
-            count_items_and_show_tab();
-        },
-        onRequest: function(instance) {
-            set_status('Approving contact...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function reject_contact(referee_id) {
-    var params = 'id=' + referee_id;
-    params = params + '&action=reject_contact';
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                alert('An error occured while ignoring contact.');
-                return false;
-            }
-            
-            set_status('');
-            show_approvals();
-        },
-        onRequest: function(instance) {
-            set_status('Ignoring contact...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function show_approvals() {
-    $('div_jobs').setStyle('display', 'none');
-    //$('div_rewards').setStyle('display', 'none');
-    $('div_approvals').setStyle('display', 'block');
-    //$('div_acknowledgements').setStyle('display', 'none');
-    $('li_jobs').setStyle('border', '1px solid #0000FF');
-    //$('li_rewards').setStyle('border', '1px solid #0000FF');
-    $('li_approvals').setStyle('border', '1px solid #CCCCCC');
-    //$('li_acknowledgements').setStyle('border', '1px solid #0000FF');
-    
-    var params = 'id=' + id + '&action=get_approvals';
-    params = params + '&order_by=' + approvals_order_by + ' ' + approvals_order;
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading approvals.');
-                return false;
-            }
-            
-            var html = '<table id="list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no contacts to approve at the moment.<br/><br/>In order to view jobs referred to you by members who are not in your <a href="' + root + '/members/candidates.php">Contacts</a> yet, you need to approve adding them first before you can see the jobs referred to you in <a class="no_link" onClick="show_referred_jobs();">Jobs Referred To Me</a>.</div>';
-                
-                $('approval_count').set('html', '');
-            } else {
-                var ids = xml.getElementsByTagName('id');
-                var emails = xml.getElementsByTagName('email_addr');
-                var names = xml.getElementsByTagName('member_name');
-                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
-                
-                for (var i=0; i < ids.length; i++) {
-                    var id = ids[i].childNodes[0].nodeValue;
-
-                    html = html + '<tr id="'+ id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="title">' + emails[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title">' + names[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="date">' + referred_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="approve"><a class="no_link" onClick="approve_contact(\'' + id + '\', \'' + emails[i].childNodes[0].nodeValue + '\');">Approve</a>&nbsp;|&nbsp;<a class="no_link" onClick="reject_contact(\'' + id + '\');">Ignore</a></td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                }
-                html = html + '</table>';
-                
-                $('approval_count').set('html', ' (' + ids.length + ')');
-            }
-            
-            $('div_approvals_list').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading approvals...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function show_rewards() {
-    $('div_jobs').setStyle('display', 'none');
-    $('div_rewards').setStyle('display', 'block');
-    $('div_approvals').setStyle('display', 'none');
-    //$('div_acknowledgements').setStyle('display', 'none');
-    $('li_jobs').setStyle('border', '1px solid #0000FF');
-    $('li_rewards').setStyle('border', '1px solid #CCCCCC');
-    $('li_approvals').setStyle('border', '1px solid #0000FF');
-    //$('li_acknowledgements').setStyle('border', '1px solid #0000FF');
-    
-    var params = 'id=' + id + '&action=get_rewards';
-    params = params + '&order_by=' + rewards_order_by + ' ' + rewards_order;
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading rewards.');
-                return false;
-            }
-            
-            var html = '<table id="list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">You have no rewards at the moment.</div>';
-                
-                $('rewards_count').set('html', '');
-            } else {
-                var ids = xml.getElementsByTagName('id');
-                var job_ids = xml.getElementsByTagName('job_id');
-                var referee_ids = xml.getElementsByTagName('referee_id');
-                var industries = xml.getElementsByTagName('industry');
-                var titles = xml.getElementsByTagName('title');
-                var candidates = xml.getElementsByTagName('candidate');
-                var employed_ons = xml.getElementsByTagName('formatted_employed_on');
-                var work_commence_ons = xml.getElementsByTagName('formatted_work_commence_on');
-                var rewards = xml.getElementsByTagName('total_reward');
-                var currencies = xml.getElementsByTagName('currency');
-                var paid_rewards = xml.getElementsByTagName('paid_reward');
-                
-                for (var i=0; i < ids.length; i++) {
-                    var referral_id = ids[i].childNodes[0].nodeValue;
-                    var job_id = job_ids[i].childNodes[0].nodeValue;
-                    var referee_id = referee_ids[i].childNodes[0].nodeValue;
-                    
-                    html = html + '<tr id="'+ referral_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="title">' + industries[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title"><a class="no_link" onClick="show_job_info(\'' + job_id + '\');">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="title"><a href="candidates.php?id=' + referee_id + '&candidate=' + candidates[i].childNodes[0].nodeValue + '">' + candidates[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="date">' + employed_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="date">' + work_commence_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="reward">' + currencies[i].childNodes[0].nodeValue + '&nbsp;' + rewards[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="reward">' + currencies[i].childNodes[0].nodeValue + '&nbsp;' + paid_rewards[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                }
-                html = html + '</table>';
-                
-                $('rewards_count').set('html', ' (' + ids.length + ')');
-            }
-            
-            $('div_rewards_list').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading rewards...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function show_acknowledgements() {
-    $('div_jobs').setStyle('display', 'none');
-    $('div_rewards').setStyle('display', 'none');
-    $('div_approvals').setStyle('display', 'none');
-    $('div_acknowledgements').setStyle('display', 'block');
-    $('li_jobs').setStyle('border', '1px solid #0000FF');
-    $('li_rewards').setStyle('border', '1px solid #0000FF');
-    $('li_approvals').setStyle('border', '1px solid #0000FF');
-    $('li_acknowledgements').setStyle('border', '1px solid #CCCCCC');
-    
-    var params = 'id=' + id + '&action=get_acknowledgements';
-    params = params + '&order_by=' + acknowledgements_order_by + ' ' + acknowledgements_order;
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                set_status('An error occured while loading acknowledgements.');
-                return false;
-            }
-            
-            var html = '<table id="list" class="list">';
-            if (txt == '0') {
-                html = '<div style="text-align: center; padding-top: 10px; padding-bottom: 10px;">There are no responses from the referred candidates.</div>';
-                
-                $('responses_count').set('html', '');
-            } else {
-                var ids = xml.getElementsByTagName('id');
-                var job_ids = xml.getElementsByTagName('job_id');
-                var referee_ids = xml.getElementsByTagName('referee_id');
-                var employers = xml.getElementsByTagName('employer');
-                var titles = xml.getElementsByTagName('title');
-                var candidates = xml.getElementsByTagName('candidate');
-                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
-                var acknowledged_ons = xml.getElementsByTagName('formatted_acknowledged_on');
-                var rewards = xml.getElementsByTagName('potential_reward');
-                var currencies = xml.getElementsByTagName('currency');
-                
-                for (var i=0; i < ids.length; i++) {
-                    var referral_id = ids[i].childNodes[0].nodeValue;
-                    var job_id = job_ids[i].childNodes[0].nodeValue;
-                    var referee_id = referee_ids[i].childNodes[0].nodeValue;
-                    
-                    html = html + '<tr id="'+ referral_id + '" onMouseOver="this.style.backgroundColor = \'#FFFF00\';" onMouseOut="this.style.backgroundColor = \'#FFFFFF\';">' + "\n";
-                    html = html + '<td class="title">' + employers[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="title"><a class="no_link" onClick="show_job_info(\'' + job_id + '\');">' + titles[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="title"><a href="candidates.php?id=' + referee_id + '&candidate=' + candidates[i].childNodes[0].nodeValue + '">' + candidates[i].childNodes[0].nodeValue + '</a></td>' + "\n";
-                    html = html + '<td class="date">' + referred_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="date">' + acknowledged_ons[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '<td class="reward">' + currencies[i].childNodes[0].nodeValue + '&nbsp;' + rewards[i].childNodes[0].nodeValue + '</td>' + "\n";
-                    html = html + '</tr>' + "\n";
-                }
-                html = html + '</table>';
-                
-                $('responses_count').set('html', ' (' + ids.length + ')');
-            }
-            
-            $('div_acknowledgements_list').set('html', html);
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Loading rewards...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function count_items_and_show_tab() {
-    var params = 'id=' + id + '&action=get_counts';
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                return false;
-            }
-            
-            var referrals = xml.getElementsByTagName('referrals');
-            var approvals = xml.getElementsByTagName('approvals');
-            var rewards = xml.getElementsByTagName('rewards');
-            var responses = xml.getElementsByTagName('responses');
-            
-            if (referrals[0].childNodes[0].nodeValue > 0) {
-                $('referred_count').set('html', ' (' + referrals[0].childNodes[0].nodeValue + ')');
-            }
-            
-            if (approvals[0].childNodes[0].nodeValue > 0) {
-                $('approval_count').set('html', ' (' + approvals[0].childNodes[0].nodeValue + ')');
-            }
-            
-            //if (rewards[0].childNodes[0].nodeValue > 0) {
-            //    $('rewards_count').set('html', ' (' + rewards[0].childNodes[0].nodeValue + ')');
-            //}
-            
-            //if (responses[0].childNodes[0].nodeValue > 0) {
-            //    $('responses_count').set('html', ' (' + responses[0].childNodes[0].nodeValue + ')');
-            //}
-            
-            if (approvals[0].childNodes[0].nodeValue > 0 && referrals[0].childNodes[0].nodeValue <= 0) {
-                show_approvals();
-            } else {
-                show_referred_jobs();
-            }
-        }
-    });
-    
-    request.send(params);
-}
-
 function get_completeness_status() {
     var params = 'id=' + id + '&action=get_completeness_status';
     
@@ -723,257 +55,367 @@ function get_completeness_status() {
     request.send(params);
 }
 
-function toggle_banner() {
-    var height = $('div_banner').getStyle('height');
-    var params = 'id=' + id + '&action=set_hide_banner';
-    
-    if (parseInt(height) >= 100) {
-        $('hide_show_label').set('html', 'Show');
-        $('div_banner').tween('height', '15px');
-        params = params + '&hide=1';
-    } else {
-        $('hide_show_label').set('html', 'Hide');
-        $('div_banner').tween('height', '175px');
-        params = params + '&hide=0';
-    }
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post'
-    });
-    
-    request.send(params);
+function show_career_summary_popup() {
+    show_window('career_summary_window');
 }
 
-function hide_show_banner() {
-    var params = 'id=' + id + '&action=get_hide_banner';
-    
-    var uri = root + "/members/home_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post', 
-        onSuccess: function(txt, xml) {
-            if (txt == '1') {
-                $('hide_show_label').set('html', 'Show');
-                $('div_banner').setStyle('height', '15px');
-            } else {
-                $('hide_show_label').set('html', 'Hide');
-                $('div_banner').setStyle('height', '175px');
+function close_career_summary_popup(_is_save) {
+    if (_is_save) {
+        var seeking = encodeURIComponent($('seeking').value);
+        var reason_leaving = encodeURIComponent($('reason_leaving').value);
+        // var current_pos = encodeURIComponent($('current_pos').value);
+        
+        var contact_me = '0';
+        if ($('contact_me').checked) {
+            contact_me = '1';
+        }
+        
+        if (!isEmpty($('expected_sal_start').value) && isNaN($('expected_sal_start').value)) {
+            alert('Expected salary must be a number.');
+            return;
+        } else if (!isEmpty($('expected_sal_end').value) && isNaN($('expected_sal_end').value)) {
+            alert('Expected salary must be a number.');
+            return;
+        } else if (!isEmpty($('expected_sal_start').value) && !isEmpty($('expected_sal_end').value)) {
+            if (parseInt($('expected_sal_start').value) > parseInt($('expected_sal_end').value)) {
+                alert('Expected salary range is invalid.');
+                return;
             }
         }
-    });
-    
-    request.send(params);
+        
+        if (!isEmpty($('current_sal_start').value) && isNaN($('current_sal_start').value)) {
+            alert('Expected salary must be a number.');
+            return;
+        } else if (!isEmpty($('current_sal_end').value) && isNaN($('current_sal_end').value)) {
+            alert('Expected salary must be a number.');
+            return;
+        } else if (!isEmpty($('current_sal_start').value) && !isEmpty($('current_sal_end').value)) {
+            if (parseInt($('current_sal_start').value) > parseInt($('current_sal_end').value)) {
+                alert('Expected salary range is invalid.');
+                return;
+            }
+        }
+        
+        var params = 'id=' + id + '&action=save_career_summary';
+        params = params + '&is_active=' + $('is_active').options[$('is_active').selectedIndex].value;
+        params = params + '&contact_me=' + contact_me;
+        params = params + '&can_travel=' + $('can_travel').options[$('can_travel').selectedIndex].value;
+        params = params + '&expected_sal_currency=' + $('expected_sal_currency').options[$('expected_sal_currency').selectedIndex].value;
+        params = params + '&current_sal_currency=' + $('current_sal_currency').options[$('current_sal_currency').selectedIndex].value;
+        params = params + '&pref_job_loc_1=' + $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].value;
+        params = params + '&pref_job_loc_2=' + $('pref_job_loc_2').options[$('pref_job_loc_2').selectedIndex].value;
+        params = params + '&seeking=' + seeking;
+        // params = params + '&current_pos=' + current_pos;
+        params = params + '&reason_leaving=' + reason_leaving;
+        params = params + '&notice_period=' + $('notice_period').value;
+        params = params + '&expected_sal_start=' + $('expected_sal_start').value;
+        params = params + '&expected_sal_end=' + $('expected_sal_end').value;
+        params = params + '&current_sal_start=' + $('current_sal_start').value;
+        params = params + '&current_sal_end=' + $('current_sal_end').value;
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error occured when saving. Please try again later.');
+                    return;
+                }
+                
+                location.reload(true);
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('career_summary_window');
+    }
 }
 
-function set_mouse_events() {
-    $('li_jobs').addEvent('mouseover', function() {
-        $('li_jobs').setStyles({
-            'color': '#FF0000',
-            'text-decoration': 'underline'
-        });
-    });
+function validate_job_profile() {
+    // if ($('specialization').selectedIndex == 0) {
+    //     alert('You need to select a specialization.');
+    //     return false;
+    // } 
     
-    $('li_jobs').addEvent('mouseout', function() {
-        $('li_jobs').setStyles({
-            'color': '#000000',
-            'text-decoration': 'none'
-        });
-    });
+    if (isEmpty($('position_title').value)) {
+        alert('Job Title cannot be empty.');
+        return false;
+    }
     
-    /*$('li_rewards').addEvent('mouseover', function() {
-        $('li_rewards').setStyles({
-            'color': '#FF0000',
-            'text-decoration': 'underline'
-        });
-    });
+    if (isEmpty($('work_from_year').value) || $('work_from_month').selectedIndex == 0) {
+        alert('Duration (beginning) cannot be empty.');
+        return false;
+    } else {
+        if (isNaN($('work_from_year').value)) {
+            alert('Only numbers are accepted for year.');
+            return false;
+        }        
+    }
     
-    $('li_rewards').addEvent('mouseout', function() {
-        $('li_rewards').setStyles({
-            'color': '#000000',
-            'text-decoration': 'none'
-        });
-    });*/
+    if ($('work_to_present').checked == false) {
+        if (isEmpty($('work_to_year').value) || $('work_to_month').selectedIndex == 0) {
+            alert('Duration (ending) cannot be empty.');
+            return false;
+        } else {
+            if (isNaN($('work_from_year').value)) {
+                alert('Only numbers are accepted for year.');
+                return false;
+            }
+        }
+    }
     
-    $('li_approvals').addEvent('mouseover', function() {
-        $('li_approvals').setStyles({
-            'color': '#FF0000',
-            'text-decoration': 'underline'
-        });
-    });
+    if (isEmpty($('company').value)) {
+        alert('Employer cannot be empty.');
+        return false;
+    }
     
-    $('li_approvals').addEvent('mouseout', function() {
-        $('li_approvals').setStyles({
-            'color': '#000000',
-            'text-decoration': 'none'
-        });
-    });
+    if ($('emp_desc').selectedIndex == 0) {
+        alert('You need to select your employer\'s description.');
+        return false;
+    }
     
-    /*$('li_acknowledgements').addEvent('mouseover', function() {
-        $('li_acknowledgements').setStyles({
-            'color': '#FF0000',
-            'text-decoration': 'underline'
-        });
-    });
+    if ($('emp_specialization').selectedIndex == 0) {
+        alert('You need to select your employer\'s specialization.');
+        return false;
+    }
     
-    $('li_acknowledgements').addEvent('mouseout', function() {
-        $('li_acknowledgements').setStyles({
-            'color': '#000000',
-            'text-decoration': 'none'
-        });
-    });*/
+    // if (isNaN($('organization_size').value)) {
+    //     alert('Only numbers are accepted for Number of Direct Reports.');
+    //     return false;
+    // } 
+    
+    return true;
 }
 
-function onDomReady() {
-    set_root();
-    get_employers_for_mini();
-    get_industries_for_mini();
-    set_mini_keywords();
-    get_potential_rewards();
-    get_job_count();
-    get_referrals_count();
-    get_requests_count();
-    get_jobs_employed_count();
-    set_mouse_events();
+function toggle_work_to() {
+    $('work_to_month').selectedIndex = 0;
+    $('work_to_year').value = '';
     
-    hide_show_banner();
+    if ($('work_to_present').checked) {
+        $('work_to_dropdown').setStyle('display', 'none');
+    } else {
+        $('work_to_dropdown').setStyle('display', 'inline');
+    }
+}
+
+function show_job_profile_popup(_id) {
+    if (_id <= 0) {
+        // new
+        $('job_profile_id').value = 0;
+        // $('specialization').selectedIndex = 0;
+        $('position_title').value = '';
+        $('position_superior_title').value = '';
+        $('organization_size').value = '';
+        $('work_from_month').selectedIndex = 0;
+        $('work_from_year').value = 'yyyy';
+        $('work_to_month').selectedIndex = 0;
+        $('work_to_year').value = 'yyyy';
+        $('company').value = '';
+        $('emp_desc').selectedIndex = 0;
+        $('emp_specialization').selectedIndex = 0;
+        
+        show_window('job_profile_window');
+        // window.scrollTo(0, 0);
+    } else {
+        // load
+        var params = 'id=' + _id + '&action=get_job_profile';
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error occured when loading job profile. Please try again later.');
+                    return;
+                }
+                
+                // var specialization = xml.getElementsByTagName('specialization');
+                var position_title = xml.getElementsByTagName('position_title');
+                var position_superior = xml.getElementsByTagName('position_superior_title');
+                var org_size = xml.getElementsByTagName('organization_size');
+                var work_from = xml.getElementsByTagName('work_from');
+                var work_to = xml.getElementsByTagName('work_to');
+                var company = xml.getElementsByTagName('employer');
+                var emp_desc = xml.getElementsByTagName('employer_description');
+                var emp_specialization = xml.getElementsByTagName('employer_specialization');
+                
+                $('job_profile_id').value = _id;
+                $('position_title').value = position_title[0].childNodes[0].nodeValue;
+                $('position_superior_title').value = position_superior[0].childNodes[0].nodeValue;
+                $('organization_size').value = org_size[0].childNodes[0].nodeValue;
+                $('company').value = company[0].childNodes[0].nodeValue.replace('&amp;', '&');
+                
+                // for (var i=0; i < $('specialization').options.length; i++) {
+                //     if ($('specialization').options[i].value == specialization[0].childNodes[0].nodeValue) {
+                //         $('specialization').selectedIndex = i;
+                //         break;
+                //     }
+                // }
+                
+                for (var i=0; i < $('emp_desc').options.length; i++) {
+                    if ($('emp_desc').options[i].value == emp_desc[0].childNodes[0].nodeValue) {
+                        $('emp_desc').selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                for (var i=0; i < $('emp_specialization').options.length; i++) {
+                    if ($('emp_specialization').options[i].value == emp_specialization[0].childNodes[0].nodeValue) {
+                        $('emp_specialization').selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                var work_from_items = work_from[0].childNodes[0].nodeValue.split('-');
+                var work_from_month = work_from_items[1];
+                var work_from_year = work_from_items[0];
+                
+                $('work_from_year').value = work_from_year;
+                for (var i=0; i < $('work_from_month').options.length; i++) {
+                    if ($('work_from_month').options[i].value == work_from_month) {
+                        $('work_from_month').selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                var work_to_items = null;
+                if (work_to[0].childNodes.length > 0) {
+                    work_to_items = work_to[0].childNodes[0].nodeValue.split('-');
+                }
+                
+                if (work_to_items == null) {
+                    $('work_to_month').selectedIndex = 0;
+                    $('work_to_year').value = '';
+                    $('work_to_dropdown').setStyle('display', 'none');
+                    $('work_to_present').checked = true;
+                } else {
+                    $('work_to_dropdown').setStyle('display', 'block');
+                    $('work_to_present').checked = false;
+                    
+                    var work_to_month = work_to_items[1];
+                    var work_to_year = work_to_items[0];
+                    
+                    $('work_to_year').value = work_to_year;
+                    for (var i=0; i < $('work_to_month').options.length; i++) {
+                        if ($('work_to_month').options[i].value == work_to_month) {
+                            $('work_to_month').selectedIndex = i;
+                            break;
+                        }
+                    }
+                } 
+                
+                show_window('job_profile_window');
+                // window.scrollTo(0, 0);
+            }
+        });
+
+        request.send(params);
+    }
+}
+
+function close_job_profile_popup(_is_save) {
+    if (_is_save) {
+        if (!validate_job_profile()) {
+            return;
+        }
+        
+        var work_from = $('work_from_year').value + '-' + $('work_from_month').options[$('work_from_month').selectedIndex].value + '-00';
+
+        var work_to = 'NULL';
+        if ($('work_to_present').checked == false) {
+            work_to = $('work_to_year').value + '-' + $('work_to_month').options[$('work_to_month').selectedIndex].value + '-00';
+        }
+        
+        var params = 'id=' + $('job_profile_id').value + '&action=save_job_profile';
+        params = params + '&member=' + id;
+        // params = params + '&specialization=' + $('specialization').value;
+        params = params + '&position_title=' + $('position_title').value;
+        params = params + '&superior_title=' + $('position_superior_title').value;
+        params = params + '&organization_size=' + encodeURIComponent($('organization_size').value);
+        params = params + '&work_from=' + work_from;
+        params = params + '&work_to=' + work_to;
+        params = params + '&employer=' + encodeURIComponent($('company').value);
+        params = params + '&emp_desc=' + $('emp_desc').value;
+        params = params + '&emp_specialization=' + $('emp_specialization').value;
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+
+                if (txt == 'ko') {
+                    alert('An error occured when saving your job profile.' + "\n\n" + 'Please try again later.');
+                    return;
+                }
+                
+                location.reload(true);
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('job_profile_window');
+    }
+}
+
+function delete_job_profile(_id) {
+    var msg = 'Are you sure to delete the selected job profile?';
     
-    $('li_jobs').addEvent('click', show_referred_jobs);
-    //$('li_rewards').addEvent('click', show_rewards);
-    $('li_approvals').addEvent('click', show_approvals);
-    //$('li_acknowledgements').addEvent('click', show_acknowledgements);
-    
-    $('sort_jobs_industry').addEvent('click', function() {
-        jobs_order_by = 'industry';
-        jobs_ascending_or_descending();
-        show_referred_jobs();
-    });
-    
-    $('sort_jobs_employer').addEvent('click', function() {
-        jobs_order_by = 'employer';
-        jobs_ascending_or_descending();
-        show_referred_jobs();
-    });
-    
-    $('sort_jobs_title').addEvent('click', function() {
-        jobs_order_by = 'title';
-        jobs_ascending_or_descending();
-        show_referred_jobs();
-    });
-    
-    $('sort_jobs_referrer').addEvent('click', function() {
-        jobs_order_by = 'referrer';
-        jobs_ascending_or_descending();
-        show_referred_jobs();
-    });
-    
-    $('sort_jobs_referred_on').addEvent('click', function() {
-        jobs_order_by = 'referrals.referred_on';
-        jobs_ascending_or_descending();
-        show_referred_jobs();
-    });
-    
-    $('sort_approvals_member').addEvent('click', function() {
-        approvals_order_by = 'member_name';
-        approvals_ascending_or_descending();
-        show_approvals();
-    });
-    
-    $('sort_approvals_referred_on').addEvent('click', function() {
-        approvals_order_by = 'member_referees.referred_on';
-        approvals_ascending_or_descending();
-        show_approvals();
-    });
-    
-    $('sort_rewards_industry').addEvent('click', function() {
-        rewards_order_by = 'industries.industry';
-        rewards_ascending_or_descending();
-        show_rewards();
-    });
-    
-    /*$('sort_rewards_title').addEvent('click', function() {
-        rewards_order_by = 'jobs.title';
-        rewards_ascending_or_descending();
-        show_rewards();
-    });
-    
-    $('sort_rewards_candidate').addEvent('click', function() {
-        rewards_order_by = 'candidate';
-        rewards_ascending_or_descending();
-        show_rewards();
-    });
-    
-    $('sort_rewards_employed_on').addEvent('click', function() {
-        rewards_order_by = 'referrals.employed_on';
-        rewards_ascending_or_descending();
-        show_rewards();
-    });
-    
-    $('sort_rewards_work_commence_on').addEvent('click', function() {
-        rewards_order_by = 'referrals.work_commence_on';
-        rewards_ascending_or_descending();
-        show_rewards();
-    });
-    
-    $('sort_rewards_reward').addEvent('click', function() {
-        rewards_order_by = 'referrals.total_reward';
-        rewards_ascending_or_descending();
-        show_rewards();
-    });
-    
-    $('sort_rewards_paid').addEvent('click', function() {
-        rewards_order_by = 'paid_reward';
-        rewards_ascending_or_descending();
-        show_rewards();
-    });
-    
-    /*$('sort_acknowledgements_employer').addEvent('click', function() {
-        acknowledgements_order_by = 'employers.employer';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_title').addEvent('click', function() {
-        acknowledgements_order_by = 'jobs.title';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_candidate').addEvent('click', function() {
-        acknowledgements_order_by = 'candidate';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_referred_on').addEvent('click', function() {
-        acknowledgements_order_by = 'referrals.referred_on';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_acknowledged_on').addEvent('click', function() {
-        acknowledgements_order_by = 'referrals.referee_acknowledged_on';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });
-    
-    $('sort_acknowledgements_reward').addEvent('click', function() {
-        acknowledgements_order_by = 'jobs.potential_reward';
-        acknowledgements_ascending_or_descending();
-        show_acknowledgements();
-    });*/
-    
-    count_items_and_show_tab();
-    get_completeness_status();
-    
-    var suggest_url = root + '/common/php/search_suggest.php';
-    new Autocompleter.Ajax.Json('mini_keywords', suggest_url, {
-        'postVar': 'keywords',
-        'minLength' : 1,
-        'overflow' : true,
-        'delay' : 50
-    });
+    if (confirm(msg)) {
+        var params = 'id=' + _id + '&action=remove_job_profile';
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+
+                if (txt == 'ko') {
+                    alert('An error occured when deleting your job profile.' + "\n\n" + 'Please try again later.');
+                    return;
+                }
+                
+                location.reload(true);
+            }
+        });
+
+        request.send(params);
+    }
+}
+
+function close_upload_photo_popup(_is_upload) {
+    if (_is_upload) {
+        if (isEmpty($('my_file').value)) {
+            alert('You need to select a photo to upload.');
+            return false;
+        }
+        
+        close_safari_connection();
+        return true;
+    } else {
+        close_window('upload_photo_window');
+    }
+}
+
+function show_upload_photo_popup() {
+    show_window('upload_photo_window');
+}
+
+function onDomReady() {}
+
+function onLoaded() {
+    initialize_page();
 }
 
 window.addEvent('domready', onDomReady);
+window.addEvent('load', onLoaded);

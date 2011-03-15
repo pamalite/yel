@@ -1,0 +1,145 @@
+<div id="div_status" class="status">
+    <span id="span_status" class="status"></span>
+</div>
+
+<div class="job_details">
+    <div class="empty_results" style="display: %show_error%;">
+        %error_message%
+    </div>
+    
+    <div style="display: %show_job%;">
+        <div class="job_title">%job_title%</div>
+        <div class="employer_country">
+            %employer_name% <span class="country">%employer_country%</span>
+        </div>
+        
+        <table class="details_table">
+            <tr>
+                <td class="description">
+                    %job_description%
+                </td>
+                <td class="rest">
+                    <div class="industry">
+                        <span class="label">Industry:</span><br/>
+                        %full_industry%
+                    </div>
+                    <div class="salary">
+                        <span class="label">Monthly Salary Range:</span><br/>
+                        %currency%$ %salary_range%
+                        %negotiable%
+                    </div>
+                    <div class="expires_on">
+                        <span class="label">Expires On:</span><br/>
+                        %expire_on%
+                    </div>
+                    <div class="expires_on">
+                        <span class="label">Recommender's Cash Reward:</span><br/>
+                        %currency%$ %potential_reward%
+                    </div>
+                    <div class="expires_on">
+                        <span class="label">Candidate's Cash Bonus:</span><br/>
+                        %currency%$ %potential_token_reward%
+                    </div>
+                    <div class="actions">
+                        <div class="action_item">
+                            <a class="no_link" onClick="show_refer_popup();">Recommend Someone</a>
+                        </div>
+                        <div class="action_item">
+                            <a class="no_link" onClick="show_apply_popup();">Explore This Opportunity</a>
+                        </div>
+                        <div class="action_item" style="display: %from_search%;">
+                            <a href="../search.php">Back to Searched Jobs</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- popup window goes here -->
+<div id="refer_window" class="popup_window">
+    <div class="popup_window_title">Refer %job_title%</div>
+    <div id="refer_progress">
+        Please wait while your request is being processed... <br/><br/>
+        <img src="%root%/common/images/progress/circle_big.gif" />
+    </div>
+    <form id="refer_form" action="%root%/refer_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_refer_popup(true);">
+        <input type="hidden" name="job_id" value="%job_id%" />
+        <table class="refer_form">
+            <tr>
+                <td class="referrer">
+                    <table class="referrer">
+                        <tr>
+                            <td colspan="2" class="title">Your Contact Details</td>
+                        </tr>
+                        
+                        <!-- %refer_form% -->
+                        
+                        <tr>
+                            <td colspan="2" class="title">Candidate's Contact Details &amp; Resume</td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="candidate_email">E-mail Address:</label></td>
+                            <td><input type="text" class="field" name="candidate_email" id="candidate_email" value="" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="candidate_phone">Telephone:</label></td>
+                            <td><input type="text" class="field" name="candidate_phone" id="candidate_phone" value="" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="candidate_name">Name:</label></td>
+                            <td><input type="text" class="field" name="candidate_name" id="candidate_name" value="" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="candidate_resume">Resume:</label></td>
+                            <td><input type="file" class="field" name="candidate_resume" id="candidate_resume" value="" /></td>
+                        </tr>
+                    </table>
+                </td>
+                <td class="candidate">
+                    <table class="candidate">
+                        <tr>
+                            <td colspan="2" class="title">Candidate's Extra Info (Optional)</td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="candidate_current_pos">Current Position:</label></td>
+                            <td><input type="text" class="field" name="candidate_current_pos" id="candidate_current_pos" value="" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="candidate_current_emp">Current Employer:</label></td>
+                            <td><input type="text" class="field" name="candidate_current_emp" id="candidate_current_emp" value="" /></td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="candidate_remarks">Other Remarks:</label></td>
+                            <td><textarea class="field" name="candidate_remarks" id="candidate_remarks"></textarea></td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div class="popup_window_buttons_bar">
+             <input type="submit" value="Refer Now" />
+             <input type="button" value="Cancel" onClick="close_refer_popup(false);" />
+        </div>
+    </form>
+</div>
+
+<div id="apply_window" class="popup_window">
+    <div class="popup_window_title">Explore %job_title%</div>
+    <div id="apply_progress">
+        Please wait while your request is being processed... <br/><br/>
+        <img src="%root%/common/images/progress/circle_big.gif" />
+    </div>
+    <form id="apply_form" action="%root%/apply_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_apply_popup(true);">
+        <input type="hidden" name="job_id" value="%job_id%" />
+        
+        <!-- %apply_form% -->
+        
+        <div class="popup_window_buttons_bar">
+            <input type="submit" value="Explore Now" />
+            <input type="button" value="Cancel" onClick="close_apply_popup(false);" />
+        </div>
+    </form>
+</div>
+

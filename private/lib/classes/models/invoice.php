@@ -2,22 +2,20 @@
 require_once dirname(__FILE__). "/../../utilities.php";
 
 class Invoice {
-    private $mysqli = NULL;
-    
-    public static function create($data) {
+    public static function create($_data) {
         $mysqli = Database::connect();
         
-        if (is_null($data) || !is_array($data)) {
+        if (is_null($_data) || !is_array($_data)) {
             return false;
         }
         
-        if (!array_key_exists('employer', $data) || 
-            !array_key_exists('issued_on', $data) || 
-            !array_key_exists('payable_by', $data)) {
+        if (!array_key_exists('employer', $_data) || 
+            !array_key_exists('issued_on', $_data) || 
+            !array_key_exists('payable_by', $_data)) {
             return false;
         }
         
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $query = "INSERT INTO invoices SET ";                
         $i = 0;
         foreach ($data as $key => $value) {
@@ -49,18 +47,18 @@ class Invoice {
         return false;
     }
     
-    public static function update($data) {
+    public static function update($_data) {
         $mysqli = Database::connect();
         
-        if (is_null($data) || !is_array($data)) {
+        if (is_null($_data) || !is_array($_data)) {
             return false;
         }
         
-        if (!array_key_exists('id', $data)) {
+        if (!array_key_exists('id', $_data)) {
             return false;
         }
         
-        $data = sanitize($data);
+        $data = sanitize($_data);
         $query = "UPDATE invoices SET ";
         $i = 0;
         foreach ($data as $key => $value) {
@@ -99,15 +97,66 @@ class Invoice {
         
         $mysqli = Database::connect();
         $query = "SELECT *, 
-                  DATE_FORMAT(payable_by, '%Y %b %e') AS formatted_payable_by, 
-                  DATE_FORMAT(issued_on, '%Y %b %e') AS formatted_issued_on, 
-                  DATE_FORMAT(paid_on, '%Y %b %e') AS formatted_paid_on 
+                  DATE_FORMAT(issued_on, '%e %b, %Y') AS formatted_issued_on, 
+                  DATE_FORMAT(payable_by, '%e %b, %Y') AS formatted_payable_by,
+                  DATE_FORMAT(paid_on, '%e %b, %Y') AS formatted_paid_on 
                   FROM invoices WHERE id = '". $_id. "' LIMIT 1";
         
         return $mysqli->query($query);
     }
     
-    public static function get_items_of($_id) {
+    public static function find($_criteria) {
+        if (is_null($_criteria) || !is_array($_criteria)) {
+            return false;
+        }
+        
+        $mysqli = Database::connect();
+        
+        $columns = '*';
+        $joins = '';
+        $order = '';
+        $group = '';
+        $limit = '';
+        $match = '';
+        
+        foreach ($_criteria as $key => $clause) {
+            switch (strtoupper($key)) {
+                case 'COLUMNS':
+                    $columns = trim($clause);
+                    break;
+                case 'JOINS':
+                    $conditions = explode(',', $clause);
+                    $i = 0;
+                    foreach ($conditions as $condition) {
+                        $joins .= "LEFT JOIN ". trim($condition);
+
+                        if ($i < count($conditions)-1) {
+                            $joins .= " ";
+                        }
+                        $i++;
+                    }
+                    break;
+                case 'ORDER':
+                    $order = "ORDER BY ". trim($clause);
+                    break;
+                case 'GROUP':
+                    $group = "GROUP BY ". trim($clause);
+                    break;
+                case 'LIMIT':
+                    $limit = "LIMIT ". trim($clause);
+                    break;
+                case 'MATCH':
+                    $match = "WHERE ". trim($clause);
+                    break;
+            }
+        }
+        
+        $query = "SELECT ". $columns. " FROM invoices ". $joins. 
+                  " ". $match. " ". $group. " ". $order. " ". $limit;
+        return $mysqli->query($query);
+    }
+    
+    public static function getItems($_id) {
         if (empty($_id)) {
             return false;
         }
@@ -118,43 +167,39 @@ class Invoice {
         return $mysqli->query($query);
     }
     
-    public static function get_all() {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM invoices";
-        
-        return $mysqli->query($query);
-    }
-    
-    public static function get_all_for_employer($_employer_id, $paid_invoices = false, $order_by = 'issued_on') {
+    public static function getAllFromEmployer($_employer_id, $_paid_invoices = false, 
+                                              $_order_by = 'issued_on') {
         $null = "IS NULL";
         if ($paid_invoices) {
             $null = "IS NOT NULL";
         }
         
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM invoices 
-                  WHERE employer = '". $_employer_id. "' AND paid_on ". $null. "
-                  ORDER BY ". $order_by;
+        $criteria = array(
+            'columns' => '*', 
+            'match' => "employer = '". $_employer_id. "' AND 
+                        paid_on ". $null, 
+            'order' => $order_by
+        );
         
-        return $mysqli->query($query);
+        return self::find($criteria);
     }
     
-    public static function add_item($_invoice, $amount = 0, $item = 0, $itemdesc = '') {
+    public static function addItem($_invoice, $_amount = 0, $_item = 0, $_itemdesc = '') {
         if (empty($_invoice) || $_invoice <= 0) {
             return false;
         }
         
         $query = "INSERT INTO invoice_items SET 
                   invoice = ". $_invoice. ", 
-                  item = ". $item. ", 
-                  itemdesc = '". $itemdesc. "', 
-                  amount = ". $amount;
+                  item = ". $_item. ", 
+                  itemdesc = '". $_itemdesc. "', 
+                  amount = ". $_amount;
         $mysqli = Database::connect();
         return $mysqli->execute($query);
     }
     
-    public static function accompany_credit_note_with($_previous_invoice, $_free_invoice, 
-                                                      $_issued_on, $_credit_amount = 0) {
+    public static function accompanyCreditNoteWith($_previous_invoice, $_free_invoice, 
+                                                   $_issued_on, $_credit_amount = 0) {
         if ((empty($_previous_invoice) || $_previous_invoice <= 0) || 
             (empty($_free_invoice) || $_free_invoice <= 0)) {
             return false;

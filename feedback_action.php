@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/private/lib/utilities.php";
+require_once dirname(__FILE__). "/../private/lib/recaptchalib.php";
 
 session_start();
 
@@ -9,18 +10,24 @@ $_SESSION['yel']['feedback']['email_addr'] = $_POST['email_addr'];
 $_SESSION['yel']['feedback']['country'] = $_POST['country'];
 $_SESSION['yel']['feedback']['feedback'] = $_POST['feedback'];
 
-if (!isset($_POST['email_addr']) || !isset($_POST['country']) || !isset($_POST['firstname']) || 
-    !isset($_POST['lastname']) || !isset($_POST['security_code']) || !isset($_POST['feedback'])) {
-    redirect_to('feedback.php');
-}
-
-// NOTE: Remember to comment this out during coding. 
-if ($_POST['security_code'] != $_SESSION['security_code']) {
+// verify captcha first
+$privatekey = '6LdwqsASAAAAAEJESjRalI-y5sjko4b82nMLC5mH';
+$resp = recaptcha_check_answer ($privatekey,
+                                'yellowelevator.com',
+                                $_POST["recaptcha_challenge_field"],
+                                $_POST["recaptcha_response_field"]);
+if (!$resp->is_valid) {
     redirect_to('feedback.php?error=1');
 }
 
+
+if (!isset($_POST['email_addr']) || !isset($_POST['country']) || !isset($_POST['firstname']) || 
+    !isset($_POST['lastname']) || !isset($_POST['feedback'])) {
+    redirect_to('feedback.php?error=2');
+}
+
 $fullname = desanitize($_SESSION['yel']['feedback']['firstname']. ', '. $_SESSION['yel']['feedback']['lastname']);
-$country = Country::country_from_code($_SESSION['yel']['feedback']['country']);
+$country = Country::getCountryFrom($_SESSION['yel']['feedback']['country']);
 
 // Send email to feedback@yellowelevator.com
 $mail_lines = file('private/mail/feedback.txt');

@@ -5,7 +5,7 @@ header('Content-type: text/xml');
 $xml_dom = new XMLDOM ();
 $response = array();
 
-$result = Country::get_all_with_display();
+$result = Country::getAllWithDisplay();
 $i = 0;
 foreach ($result as $row) {
     $response[$i]['country_code'] = $row['country_code'];
