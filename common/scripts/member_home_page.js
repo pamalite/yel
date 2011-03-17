@@ -247,10 +247,30 @@ function show_job_profile_popup(_id) {
                 var emp_specialization = xml.getElementsByTagName('employer_specialization');
                 
                 $('job_profile_id').value = _id;
-                $('position_title').value = position_title[0].childNodes[0].nodeValue;
-                $('position_superior_title').value = position_superior[0].childNodes[0].nodeValue;
-                $('organization_size').value = org_size[0].childNodes[0].nodeValue;
-                $('company').value = company[0].childNodes[0].nodeValue.replace('&amp;', '&');
+                
+                var job_title = '';
+                if (position_title[0].childNodes.length > 0) {
+                    job_title = position_title[0].childNodes[0].nodeValue;
+                }
+                $('position_title').value = job_title;
+                
+                var superior_title = '';
+                if (position_superior[0].childNodes.length > 0) {
+                    superior_title = position_superior[0].childNodes[0].nodeValue;
+                }
+                $('position_superior_title').value = superior_title;
+                
+                var orgsize = '';
+                if (org_size[0].childNodes.length > 0) {
+                    orgsize = org_size[0].childNodes[0].nodeValue;
+                }
+                $('organization_size').value = orgsize;
+                
+                var company_name = '';
+                if (company[0].childNodes.length > 0) {
+                    company_name = company[0].childNodes[0].nodeValue;
+                }
+                $('company').value = company_name.replace('&amp;', '&');
                 
                 // for (var i=0; i < $('specialization').options.length; i++) {
                 //     if ($('specialization').options[i].value == specialization[0].childNodes[0].nodeValue) {
