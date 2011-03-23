@@ -96,12 +96,12 @@ textarea {
     text-align: center;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
-}
+}*/
 
 #fees_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 .center {
@@ -159,7 +159,7 @@ table.subscription_form td div {
 }
 
 #jobs_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 #job_form {

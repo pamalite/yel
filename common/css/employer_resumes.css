@@ -34,13 +34,13 @@
     font-size: 12pt;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
-}
+}*/
 
 #referred_jobs_table tr:hover, 
 #resumes_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 .inline_job_desc {

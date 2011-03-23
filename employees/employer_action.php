@@ -431,9 +431,9 @@ if ($_POST['action'] == 'copy_fees') {
     $from_employer = new Employer($_POST['employer']);
     $to_employer = new Employer($_POST['id']);
     
-    $fees = $from_employer->get_fees();
+    $fees = $from_employer->getFees();
     
-    if ($to_employer->create_fees($fees) === false) {
+    if ($to_employer->createFees($fees) === false) {
         echo 'ko';
         exit();
     }

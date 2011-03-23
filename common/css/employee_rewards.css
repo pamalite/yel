@@ -41,7 +41,7 @@ a.menu {
 
 #new_rewards_table tr:hover, 
 #paid_rewards_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 .header {
@@ -62,10 +62,10 @@ a.menu {
     text-align: center;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
 }
-
+*/
 .buttons_bar {
     background-color: #CCCCCC;
     text-align: right;

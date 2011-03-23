@@ -42,10 +42,10 @@ div.pagination {
     text-align: center;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
 }
-
+*/
 .center {
     text-align: center;
 }
@@ -82,7 +82,7 @@ table.buttons td.right {
 }
 
 #applications_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 div.resume {

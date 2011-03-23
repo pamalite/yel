@@ -24,7 +24,7 @@ a.menu {
 #new_applicants_table tr:hover, 
 #applicants_table tr:hover, 
 #members_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 .header {
@@ -45,10 +45,10 @@ a.menu {
     text-align: center;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
 }
-
+*/
 .cell_indicator {
     width: 20px;
     text-align: center;
@@ -318,7 +318,7 @@ div.pagination {
 }
 
 #other_jobs_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 span.viewed {

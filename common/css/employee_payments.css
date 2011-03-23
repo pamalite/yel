@@ -31,7 +31,7 @@ a.menu {
 
 #invoices_table tr:hover, 
 #receipts_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 #invoices_table td.expiry_status {
@@ -61,10 +61,10 @@ img.warning {
     text-align: center;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
 }
-
+*/
 .buttons_bar {
     background-color: #CCCCCC;
     text-align: right;

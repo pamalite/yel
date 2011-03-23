@@ -56,7 +56,7 @@ class WelcomePage extends Page {
 
                 $salary = $job['currency']. '$ '. number_format($job['salary_start'], 0, '.', ',');
                 if (!is_null($job['salary_end'])) {
-                    $salary .= ' - '. number_format($job['salary_start'], 0, '.', ',');
+                    $salary .= ' - '. number_format($job['salary_end'], 0, '.', ',');
                 }
                 $top_jobs_table->set($i+1, 2, $salary, '', '');
 
