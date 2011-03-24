@@ -157,7 +157,12 @@ if ($_POST['action'] == 'buy_subscriptions') {
     
     unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
     
-    // 3. extend the subscription
+    // 3. unsuspend and extend the subscription
+    if ($employer->unsuspend_subscription() === false) {
+        echo 'ko';
+        exit();
+    }
+    
     if ($employer->extend_subscription($_POST['period']) === false) {
         echo 'ko';
         exit();

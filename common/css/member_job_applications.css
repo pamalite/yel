@@ -22,12 +22,12 @@
     border-bottom: 1px solid #CCCCCC;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
-}
+}*/
 
 #applications_table tr:hover {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 .empty_results {

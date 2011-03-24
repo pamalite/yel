@@ -60,35 +60,6 @@ class MemberSignUpPage extends Page {
         return $countries_options_html;
     }
     
-    private function generate_password_reset_questions($_selected) {
-        $questions_options_html = '';
-        
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM password_reset_questions";
-        $questions = $mysqli->query($query);
-        
-        $questions_options_html = '<select class="field" id="forget_password_question" name="forget_password_question">'. "\n";
-        
-        if (empty($_selected) || is_null($_selected) || $_selected == '0') {
-            $questions_options_html .= '<option value="0" selected>Please select a password hint.</option>'. "\n";    
-        } else {
-            $questions_options_html .= '<option value="0">Please select a password hint.</option>'. "\n";
-        }
-        
-        echo '<option value="0" disabled>&nbsp;</option>'. "\n";
-        foreach ($questions as $question) {
-            if ($question['id'] != $selected) {
-                $questions_options_html .= '<option value="'. $question['id']. '">'. $question['question']. '</option>'. "\n";
-            } else {
-                $questions_options_html .= '<option value="'. $question['id']. '" selected>'. $question['question']. '</option>'. "\n";
-            }
-        }
-        
-        $questions_options_html .= '</select>'. "\n";
-        
-        return $questions_options_html;
-    }
-    
     private function generate_industries($_id, $_selecteds, $_is_multi=false) {
         $industries_options_html = '';
         
@@ -165,7 +136,6 @@ class MemberSignUpPage extends Page {
         
         $page = file_get_contents(dirname(__FILE__). '/../../../html/member_sign_up_page.html');
         $page = str_replace('%root%', $this->url_root, $page);
-        $page = str_replace('%password_reset_questions%', $this->generate_password_reset_questions(0), $page);
         $page = str_replace('%work_from_month%', generate_month_dropdown('work_from_month', ''), $page);
         $page = str_replace('%work_to_month%', generate_month_dropdown('work_to_month', ''), $page);
         $page = str_replace('%emp_desc%', $this->generate_employer_description('emp_desc', -1), $page);

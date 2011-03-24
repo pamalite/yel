@@ -37,12 +37,12 @@
     vertical-align: middle;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
-}
+}*/
 
 #employers_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 .small_contact {

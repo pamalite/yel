@@ -111,10 +111,10 @@ textarea {
     text-align: center;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
 }
-
+*/
 .center {
     text-align: center;
 }
@@ -147,7 +147,7 @@ div.buttons_bar {
 }
 
 #resumes_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 table.buttons {
@@ -273,7 +273,7 @@ table.notes_form td.title {
 }
 
 #job_profiles_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 .mini_emp_desc, .mini_spec, 
@@ -335,7 +335,7 @@ table.notes_form td.title {
 
 #referrers_table tr:hover, 
 #referees_table tr:hover {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 #extra_notes {
@@ -358,7 +358,7 @@ table.notes_form td.title {
 }
 
 #applications_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 #testimony_window,

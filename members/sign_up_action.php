@@ -23,8 +23,7 @@ if ($_POST['action'] == 'sign_up') {
         exit();
     }
     
-    if (!isset($_POST['email_addr']) || !isset($_POST['phone_num']) || 
-        !isset($_POST['forget_password_question']) || !isset($_POST['forget_password_answer'])) {
+    if (!isset($_POST['email_addr']) || !isset($_POST['phone_num'])) {
         echo 'ko - empty_fields';
         exit();
     }
@@ -55,8 +54,6 @@ if ($_POST['action'] == 'sign_up') {
     $data['firstname'] = $_POST['firstname'];
     $data['lastname'] = $_POST['lastname'];
     $data['password'] = md5($_POST['password']);
-    $data['forget_password_question'] = $_POST['forget_password_question'];
-    $data['forget_password_answer'] = $_POST['forget_password_answer'];
     $data['phone_num'] = $_POST['phone_num'];
     $data['joined_on'] = $joined_on;
     $data['updated_on'] = $joined_on;

@@ -17,8 +17,7 @@ if (!isset($_POST['action'])) {
 
 if ($_POST['action'] == 'save_profile') {
     if (!isset($_POST['id']) || !isset($_POST['phone_num']) ||
-        !isset($_POST['zip']) || !isset($_POST['country']) || 
-        !isset($_POST['forget_password_question']) || !isset($_POST['forget_password_answer'])) {
+        !isset($_POST['zip']) || !isset($_POST['country'])) {
         echo 'ko';
         exit();
     }
@@ -27,8 +26,6 @@ if ($_POST['action'] == 'save_profile') {
 
     $data = array();
     $data['citizenship'] = $_POST['citizenship'];
-    $data['forget_password_question'] = $_POST['forget_password_question'];
-    $data['forget_password_answer'] = $_POST['forget_password_answer'];
     $data['phone_num'] = $_POST['phone_num'];
     $data['email_addr'] = $_POST['email_addr'];
     $data['zip'] = $_POST['zip'];

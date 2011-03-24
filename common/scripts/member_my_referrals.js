@@ -113,6 +113,9 @@ function show_testimony(referral_id) {
             var html = 'No testimony found.';
             if (testimonies[0].childNodes.length > 0) {
                 html = testimonies[0].childNodes[0].nodeValue.replace(/\n/g, '<br/>');
+                html = html.replace(/&amp;/g, '&');
+                html = html.replace(/&lt;/g, '<');
+                html = html.replace(/&gt;/g, '>');
             }
             $('testimony').set('html', html);
             $('div_blanket').setStyle('display', 'block');

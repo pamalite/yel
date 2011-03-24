@@ -153,15 +153,15 @@ echo '<link rel="stylesheet" type="text/css" href="'. $GLOBALS['protocol']. '://
         </tr>
         <tr>
             <td class="value"><?php echo pad($_GET['id'], 11, '0') ?></td>
-            <td class="value"><?php echo $invoice[0]['issued_on'] ?></td>
+            <td class="value"><?php echo $invoice[0]['formatted_issued_on'] ?></td>
             <?php
                 if (is_null($invoice[0]['paid_on']) || empty($invoice[0]['paid_on'])) {
             ?>
-            <td class="value"><?php echo $invoice[0]['payable_by'] ?></td>
+            <td class="value"><?php echo $invoice[0]['formatted_payable_by'] ?></td>
             <?php
                 } else {
             ?>
-            <td class="value"><?php echo $invoice[0]['paid_on'] ?></td>
+            <td class="value"><?php echo $invoice[0]['formatted_paid_on'] ?></td>
             <?php
                 }
             ?>

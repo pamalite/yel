@@ -580,7 +580,12 @@ if ($_POST['action'] == 'save_profile') {
 
         unlink($GLOBALS['data_path']. '/subscription_invoices/'. $invoice. '.pdf');
 
-        // 3. extend the subscription
+        // 3. unsuspend and extend the subscription
+        if ($employer->unsuspend_subscription() === false) {
+            echo 'ko';
+            exit();
+        }
+        
         if ($employer->extend_subscription($_POST['subscription_period']) === false) {
             echo 'ko';
             exit();

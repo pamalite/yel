@@ -270,12 +270,12 @@ div.job_profiles {
     text-align: center;
 }
 
-.cell:hover {
+/*.cell:hover {
     background-color: #BBFCA1;
-}
+}*/
 
 #job_profiles_table tr:hover  {
-    background-color: #FFFF00;
+    background-color: #EFEFEF;
 }
 
 .mini_emp_desc, .mini_spec, 

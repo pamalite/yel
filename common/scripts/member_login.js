@@ -1,57 +1,22 @@
 var seed = "";
 var sid = "";
 
-function continue_password_reset() {
-    if (!isEmail($('email_addr').value)) {
-        alert('Please provide the e-mail address used as your login.\n\nIf you have forgotten your login e-mail, please contact our support team.');
-        return false;
-    }
-    
-    var params = 'id=' + $('email_addr').value + '&action=get_password_hint';
-    var uri = root + "/members/login_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                alert('An error occured while searching password hint.');
-                return false;
-            }
-            
-            var hints = xml.getElementsByTagName('hint');
-            $('password_hint').set('html', hints[0].childNodes[0].nodeValue);
-            
-            $('div_password_hint_form').setStyle('display', 'none');
-            $('div_password_reset_form').setStyle('display', 'block');
-            $('window_title').set('html', 'Reset My Password');
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Searching password hint...');
-        }
-    });
-    
-    request.send(params);
-    
-}
-
 function close_password_reset_window(_is_reset_password) {
     if (_is_reset_password) {
-        if (isEmpty($('hint_answer').value)) {
-            alert('You need to answer the question to proceed with the password reset.');
+        if (!isEmail($('email_addr').value)) {
+            alert('Please provide the e-mail address used as your login.\n\nIf you have forgotten your login e-mail, please contact our support team.');
             return false;
         }
-
+        
         var params = 'id=' + $('email_addr').value + '&action=reset_password';
-        params = params + '&answer='+ $('hint_answer').value;
-
+        
         var uri = root + "/members/login_action.php";
         var request = new Request({
             url: uri,
             method: 'post',
             onSuccess: function(txt, xml) {
                 if (txt == 'ko') {
-                    alert('An error occured while resetting password hint.');
+                    alert('An error occured while resetting password.');
                     return false;
                 }
 
@@ -61,6 +26,7 @@ function close_password_reset_window(_is_reset_password) {
                 }
                 
                 alert('Password was successfully reset. Please check your inbox for temporary password.');
+                set_status();
             },
             onRequest: function(instance) {
                 set_status('Resetting password...');
@@ -74,8 +40,7 @@ function close_password_reset_window(_is_reset_password) {
 }
 
 function show_password_reset_window() {
-    $('div_password_hint_form').setStyle('display', 'block');
-    $('div_password_reset_form').setStyle('display', 'none');
+    $('div_password_reset_form').setStyle('display', 'block');
     
     show_window('div_password_reset_window');
 }
