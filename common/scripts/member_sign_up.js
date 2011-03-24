@@ -42,22 +42,6 @@ function validate_sign_up() {
         reset_field($('password_confirm'))
     }
     
-    if ($('forget_password_question').options[$('forget_password_question').selectedIndex].value == 0) {
-        alert('You must at least choose a password hint.');
-        $('forget_password_question').setStyle('border', '2px solid #FF0000');
-        return false;
-    } else {
-        reset_field($('forget_password_question'));
-    }
-    
-    if ($('forget_password_answer').value == '') {
-        alert('The answer to your password hint cannot be empty');
-        $('forget_password_answer').setStyle('border', '2px solid #FF0000');
-        return false;
-    } else {
-        reset_field($('forget_password_answer'));
-    }
-    
     if ($('phone_num').value == '') {
         alert('Telephone number cannot be empty.');
         $('phone_num').setStyle('border', '2px solid #FF0000');
@@ -233,8 +217,6 @@ function sign_up() {
     params = params + '&firstname=' + $('firstname').value;
     params = params + '&lastname=' + $('lastname').value;
     params = params + '&password=' + $('password').value;
-    params = params + '&forget_password_question=' + $('forget_password_question').value;
-    params = params + '&forget_password_answer=' + $('forget_password_answer').value;
     params = params + '&phone_num=' + $('phone_num').value;
     params = params + '&recaptcha_challenge=' + encodeURIComponent($('recaptcha_challenge_field').value);
     params = params + '&recaptcha_response=' + encodeURIComponent($('recaptcha_response_field').value);

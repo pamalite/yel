@@ -63,24 +63,6 @@ class MemberProfilePage extends Page {
         echo '</select>'. "\n";
     }
     
-    private function generate_password_reset_questions($_selected) {
-        $mysqli = Database::connect();
-        $query = "SELECT * FROM password_reset_questions";
-        $questions = $mysqli->query($query);
-        
-        echo '<select class="field" id="forget_password_question" name="forget_password_question">'. "\n";
-        
-        foreach ($questions as $question) {
-            if ($question['id'] != $_selected) {
-                echo '<option value="'. $question['id']. '">'. $question['question']. '</option>'. "\n";
-            } else {
-                echo '<option value="'. $question['id']. '" selected>'. $question['question']. '</option>'. "\n";
-            }
-        }
-        
-        echo '</select>'. "\n";
-    }
-    
     private function generate_industries($_id) {
         $expertises = $this->member->getIndustries();
         
@@ -197,16 +179,6 @@ class MemberProfilePage extends Page {
                     <tr>
                         <td class="label"><label for="password_confirm">Confirm New Password:</label></td>
                         <td class="field"><input class="field" type="password" id="password_confirm" name="password_confirm" /></td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="forget_password_question">Forgot password question:</label></td>
-                        <td class="field">
-                            <?php $this->generate_password_reset_questions($profile[0]['forget_password_question']); ?>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label"><label for="forget_password_answer">Forgot passsword answer:</label></td>
-                        <td class="field"><input class="field" type="text" id="forget_password_answer" name="forget_password_answer" value="<?php echo $profile[0]['forget_password_answer'] ?>" /></td>
                     </tr>
                     <tr>
                         <td class="title" colspan="2">Contact Details</td>

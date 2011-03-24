@@ -15,31 +15,11 @@ if (!isset($_POST['action'])) {
     redirect_to('login.php');
 }
 
-if ($_POST['action'] == 'get_password_hint') {
-    $member = new Member($_POST['id']);
-    $question = $member->getPasswordHint();
-    
-    if (!$question) {
-        echo 'ko';
-        exit();
-    }
-    
-    header('Content-type: text/xml');
-    $response = array('password' => array('hint' => $question));
-    echo $xml_dom->get_xml_from_array($response);
-    exit();
-}
-
 if ($_POST['action'] == 'reset_password') {
     $member = new Member($_POST['id']);
-    $criteria = array(
-        'columns' => "forget_password_answer", 
-        'match' => "email_addr = '". $member->getId(). "'", 
-        'limit' => "1"
-    );
-    $result = $member->find($criteria);
+    $result = $member->get();
     
-    if (strtoupper(trim($result[0]['forget_password_answer'])) == strtoupper(trim($_POST['answer']))) {
+    if (!is_null($result) && !empty($result)) {
         $temp_password = generate_random_string_of(6);
         $data = array();
         $data['password'] = md5($temp_password);

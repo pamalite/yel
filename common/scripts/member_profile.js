@@ -6,11 +6,6 @@ function validate() {
         return false;
     }
     
-    if ($('forget_password_answer').value == '') {
-        alert('Forgot password answer cannot be empty');
-        return false;
-    }
-    
     if ($('phone_num').value == '') {
         alert('Telephone number cannot be empty.');
         return false;
@@ -82,8 +77,6 @@ function save_profile() {
     
     var params = 'id=' + id + '&action=save_profile';
     params = params + '&citizenship=' + $('citizenship').options[$('citizenship').selectedIndex].value;
-    params = params + '&forget_password_question=' + $('forget_password_question').value;
-    params = params + '&forget_password_answer=' + $('forget_password_answer').value;
     params = params + '&phone_num=' + $('phone_num').value;
     params = params + '&address=' + $('address').value;
     params = params + '&state=' + $('state').value;
