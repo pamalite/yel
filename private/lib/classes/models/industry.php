@@ -200,5 +200,27 @@ class Industry {
         
         return $main_industries;
     }
+    
+    public static function getIndustriesFromJobs($_with_job_count = false) {
+        $mysqli = Database::connect();
+        
+        $query = "";
+        if ($_with_job_count) {
+            $query = "SELECT industries.id, industries.industry, COUNT(jobs.id) AS job_count 
+                      FROM jobs 
+                      LEFT JOIN industries ON industries.id = jobs.industry 
+                      -- WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() 
+                      GROUP BY industries.id 
+                      ORDER BY industries.industry";
+        } else {
+            $query = "SELECT DISTINCT industries.id, industries.industry 
+                      FROM jobs 
+                      LEFT JOIN industries ON industries.id = jobs.industry 
+                      -- WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() 
+                      ORDER BY industries.industry";
+        }
+        
+        return $mysqli->query($query);
+    }
 }
 ?>

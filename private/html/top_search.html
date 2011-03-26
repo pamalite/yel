@@ -7,6 +7,7 @@
             <td class="top_search">
                 <form method="post" action="%root%/search.php" onSubmit="return verify_mini();">
                     <div>
+                        <input type="text" name="keywords" id="mini_keywords" alt="Job title or keywords" value="" />
                         <select id="mini_employer" name="employer"> 
                             <option value="0">Any Employer</option> 
                             <option value="0" disabled>&nbsp;</option> 
@@ -22,11 +23,12 @@
                             <option value="" disabled>&nbsp;</option> 
                             <!-- %countries_options% -->
                         </select>
+                        <input id="mini_search_button" type="submit" value="Search Jobs" />
                     </div>
                     <div>
-                        <input type="text" name="keywords" id="mini_keywords" alt="Job title or keywords" value="" />
+                        <!-- input type="text" name="keywords" id="mini_keywords" alt="Job title or keywords" value="" />
                         &nbsp;
-                        <input id="mini_search_button" type="submit" value="Search Jobs">
+                        <input id="mini_search_button" type="submit" value="Search Jobs" -->
                     </div>
                 </form>
             </td>

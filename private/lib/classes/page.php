@@ -126,43 +126,27 @@ class Page {
     protected function top_search($_page_title) {
         // get the employers
         $criteria = array(
-            'columns' => 'DISTINCT employers.id, employers.name', 
-            'joins' => 'jobs ON employers.id = jobs.employer',
+            'columns' => 'employers.id, employers.name, COUNT(jobs.id) AS job_count', 
+            'joins' => 'employers ON employers.id = jobs.employer',
             // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'group' => 'employers.id', 
             'order' => 'employers.name ASC'
         );
-        $employer = new Employer();
-        $employers = $employer->find($criteria);
+        $job = new Job();
+        $employers = $job->find($criteria);
         if ($employers === false) {
             $employers = array();
         }
         
         // get the industries
-        $industries = array();
-        $main_industries = Industry::getMain(true);
-        $i = 0;
-        foreach ($main_industries as $main) {
-            $industries[$i]['id'] = $main['id'];
-            $industries[$i]['name'] = $main['industry'];
-            $industries[$i]['job_count'] = $main['job_count'];
-            $industries[$i]['is_main'] = true;
-            $subs = Industry::getSubIndustriesOf($main['id'], true);
-            foreach ($subs as $sub) {
-                $i++;
-
-                $industries[$i]['id'] = $sub['id'];
-                $industries[$i]['name'] = $sub['industry'];
-                $industries[$i]['job_count'] = $sub['job_count'];
-                $industries[$i]['is_main'] = false;
-            }
-            $i++;
-        }
+        $industries = Industry::getIndustriesFromJobs(true);
         
         // get the countries
         $criteria = array(
-            'columns' => "DISTINCT countries.country_code, countries.country", 
+            'columns' => "countries.country_code, countries.country, COUNT(jobs.id) AS job_count", 
             'joins' => "countries ON countries.country_code = jobs.country",
             // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'group' => "countries.country_code", 
             'order' => "countries.country ASC"
         );
         
@@ -174,18 +158,19 @@ class Page {
         
         $employers_options = '';
         foreach ($employers as $emp) {
-            $employers_options .= '<option value="'. $emp['id'].'">'. desanitize($emp['name']). '</option>'. "\n";
+            $employers_options .= '<option value="'. $emp['id'].'">'. desanitize($emp['name']);
+            
+            if ($emp['job_count'] > 0) {
+                $employers_options .= '&nbsp;('. $emp['job_count']. ')';
+            }
+            $employers_options .= '</option>'. "\n";
         }
         $top = str_replace('<!-- %employers_options% -->', $employers_options, $top);
         
         $industries_options = '';
         foreach ($industries as $industry) {
-            if ($industry['is_main']) {
-                $industries_options .= '<option value="'. $industry['id']. '" class="main_industry">'. $industry['name'];
-            } else {
-                $industries_options .= '<option value="'. $industry['id']. '">&nbsp;&nbsp;&nbsp;&nbsp;'. $industry['name'];
-            }
-
+            $industries_options .= '<option value="'. $industry['id']. '">'. $industry['industry'];
+            
             if ($industry['job_count'] > 0) {
                 $industries_options .= '&nbsp;('. $industry['job_count']. ')';
             }
@@ -195,7 +180,12 @@ class Page {
         
         $countries_options = '';
         foreach ($countries as $a_country) {
-            $countries_options .= '<option value="'. $a_country['country_code']. '">'. $a_country['country']. '</option>'. "\n";
+            $countries_options .= '<option value="'. $a_country['country_code']. '">'. $a_country['country'];
+            
+            if ($a_country['job_count'] > 0) {
+                $countries_options .= '&nbsp;('. $a_country['job_count']. ')';
+            }
+            $countries_options .= '</option>'. "\n";
         }
         $top = str_replace('<!-- %countries_options% -->', $countries_options, $top);
         
