@@ -17,7 +17,7 @@ body {
 #welcome_top {
     margin: auto;
 /*    width: 779px;*/
-    width: 80%;
+    width: 90%;
     height: 107px;
 /*    border: 1px solid white;*/
 }
@@ -221,7 +221,7 @@ div.top_jobs {
 /*    margin-top: 15px;*/
     margin-bottom: 15px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #d9d9d9;
+/*    border-bottom: 1px solid #d9d9d9;*/
 }
 
 div.top_jobs div.top_jobs_title {
