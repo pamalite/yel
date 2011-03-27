@@ -2,17 +2,19 @@
     <div id="welcome_top">
         <img src="%root%/common/images/logos/logo2.jpg" alt="Elevator" id="logo" />
         
-        <div class="topmenu">
-            <a href="about.php">About Us</a>
-            &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="margin-top: 3px;"/>&nbsp;
-            <a href="contact.php">Contact Us</a>
-        </div>
-        
         <div class="loginpanel">
+            <form onSubmit="return false;">
             <span style="display: %not_logged_in%;">
-                <a class="welcome_employers" href="%root%/employers/">Employers</a>
-                &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="margin-top: 3px;" />&nbsp;
-                <a class="welcome_members" href="%root%/members/">Candidates Login</a>
+                <!-- <a class="welcome_members" href="%root%/members/">Candidate Login</a> -->
+                <input type="text" id="login_email_addr" alt="Email" />
+                <input type="password" id="login_password" alt="Password" />
+                <input type="button" id="login" value="Login" />
+                &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="vertical-align: middle;" />&nbsp;
+                <a class="welcome_members" href="%root%/members/">
+                    <img src="%root%/common/images/but-log-in-linkedin-small.png" style="border: none; vertical-align: middle;" />
+                </a>
+                &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="vertical-align: middle;" />&nbsp;
+                <a class="welcome_members" href="%root%/members/sign_up.php">Sign Up</a>
             </span>
             <span style="display: %member_logged_in%;">
                 Go back to <span style="font-weight: bold;"><a href="%root%/members">Career Profile</a></span> or <span style="font-weight: bold;"><a href="%root%/members/logout.php">Logout</a></span>
@@ -23,7 +25,7 @@
             <span style="display: %employee_logged_in%;">
                 Go back to <span style="font-weight: bold;"><a href="%root%/employees">Employee Home</a></span> or <span style="font-weight: bold;"><a href="%root%/employees/logout.php">Logout</a></span>
             </span>
+            </form>
         </div>
-        
     </div>
 </div>

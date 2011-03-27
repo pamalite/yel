@@ -113,6 +113,44 @@
     margin-top: -19px;
 }
 
+#div_resumes {
+    padding-top: 5px;
+    padding-bottom: 20px;
+}
+
+#resumes_table {
+    margin: auto;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#resumes_table tr:hover {
+    background-color: #EFEFEF;
+}
+
+#upload_resume_window {
+    width: 450px;
+    display: none;
+}
+
+#upload_progress {
+    display: none;
+}
+
+.upload_resume_form {
+    width: 99%;
+    height: 165px;
+    margin: auto;
+    overflow: auto;
+}
+
+.upload_field {
+    margin-top: 3px;
+    text-align: center;
+    margin: auto;
+    width: 100%;
+}
+
 .profile {
     width: 99%;
     border: 1px solid #FFFFFF;

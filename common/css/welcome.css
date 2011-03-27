@@ -16,8 +16,10 @@ body {
 
 #welcome_top {
     margin: auto;
-    width: 779px;
+/*    width: 779px;*/
+    width: 80%;
     height: 107px;
+/*    border: 1px solid white;*/
 }
 
 #welcome_top div.topmenu {
@@ -31,9 +33,12 @@ body {
 #welcome_top div.loginpanel {
     font-size: 11pt;
     display: inline;
-    position: absolute;
+/*    position: absolute;*/
     margin-top: 20px;
-    margin-left: 300px;
+    margin-right: 50px;
+    float: right;
+    text-align: right;
+/*    border: 1px solid white;*/
 }
 
 
@@ -57,7 +62,8 @@ body {
 
 div.content {
     margin: auto;
-    width: 747px;
+/*    width: 747px;*/
+    width: 80%;
 }
 
 div.content div.section_top {
@@ -82,11 +88,13 @@ div.panel.middle {
 
 div.section_bottom {
     margin: auto;
+    padding-top: 10px;
 }
 
 table.details {
     margin: auto;
-    width: 747px;
+/*    width: 747px;*/
+    width: 85%;
     border-collapse: collapse;
     border-spacing: 0px;
 }
@@ -95,8 +103,12 @@ table.details td {
     vertical-align: top;
 }
 
-table.details td.why_connect {
+table.details td.top_jobs {
     border-right: 1px solid #d9d9d9;
+}
+
+table.details td.for_employers {
+    width: 30%;
 }
 
 table.details td div.practice {
@@ -118,6 +130,36 @@ table.details td div.facebook_panel {
 table.details td div.youtube {
     margin-top: 10px;
     margin-left: 23px;
+}
+
+div.for_employers {
+    margin: 3px 3px 3px 3px;
+    margin-top: 20px;
+}
+
+div.for_employers div.for_employers_title {
+    font-size: 20pt;
+    border-bottom: 1px solid #d9d9d9;
+    color: #000000;
+    margin: 3px 3px 3px 3px;
+    padding-bottom: 15px;
+}
+
+div.for_employers div.for_employers_content {
+    margin-top: 10px;
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-bottom: 3px;
+}
+
+div.for_employers div.for_employers_login {
+    margin-top: 35px;
+    margin-left: 35px;
+    margin-right: 35px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid #cccccc;
+    text-align: center;
 }
 
 div.side-text {
@@ -172,24 +214,25 @@ label.overTxtLabel {
 }
 
 div.top_jobs {
-    width: 847px;
+/*    width: 847px;*/
+    width: 98%;
     background-color: white;
     margin: auto;
-    margin-top: 15px;
+/*    margin-top: 15px;*/
     margin-bottom: 15px;
     padding-bottom: 15px;
     border-bottom: 1px solid #d9d9d9;
 }
 
 div.top_jobs div.top_jobs_title {
-    padding-top: 30px;
+    padding-top: 25px;
     border-bottom: 1px solid #d9d9d9;
     padding-left: 25px;
     padding-bottom: 10px;
 }
 
 #top_jobs_table {
-    width: 784px !important;
+/*    width: 784px !important;*/
     margin-top: 17px !important;
     color: #8b8987;
     width: 100%;
@@ -225,7 +268,7 @@ div.counters {
     width: 847px;
 }
 
-#top_employers {
+/*#top_employers {
     width: 847px;
     margin: auto;
     padding-top: 35px;
@@ -250,4 +293,22 @@ div.counters {
 
 div.employer_logos {
     text-align: center;
+}
+*/
+
+div.client-box {
+    margin: 3px 3px 3px 3px;
+    margin-top: 28px;
+}
+div.client-box .employer_logos {
+    width: 230px;
+}
+
+div.client-box table.employers_carousel {
+    margin: auto;
+    border-collapse: collapse;
+}
+
+div.client-box table.employers_carousel td {
+    vertical-align: middle;
 }

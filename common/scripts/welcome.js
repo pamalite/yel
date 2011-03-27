@@ -1,3 +1,5 @@
+var seed = "";
+var sid = "";
 var employers_index = 0;
 
 function verify() {
@@ -14,6 +16,79 @@ function verify() {
     }
     
     return true;
+}
+
+function login() {
+    if (!isEmail($('login_email_addr').value) || isEmpty($('login_password').value)) {
+        set_status("Sign In Email and Password fields cannot be empty.");
+        return false;
+    } 
+    
+    if (seed == "") {
+        location.replace(root + "/errors/temporarily_down.php");
+        return false;
+    }
+    
+    
+    var hash = sha1($('login_email_addr').value + md5($('login_password').value) + seed);
+    var params = 'id=' + $('login_email_addr').value + '&sid=' + sid + '&hash=' + hash + '&action=login';
+    
+    var uri = root + "/members/login_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            if (xml.getElementsByTagName('errors').length != 0) {
+                var errors = xml.getElementsByTagName('error');
+                var msg = errors[0].childNodes[0].nodeValue;
+                if (msg == "bad_login") {
+                    location.replace(root + '/errors/failed_login.php?dir=members');
+                }
+                
+                // set_status(msg);
+                return false;
+            }
+            
+            var status = xml.getElementsByTagName('status');
+            
+            if (status[0].childNodes[0].nodeValue == 'ok') {
+                location.replace(root + '/members/home.php');
+            }
+        },
+        onRequest: function(instance) {
+            // set_status("Logging in...");
+        }
+    });
+    
+    request.send(params);
+}
+
+function get_seed() {
+    var seed_uri = root + "/members/seed.php";
+    var request = new Request({
+        url: seed_uri,
+        onSuccess: function(txt, xml) {
+            // set_status("");
+            
+            if (xml.getElementsByTagName('errors').length != 0) {
+                location.replace(root + '/errors/temporarily_down.php');
+            }
+            
+            var sids = xml.getElementsByTagName('id');
+            var seeds = xml.getElementsByTagName('seed');
+            
+            sid = sids[0].childNodes[0].nodeValue;
+            seed = seeds[0].childNodes[0].nodeValue;
+        },
+        onFailure: function() {
+            location.replace(root + '/errors/temporarily_down.php');
+        },
+        onRequest: function(instance) {
+            // set_status("Loading...");
+        }
+    });
+    
+    request.send();
 }
 
 function set_employers_mouse_events() {
@@ -73,47 +148,15 @@ function onDomReady() {
 }
 
 function onLoaded() {
+    if ($('login_email_addr') != null) {
+        new OverText($('login_email_addr'));
+        new OverText($('login_password'));
+    }
+    
     initialize_page();
     
-    $('connect').addEvent('mouseover', function(e) {
-        $('connect').src = root + '/common/images/connect_with_recruitment_hover.jpg';
-    });
-    
-    $('connect').addEvent('mouseout', function(e) {
-        $('connect').src = root + '/common/images/connect_with_recruitment.jpg';
-    });
-    
-    $('cash_bonus').addEvent('mouseover', function(e) {
-        $('cash_bonus').src = root + '/common/images/get_cash_bonus_hover.jpg';
-    });
-    
-    $('cash_bonus').addEvent('mouseout', function(e) {
-        $('cash_bonus').src = root + '/common/images/get_cash_bonus.jpg';
-    });
-    
-    $('7_years').addEvent('mouseover', function(e) {
-        $('7_years').src = root + '/common/images/7years_work_experience_hover.jpg';
-    });
-    
-    $('7_years').addEvent('mouseout', function(e) {
-        $('7_years').src = root + '/common/images/7years_work_experience.jpg';
-    });
-    
-    $('get_connected_1').addEvent('mouseover', function(e) {
-        $('get_connected_1').src = root + '/common/images/get_connected_but_hover.jpg';
-    });
-    
-    $('get_connected_1').addEvent('mouseout', function(e) {
-        $('get_connected_1').src = root + '/common/images/get_connected_but.jpg';
-    });
-    
-    $('get_connected_2').addEvent('mouseover', function(e) {
-        $('get_connected_2').src = root + '/common/images/get_connected_but_hover.jpg';
-    });
-    
-    $('get_connected_2').addEvent('mouseout', function(e) {
-        $('get_connected_2').src = root + '/common/images/get_connected_but.jpg';
-    });
+    get_seed();
+    $('login').addEvent('click', login);
 }
 
 window.addEvent('domready', onDomReady);

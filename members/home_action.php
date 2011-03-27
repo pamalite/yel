@@ -125,4 +125,48 @@ if ($_POST['action'] == 'remove_job_profile') {
     echo 'ok';
     exit();
 }
+
+if ($_POST['action'] == 'upload') {
+    $resume = NULL;
+    $member = new Member($_POST['member']);
+    $is_update = false;
+    $data = array();
+    $data['modified_on'] = now();
+    $data['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_resume_file']['name']));
+    $data['private'] = 'N';
+    
+    if ($_POST['id'] == '0') {
+        $resume = new Resume($member->getId());
+        if (!$resume->create($data)) {
+            redirect_to('home.php?error=2');
+            exit();
+        }
+    } else {
+        $resume = new Resume($member->getId(), $_POST['id']);
+        $is_update = true;
+        if (!$resume->update($data)) {
+            redirect_to('home.php?error=3');
+            exit();
+        }
+    }
+    
+    $data = array();
+    $data['FILE'] = array();
+    $data['FILE']['type'] = $_FILES['my_resume_file']['type'];
+    $data['FILE']['size'] = $_FILES['my_resume_file']['size'];
+    $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['my_resume_file']['name']));
+    $data['FILE']['tmp_name'] = $_FILES['my_resume_file']['tmp_name'];
+    
+    if ($resume->uploadFile($data, $is_update) === false) {
+        $query = "DELETE FROM resume_index WHERE resume = ". $resume->getId(). ";
+                  DELETE FROM resumes WHERE id = ". $resume->getId();
+        $mysqli = Database::connect();
+        $mysqli->transact($query);
+        redirect_to('home.php?error=4');
+        exit();
+    }
+    
+    redirect_to('home.php');
+    exit();
+}
 ?>

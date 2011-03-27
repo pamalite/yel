@@ -20,6 +20,15 @@ class MemberHomePage extends Page {
             case '1':
                 $this->error_message = 'An error occured when trying to upload your photo.\\n\\nPlease try again later. Please make sure that the file you are uploading is listed in the resume upload window.\\n\\nIf problem persist, please contact our technical support for further assistance.';
                 break;
+            case '2':
+                $this->error_message = 'An error occured when trying to create a new resume placeholder.\\n\\nPlease try again later. If problem persist, please contact our technical support for further assistance.';
+                break;
+            case '3':
+                $this->error_message = 'An error occured when trying to update your resume.\\n\\nPlease try again later. If problem persist, please contact our technical support for further assistance.';
+                break;
+            case '4':
+                $this->error_message = 'An error occured when uploading your resume. \\n\\nPlease try again later. Please make sure that the file you are uploading is listed in the resume upload window.\\n\\nIf problem persist, please contact our technical support for further assistance.';
+                break;
             default:
                 $this->error_message = '';
         }
@@ -248,6 +257,20 @@ class MemberHomePage extends Page {
         return $emp_descs_options_str;
     }
     
+    private function get_resumes() {
+        $resume = new Resume();
+        
+        $criteria = array(
+            'columns' => "id, file_name, DATE_FORMAT(modified_on, '%e %b, %Y') AS formatted_modified_on", 
+            'match' => "member = '". $this->member->getId(). "' AND 
+                        deleted = 'N' AND 
+                        is_yel_uploaded = FALSE", 
+            'order' => "modified_on DESC"
+        );
+        
+        return $resume->find($criteria);
+    }
+    
     public function show() {
         $this->begin();
         $this->top_search('Home');
@@ -330,6 +353,31 @@ class MemberHomePage extends Page {
             $photo_html = '<img id="photo_image" class="photo_image" src="candidate_photo.php?id='. $this->member->getId(). '" />';
         }
         $page = str_replace('%photo_html%', $photo_html, $page);
+        
+        // resumes
+        $resumes = $this->get_resumes();
+        $page = str_replace('%member_email%', $this->member->getId(), $page);
+        if (empty($resumes)) {
+            $page = str_replace('%no_resumes%', 'block', $page);
+            $page = str_replace('%resumes_table%', '', $page);
+        } else {
+            $page = str_replace('%no_resumes%', 'none', $page);
+            $resumes_table = new HTMLTable('resumes_table', 'resumes');
+            
+            $resumes_table->set(0, 0, "Updated On", '', 'header');
+            $resumes_table->set(0, 1, "File Name", '', 'header');
+            $resumes_table->set(0, 2, "&nbsp;", '', 'header actions');
+
+            foreach ($resumes as $i=>$resume) {
+                $resumes_table->set($i+1, 0, $resume['formatted_modified_on'], '', 'cell');
+                $resumes_table->set($i+1, 1, '<a href="resume.php?id='. $resume['id']. '">'. $resume['file_name']. '</a>', '', 'cell');
+                $resumes_table->set($i+1, 2, '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>', '', 'cell actions');
+                //$resumes_table->set($i+1, 2, '<a class="no_link" onClick="delete_resume('. $resume['id']. ');">Delete</a>&nbsp;|&nbsp;<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>', '', 'cell actions');
+            }
+
+            $page = str_replace('%resumes_table%', $resumes_table->get_html(), $page);
+        }
+        
         
         // career profile
         $is_active_str = 'No';

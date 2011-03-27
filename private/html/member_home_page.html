@@ -33,6 +33,16 @@
                     </td>
                     
                     <td class="career_profile">
+                        <div class="resumes">
+                            <div class="profile_title">Resumes [<a class="no_link" onClick="show_upload_resume_popup(0);">upload new</a>]</div>
+                            <div id="div_resumes">
+                                <div class="empty_results" style="display: %no_resumes%;">
+                                    Upload a <a class="no_link" onClick="show_upload_resume_popup(0);">new resume</a>.
+                                </div>
+                                %resumes_table%
+                            </div>
+                        </div>
+                        
                         <div class="profile">
                             <div class="profile_title">Career Profile [<a class="no_link" onClick="show_career_summary_popup();">edit</a>]</div>
                             <div class="profile_form">
@@ -180,6 +190,35 @@
         <div class="popup_window_buttons_bar">
             <input type="submit" value="Upload Photo" />
             <input type="button" value="Close" onClick="close_upload_photo_popup(false);" />
+        </div>
+    </form>
+</div>
+
+<div id="upload_resume_window" class="popup_window">
+    <div class="popup_window_title">Upload Resume</div>
+    <form id="upload_resume_form" action="home_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_upload_resume_popup(true);">
+        <div class="upload_resume_form">
+            <input type="hidden" id="resume_id" name="id" value="0" />
+            <input type="hidden" name="member" value="%member_email%" />
+            <input type="hidden" name="action" value="upload" />
+            <div id="upload_progress" style="text-align: center; width: 99%; margin: auto;">
+                Please wait while your resume is being uploaded... <br/><br/>
+                <img src="%root%/common/images/progress/circle_big.gif" />
+            </div>
+            <div id="upload_field" class="upload_field">
+                <input id="my_resume_file" name="my_resume_file" type="file" />
+                <div style="font-size: 9pt; margin-top: 15px;">
+                    <ol>
+                        <li>Only HTML (*.html, *.htm), Text (*.txt), Portable Document Format (*.pdf) or MS Word document (*.doc) with the file size of less than 1MB are allowed.</li>
+                        <li>You can upload as many resumes as you want and designate them for different job applications.</li>
+                        <li>You can update your resume by clicking &quot;Update&quot; then upload an updated version.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="popup_window_buttons_bar">
+             <input type="submit" value="Upload" />
+             <input type="button" value="Cancel" onClick="close_upload_resume_popup(false);" />
         </div>
     </form>
 </div>

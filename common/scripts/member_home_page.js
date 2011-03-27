@@ -431,6 +431,32 @@ function show_upload_photo_popup() {
     show_window('upload_photo_window');
 }
 
+function update_resume(_resume_id) {
+    show_upload_resume_popup(_resume_id);
+}
+
+function close_upload_resume_popup(_is_upload) {
+    if (_is_upload) {
+        if (isEmpty($('my_resume_file').value)) {
+            alert('You need to select a resume to upload.');
+            return false;
+        }
+        
+        close_safari_connection();
+        return true;
+    } else {
+        close_window('upload_resume_window');
+    }
+}
+
+function show_upload_resume_popup(_resume_id) {
+    $('resume_id').value = _resume_id;
+    $('upload_field').setStyle('display', 'block');
+    show_window('upload_resume_window');
+    // window.scrollTo(0, 0);
+}
+
+
 function onDomReady() {}
 
 function onLoaded() {

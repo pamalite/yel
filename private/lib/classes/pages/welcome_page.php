@@ -34,7 +34,7 @@ class WelcomePage extends Page {
             'joins' => "job_index ON job_index.job = jobs.id, 
                         employers ON employers.id = jobs.employer, 
                         branches ON branches.id = employers.branch", 
-            'match' => "jobs.closed = 'N' AND jobs.expire_on >= NOW() AND jobs.deleted = FALSE", 
+            // 'match' => "jobs.closed = 'N' AND jobs.expire_on >= NOW() AND jobs.deleted = FALSE", 
             'order' => "jobs.salary DESC", 
             'limit' => "10"
         );

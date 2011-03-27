@@ -273,12 +273,6 @@ class Page {
                 $menu = str_replace('%member_home%', 'none', $menu);
             }
             
-            if ($page == 'resumes') {
-                $menu = str_replace('%member_resumes%', $selected, $menu);
-            } else {
-                $menu = str_replace('%member_resumes%', 'none', $menu);
-            }
-            
             if ($page == 'job_applications') {
                 $menu = str_replace('%member_job_apps%', $selected, $menu);
             } else {
