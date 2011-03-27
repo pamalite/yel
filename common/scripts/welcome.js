@@ -20,7 +20,7 @@ function verify() {
 
 function login() {
     if (!isEmail($('login_email_addr').value) || isEmpty($('login_password').value)) {
-        set_status("Sign In Email and Password fields cannot be empty.");
+        alert("Email and Password fields cannot be empty.");
         return false;
     } 
     
@@ -45,7 +45,7 @@ function login() {
                     location.replace(root + '/errors/failed_login.php?dir=members');
                 }
                 
-                // set_status(msg);
+                alert(msg);
                 return false;
             }
             
@@ -89,6 +89,50 @@ function get_seed() {
     });
     
     request.send();
+}
+
+function close_password_reset_window(_is_reset_password) {
+    if (_is_reset_password) {
+        if (!isEmail($('email_addr').value)) {
+            alert('Please provide the e-mail address used as your login.\n\nIf you have forgotten your login e-mail, please contact our support team.');
+            return false;
+        }
+        
+        var params = 'id=' + $('email_addr').value + '&action=reset_password';
+        
+        var uri = root + "/members/login_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('An error occured while resetting password.');
+                    return false;
+                }
+
+                if (txt == 'bad') {
+                    alert('The answer is incorrect.');
+                    return false;
+                }
+                
+                alert('Password was successfully reset. Please check your inbox for temporary password.');
+                // set_status();
+            },
+            onRequest: function(instance) {
+                // set_status('Resetting password...');
+            }
+        });
+
+        request.send(params);
+    }
+    
+    close_window('div_password_reset_window');
+}
+
+function show_password_reset_window() {
+    $('div_password_reset_form').setStyle('display', 'block');
+    
+    show_window('div_password_reset_window');
 }
 
 function set_employers_mouse_events() {

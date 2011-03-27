@@ -59,7 +59,7 @@
             </td>
             <td class="for_employers">
                 <div class="for_employers">
-                    <div class="for_employers_title">Employers?</div>
+                    <div class="for_employers_title">Employers</div>
                     <div class="for_employers_content">
                         For enquiries, please drop us an email with your name, designation, company name, 
                         and telephone number to <a href="mailto:sales@yellowelevator.com">sales@yellowelevator.com</a>
@@ -250,3 +250,25 @@
         </table>
     </div>
 </div -->
+
+<!-- popup goes here -->
+<div id="div_password_reset_window" class="popup_window">
+    <div class="window_title" id="window_title" class="popup_window_title">Reset My Password</div>
+    
+    <form method="post" onSubmit="return false;">
+        <div id="div_password_reset_form">
+            <table class="password_reset_form">
+                <tr>
+                    <td class="label"><label for="email_addr">Email:</label></td>
+                    <td class="field"><input class="field" type="text" id="email_addr" name="email_addr" /></td>
+                </tr>
+                <tr>
+                    <td class="buttons" colspan="2">
+                        <input type="button" value="Reset My Password" onClick="close_password_reset_window(true);" />
+                        <input type="button" onClick="close_password_reset_window(false);" value="Cancel" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>

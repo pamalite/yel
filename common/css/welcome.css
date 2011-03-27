@@ -268,6 +268,47 @@ div.counters {
     width: 847px;
 }
 
+#div_password_reset_window {
+    width: 450px;
+    display: none;
+}
+
+input.field {
+    width: 99%;
+    font-size: 12pt;
+}
+
+td.label {
+    width: 25%;
+    color: #000000;
+}
+
+td.buttons {
+    text-align: right;
+    border-top: 1px solid #CCCCCC;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+.window_title {
+    text-align: center;
+    background-color: #CCCCCC;
+    color: #000000;
+    font-size: 10pt;
+    font-weight: bold;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#div_password_reset_form {
+    display: none;
+}
+
+.password_reset_form {
+    margin: auto;
+    width: 100%;
+}
+
 /*#top_employers {
     width: 847px;
     margin: auto;
