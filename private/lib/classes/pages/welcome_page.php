@@ -36,7 +36,7 @@ class WelcomePage extends Page {
                         branches ON branches.id = employers.branch", 
             // 'match' => "jobs.closed = 'N' AND jobs.expire_on >= NOW() AND jobs.deleted = FALSE", 
             'order' => "jobs.salary DESC", 
-            'limit' => "10"
+            'limit' => "5"
         );
         
         $job = new Job();

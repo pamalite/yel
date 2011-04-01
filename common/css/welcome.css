@@ -31,6 +31,7 @@ body {
 }
 
 div.loginbar {
+    position: relative;
     text-align: center;
     background-color: #efefef;
     padding-top: 5px;
@@ -41,9 +42,17 @@ div.facebook_like {
     display: inline;
 }
 
-div.facebook_like iframe {
+div.facebook_like iframe,
+#twitter_btn {
     vertical-align: middle;
     margin-top: -55px;
+}
+
+#linkedin_btn {
+    border: none; 
+    position: absolute; 
+    top: 50%;
+    margin-top: -11px;
 }
 
 #welcome_top div.topmenu a {

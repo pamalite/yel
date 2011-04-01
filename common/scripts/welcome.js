@@ -199,8 +199,11 @@ function onLoaded() {
     
     initialize_page();
     
-    get_seed();
-    $('login').addEvent('click', login);
+    if ($('login') != null) {
+        get_seed();
+        $('login').addEvent('click', login);
+        $('login_password').addEvent('keypress:keys(enter)', login);
+    }
 }
 
 window.addEvent('domready', onDomReady);

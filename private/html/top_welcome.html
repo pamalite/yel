@@ -2,22 +2,33 @@
     <div id="welcome_top">
         <img src="%root%/common/images/logos/logo2.jpg" alt="Elevator" id="logo" />
         &nbsp;&nbsp;&nbsp;
-        <div class="facebook_like"><iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fyellowelevator.com&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;font&amp;colorscheme=dark&amp;height=35" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:35px;" allowTransparency="true"></iframe></div>
+        <a href="http://www.twitter.com/yellowelevator/">
+            <img src="%root%/common/images/twitter_small.png" id="twitter_btn" />
+        </a>
+        &nbsp;
+        <a href="http://www.youtube.com/yellowelevator/">
+            <img src="%root%/common/images/youtube_small.png" id="twitter_btn" />
+        </a>
+        &nbsp;
+        <div class="facebook_like">
+            <iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fyellowelevator.com&amp;layout=button_count&amp;show_faces=false&amp;width=323&amp;action=like&amp;font&amp;colorscheme=dark&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:323px; height:21px;" allowTransparency="true"></iframe>
+        </div>
     </div>
 </div>
 <div class="loginbar">
     <span style="display: %not_logged_in%;">
         <a class="welcome_members" href="%root%/members/sign_up.php">Join Now</a>
         &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="vertical-align: middle;" />&nbsp;
+        Candidate:&nbsp;
         <input type="text" id="login_email_addr" alt="Email" />
         <input type="password" id="login_password" alt="Password" />
         <input type="button" id="login" value="Login" />
-        <span style="font-size: 9pt;">
-            <a class="welcome_members" href="#" onClick="show_password_reset_window();">Reset Password</a>
+        <span style="font-size: 8pt;">
+            <a class="welcome_members" href="#" onClick="show_password_reset_window();">Forgot Password?</a>
         </span>
         &nbsp;OR&nbsp;
         <a class="welcome_members" href="%root%/members/">
-            <img src="%root%/common/images/but-log-in-linkedin-small.png" style="border: none; vertical-align: middle;" />
+            <img src="%root%/common/images/linkedin-small.png" id="linkedin_btn" />
         </a>
     </span>
     <span style="display: %member_logged_in%;">
