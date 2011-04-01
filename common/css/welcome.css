@@ -30,25 +30,27 @@ body {
     margin-left: 10px;
 }
 
-#welcome_top div.loginpanel {
-    font-size: 11pt;
-    display: inline;
-/*    position: absolute;*/
-    margin-top: 20px;
-    margin-right: 50px;
-    float: right;
-    text-align: right;
-/*    border: 1px solid white;*/
+div.loginbar {
+    text-align: center;
+    background-color: #efefef;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
+div.facebook_like {
+    display: inline;
+}
 
-#welcome_top div.topmenu a, 
-#welcome_top div.loginpanel a {
+div.facebook_like iframe {
+    vertical-align: middle;
+    margin-top: -55px;
+}
+
+#welcome_top div.topmenu a {
     color: #FFFFFF;
 }
 
-#welcome_top div.topmenu a:hover, 
-#welcome_top div.loginpanel a.loginpanel:hover {
+#welcome_top div.topmenu a:hover {
     color: #FC8F02;
 }
 

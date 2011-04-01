@@ -1,34 +1,32 @@
 <div class="top">
     <div id="welcome_top">
         <img src="%root%/common/images/logos/logo2.jpg" alt="Elevator" id="logo" />
-        
-        <div class="loginpanel">
-            <form onSubmit="return false;">
-            <span style="display: %not_logged_in%;">
-                <!-- <a class="welcome_members" href="%root%/members/">Candidate Login</a> -->
-                <input type="text" id="login_email_addr" alt="Email" />
-                <input type="password" id="login_password" alt="Password" />
-                <input type="button" id="login" value="Login" />
-                <span style="font-size: 9pt;">
-                    <a class="welcome_members" href="#" onClick="show_password_reset_window();">Reset Password</a>
-                </span>
-                &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="vertical-align: middle;" />&nbsp;
-                <a class="welcome_members" href="%root%/members/">
-                    <img src="%root%/common/images/but-log-in-linkedin-small.png" style="border: none; vertical-align: middle;" />
-                </a>
-                &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="vertical-align: middle;" />&nbsp;
-                <a class="welcome_members" href="%root%/members/sign_up.php">Sign Up</a>
-            </span>
-            <span style="display: %member_logged_in%;">
-                Go back to <span style="font-weight: bold;"><a href="%root%/members">Career Profile</a></span> or <span style="font-weight: bold;"><a href="%root%/members/logout.php">Logout</a></span>
-            </span>
-            <span style="display: %employer_logged_in%;">
-                Go back to <span style="font-weight: bold;"><a href="%root%/employers">Resumes Page</a></span> or <span style="font-weight: bold;"><a href="%root%/employers/logout.php">Logout</a></span>
-            </span>
-            <span style="display: %employee_logged_in%;">
-                Go back to <span style="font-weight: bold;"><a href="%root%/employees">Employee Home</a></span> or <span style="font-weight: bold;"><a href="%root%/employees/logout.php">Logout</a></span>
-            </span>
-            </form>
-        </div>
+        &nbsp;&nbsp;&nbsp;
+        <div class="facebook_like"><iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fyellowelevator.com&amp;layout=standard&amp;show_faces=false&amp;width=450&amp;action=like&amp;font&amp;colorscheme=dark&amp;height=35" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:450px; height:35px;" allowTransparency="true"></iframe></div>
     </div>
+</div>
+<div class="loginbar">
+    <span style="display: %not_logged_in%;">
+        <a class="welcome_members" href="%root%/members/sign_up.php">Join Now</a>
+        &nbsp;<img src="%root%/common/images/topmenu-divider.gif" style="vertical-align: middle;" />&nbsp;
+        <input type="text" id="login_email_addr" alt="Email" />
+        <input type="password" id="login_password" alt="Password" />
+        <input type="button" id="login" value="Login" />
+        <span style="font-size: 9pt;">
+            <a class="welcome_members" href="#" onClick="show_password_reset_window();">Reset Password</a>
+        </span>
+        &nbsp;OR&nbsp;
+        <a class="welcome_members" href="%root%/members/">
+            <img src="%root%/common/images/but-log-in-linkedin-small.png" style="border: none; vertical-align: middle;" />
+        </a>
+    </span>
+    <span style="display: %member_logged_in%;">
+        Go back to <span style="font-weight: bold;"><a href="%root%/members">Career Profile</a></span> or <span style="font-weight: bold;"><a href="%root%/members/logout.php">Logout</a></span>
+    </span>
+    <span style="display: %employer_logged_in%;">
+        Go back to <span style="font-weight: bold;"><a href="%root%/employers">Resumes Page</a></span> or <span style="font-weight: bold;"><a href="%root%/employers/logout.php">Logout</a></span>
+    </span>
+    <span style="display: %employee_logged_in%;">
+        Go back to <span style="font-weight: bold;"><a href="%root%/employees">Employee Home</a></span> or <span style="font-weight: bold;"><a href="%root%/employees/logout.php">Logout</a></span>
+    </span>
 </div>
