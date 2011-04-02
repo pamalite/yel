@@ -231,6 +231,34 @@ function isNumeric(strInput) {
     return boolFound;
 }
 
+function to_number(_str) {
+    var out = _str.replace(/,/g, '');
+    out.replace(/ /g, '');
+    
+    return out;
+}
+
+function to_nice_number(_str, _decimals) {
+    var out = '';
+    var decimal_count = 0;
+    var partition_count = 0;
+    for (var i=_str.length; i >= 0; i--) {
+        if (decimal_count < (_decimals+1)) {
+            out = _str.charAt(i) + out;
+            decimal_count++;
+        } else {
+            out = _str.charAt(i) + out;
+            if ((partition_count % 3) == 0 && partition_count > 0) {
+                if (i > 0) {
+                    out = ',' + out;
+                }
+            } 
+            partition_count++;
+        }
+    }
+    return out;
+}
+
 function list_months_in(selected, placeholder, used_id, used_name) {
     var html = '<select id="' + used_id + '" name="' + used_name + '">' + "\n";
     

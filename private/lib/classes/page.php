@@ -93,7 +93,7 @@ class Page {
             $top = str_replace('%member_logged_in%', 'none', $top);
             $top = str_replace('%employee_logged_in%', 'inline', $top);
         } else {
-            $top = str_replace('%not_logged_in%', 'inline', $top);
+            $top = str_replace('%not_logged_in%', 'default', $top);
             $top = str_replace('%employer_logged_in%', 'none', $top);
             $top = str_replace('%member_logged_in%', 'none', $top);
             $top = str_replace('%employee_logged_in%', 'none', $top);

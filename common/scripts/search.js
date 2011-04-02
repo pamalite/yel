@@ -14,6 +14,10 @@ function ascending_or_descending() {
     }
 }
 
+function sort_using_selected() {
+    sort_by($('sort_selector').options[$('sort_selector').selectedIndex].value);
+}
+
 function sort_by(_column) {
     order_by = _column;
     ascending_or_descending();
@@ -105,47 +109,33 @@ function show_jobs() {
                 
                 var html = '';
                 for (var i=0; i < ids.length; i++) {
-                    var total_rewards = parseFloat(rewards[i].childNodes[0].nodeValue);
+                    var total_rewards = parseFloat(to_number(rewards[i].childNodes[0].nodeValue));
                     var token_reward = total_rewards * 0.05;
                     var potential_reward = total_rewards - token_reward;
                     
-                    var job_short_details = '<div class="job_short_details">' + "\n";
+                    var a_result = a_result_template;
+                    a_result = a_result.replace(/%job_id%/g, ids[i].childNodes[0].nodeValue);
+                    a_result = a_result.replace(/%job_title%/g, job_titles[i].childNodes[0].nodeValue);
+                    a_result = a_result.replace(/%currency%/g, currencies[i].childNodes[0].nodeValue);
                     
-                    // job title
-                    job_short_details = job_short_details + '<div class="job_title">' + "\n";
-                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '">' + job_titles[i].childNodes[0].nodeValue + '</a>' + "\n";
-                    job_short_details = job_short_details + '</div>' + "\n";
+                    a_result = a_result.replace(/%employer%/g, employers[i].childNodes[0].nodeValue);
+                    a_result = a_result.replace(/%country%/g, countries[i].childNodes[0].nodeValue);
+                    a_result = a_result.replace(/%industry%/g, industries[i].childNodes[0].nodeValue);
                     
-                    // employer
-                    job_short_details = job_short_details + '<div class="employer">' + "\n";
-                    job_short_details = job_short_details + employers[i].childNodes[0].nodeValue + "\n";
-                    job_short_details = job_short_details + '<span class="country">' + countries[i].childNodes[0].nodeValue + '</span> | ' + '<span class="industry">' + industries[i].childNodes[0].nodeValue + '</span>' + "\n";
-                    job_short_details = job_short_details + '</div>' + "\n";
-                    
-                    // date and salary
-                    job_short_details = job_short_details + '<div class="date_and_salary">' + "\n";
-                    job_short_details = job_short_details + 'Monthly Salary Range: ' + currencies[i].childNodes[0].nodeValue + "$ \n";
+                    var salary_range = salaries[i].childNodes[0].nodeValue;
                     if (salary_ends[i].childNodes.length > 0) {
-                        job_short_details = job_short_details + salaries[i].childNodes[0].nodeValue + ' - ' + salary_ends[i].childNodes[0].nodeValue;
-                    } else {
-                        job_short_details = job_short_details + salaries[i].childNodes[0].nodeValue
+                        salary_range = salary_range + ' - ' + salary_ends[i].childNodes[0].nodeValue;
                     }
-                    job_short_details = job_short_details + '<br/>Recommender\'s Cash Reward:' + currencies[i].childNodes[0].nodeValue + '$ ' + potential_reward;
-                    job_short_details = job_short_details + '<br/>Candidate\'s Cash Bonus:' + currencies[i].childNodes[0].nodeValue + '$ ' + token_reward + '<br/><br/>' + "\n";
+                    a_result = a_result.replace(/%salary_range%/g, salary_range);
                     
-                    job_short_details = job_short_details + '<span class="controls">' + "\n";
-                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '?refer=1">Recommend Someone</a> <span class="black">|</span> ';
-                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '?apply=1">Explore This Opportunity</a> <span class="black">|</span> ';
-                    job_short_details = job_short_details + '<a href="./job/' + ids[i].childNodes[0].nodeValue + '">View Details</a>' + '</span>' + "\n";
-                    job_short_details = job_short_details + '</div>' + "\n";
+                    a_result = a_result.replace(/%potential_reward%/g, to_nice_number(potential_reward.toFixed(2), 2));
+                    a_result = a_result.replace(/%potential_token_reward%/g, to_nice_number(token_reward.toFixed(2), 2));
+                    a_result = a_result.replace(/%expire_on%/g, expire_ons[i].childNodes[0].nodeValue);
                     
-                    job_short_details = job_short_details + '<div class="expire_on">Expires on ' + expire_ons[i].childNodes[0].nodeValue + '</div>' + "\n";
-                    
-                    job_short_details = job_short_details + '</div>' + "\n";
-                    html = html + "\n" + job_short_details;
+                    html = html + a_result;
                 }
                 
-                $('results').set('html', html);
+                $('searched_results').set('html', html);
                 // window.scrollTo(0, 0);
                 
                 if ($('page') != null) {
@@ -158,211 +148,6 @@ function show_jobs() {
         },
         onRequest: function(instance) {
             set_status('Searching jobs...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function close_refer_form() {
-    $('div_refer_form').setStyle('display', 'none');
-    $('div_blanket').setStyle('display', 'none');
-}
-
-function show_refer_job() {
-    $('div_blanket').setStyle('display', 'block');
-    
-    var window_height = 0;
-    var window_width = 0;
-    var div_height = parseInt($('div_refer_form').getStyle('height'));
-    var div_width = parseInt($('div_refer_form').getStyle('width'));
-    
-    if (typeof window.innerHeight != 'undefined') {
-        window_height = window.innerHeight;
-    } else {
-        window_height = document.documentElement.clientHeight;
-    }
-    
-    if (typeof window.innerWidth != 'undefined') {
-        window_width = window.innerWidth;
-    } else {
-        window_width = document.documentElement.clientWidth;
-    }
-    
-    $('div_refer_form').setStyle('top', ((window_height - div_height) / 2));
-    $('div_refer_form').setStyle('left', ((window_width - div_width) / 2));
-    
-    $('job_title').set('html', $('job.title').get('html'));
-    
-    $('div_refer_form').setStyle('display', 'block');
-    show_candidates();
-}
-
-function set_filter() {
-    filter_by = $('network_filter').options[$('network_filter').selectedIndex].value;
-    show_candidates();
-}
-
-function check_has_banks(_member) {
-    var params = 'id=' + _member + '&action=has_banks';
-    var uri = root + "/search_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == '0') {
-                alert('Our system indicates that you have not provided us your bank account details. \n\nIf you like us to transfer your rewards directly into your bank account, please go to the "Bank Accounts" page to submit your bank account details. \n\nHowever, if you wish to receive your rewards by cheque instead, please ensure that your full name and mailing address in the "Profile" page is valid.');
-            } 
-        },
-        onRequest: function(instance) {
-            set_status('Checking reward matters...');
-        }
-    });
-    
-    request.send(params);
-}
-
-function check_referred_already() {
-    var params = 'job=' + $('job_id').value + 
-                  '&id=' + id + 
-                  '&candidate=' + candidates_list.selected_value + 
-                  '&action=referred_already';
-
-    var uri = root + "/members/search_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == '1') {
-                alert("You have already referred " + candidates_list.selected_item + " to this job. \n\nPlease unselect " + candidates_list.selected_item + " from the Contacts list.");
-            } 
-            
-            set_status('');
-        },
-        onRequest: function(instance) {
-            set_status('Checking referral existence...');
-        }
-    });
-
-    request.send(params);
-}
-
-function check_referred_already() {
-    if (!isEmpty(candidates_list.selected_value)) {
-        var params = 'job=' + $('job_id').value + 
-                      '&id=' + id + 
-                      '&candidate=' + candidates_list.selected_value + 
-                      '&action=referred_already';
-
-        var uri = root + "/search_action.php";
-        var request = new Request({
-            url: uri,
-            method: 'post',
-            onSuccess: function(txt, xml) {
-                if (txt == '1') {
-                    alert("You have already referred " + candidates_list.selected_item + " to this job. \n\nPlease unselect " + candidates_list.selected_item + " from the Contacts list.");
-                } 
-
-                set_status('');
-            },
-            onRequest: function(instance) {
-                set_status('Checking referral existence...');
-            }
-        });
-
-        request.send(params);
-    }
-}
-
-function refer() {
-    var referee = '';
-    var from = 'list'; // list or email
-    if ($('from_list').checked) {
-        if (isEmpty(candidates_list.selected_value)) {
-            alert('Please select a candidate.');
-            return false;
-        }
-        
-        referee = candidates_list.selected_value;
-    } else {
-        if (isEmpty($('email_addr').value) || !isEmail($('email_addr').value)) {
-            alert('Please provide a valid email address of the candidate.');
-            return false;
-        }
-        
-        referee = $('email_addr').value;
-        from = 'email';
-    }
-    
-    var answer_1 = $('testimony_answer_1').value;
-    var answer_2 = $('testimony_answer_2').value;
-    var answer_3 = $('testimony_answer_3').value;
-    
-    if (isEmpty(answer_1) || isEmpty(answer_2) || isEmpty(answer_3)) {
-        alert('Please briefly answer all questions.');
-        return false;
-    } else if (answer_1.split(' ').length > 200 || answer_2.split(' ').length > 200 || answer_3.split(' ').length > 200) {
-        if (answer_1.split(' ').length > 200) {
-            alert('Please keep your 1st answer below 200 words.');
-        } else if (answer_2.split(' ').length > 200) {
-            alert('Please keep your 2nd answer below 200 words.');
-        } else if (answer_3.split(' ').length > 200) {
-            alert('Please keep your 3rd and final answer below 200 words.');
-        }
-        return false;
-    }
-    
-    var testimony = answer_1 + '<br/>' + answer_2 + '<br/>' + answer_3;
-    
-    check_has_banks(id);
-    
-    var params = 'id=' + id + '&action=make_referral';
-    params = params + '&from=' + from;
-    params = params + '&referee=' + referee;
-    params = params + '&job=' + $('job_id').value;
-    params = params + '&testimony=' + testimony;
-    
-    var uri = root + "/search_action.php";
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            if (txt == 'ko') {
-                alert('An error occured while referring the candidate to the job. \n\nIt might because of this referral had been made before. Please try again.');
-                close_refer_form();
-                set_status('');
-                return false;
-            } else if (txt == '-900') {
-                alert('An error occured while adding the potential candidate into your contacts list. Please try again.');
-                close_refer_form();
-                set_status('');
-                return false;
-            } else if (txt == '-901') {
-                alert('An error occured while inviting the potential candidate to become a member. Please try again.');
-                close_refer_form();
-                set_status('');
-                return false;
-            } else if (txt == '-902') {
-                alert('An error occured while reserving a member place for the potential candidate. Please try again.');
-                close_refer_form();
-                set_status('');
-                return false;
-            } else if (txt == '-903') {
-                alert('Hmm... an error occured while adding the potential candidate into your contacts list after inviting and reserving a place. Please try again.');
-                close_refer_form();
-                set_status('');
-                return false;
-            } else if (txt == '-2') {
-                alert('It appears that this candidate is not in your candidates list. The candidate will be notified before the referral can be made. \n\nYellow Elevator will automatically complete the referral process once the candidate approved the request of being added to your list.');
-            } else if (txt == '-3') {
-                alert('It appears that this candidate is not in a member of Yellow Elevator. The candidate will be notified before the referral can be made. \n\nYellowElevator.com will automatically complete the referral process once the candidate had signed up as a member. The candidate will be added into your contacts list automatically.');
-            }
-            
-            close_refer_form();
-            set_status('Your contact was successfully referred. A notification email has been sent to the referred contact. You may make another referrals.');
-        },
-        onRequest: function(instance) {
-            set_status('Making referral...');
         }
     });
     

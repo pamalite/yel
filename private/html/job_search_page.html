@@ -1,0 +1,77 @@
+<div id="div_status" class="status">
+    <span id="span_status" class="status"></span>
+</div>
+
+<div class="content">
+    <div class="statistics" id="statistics">
+        Found %total_results% jobs in %time_elapsed% seconds.
+    </div>
+    
+    <table class="results_table">
+        <tr>
+            <td class="mini_search">
+                <div class="filter">
+                    <div class="filter_title">Refine Results</div>
+                    <table class="filter_options">
+                        <tr>
+                            <td class="label"><label for="filter_employer">Employer:</label></td>
+                            <td class="field">
+                                <select id="filter_employer">
+                                    %filter_employer%
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="filter_industry">Specialization:</label></td>
+                            <td class="field">
+                                <select id="filter_industry">
+                                    %filter_industry%
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="filter_country">Country:</label></td>
+                            <td class="field">
+                                <select id="filter_country" onChange="changed_country();">
+                                    %filter_country%
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="filter_salary">Salary from:</label></td>
+                            <td class="field">
+                                <select id="filter_salary">
+                                    %filter_salary%
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="filter_button">
+                        <input type="button" value="Refine Results" onClick="filter_jobs();" />
+                    </div>
+                </div>
+            </td>
+            <td class="results" id="results">
+                <div class="results_controls">
+                    <span id="pagination">Page %pagination%</span>
+                    &nbsp; | &nbsp;
+                    Sort by 
+                    <select id="sort_selector" onChange="sort_using_selected();">
+                        <option value="jobs.expire_on" selected>Expiry Date</option>
+                        <option value="jobs.title">Job Title</option>
+                        <option value="employers.name">Employer</option>
+                        <option value="jobs.salary">Monthly Salary Range</option>
+                        <option value="industries.industry">Specialization</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px; border-bottom: 1px solid #efefef;">&nbsp;</div>
+                <div id="searched_results">
+                    %searched_results%
+                </div>
+            </td>
+            <td class="saved_search">
+                &nbsp;
+            </td>
+        </tr>
+    </table>
+</div>

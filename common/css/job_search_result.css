@@ -1,0 +1,70 @@
+.job_short_details {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #EEEEEE;
+}
+
+.job_short_details:hover {
+    background-color: #efefef;
+}
+
+.job_short_details .job_title {
+    font-size: 12pt;
+    font-weight: bold;
+    padding-bottom: 5px;
+}
+
+.job_short_details .employer {
+    padding-bottom: 5px
+}
+
+.job_short_details .industry {
+    font-style: normal;
+    font-size: 9pt;
+    font-weight: bold;
+    color: #078B21;
+    background-color: #F1F0BC;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+.job_short_details .country {
+    font-style: normal;
+    font-weight: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+div.date_and_salary {
+    padding-bottom: 5px;
+}
+
+table.date_and_salary {
+    width: 100%;
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table.date_and_salary td {
+    color: #7f7f7f;
+    vertical-align: middle;
+    font-size: 11pt;
+}
+
+table.date_and_salary td.actions {
+    width: 200px;
+}
+
+div.action_control {
+    text-align: center;
+    padding: 3px 3px 3px 3px;
+    margin: 3px 3px 3px 3px;
+    background-color: #FFEABD;
+}
+
+.expire_on {
+    padding-top: 5px;
+    font-style: italic;
+    font-size: 7pt;
+    color: #666666;
+}
