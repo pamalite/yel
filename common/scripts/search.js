@@ -6,12 +6,9 @@ function changed_country() {
     // is_local = 0;
 }
 
-function ascending_or_descending() {
-    if (order == 'desc') {
-        order = 'asc';
-    } else {
-        order = 'desc';
-    }
+function change_order() {
+    order = $('order_selector').options[$('order_selector').selectedIndex].value;
+    sort_using_selected();
 }
 
 function sort_using_selected() {
@@ -20,7 +17,6 @@ function sort_using_selected() {
 
 function sort_by(_column) {
     order_by = _column;
-    ascending_or_descending();
     show_jobs();
 }
 

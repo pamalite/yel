@@ -63,6 +63,12 @@
                         <option value="jobs.salary">Monthly Salary Range</option>
                         <option value="industries.industry">Specialization</option>
                     </select>
+                    in
+                    <select id="order_selector" onChange="change_order();">
+                        <option value="ASC">Ascending A &rarr; Z</option>
+                        <option value="DESC" selected>Descending Z &rarr; A</option>
+                    </select>
+                    order
                 </div>
                 <div style="margin-bottom: 15px; border-bottom: 1px solid #efefef;">&nbsp;</div>
                 <div id="searched_results">
