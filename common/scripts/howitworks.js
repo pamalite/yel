@@ -4,6 +4,10 @@ var howitworks_recommender = '';
 var howitworks_candidate = '';
 
 function initialize_howitworks() {
+    if ($('howitworks') == null) {
+        return;
+    }
+    
     $('howitworks').setStyle('display', 'block');
     howitworks_slider = new Fx.Slide($('howitworks'), {
         mode: 'vertical'
