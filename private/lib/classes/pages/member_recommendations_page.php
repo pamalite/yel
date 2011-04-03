@@ -33,6 +33,7 @@ class MemberRecommendationsPage extends Page {
         $this->begin();
         $this->top_search("Recommendations");
         $this->menu('member', 'recommendations');
+        $this->howitworks();
         
         $recommendations = $this->member->getReferrals();
         

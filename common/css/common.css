@@ -178,6 +178,7 @@ div.footer {
 /*    color: #FFFFFF;*/
     margin-top: 15px;
     padding-top: 3px;
+    height: 50px;
 }
 div.footer a {
     color: #fc8f02;

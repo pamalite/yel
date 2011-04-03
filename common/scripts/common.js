@@ -7,6 +7,8 @@ var root = "";
 function initialize_page() {
     set_root();
     
+    initialize_howitworks();
+    
     if ($('mini_keywords') != undefined) {
         var mini_keywords_overtext = new OverText($('mini_keywords'));
         

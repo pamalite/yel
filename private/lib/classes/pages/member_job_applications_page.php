@@ -33,6 +33,7 @@ class MemberJobApplicationsPage extends Page {
         $this->begin();
         $this->top_search("Job Applications");
         $this->menu('member', 'job_applications');
+        $this->howitworks();
         
         $applications = $this->member->getAllAppliedJobs();
         

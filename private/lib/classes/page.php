@@ -67,6 +67,12 @@ class Page {
         echo $footer;
     }
     
+    public function howitworks() {
+        $howitworks = file_get_contents(dirname(__FILE__). '/../../html/howitworks.html');
+        
+        echo $howitworks;
+    }
+    
     protected function top_welcome() {
         $top = file_get_contents(dirname(__FILE__). '/../../html/top_welcome.html');
         $top = str_replace('%root%', $this->url_root, $top);

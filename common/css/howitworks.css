@@ -1,0 +1,81 @@
+/* for welcome page only */
+div.howitworks_pulldown_bar {
+    position: absolute;
+    width: 100%;
+    background-color: transparent;
+    margin: auto;
+    border: none;
+}
+
+div.howitworks_pulldown_bar div.pulldown {
+    padding: 5px 5px 5px 5px;
+    border: none;
+    background-color: #efefef;
+    width: 200px;
+    text-align: center;
+    font-weight: bold;
+    margin-left: 200px;
+}
+/* for welcome page only */
+
+/* main banner */
+#howitworks {
+    width: 100%;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 3px solid #efefef;
+    height: 100px;
+}
+
+table.howitworks {
+    margin: auto;
+    width: 70%;
+    height: 98%;
+}
+
+table.howitworks td {
+    padding: 3px 3px 3px 3px;
+}
+
+table.howitworks td.banner {
+    width: 85%;
+}
+
+table.howitworks td.toggle {
+    border-left: 1px solid #d9d9d9;
+    padding-left: 0px;
+}
+
+span.howitworks_toggle {
+    padding: 5px 5px 5px 5px;
+}
+
+#howitworks_toggle_recommender {
+    background-color: #d9d9d9;
+}
+/* main banner */
+
+/* banners */
+#howitworks_recommender, 
+#howitworks_candidate {
+    width: 90%;
+    margin: auto;
+}
+
+#howitworks_candidate {
+    display: none;
+}
+
+table.banner {
+    width: 100%;
+    margin: auto;
+    border-spacing: 5px;
+}
+
+table.banner td.box {
+    border: 1px solid #d9d9d9;
+    width: 75px;
+    height: 75px;
+}
+/* banners */

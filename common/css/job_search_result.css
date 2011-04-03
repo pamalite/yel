@@ -19,11 +19,7 @@
 }
 
 .job_short_details .industry {
-    font-style: normal;
-    font-size: 9pt;
-    font-weight: bold;
-    color: #078B21;
-    background-color: #F1F0BC;
+    font-style: italic;
     padding-left: 3px;
     padding-right: 3px;
 }
@@ -48,7 +44,6 @@ table.date_and_salary {
 table.date_and_salary td {
     color: #7f7f7f;
     vertical-align: middle;
-    font-size: 11pt;
 }
 
 table.date_and_salary td.actions {

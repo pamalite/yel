@@ -102,6 +102,7 @@ class MemberProfilePage extends Page {
         $this->begin();
         $this->top_search("Profile");
         $this->menu('member', 'profile');
+        $this->howitworks();
         
         $profile = desanitize($this->member->get());
         $bank = $this->member->getBankAccount();

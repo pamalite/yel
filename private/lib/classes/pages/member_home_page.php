@@ -275,6 +275,7 @@ class MemberHomePage extends Page {
         $this->begin();
         $this->top_search('Home');
         $this->menu('member', 'home');
+        $this->howitworks();
         
         $country = $this->member->getCountry();
         $currency = Currency::getSymbolFromCountryCode($country);
