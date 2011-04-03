@@ -20,6 +20,7 @@ div.howitworks_pulldown_bar div.pulldown {
 
 /* main banner */
 #howitworks {
+    display: none;
     width: 100%;
     text-align: center;
     padding-top: 5px;

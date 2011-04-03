@@ -4,9 +4,11 @@ var howitworks_recommender = '';
 var howitworks_candidate = '';
 
 function initialize_howitworks() {
-    howitworks_slider = new Fx.Slide('howitworks', {
+    $('howitworks').setStyle('display', 'block');
+    howitworks_slider = new Fx.Slide($('howitworks'), {
         mode: 'vertical'
     });
+    
     howitworks_slider.hide();
     
     howitworks_recommender = $('howitworks_recommender');
@@ -28,19 +30,32 @@ function toggle_howitworks() {
 }
 
 function howitworks_switch_to(_div) {
+    var recommender_tween = new Fx.Tween(howitworks_recommender);
+    var candidate_tween = new Fx.Tween(howitworks_candidate);
+    
     if (_div == 'recommender') {
-        howitworks_candidate.fade('out');
-        howitworks_candidate.setStyle('display', 'none');
-        howitworks_recommender.fade('in');
-        howitworks_recommender.setStyle('display', 'block');
+        // sets the tab
         $('howitworks_toggle_recommender').setStyle('background-color', '#d9d9d9');
         $('howitworks_toggle_candidate').setStyle('background-color', '#fff');
+        
+        // sets the display
+        candidate_tween.start('opacity', 1, 0).chain(function() {
+            howitworks_candidate.setStyle('display', 'none');
+            howitworks_recommender.setStyle('opacity', '0');
+            howitworks_recommender.setStyle('display', 'block');
+            recommender_tween.start('opacity', 0, 1);
+        });
     } else {
-        howitworks_recommender.fade('out');
-        howitworks_recommender.setStyle('display', 'none');
-        howitworks_candidate.setStyle('display', 'block');
-        howitworks_candidate.fade('in');
+        // sets the tab
         $('howitworks_toggle_recommender').setStyle('background-color', '#fff');
         $('howitworks_toggle_candidate').setStyle('background-color', '#d9d9d9');
+        
+        // sets the display
+        recommender_tween.start('opacity', 1, 0).chain(function () {
+            howitworks_recommender.setStyle('display', 'none');
+            howitworks_candidate.setStyle('opacity', '0');
+            howitworks_candidate.setStyle('display', 'block');
+            candidate_tween.start('opacity', 0, 1);
+        });
     }
 }
