@@ -1,52 +1,44 @@
-.login_form {
-    width: 500px;
+div.login_form {
+    padding-top: 20px;
+    padding-bottom: 20px;
     margin: auto;
-    border: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
     padding: 5px 3px 35px 5px;
 }
 
-.contact_drop {
-    margin-top: 10px;
-    text-align: center;
-    padding: 5px 5px 5px 5px;
-}
-
-.button_bar {
+div.button_bar {
     margin-top: 5px;
-    width: 50%;
-}
-
-.left {
-    float: left;
-}
-
-.right {
-    float: right;
     text-align: right;
 }
 
-#contact_drop_form {
-    display: none;
-    width: 500px;
-}
-
-table.drop_contact {
-    /*border: 1px solid #6699FF;*/
-    /*border: 1px solid #C3E0FA;*/
-    border: none;
-    width: 100%;
+table.employer_page {
+    width: 60%;
+    border-collapse: collapse;
     margin: auto;
 }
 
+table.employer_page td {
+    padding-left: 15px;
+    padding-right: 15px;
+    vertical-align: top;
+}
 
-td.title {
-    text-align: center;
-    /*background-color: #6699FF;*/
-    background-color: #CCCCCC;
-    font-size: 10pt;
-    font-weight: bold;
-    padding-top: 3px;
-    padding-bottom: 3px;
+table.employer_page td.side {
+    width: 10%;
+    border-left: 1px solid #d9d9d9;
+}
+
+div.title {
+    border-bottom: 1px solid #d9d9d9;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+div.texts {
+    font-size: 11pt;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    color: #666666;
 }
 
 #id, #password {
@@ -79,117 +71,25 @@ td.buttons {
     padding-bottom: 3px;
 }
 
-#company, #email, #phone, #contact {
-    font-family: verdana, tahoma, arial;
-    font-size: 10pt;
-    width: 99%;
-    height: 23px;
+div.client-box {
+    margin: 3px 3px 3px 3px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #d9d9d9;
 }
 
-label {
-    font-size: 12pt;
+div.client-box div.employer_logos {
+    width: 240px;
 }
 
-/* jasmine start */
-.wrapper {
-	min-height: 100%;
-	height: auto !important;
-	height: 100%;
-	margin-bottom:-162px;
-	/*border:1px red solid;	*/
+div.client-box table.employers_carousel {
+    margin: auto;
+    border-collapse: collapse;
+    height: 150px;
 }
 
-.content {
-    width: 780px;
-    margin: 0 auto 50px;
-    padding-top: 35px;
-}
-.content .main {
-    width: 523px;
-    float: left;
-}
-.content .side {
-    width: 234px;
-    float: right;
-    padding-left: 22px;
-    border-left: 1px #d9d9d9 solid;
-    padding-top: 65px;
-    padding-bottom: 50px;
-}
-.content .side .login_form {
-    width: auto;
-    border: 0;
-    border-bottom: 1px #d9d9d9 solid;
-    padding-bottom: 54px;
-}
-.content .side .login_form #id, .content .side .login_form #password {
-    width: 217px;
-    height: 22px;
-/*    border: 1px #abadb3 solid;*/
-    font-size: 12px;
-    margin-top: 3px;
-}
-.content .side .login_form label {
-    font-size: 12px;
-}
-.content .side .login_form .left {
-    float: none;
-    width: auto;
-}
-.content .side .login_form .right {
-    width: auto;
-    padding-right: 5px;
-    padding-top: 10px;
-}
-/*.content .side .login_form .right input {
-    border: 1px #cccccc solid;
-    background: #f0f0f0;
-    width: 55px;
-    height: 25px;
-    padding-bottom: 3px;
+div.client-box table.employers_carousel td {
+    vertical-align: middle;
     text-align: center;
-}
-.content .side .login_form a {
-    color: #ff8e00;
-    font-weight: normal;
-    font-size: 13px;
-}
-*/
-.content .login-enquiry-box {
-    background: url('../images/login_enquiry_box.jpg') no-repeat center;
-    width: 496px;
-    height: 85px;
-    margin-bottom: 30px;
-    color: #ffffff;
-    margin-left: -5px;
-}
-.content .login-enquiry-box span {
-    display: block;
-    padding: 27px 0 0 30px;
-}
-.content .login-enquiry-box a {
-    color: #fc8f02;
-    font-weight: bold;
-}
-.clear {
-    clear: both;
-}
-.client-box {
-    padding-top: 28px;
-    padding-left: 5px;
-}
-.client-box .employer_logos {
-    width: 230px;
-}
-#employers_carousel {
-    margin-left:-10px;
-}
-div.status {
-    position: absolute;
-    width: 100%;
-}
-
-
-.push{
-	height: 162px;	
+    padding: 3px;
 }

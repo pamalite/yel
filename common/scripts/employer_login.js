@@ -82,65 +82,6 @@ function get_seed() {
     request.send();
 }
 
-function drop_contact_now() {
-    if ($('company').value == '' || $('company').value == '-') {
-        alert('You will need to provide the name of your company.');
-        return false;
-    } 
-    
-    if ($('phone').value == '' && $('email').value == '') {
-        alert('You will need to provide at least a way to contact you. \n\n Perhaps an e-mail address or telephone number?');
-        return false;
-    }
-    
-    if ($('email').value != '') {
-        if (!isEmail($('email').value)) {
-            alert('Thank you for providing an email. However, it seems like the email address is incorrect. \n\n Please try again.');
-            return false;
-        }
-    }
-    
-    if ($('contact').value == '') {
-        var is_fine = confirm("Not to be rude, perhaps it is fine not to address you when we contact you?");
-        if (!is_fine) {
-            return false;
-        }
-    }
-    
-    var company = $('company').value;
-    var phone = $('phone').value;
-    var email = $('email').value;
-    var contact = $('contact').value;
-    var uri = root + "/common/php/drop_contact.php";
-    var params = 'company=' + company + '&phone=' + phone + '&email=' + email + '&contact=' + contact;
-    var request = new Request({
-        url: uri,
-        method: 'post',
-        onSuccess: function(txt, xml) {
-            set_status('');
-            
-            if (txt == 'ok') {
-                alert('Great news! We have successfully received your contact and you will hear from us shortly.');
-                close_contact_drop_form();
-            } else {
-                alert('Somehow your contact drop is not working. Perhaps you should try again later.');
-            }
-        }
-    });
-    
-    request.send(params);
-    
-    return false;
-}
-
-function close_contact_drop_form() {
-    close_window('contact_drop_form');
-}
-
-function show_contact_drop_form() {
-    show_window('contact_drop_form');
-}
-
 function set_employers_mouse_events() {
     var employers = new Array();
     var number_of_tabs = 0;
@@ -197,7 +138,6 @@ function onDomReady() {
     initialize_page();
     get_seed();
     $('login').addEvent('click', login);
-    // $('drop').addEvent('click', drop_contact_now);
     set_employers_mouse_events();
 }
 
