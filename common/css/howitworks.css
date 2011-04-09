@@ -1,20 +1,24 @@
 /* for welcome page only */
 div.howitworks_pulldown_bar {
-    position: absolute;
-    width: 100%;
+    width: 75%;
     background-color: transparent;
     margin: auto;
-    border: none;
 }
 
 div.howitworks_pulldown_bar div.pulldown {
     padding: 5px 5px 5px 5px;
-    border: none;
     background-color: #efefef;
-    width: 200px;
-    text-align: center;
+    width: 215px;
     font-weight: bold;
-    margin-left: 200px;
+    text-align: center;
+}
+
+a.how_it_works {
+    color: #666666;
+}
+
+#howitworks_arrow {
+    height: 12px;
 }
 /* for welcome page only */
 

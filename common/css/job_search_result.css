@@ -1,6 +1,9 @@
 .job_short_details {
+    padding-top: 10px;
     padding-bottom: 10px;
+    padding-left: 10px;
     margin-bottom: 10px;
+    margin-left: 10px;
     border-bottom: 1px solid #EEEEEE;
 }
 
@@ -51,10 +54,8 @@ table.date_and_salary td.actions {
 }
 
 div.action_control {
-    text-align: center;
     padding: 3px 3px 3px 3px;
     margin: 3px 3px 3px 3px;
-    background-color: #FFEABD;
 }
 
 .expire_on {
