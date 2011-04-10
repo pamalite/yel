@@ -8,6 +8,10 @@ $data_path = "/Users/pamalite/yel3_files/db";
 $forex_feed = 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml'; // the file is updated daily between 14:15 and 15:00 CET
 $openinviter_path = '/../../openinviter';
 
+// LinkedIn settings
+$linkedin_api_key = 'R2lTi8uK9ROT8_1AfK_h5KWRBuMpycGGxGw0Dqn6_aXbHlRYwA-vqTe1eozKzAUo';
+$linkedin_secret_key = 'LsgYZUxq5lAcmrXaKJMgPckN3R9pnfqI29kHybevAKCCDdz3_YjzITkGtKbTkZiY';
+
 // Geographical settings
 $default_country_code = "MY";
 $default_country = "Malaysia";

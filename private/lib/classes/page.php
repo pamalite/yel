@@ -40,7 +40,14 @@ class Page {
             $this->header = str_replace('%page_javascript%', ''. "\n", $this->header);
         }
     }
-
+    
+    public function insert_linkedin_jsscript() {
+        $this->header .= '<script type="text/javascript" src="http://platform.linkedin.com/in.js">'. "\n";
+        $this->header .= 'api_key: '. $GLOBALS['linkedin_api_key']. ";\n";
+        $this->header .= 'authorize: true'. ";\n";
+        $this->header .= '</script>';
+    }
+    
     public function header($hashes = "") {
         $override_title = (!isset($hashes['override_title'])) ? false : true;
         $title = (!isset($hashes['title'])) ? '' : $hashes['title'];

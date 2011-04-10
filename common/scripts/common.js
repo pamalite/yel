@@ -4,6 +4,9 @@ var root = "";
 // var paypal_ipn_url = 'http://60.50.27.9/yel/employers/slots_ipn_action.php';
 // var paypal_id = 'J77S5ZAUFN8SS';
 
+var linkedin_api_key = 'R2lTi8uK9ROT8_1AfK_h5KWRBuMpycGGxGw0Dqn6_aXbHlRYwA-vqTe1eozKzAUo';
+var linkedin_secret_key = 'LsgYZUxq5lAcmrXaKJMgPckN3R9pnfqI29kHybevAKCCDdz3_YjzITkGtKbTkZiY';
+
 function initialize_page() {
     set_root();
     
