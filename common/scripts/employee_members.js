@@ -1565,6 +1565,8 @@ function close_new_application_popup(_is_save) {
             
             if (confirm('Without stating the referrer, the system will default it to YellowElevator.' + "\n\n" + 'Are you sure to continue?')) {
                 referrer_is_yel = 1;
+            } else {
+                return;
             }
         } else if (!referrer_is_yel && 
                    !isEmpty($('referrer_email_addr').value) &&

@@ -887,7 +887,7 @@ if ($_POST['action'] == 'add_new_application') {
     $data['candidate_phone'] = (empty($_POST['candidate_phone']) ? "NULL" : $_POST['candidate_phone']);
     $data['current_position'] = (empty($_POST['current_pos']) ? "NULL" : $_POST['current_pos']);
     $data['current_employer'] = (empty($_POST['current_emp']) ? "NULL" : $_POST['current_emp']);
-    $data['progress_notes'] = (empty($_POST['notes']) ? "NULL" : $_POST['notes']);;
+    $data['progress_notes'] = (empty($_POST['notes']) ? "NULL" : $_POST['notes']);
     
     $jobs = explode(',', $_POST['jobs']);
     
