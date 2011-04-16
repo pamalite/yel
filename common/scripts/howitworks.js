@@ -26,9 +26,13 @@ function toggle_howitworks() {
     
     if (howitworks_state == true) {
         $('howitworks_arrow').set('src', root + '/common/images/howitworks_down.gif');
+        $('howitworks').setStyle('margin',  'auto');
+        $('howitworks').setStyle('text-align',  'center');
         howitworks_state = false;
     } else {
         $('howitworks_arrow').set('src', root + '/common/images/howitworks_up.gif');
+        $('howitworks').setStyle('margin',  'auto');
+        $('howitworks').setStyle('text-align',  'center');
         howitworks_state = true;
     }
 }
