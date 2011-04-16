@@ -37,6 +37,32 @@ class MemberJobApplicationsPage extends Page {
         
         $applications = $this->member->getAllAppliedJobs();
         
+        // filter out jobs in 'job' that are already in 'ref'
+        $filter_apps = array();
+        $skips = array();
+        for($i=0; $i < count($applications); $i++) {
+            $current_app = $applications[$i];
+            $next_i = $i + 1;
+            if ($next_i <= count($applications)-1) {
+                for($j=$next_i; $j < count($applications); $j++) {
+                    if (!in_array($j, $skips)) {
+                        if ($current_app['job_id'] == $applications[$j]['job_id']) {
+                            if ($current_app['tab'] == 'ref') {
+                                $skips[] = $j;
+                            } else {
+                                $skips[] = $i;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (!in_array($i, $skips)) {
+                $filter_apps[] = $current_app;
+            }
+        }
+        $applications = $filter_apps;
+        
         ?>
         <div id="div_status" class="status">
             <span id="span_status" class="status"></span>

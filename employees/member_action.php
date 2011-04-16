@@ -338,7 +338,7 @@ if ($_POST['action'] == 'get_applications') {
         if ($next_i <= count($result)-1) {
             for ($j=$next_i; $j < count($result); $j++) {
                 if (!in_array($j, $skips)) {
-                    if ($current_row['job'] == $result[$j]['job']) {
+                    if ($current_row['job_id'] == $result[$j]['job_id']) {
                         if ($current_row['tab'] == 'ref') {
                             $skips[] = $j;
                         } else {

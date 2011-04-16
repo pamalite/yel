@@ -16,12 +16,20 @@ body {
 
 #welcome_top {
     margin: auto;
-    width: 75%;
+    width: 800px;
     height: 107px;
 }
 
 #logo {
     margin-top: 10px;
+}
+
+div.join_now_top {
+    font-weight: bold;
+    margin-left: 20px;
+    display: inline;
+    position: relative;
+    bottom: 20px;
 }
 
 #welcome_top div.topmenu {
@@ -88,7 +96,7 @@ div.panel.middle {
 div.section_bottom {
     margin: auto;
     padding-top: 10px;
-    width: 75%;
+    width: 850px;
 }
 
 table.details {
@@ -116,9 +124,6 @@ div.join_now {
     margin: 3px 3px 3px 3px;
     padding-top: 20px;
     padding-bottom: 20px;
-    text-align: center;
-    font-size: 32pt;
-    font-weight: bold;
     border-bottom: 1px solid #d9d9d9;
 }
 
@@ -126,9 +131,6 @@ div.for_employers {
     margin: 3px 3px 3px 3px;
     padding-top: 20px;
     padding-bottom: 20px;
-    text-align: center;
-    font-size: 20pt;
-    font-weight: bold;
     border-bottom: 1px solid #d9d9d9;
 }
 
@@ -140,7 +142,7 @@ div.client-box {
 }
 
 div.client-box .employer_logos {
-    width: 230px;
+/*    width: 230px;*/
 }
 
 div.client-box table.employers_carousel {
@@ -159,7 +161,6 @@ div.youtube {
     padding-top: 20px;
     padding-bottom: 20px;
     border-bottom: 1px solid #d9d9d9;
-    text-align: center;
 }
 
 div.search {
@@ -170,8 +171,7 @@ div.search {
     padding-bottom: 16px;
     margin-top: 15px;
     color: #000000;
-/*    width: 850px;*/
-    width: 75%;
+    width: 800px;
 }
 
 div.search div.form_title {
@@ -202,7 +202,7 @@ div.search div.keywords {
 }
 
 div.search #keywords {
-    width: 760px;
+    width: 585px;
     font-size: 12pt;
 }
 

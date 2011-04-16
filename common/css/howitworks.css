@@ -1,6 +1,6 @@
 /* for welcome page only */
 div.howitworks_pulldown_bar {
-    width: 75%;
+    width: 800px;
     background-color: transparent;
     margin: auto;
 }
@@ -25,17 +25,20 @@ a.how_it_works {
 /* main banner */
 #howitworks {
     display: none;
-    width: 100%;
+    margin: auto;
+    width: 950px;
     text-align: center;
     padding-top: 5px;
     padding-bottom: 5px;
     border-bottom: 3px solid #efefef;
+    border-left: 3px solid #efefef;
+    border-right: 3px solid #efefef;
     height: 100px;
 }
 
 table.howitworks {
     margin: auto;
-    width: 70%;
+    width: 100%;
     height: 98%;
 }
 

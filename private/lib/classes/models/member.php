@@ -969,9 +969,9 @@ class Member implements Model {
     public function getAllAppliedJobs($_order = "") {
         $order_by = "";
         if (empty($_order)) {
-            $order_by = "ORDER BY applied_on DESC";
+            $order_by .= "ORDER BY applied_on DESC";
         } else {
-            $order_by = "ORDER BY ". $_order;
+            $order_by .= "ORDER BY ". $_order;
         }
         
         $query = "SELECT 'ref' AS tab, referrals.id, referrals.job AS job_id, jobs.alternate_employer, 
