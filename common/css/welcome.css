@@ -32,6 +32,14 @@ div.join_now_top {
     bottom: 20px;
 }
 
+div.join_now_top a.join_now_top {
+    color: #f5cf10;
+}
+
+div.join_now_top a.join_now_top:hover {
+    color: #ff0000;
+}
+
 #welcome_top div.topmenu {
     font-size: 11pt;
     display: inline;
@@ -124,6 +132,7 @@ div.join_now {
     margin: 3px 3px 3px 3px;
     padding-top: 20px;
     padding-bottom: 20px;
+    padding-left: 15px;
     border-bottom: 1px solid #d9d9d9;
 }
 
@@ -131,6 +140,7 @@ div.for_employers {
     margin: 3px 3px 3px 3px;
     padding-top: 20px;
     padding-bottom: 20px;
+    padding-left: 15px;
     border-bottom: 1px solid #d9d9d9;
 }
 
@@ -138,11 +148,8 @@ div.client-box {
     margin: 3px 3px 3px 3px;
     padding-top: 20px;
     padding-bottom: 20px;
+    padding-left: 15px;
     border-bottom: 1px solid #d9d9d9;
-}
-
-div.client-box .employer_logos {
-/*    width: 230px;*/
 }
 
 div.client-box table.employers_carousel {
@@ -160,6 +167,7 @@ div.youtube {
     margin: 3px 3px 3px 3px;
     padding-top: 20px;
     padding-bottom: 20px;
+    padding-left: 15px;
     border-bottom: 1px solid #d9d9d9;
 }
 
@@ -177,7 +185,6 @@ div.search {
 div.search div.form_title {
     padding-left: 31px;
     padding-bottom: 15px;
-    padding-top: 15px;
     border-bottom: 1px solid #d9d9d9;
 }
 
