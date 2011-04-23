@@ -26,14 +26,14 @@ a.how_it_works {
 #howitworks {
     display: none;
     margin: auto;
-    width: 950px;
+    width: 900px;
     text-align: center;
     padding-top: 5px;
     padding-bottom: 5px;
     border-bottom: 3px solid #efefef;
     border-left: 3px solid #efefef;
     border-right: 3px solid #efefef;
-    height: 100px;
+    height: 145px;
 }
 
 table.howitworks {

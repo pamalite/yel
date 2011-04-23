@@ -76,7 +76,7 @@ class Page {
     
     public function howitworks() {
         $howitworks = file_get_contents(dirname(__FILE__). '/../../html/howitworks.html');
-        
+        $howitworks = str_replace('%root%', $this->url_root, $howitworks);
         echo $howitworks;
     }
     

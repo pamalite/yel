@@ -26,14 +26,15 @@ body {
 
 div.join_now_top {
     font-weight: bold;
-    margin-left: 20px;
+    margin-left: 40px;
     display: inline;
     position: relative;
     bottom: 20px;
+    font-size: 13pt;
 }
 
 div.join_now_top a.join_now_top {
-    color: #f5cf10;
+    color: #f2b92e;
 }
 
 div.join_now_top a.join_now_top:hover {
@@ -88,7 +89,8 @@ div.content div.section_top {
 
 div.section_top div.main_title {
     text-align: center;
-    margin-top: 40px;
+    margin-top: 15px;
+    padding-bottom: 15px;
 }
 
 div.section_top div.panel {
@@ -177,7 +179,6 @@ div.search {
     border: 1px #d9d9d9 solid;
     padding-top: 16px;
     padding-bottom: 16px;
-    margin-top: 15px;
     color: #000000;
     width: 800px;
 }
