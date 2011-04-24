@@ -37,10 +37,6 @@ div.join_now_top a.join_now_top {
     color: #f2b92e;
 }
 
-div.join_now_top a.join_now_top:hover {
-    color: #ff0000;
-}
-
 #welcome_top div.topmenu {
     font-size: 11pt;
     display: inline;
