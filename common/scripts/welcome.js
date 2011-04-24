@@ -63,6 +63,78 @@ function login() {
     request.send(params);
 }
 
+function on_linkedin_auth() {
+    IN.API.Profile("me").result(function(me) {
+        var linkedin_id = me.values[0].id;
+        var linkedin_firstname = me.values[0].firstName;
+        var linkedin_lastname = me.values[0].lastName;
+        
+        if (isEmpty(linkedin_id) || linkedin_id == null) {
+            alert('Cannot login from LinkedIn. Please use your normal login instead.');
+            return;
+        }
+        
+        var params = 'id=' + linkedin_id + '&action=linkedin_auth';
+        var request = new Request({
+            url: root + "/members/login_action.php",
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('Cannot login from LinkedIn. Please use your normal login instead.');
+                    return;
+                }
+                
+                var new_linkedin = false;
+                var member_id = '';
+                if (isEmpty(txt)) {
+                    member_id = prompt('Please enter your email address again.');
+                    if (member_id == false) {
+                        alert('You have chosen not to sign in through LinkedIn.' + "\n\n" + 'Cannot login from LinkedIn. Please use your normal login instead.');
+                        return;
+                    }
+                    
+                    while (!isEmail(member_id)) {
+                        member_id = prompt('The email address entered is invalid.' + "\n\n" + 'Please enter your email address again.');
+                    }
+                    
+                    new_linkedin = true;
+                } else {
+                    if (!isEmail(txt)) {
+                        alert('Cannot login from LinkedIn. Please use your normal login instead.');
+                        return;
+                    }
+                    
+                    member_id = txt;
+                }
+                
+                login_via_linkedin(member_id, linkedin_id, linkedin_firstname, 
+                                   linkedin_lastname, new_linkedin);
+            }
+        });
+
+        request.send(params);
+    });
+}
+
+function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
+                            _linkedin_lastname, _is_new) {
+    alert('member_id: ' + _member_id + "\n" + 'linkedin_id: ' + _linkedin_id);
+    
+    var params = 'id=' + _member_id + '&action=linkedin_login';
+    params = params + '&linkedin_id=' + _linkedin_id;
+    params = params + '&linkedin_firstname=' + _linkedin_firstname;
+    params = params + '&linkedin_lastname=' + _linkedin_lastname;
+    var hash = sha1(_member_id + md5(_linkedin_id) + seed);
+    params = params + '&sid=' + sid + '&hash=' + hash;
+    
+    if (_is_new) {
+        params = params + '&is_new=1';
+    } else {
+        params = params + '&is_new=0';
+    }
+    
+    alert(params);
+}
+
 function get_seed() {
     var seed_uri = root + "/members/seed.php";
     var request = new Request({

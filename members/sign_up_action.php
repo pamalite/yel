@@ -65,7 +65,8 @@ if ($_POST['action'] == 'sign_up') {
             echo 'ko - error_create';
         }
     } else {
-        if ($member->update($data, true) === false) {
+        $member->setAdmin(true);
+        if ($member->update($data) === false) {
             echo 'ko - error_update';
         }
     }
