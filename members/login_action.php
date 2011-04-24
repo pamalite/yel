@@ -111,6 +111,8 @@ if ($_POST['action'] == 'linkedin_login') {
     $_SESSION['yel']['member']['sid'] = $sid;
     $_SESSION['yel']['member']['linkedin_id'] = $linkedin_id;
     
+    header('Content-type: text/xml');
+    
     $member = new Member($id, $sid);
     // 1. find whether this member exists, from the ID
     $criteria = array(
@@ -132,7 +134,13 @@ if ($_POST['action'] == 'linkedin_login') {
         $data['updated_on'] = $joined_on;
         $data['active'] = 'Y';
         $data['checked_profile'] = 'Y';
-
+        
+        if (is_null($data['firstname']) || empty($data['firstname']) || 
+            is_null($data['lastname']) || empty($data['lastname'])) {
+            $data['firstname'] = 'Unknown';
+            $data['lastname'] = 'Unknown';
+        }
+        
         if ($member->create($data) === false) {
             $_SESSION['yel']['member']['hash'] = "";
             $response['errors'] = array(

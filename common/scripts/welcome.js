@@ -117,8 +117,6 @@ function on_linkedin_auth() {
 
 function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
                             _linkedin_lastname, _is_new) {
-    alert('member_id: ' + _member_id + "\n" + 'linkedin_id: ' + _linkedin_id);
-    
     var params = 'id=' + _member_id + '&action=linkedin_login';
     params = params + '&linkedin_id=' + _linkedin_id;
     params = params + '&linkedin_firstname=' + _linkedin_firstname;
@@ -131,8 +129,43 @@ function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
     } else {
         params = params + '&is_new=0';
     }
-    
-    alert(params);
+        
+    var request = new Request({
+        url: root + "/members/login_action.php",
+        onSuccess: function(txt, xml) {
+            if (xml.getElementsByTagName('errors').length != 0) {
+                 var errors = xml.getElementsByTagName('error');
+                var msg = errors[0].childNodes[0].nodeValue;
+                if (msg == 'create_error') {
+                    alert('An error occured while signing up with LinkedIn account.');
+                    return;
+                }
+
+                if (msg == 'update_error') {
+                    alert('An error occured while associating your existing account with LinkedIn.');
+                    return;
+                }
+
+                if (msg == 'hacking_detected') {
+                    alert('Another LinkedIn user has already used this email address.');
+                    return;
+                }
+
+                if (msg == "bad_login") {
+                    location.replace(root + '/errors/failed_login.php?dir=members');
+                    return;
+                }
+            }
+            
+            var status = xml.getElementsByTagName('status');
+            
+            if (status[0].childNodes[0].nodeValue == 'ok') {
+                location.replace(root + '/members/home.php');
+            }
+        }
+    });
+
+    request.send(params);
 }
 
 function get_seed() {
