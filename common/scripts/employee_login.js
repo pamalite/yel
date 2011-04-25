@@ -63,9 +63,6 @@ function get_seed() {
             sid = sids[0].childNodes[0].nodeValue;
             seed = seeds[0].childNodes[0].nodeValue;
         },
-        onFailure: function() {
-            location.replace(root + '/errors/temporarily_down.php');
-        },
         onRequest: function(instance) {
             set_status("Loading...");
         }

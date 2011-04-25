@@ -54,9 +54,6 @@ function login() {
             if (status[0].childNodes[0].nodeValue == 'ok') {
                 location.replace(root + '/members/home.php');
             }
-        },
-        onRequest: function(instance) {
-            // set_status("Logging in...");
         }
     });
     
@@ -79,12 +76,6 @@ function get_seed() {
             
             sid = sids[0].childNodes[0].nodeValue;
             seed = seeds[0].childNodes[0].nodeValue;
-        },
-        onFailure: function() {
-            location.replace(root + '/errors/temporarily_down.php');
-        },
-        onRequest: function(instance) {
-            // set_status("Loading...");
         }
     });
     
@@ -117,9 +108,6 @@ function close_password_reset_window(_is_reset_password) {
                 
                 alert('Password was successfully reset. Please check your inbox for temporary password.');
                 // set_status();
-            },
-            onRequest: function(instance) {
-                // set_status('Resetting password...');
             }
         });
 
