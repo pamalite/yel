@@ -57,6 +57,8 @@ class Page {
         } else {
             $this->header = str_replace('%page_title%', $GLOBALS['COMPANYNAME']. ' - '.$title, $this->header);
         }
+        
+        $this->insert_linkedin_jsscript();
     }
     
     public function begin() {

@@ -42,7 +42,6 @@ $welcome->header(array('title' => 'Welcome'));
 $welcome->insert_welcome_css();
 $welcome->insert_welcome_scripts();
 $welcome->insert_inline_scripts();
-$welcome->insert_linkedin_jsscript();
 $welcome->show();
 $welcome->footer();
 ?>
