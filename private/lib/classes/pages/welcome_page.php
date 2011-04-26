@@ -38,7 +38,7 @@ class WelcomePage extends Page {
                         industries ON industries.id = jobs.industry, 
                         countries ON countries.country_code = jobs.country, 
                         branches ON branches.id = employers.branch", 
-            // 'match' => "jobs.closed = 'N' AND jobs.expire_on >= NOW() AND jobs.deleted = FALSE", 
+            'match' => "jobs.closed = 'N' AND jobs.expire_on >= NOW() AND jobs.deleted = FALSE", 
             'order' => "jobs.salary DESC", 
             'limit' => "5"
         );
@@ -90,7 +90,7 @@ class WelcomePage extends Page {
         $criteria = array(
             'columns' => 'employers.id, employers.name, COUNT(jobs.id) AS job_count', 
             'joins' => 'employers ON employers.id = jobs.employer',
-            // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'match' => "jobs.deleted = FALSE AND jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
             'group' => 'employers.id', 
             'order' => 'employers.name ASC'
         );
@@ -112,7 +112,7 @@ class WelcomePage extends Page {
         $criteria = array(
             'columns' => "countries.country_code, countries.country, COUNT(jobs.id) AS job_count", 
             'joins' => "countries ON countries.country_code = jobs.country",
-            // 'match' => "jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
+            'match' => "jobs.deleted = FALSE AND jobs.expire_on >= CURDATE() AND jobs.closed = 'N'", 
             'group' => "countries.country_code", 
             'order' => "countries.country ASC"
         );

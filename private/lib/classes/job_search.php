@@ -72,8 +72,7 @@ class JobSearch {
                                  job_index.state) 
                           AGAINST ('". $this->keywords. "' IN BOOLEAN MODE)";
         
-        $filter_job_status = "(jobs.closed = 'N' OR jobs.closed = 'Y')";
-        //$filter_job_status = "jobs.closed = 'N'";
+        $filter_job_status = "jobs.closed = 'N' AND jobs.deleted = FALSE AND jobs.expire_on >= CURDATE()";
         
         $filter_employer = "jobs.employer IS NOT NULL";
         if (!empty($this->employer)) {
