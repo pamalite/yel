@@ -97,7 +97,7 @@ class JobPage extends Page {
                         employers ON employers.id = jobs.employer, 
                         employees ON employees.id = employers.registered_by, 
                         branches ON branches.id = employees.branch', 
-            'match' => "jobs.id = '. $this->job_id. ' AND 
+            'match' => "jobs.id = ". $this->job_id. " AND 
                         jobs.closed = 'N' AND jobs.deleted = FALSE AND jobs.expire_on >= CURDATE()"
         );
         
