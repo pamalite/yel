@@ -66,6 +66,10 @@ function on_linkedin_auth() {
         var linkedin_firstname = me.values[0].firstName;
         var linkedin_lastname = me.values[0].lastName;
         
+        if (isEmpty(seed) || isEmpty(sid)) {
+            get_seed();
+        }
+        
         if (isEmpty(linkedin_id) || linkedin_id == null) {
             alert('Cannot login from LinkedIn. Please use your normal login instead.');
             return;
@@ -73,7 +77,7 @@ function on_linkedin_auth() {
         
         var params = 'id=' + linkedin_id + '&action=linkedin_auth';
         var request = new Request({
-            url: root + "/members/login_action.php",
+            url: 'members/login_action.php',
             onSuccess: function(txt, xml) {
                 if (txt == 'ko') {
                     alert('Cannot login from LinkedIn. Please use your normal login instead.');
@@ -126,12 +130,18 @@ function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
     } else {
         params = params + '&is_new=0';
     }
-        
+    
+    $('div_login_blanket').setStyle('display', 'block');
+    show_window('div_login_progress_window');
+    
     var request = new Request({
-        url: root + "/members/login_action.php",
+        url: 'members/login_action.php',
         onSuccess: function(txt, xml) {
             if (xml.getElementsByTagName('errors').length != 0) {
-                 var errors = xml.getElementsByTagName('error');
+                close_window('div_login_progress_window');
+                $('div_login_blanket').setStyle('display', 'none');
+                
+                var errors = xml.getElementsByTagName('error');
                 var msg = errors[0].childNodes[0].nodeValue;
                 if (msg == 'create_error') {
                     alert('An error occured while signing up with LinkedIn account.');
@@ -157,7 +167,7 @@ function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
             var status = xml.getElementsByTagName('status');
             
             if (status[0].childNodes[0].nodeValue == 'ok') {
-                location.replace(root + '/members/home.php');
+                location.replace('members/home.php');
             }
         }
     });
@@ -166,7 +176,7 @@ function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
 }
 
 function get_seed() {
-    var seed_uri = root + "/members/seed.php";
+    var seed_uri = 'members/seed.php';
     var request = new Request({
         url: seed_uri,
         onSuccess: function(txt, xml) {

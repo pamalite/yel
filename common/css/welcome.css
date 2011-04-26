@@ -310,3 +310,27 @@ td.buttons {
     margin: auto;
     width: 100%;
 }
+
+#div_login_blanket {
+    background-color: #ffffff;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: none;
+}
+
+#div_login_progress_window {
+    display: none;
+    width: 350px;
+}
+
+#div_login_progress_window div.login_progress {
+    margin: auto;
+    width: 98%;
+    text-align: center;
+    font-size: 18pt;
+}
