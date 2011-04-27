@@ -33,12 +33,18 @@ function login() {
     var hash = sha1($('login_email_addr').value + md5($('login_password').value) + seed);
     var params = 'id=' + $('login_email_addr').value + '&sid=' + sid + '&hash=' + hash + '&action=login';
     
+    $('div_login_blanket').setStyle('display', 'block');
+    show_window('div_login_progress_window');
+    
     var uri = root + "/members/login_action.php";
     var request = new Request({
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
             if (xml.getElementsByTagName('errors').length != 0) {
+                close_window('div_login_progress_window');
+                $('div_login_blanket').setStyle('display', 'none');
+                
                 var errors = xml.getElementsByTagName('error');
                 var msg = errors[0].childNodes[0].nodeValue;
                 if (msg == "bad_login") {
