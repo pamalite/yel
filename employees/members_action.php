@@ -473,6 +473,7 @@ if ($_POST['action'] == 'get_members') {
         $member = new Member();
         $sub_result = $member->find($sub_criteria);
         if (count($sub_result) > 0 && !is_null($sub_result)) {
+            $sub_row = $sub_result[0];
             $result[$i]['position_title'] = htmlspecialchars_decode(stripslashes($sub_row['position_title']));
             $result[$i]['employer'] = htmlspecialchars_decode(stripslashes($sub_row['employer']));
             $result[$i]['formatted_work_from'] = $sub_row['formatted_work_from'];
