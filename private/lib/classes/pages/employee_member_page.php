@@ -411,7 +411,7 @@ class EmployeeMemberPage extends Page {
                 'country' => $branch[0]['country'],  
                 'hrm_gender' => '',
                 'hrm_ethicnity' => '',
-                'hrm_birthdate' => '1957-08-31',
+                'hrm_birthdate' => '',
                 'citizenship' => $branch[0]['country'],
                 'resumes' => array()
             );

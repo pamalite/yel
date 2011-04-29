@@ -60,7 +60,7 @@ function reset_password() {
 }
 
 function validate_profile_form() {
-    // is new employer?
+    // is new member?
     if (member_id == '0') {
         if (!isEmail($('email_addr').value)) {
             alert('Please provide a valid e-mail address.');
@@ -83,45 +83,45 @@ function validate_profile_form() {
         return false;
     }
     
-    if (isEmpty($('zip').value)) {
-        alert('Zip/Postal code cannot be empty.');
-        return false;
-    }
+    // if (isEmpty($('zip').value)) {
+    //     alert('Zip/Postal code cannot be empty.');
+    //     return false;
+    // }
     
-    if ($('country').options[$('country').selectedIndex].value == '0') {
-        alert('You need to select a country of residence.');
-        return false;
-    }
+    // if ($('country').options[$('country').selectedIndex].value == '0') {
+    //     alert('You need to select a country of residence.');
+    //     return false;
+    // }
     
-    if ($('citizenship').options[$('citizenship').selectedIndex].value == '0') {
-        alert('You need to select a country of citizenship.');
-        return false;
-    }
-    
-    if ($('gender').options[$('gender').selectedIndex].value == '') {
-        alert('You need to select a gender.');
-        return false;
-    }
-    
-    if (isEmpty($('ethnicity').value)) {
-        alert('You need to provide the ethnicity of the member.');
-        return false;
-    }
-    
-    if ($('birthdate_month').options[$('birthdate_month').selectedIndex].value == '') {
-        alert('You need to select the birthdate month.');
-        return false;
-    }
-    
-    if ($('birthdate_day').options[$('birthdate_day').selectedIndex].value == '') {
-        alert('You need to select the birthdate day.');
-        return false;
-    }
-    
-    if (isEmpty($('birthdate_year').value) || parseInt($('birthdate_year').value) <= 0) {
-        alert('You need to provide a valid year for birthdate year');
-        return false;
-    }
+    // if ($('citizenship').options[$('citizenship').selectedIndex].value == '0') {
+    //     alert('You need to select a country of citizenship.');
+    //     return false;
+    // }
+    // 
+    // if ($('gender').options[$('gender').selectedIndex].value == '') {
+    //     alert('You need to select a gender.');
+    //     return false;
+    // }
+    // 
+    // if (isEmpty($('ethnicity').value)) {
+    //     alert('You need to provide the ethnicity of the member.');
+    //     return false;
+    // }
+    // 
+    // if ($('birthdate_month').options[$('birthdate_month').selectedIndex].value == '') {
+    //     alert('You need to select the birthdate month.');
+    //     return false;
+    // }
+    // 
+    // if ($('birthdate_day').options[$('birthdate_day').selectedIndex].value == '') {
+    //     alert('You need to select the birthdate day.');
+    //     return false;
+    // }
+    // 
+    // if (isEmpty($('birthdate_year').value) || parseInt($('birthdate_year').value) <= 0) {
+    //     alert('You need to provide a valid year for birthdate year');
+    //     return false;
+    // }
     
     return true;
     

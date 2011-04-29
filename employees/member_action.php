@@ -27,6 +27,10 @@ if ($_POST['action'] == 'save_profile') {
     $employee = new Employee($_POST['employee']);
     $branch = $employee->getBranch();
     
+    if ($_POST['hrm_birthdate'] == '--') {
+        $_POST['hrm_birthdate'] = '';
+    }
+    
     $data = array();
     $data['firstname'] = $_POST['firstname'];
     $data['lastname'] = $_POST['lastname'];
@@ -34,7 +38,7 @@ if ($_POST['action'] == 'save_profile') {
     $data['address'] = $_POST['address'];
     $data['state'] = $_POST['state'];
     $data['zip'] = $_POST['zip'];
-    $data['country'] = $_POST['country'];
+    $data['country'] = sql_nullify($_POST['country']);
     $data['citizenship'] = sql_nullify($_POST['citizenship']);
     $data['hrm_gender'] = sql_nullify($_POST['hrm_gender']);
     $data['hrm_ethnicity'] = sql_nullify($_POST['hrm_ethnicity']);
@@ -44,6 +48,7 @@ if ($_POST['action'] == 'save_profile') {
     $member = NULL;
     if ($mode == 'update') {
         $member = new Member($_POST['id']);
+        $member->setAdmin(true);
         if (!$member->update($data)) {
             echo 'ko';
             exit();
