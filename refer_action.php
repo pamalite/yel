@@ -142,16 +142,41 @@ if (isset($_SESSION['yel']['member']['id']) &&
 }
 $branch_email = 'team.'. $country_code. '@yellowelevator.com';
 
+// get employer info
+$criteria = array(
+    'criteria' => "jobs.employer, employers.name AS employer_name", 
+    'joins' => "employers ON employers.id = jobs.employer", 
+    'match' => "jobs.id = ". $job->getId(), 
+    'limit' => "1"
+);
+
+$result = $job->find($criteria);
+$employer_id = $result[0]['employer'];
+$employer_name = $result[0]['employer_name'];
+
 $mail_lines = file(dirname(__FILE__). '/private/mail/new_referral.txt');
 $message = '';
 foreach ($mail_lines as $line) {
     $message .= $line;
 }
 
+$candidate_current_position = '(None provided)';
+if (!empty($_POST['candidate_current_pos'])) {
+    $candidate_current_position = htmlspecialchars_decode(stripslashes($_POST['candidate_current_pos']));
+}
+
+if (!empty($_POST['candidate_current_emp'])) {
+    $candidate_current_position .= '('. htmlspecialchars_decode(stripslashes($_POST['candidate_current_emp'])). ')';
+}
+
+$message = str_replace('%employer_id%', $employer_id, $message);
+$message = str_replace('%employer%', htmlspecialchars_decode(stripslashes($employer_name)), $message);
 $message = str_replace('%referrer%', htmlspecialchars_decode(stripslashes($referrer['name'])), $message);
 $message = str_replace('%candidate%', htmlspecialchars_decode(stripslashes($candidate['name'])), $message);
+$message = str_replace('%candidate_phone%', $candidate['phone_num'], $message);
 $message = str_replace('%referrer_email%', $referrer['email_addr'], $message);
 $message = str_replace('%candidate_email%', $candidate['email_addr'], $message);
+$message = str_replace('%candidate_current_position%', $candidate_current_position, $message);
 $message = str_replace('%request_on%', $today, $message);
 $message = str_replace('%job_title%', $job->getTitle(), $message);
 $message = str_replace('%has_resume%', $has_resume, $message);

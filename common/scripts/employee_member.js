@@ -1447,7 +1447,8 @@ function close_job_profile_popup(_is_save) {
             method: 'post',
             onSuccess: function(txt, xml) {
                 set_status('');
-
+                $('job_profile_processing').setStyle('display', 'none');
+                
                 if (txt == 'ko') {
                     alert('An error occured when saving job profile.' + "\n\n" + 'Please try again later.');
                     return;
@@ -1455,6 +1456,9 @@ function close_job_profile_popup(_is_save) {
                 
                 close_window('job_profile_window');
                 location.reload();
+            },
+            onRequest: function() {
+                $('job_profile_processing').setStyle('display', 'inline');
             }
         });
 

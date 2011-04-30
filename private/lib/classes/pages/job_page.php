@@ -8,6 +8,7 @@ class JobPage extends Page {
     private $is_employee_viewing = false;
     private $action_has_error = false;
     private $action_responded = false;
+    private $job = NULL;
     
     function __construct($_session = NULL, $_job_id, $_criterias = NULL) {
         parent::__construct();
@@ -23,6 +24,8 @@ class JobPage extends Page {
         }
         
         $this->criterias = $_criterias;
+        
+        $this->job = $this->get_job_info();
     }
     
     function set_request_status($_error_number = 0) {
@@ -41,12 +44,19 @@ class JobPage extends Page {
     }
     
     public function insert_job_scripts() {
-        $this->insert_scripts('job.js');
+        $this->insert_scripts(array('job.js', 'job_search_result.js'));
     }
     
     public function insert_inline_scripts($_show_popup = '') {
         $script = 'var job_id = "'. $this->job_id. '";'. "\n";
-        $script .= 'var show_popup = "'. $_show_popup. '";'. "\n";
+        
+        if (count($this->job) <= 0 || is_null($this->job) || $this->job === false) {
+            $script .= 'var show_popup = "";'. "\n";
+        } else if ($this->job['expired'] >= 0 || $this->job['closed'] == 'Y') {
+            $script .= 'var show_popup = "";'. "\n";
+        } else {
+            $script .= 'var show_popup = "'. $show_popup. '";'. "\n";
+        }
         
         if (!is_null($this->member)) {
             $script .= 'var id = "'. $this->member->getId(). '";'. "\n";
@@ -97,8 +107,7 @@ class JobPage extends Page {
                         employers ON employers.id = jobs.employer, 
                         employees ON employees.id = employers.registered_by, 
                         branches ON branches.id = employees.branch', 
-            'match' => "jobs.id = ". $this->job_id. " AND 
-                        jobs.closed = 'N' AND jobs.deleted = FALSE AND jobs.expire_on >= CURDATE()"
+            'match' => "jobs.id = ". $this->job_id. " AND jobs.deleted = FALSE"
         );
         
         $job = new Job();
@@ -203,7 +212,7 @@ class JobPage extends Page {
             $this->menu('member');
         }
         
-        $job = $this->get_job_info();
+        $job = $this->job;
         $career = $this->get_member_career();
         
         $error_message = '';
@@ -211,16 +220,12 @@ class JobPage extends Page {
             $error_message = 'The job that you are looking for cannot be found.';
         } else if ($job === false) {
             $error_message = 'An error occured while loading the job details.';
+        } else if ($job['expired'] >= 0 || $job['closed'] == 'Y') {
+            $error_message = 'The job that you are looking for is no longer available.';
         }
         
         // format tags to HTML
         $job['description'] = format_job_description($job['description']);
-        
-        if (!$this->is_employee_viewing) {
-            if ($job['expired'] >= 0 || $job['closed'] == 'Y') {
-                // $error_message = 'The job that you are looking for is no longer available.';
-            }
-        }
         
         $page = file_get_contents(dirname(__FILE__). '/../../../html/job_page.html');
         $page = str_replace('%root%', $this->url_root, $page);

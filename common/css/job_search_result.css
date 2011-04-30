@@ -64,3 +64,30 @@ div.action_control {
     font-size: 7pt;
     color: #666666;
 }
+
+div.tip_window {
+    position: absolute;
+    display: none;
+    border: 3px solid #dfdfdf;
+    width: 550px;
+    background-color: #ffffff;
+}
+
+div.tip_window div.tip_title {
+    font-weight: bold;
+    font-size: 14pt;
+    padding: 5px 5px 5px 5px;
+    background-color: #dfdfdf;
+}
+
+div.tip_window div.tip_title a.close_tip {
+    font-weight: normal;
+    font-size: 10pt;
+    float: right;
+}
+
+div.tip_window div.tip_content {
+    font-size: 12pt;
+    padding: 5px 5px 5px 5px;
+    background-color: #efefef;
+}

@@ -2,8 +2,12 @@ Hi,
 
 A new referral for %job_title% was made on %request_on%. 
 
+Company ID: %employer_id%
+Company: %employer%
 Referrer: %referrer% (%referrer_email%)
 Candidate: %candidate% (%candidate_email%)
+Candidate Phone: %candidate_phone%
+Candidate Current Position: %candidate_current_position%
 Has resume: %has_resume%
 
 Yellow Elevator

@@ -17,7 +17,7 @@ class WelcomePage extends Page {
     }
     
     public function insert_welcome_scripts() {
-        $this->insert_scripts(array('welcome.js'));
+        $this->insert_scripts(array('welcome.js', 'job_search_result.js'));
     }
     
     public function insert_inline_scripts() {
