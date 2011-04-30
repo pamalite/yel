@@ -55,7 +55,7 @@ class JobPage extends Page {
         } else if ($this->job['expired'] >= 0 || $this->job['closed'] == 'Y') {
             $script .= 'var show_popup = "";'. "\n";
         } else {
-            $script .= 'var show_popup = "'. $show_popup. '";'. "\n";
+            $script .= 'var show_popup = "'. $_show_popup. '";'. "\n";
         }
         
         if (!is_null($this->member)) {
