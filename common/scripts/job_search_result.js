@@ -6,7 +6,7 @@ function show_tip(_tip) {
             break;
         case 'bonus':
             $('tip_title').set('html', 'Candidate\'s Bonus');
-            $('tip_content').set('html', 'This is a congratulatory gift from us and a token of appreciation for using YellowElevator.com. When you are successfully hired for this job position, please sign into your account and click the "I\'m Employed" button location in the Job Applications section in order to claim your Candidate\'s Bonus.');
+            $('tip_content').set('html', 'This is a congratulatory gift from us and a token of appreciation for using YellowElevator.com. When you are successfully hired for this job position, please sign into your account and click the "I\'m Employed" button located in the Job Applications section in order to claim your Candidate\'s Bonus.');
             break;            
     }
     

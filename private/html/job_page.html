@@ -33,11 +33,11 @@
                         %expire_on%
                     </div>
                     <div class="expires_on">
-                        <span class="label">Recommender's Reward:</span><br/>
+                        <span class="label">Recommender's Reward <span class="tooltip_mark"><a class="no_link" onClick="show_tip('reward');">(?)</a></span>:</span><br/>
                         %currency%$ %potential_reward%
                     </div>
                     <div class="expires_on">
-                        <span class="label">Candidate's Bonus:</span><br/>
+                        <span class="label">Candidate's Bonus <span class="tooltip_mark"><a class="no_link" onClick="show_tip('bonus');">(?)</a></span>:</span><br/>
                         %currency%$ %potential_token_reward%
                     </div>
                     <div class="actions">
@@ -143,3 +143,8 @@
     </form>
 </div>
 
+<!-- tips goes here -->
+<div id="tip_window" class="tip_window">
+    <div class="tip_title"><span id="tip_title"></span><a class="no_link close_tip" onClick="close_window('tip_window');">[close]</a></div>
+    <div class="tip_content" id="tip_content"></div>
+</div>

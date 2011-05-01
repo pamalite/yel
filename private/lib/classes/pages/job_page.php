@@ -40,7 +40,7 @@ class JobPage extends Page {
     }
     
     public function insert_job_css() {
-        $this->insert_css(array('list_box.css', 'job.css', 'job_desc.css'));
+        $this->insert_css(array('list_box.css', 'job.css', 'job_desc.css', 'job_search_result.css'));
     }
     
     public function insert_job_scripts() {
@@ -217,7 +217,7 @@ class JobPage extends Page {
         
         $error_message = '';
         if (count($job) <= 0 || is_null($job)) {
-            $error_message = 'The job that you are looking for cannot be found.';
+                 $error_message = 'The job that you are looking for cannot be found.';
         } else if ($job === false) {
             $error_message = 'An error occured while loading the job details.';
         } else if ($job['expired'] >= 0 || $job['closed'] == 'Y') {
