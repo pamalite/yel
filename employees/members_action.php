@@ -54,6 +54,7 @@ function create_member_from($_email_addr, $_fullname, $_phone) {
     
     $subject = 'New Membership from Yellow Elevator';
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
     
     mail($_email_addr, $subject, $message, $headers);
     

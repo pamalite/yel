@@ -93,6 +93,7 @@ if ($_POST['action'] == 'sign_up') {
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     $subject = "Member Activation Required";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
     mail($_POST['email_addr'], $subject, $message, $headers);
     
     // $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
