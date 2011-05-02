@@ -315,7 +315,7 @@ function save_job_profile() {
                 return;
             }
             
-            alert('Congratulations! Your profile has been successfully saved.' + "\n\n" + 'Please remember to activate your account in order to sign in. If you do not receive the activation email in the next 24 hours, please do not worry, as our consultants will send contact you shortly.');
+            alert('Congratulations! Your Current Career Profile has been successfully submitted.' + "\n\n" + 'One of our Recruitment Consultants will get in touch with you through email shortly to guide you how to sign into your account.');
             
             location.replace(root);
         },
