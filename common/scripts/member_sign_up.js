@@ -239,7 +239,7 @@ function sign_up() {
             
             var responses = txt.split(' - ');
             if (responses[1] == 'email_taken') {
-                alert('The e-mail address is already signed up with us.' + "\n\n" + 'Please use another one.');
+                alert('The e-mail address is already registered with YellowElevator.com.' + "\n\n" + 'If you do not remember your password, please click on Forget Password to reset it to a new password. Thank you.');
             } else if (responses[1] == 'error_create' || responses[1] == 'error_update') {
                 alert('An error occured when signing up.' + "\n\n" + 'Please try again later.');
             } else if (responses[1] == 'error_activation') {

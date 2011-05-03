@@ -41,6 +41,7 @@ if ($_POST['action'] == 'sign_up') {
         $member = new Member($_POST['email_addr']);
         if ($member->isActive()) {
             echo 'ko - email_taken';
+            exit();
         } else {
             $inactive = true;
         }
@@ -63,10 +64,12 @@ if ($_POST['action'] == 'sign_up') {
     if (!$inactive) {
         if ($member->create($data) === false) {
             echo 'ko - error_create';
+            exit();
         }
     } else {
         if ($member->update($data, true) === false) {
             echo 'ko - error_update';
+            exit();
         }
     }
     
