@@ -382,7 +382,7 @@ function save_career() {
                 return false;
             }
             
-            location.reload();
+            location.replace('member.php?member_email_addr=' + member_id + '&page=career');
         },
         onRequest: function(instance) {
             set_status('Saving career profile...');
@@ -1342,9 +1342,24 @@ function show_job_profile_popup(_id) {
                 
                 $('job_profile_id').value = _id;
                 $('position_title').value = position_title[0].childNodes[0].nodeValue;
-                $('position_superior_title').value = position_superior[0].childNodes[0].nodeValue;
-                $('organization_size').value = org_size[0].childNodes[0].nodeValue;
-                $('company').value = company[0].childNodes[0].nodeValue.replace('&amp;', '&');
+                
+                if (position_superior[0].childNodes.length > 0) {
+                    $('position_superior_title').value = position_superior[0].childNodes[0].nodeValue;
+                } else {
+                    $('position_superior_title').value = '';
+                }
+                
+                if (org_size[0].childNodes.length > 0) {
+                    $('organization_size').value = org_size[0].childNodes[0].nodeValue;
+                } else {
+                    $('organization_size').value = '';
+                }
+                
+                if (company[0].childNodes.length > 0) {
+                    $('company').value = company[0].childNodes[0].nodeValue.replace('&amp;', '&');
+                } else {
+                    $('company').value = '';
+                }
                 
                 // for (var i=0; i < $('specialization').options.length; i++) {
                 //     if ($('specialization').options[i].value == specialization[0].childNodes[0].nodeValue) {
