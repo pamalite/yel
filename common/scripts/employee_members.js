@@ -1078,6 +1078,7 @@ function update_members() {
                 var phone_nums = xml.getElementsByTagName('phone_num');
                 var is_actives = xml.getElementsByTagName('active');
                 var updated_ons = xml.getElementsByTagName('formatted_updated_on');
+                var last_logins = xml.getElementsByTagName('last_login');
                 var is_seeking_jobs = xml.getElementsByTagName('is_active_seeking_job');
                 var positions = xml.getElementsByTagName('position_title');
                 var employers = xml.getElementsByTagName('employer');
@@ -1109,7 +1110,14 @@ function update_members() {
                     if (updated_ons[i].childNodes.length > 0) {
                         updated_on = updated_ons[i].childNodes[0].nodeValue;
                     }
-                    row.set(0, new Cell(updated_on, '', 'cell'));
+                    
+                    var last_login_on = '(Never Logged In)';
+                    if (last_logins[i].childNodes.length > 0) {
+                        last_login_on = last_logins[i].childNodes[0].nodeValue;
+                    }
+                    
+                    last_login_on = '<span style="font-size: 9pt; color: #666666;"><span style="font-weight: bold;">Last Login:</span> ' + last_login_on + '</span>';
+                    row.set(0, new Cell(updated_on + '<br/><br/>' + last_login_on, '', 'cell'));
                     
                     // member details
                     var short_desc = '<a class="member_link" href="member.php?member_email_addr=' + emails[i].childNodes[0].nodeValue + '&page=career" target="_blank">' + members[i].childNodes[0].nodeValue + '</a>' + "\n";

@@ -2,7 +2,12 @@ Hi,
 
 A new application for %job_title% was made on %request_on%. 
 
+Company ID: %employer_id%
+Company: %employer%
 Candidate: %candidate% (%candidate_email%)
+Candidate Phone: %candidate_phone%
+Candidate Current Position: %candidate_current_position%
+Has Resume: %has_resume%
 
 Yellow Elevator
 Refer a job

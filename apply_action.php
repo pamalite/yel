@@ -14,6 +14,18 @@ $candidate['current_employer'] = sanitize(stripslashes($_POST['apply_current_emp
 $job_id = $_POST['job_id'];
 $job = new Job($job_id);
 
+// get employer info
+$criteria = array(
+    'criteria' => "jobs.employer, employers.name AS employer_name", 
+    'joins' => "employers ON employers.id = jobs.employer", 
+    'match' => "jobs.id = ". $job->getId(), 
+    'limit' => "1"
+);
+
+$result = $job->find($criteria);
+$employer_id = $result[0]['employer'];
+$employer_name = $result[0]['employer_name'];
+
 $today = now();
 
 // 2. store the contacts
@@ -49,6 +61,7 @@ if ($buffer_id === false) {
 }
 
 // 2. check any files to upload
+$has_resume = 'NO';
 $file_path = '';
 $resume_text = '';
 if (!empty($_FILES['apply_resume']['name'])) {
@@ -161,10 +174,24 @@ foreach ($mail_lines as $line) {
     $message .= $line;
 }
 
+$candidate_current_position = '(None provided)';
+if (!empty($candidate['current_position'])) {
+    $candidate_current_position = htmlspecialchars_decode(stripslashes($candidate['current_position']));
+}
+
+if (!empty($_POST['current_employer'])) {
+    $candidate_current_position .= '('. htmlspecialchars_decode(stripslashes($candidate['current_employer'])). ')';
+}
+
+$message = str_replace('%employer_id%', $employer_id, $message);
+$message = str_replace('%employer%', htmlspecialchars_decode(stripslashes($employer_name)), $message);
 $message = str_replace('%candidate%', htmlspecialchars_decode(stripslashes($candidate['name'])), $message);
+$message = str_replace('%candidate_phone%', $candidate['phone_num'], $message);
 $message = str_replace('%candidate_email%', $candidate['email_addr'], $message);
+$message = str_replace('%candidate_current_position%', $candidate_current_position, $message);
 $message = str_replace('%request_on%', $today, $message);
 $message = str_replace('%job_title%', $job->getTitle(), $message);
+$message = str_replace('%has_resume%', $has_resume, $message);
 
 $subject = "New Application for ". $job->getTitle(). " position";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";

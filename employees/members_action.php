@@ -458,6 +458,25 @@ if ($_POST['action'] == 'get_members') {
         exit();
     }
     
+    // get last login date
+    foreach ($result as $i=>$row) {
+        $sub_criteria_last_login = array(
+            'columns' => "DATE_FORMAT(member_sessions.last_login, '%e %b, %Y') AS formatted_last_login", 
+            'joins' => "member_sessions ON member_sessions.member = members.email_addr", 
+            'match' => "members.email_addr = '". $row['email_addr']. "'", 
+            'order' => "member_sessions.last_login DESC", 
+            'limit' => "1"
+        );
+        
+        $member = new Member();
+        $sub_result_last_login = $member->find($sub_criteria_last_login);
+        if (!is_null($sub_result_last_login) && count($sub_result_last_login) > 0) {
+            $result[$i]['last_login'] = $sub_result_last_login[0]['formatted_last_login'];
+        } else {
+            $result[$i]['last_login'] = '';
+        }
+    }
+    
     // get the job_profile
     foreach ($result as $i=>$row) {
         $sub_criteria = array(
