@@ -239,7 +239,7 @@ function sign_up() {
             
             var responses = txt.split(' - ');
             if (responses[1] == 'email_taken') {
-                alert('The e-mail address is already signed up with us.' + "\n\n" + 'Please use another one.');
+                alert('The e-mail address is already registered with YellowElevator.com.' + "\n\n" + 'If you do not remember your password, please click on Forget Password to reset it to a new password. Thank you.');
             } else if (responses[1] == 'error_create' || responses[1] == 'error_update') {
                 alert('An error occured when signing up.' + "\n\n" + 'Please try again later.');
             } else if (responses[1] == 'error_activation') {
@@ -315,7 +315,7 @@ function save_job_profile() {
                 return;
             }
             
-            alert('Congratulations! Your profile has been successfully saved.' + "\n\n" + 'Please remember to activate your account in order to sign in.');
+            alert('Congratulations! Your Current Career Profile has been successfully submitted.' + "\n\n" + 'One of our Recruitment Consultants will get in touch with you through email shortly to guide you how to sign into your account.');
             
             location.replace(root);
         },

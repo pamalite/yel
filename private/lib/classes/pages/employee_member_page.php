@@ -411,7 +411,7 @@ class EmployeeMemberPage extends Page {
                 'country' => $branch[0]['country'],  
                 'hrm_gender' => '',
                 'hrm_ethicnity' => '',
-                'hrm_birthdate' => '1957-08-31',
+                'hrm_birthdate' => '',
                 'citizenship' => $branch[0]['country'],
                 'resumes' => array()
             );
@@ -1368,6 +1368,11 @@ class EmployeeMemberPage extends Page {
                 </div>
             </form>
             <div class="popup_window_buttons_bar">
+                <span id="job_profile_processing">
+                    <img src="../common/images/progress/circle_small.gif" style="border: none;"/>
+                    Saving job profile. Please wait...
+                </span>
+                &nbsp;&nbsp;&nbsp;
                 <input type="button" value="Save" onClick="close_job_profile_popup(true);" />
                 <input type="button" value="Cancel" onClick="close_job_profile_popup(false);" />
             </div>

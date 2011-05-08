@@ -209,14 +209,14 @@ class Industry {
             $query = "SELECT industries.id, industries.industry, COUNT(jobs.id) AS job_count 
                       FROM jobs 
                       LEFT JOIN industries ON industries.id = jobs.industry 
-                      -- WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() 
+                      WHERE jobs.deleted = FALSE AND jobs.expire_on >= CURDATE() AND jobs.closed = 'N'  
                       GROUP BY industries.id 
                       ORDER BY industries.industry";
         } else {
             $query = "SELECT DISTINCT industries.id, industries.industry 
                       FROM jobs 
                       LEFT JOIN industries ON industries.id = jobs.industry 
-                      -- WHERE jobs.closed = 'N' AND jobs.expire_on >= NOW() 
+                      WHERE jobs.deleted = FALSE AND jobs.expire_on >= CURDATE() AND jobs.closed = 'N'
                       ORDER BY industries.industry";
         }
         

@@ -586,3 +586,9 @@ input.hr_contact {
     margin: 5px 5px 5px 5px;
     overflow: auto;
 }
+
+#job_profile_processing {
+    font-size: 9pt;
+    color: #666666;
+    display: none;
+}

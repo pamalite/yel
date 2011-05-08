@@ -41,6 +41,7 @@ if ($_POST['action'] == 'sign_up') {
         $member = new Member($_POST['email_addr']);
         if ($member->isActive()) {
             echo 'ko - email_taken';
+            exit();
         } else {
             $inactive = true;
         }
@@ -63,11 +64,13 @@ if ($_POST['action'] == 'sign_up') {
     if (!$inactive) {
         if ($member->create($data) === false) {
             echo 'ko - error_create';
+            exit();
         }
     } else {
         $member->setAdmin(true);
         if ($member->update($data) === false) {
             echo 'ko - error_update';
+            exit();
         }
     }
     
@@ -92,9 +95,12 @@ if ($_POST['action'] == 'sign_up') {
     $message = str_replace('%activation_id%', $activation_id, $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
-    $subject = "Member Activation Required";
+    //$subject = "Member Activation Required";
+    $subject = "[". $_POST['email_addr']. "] Member Activation Required";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    mail($_POST['email_addr'], $subject, $message, $headers);
+    //$headers .= 'Cc: team.my@yellowelevator.com'. "\n";
+    //mail($_POST['email_addr'], $subject, $message, $headers);
+    mail('team.my@yellowelevator.com', $subject, $message, $headers);
     
     // $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
     // fwrite($handle, 'Subject: '. $subject. "\n\n");

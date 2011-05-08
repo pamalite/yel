@@ -21,7 +21,7 @@ function close_password_reset_window(_is_reset_password) {
                 }
 
                 if (txt == 'bad') {
-                    alert('The answer is incorrect.');
+                    alert('The email address provided is invalid.');
                     return false;
                 }
                 

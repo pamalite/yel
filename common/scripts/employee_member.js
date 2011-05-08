@@ -60,7 +60,7 @@ function reset_password() {
 }
 
 function validate_profile_form() {
-    // is new employer?
+    // is new member?
     if (member_id == '0') {
         if (!isEmail($('email_addr').value)) {
             alert('Please provide a valid e-mail address.');
@@ -83,45 +83,45 @@ function validate_profile_form() {
         return false;
     }
     
-    if (isEmpty($('zip').value)) {
-        alert('Zip/Postal code cannot be empty.');
-        return false;
-    }
+    // if (isEmpty($('zip').value)) {
+    //     alert('Zip/Postal code cannot be empty.');
+    //     return false;
+    // }
     
-    if ($('country').options[$('country').selectedIndex].value == '0') {
-        alert('You need to select a country of residence.');
-        return false;
-    }
+    // if ($('country').options[$('country').selectedIndex].value == '0') {
+    //     alert('You need to select a country of residence.');
+    //     return false;
+    // }
     
-    if ($('citizenship').options[$('citizenship').selectedIndex].value == '0') {
-        alert('You need to select a country of citizenship.');
-        return false;
-    }
-    
-    if ($('gender').options[$('gender').selectedIndex].value == '') {
-        alert('You need to select a gender.');
-        return false;
-    }
-    
-    if (isEmpty($('ethnicity').value)) {
-        alert('You need to provide the ethnicity of the member.');
-        return false;
-    }
-    
-    if ($('birthdate_month').options[$('birthdate_month').selectedIndex].value == '') {
-        alert('You need to select the birthdate month.');
-        return false;
-    }
-    
-    if ($('birthdate_day').options[$('birthdate_day').selectedIndex].value == '') {
-        alert('You need to select the birthdate day.');
-        return false;
-    }
-    
-    if (isEmpty($('birthdate_year').value) || parseInt($('birthdate_year').value) <= 0) {
-        alert('You need to provide a valid year for birthdate year');
-        return false;
-    }
+    // if ($('citizenship').options[$('citizenship').selectedIndex].value == '0') {
+    //     alert('You need to select a country of citizenship.');
+    //     return false;
+    // }
+    // 
+    // if ($('gender').options[$('gender').selectedIndex].value == '') {
+    //     alert('You need to select a gender.');
+    //     return false;
+    // }
+    // 
+    // if (isEmpty($('ethnicity').value)) {
+    //     alert('You need to provide the ethnicity of the member.');
+    //     return false;
+    // }
+    // 
+    // if ($('birthdate_month').options[$('birthdate_month').selectedIndex].value == '') {
+    //     alert('You need to select the birthdate month.');
+    //     return false;
+    // }
+    // 
+    // if ($('birthdate_day').options[$('birthdate_day').selectedIndex].value == '') {
+    //     alert('You need to select the birthdate day.');
+    //     return false;
+    // }
+    // 
+    // if (isEmpty($('birthdate_year').value) || parseInt($('birthdate_year').value) <= 0) {
+    //     alert('You need to provide a valid year for birthdate year');
+    //     return false;
+    // }
     
     return true;
     
@@ -382,7 +382,7 @@ function save_career() {
                 return false;
             }
             
-            location.reload();
+            location.replace('member.php?member_email_addr=' + member_id + '&page=career');
         },
         onRequest: function(instance) {
             set_status('Saving career profile...');
@@ -1342,9 +1342,24 @@ function show_job_profile_popup(_id) {
                 
                 $('job_profile_id').value = _id;
                 $('position_title').value = position_title[0].childNodes[0].nodeValue;
-                $('position_superior_title').value = position_superior[0].childNodes[0].nodeValue;
-                $('organization_size').value = org_size[0].childNodes[0].nodeValue;
-                $('company').value = company[0].childNodes[0].nodeValue.replace('&amp;', '&');
+                
+                if (position_superior[0].childNodes.length > 0) {
+                    $('position_superior_title').value = position_superior[0].childNodes[0].nodeValue;
+                } else {
+                    $('position_superior_title').value = '';
+                }
+                
+                if (org_size[0].childNodes.length > 0) {
+                    $('organization_size').value = org_size[0].childNodes[0].nodeValue;
+                } else {
+                    $('organization_size').value = '';
+                }
+                
+                if (company[0].childNodes.length > 0) {
+                    $('company').value = company[0].childNodes[0].nodeValue.replace('&amp;', '&');
+                } else {
+                    $('company').value = '';
+                }
                 
                 // for (var i=0; i < $('specialization').options.length; i++) {
                 //     if ($('specialization').options[i].value == specialization[0].childNodes[0].nodeValue) {
@@ -1447,7 +1462,8 @@ function close_job_profile_popup(_is_save) {
             method: 'post',
             onSuccess: function(txt, xml) {
                 set_status('');
-
+                $('job_profile_processing').setStyle('display', 'none');
+                
                 if (txt == 'ko') {
                     alert('An error occured when saving job profile.' + "\n\n" + 'Please try again later.');
                     return;
@@ -1455,6 +1471,9 @@ function close_job_profile_popup(_is_save) {
                 
                 close_window('job_profile_window');
                 location.reload();
+            },
+            onRequest: function() {
+                $('job_profile_processing').setStyle('display', 'inline');
             }
         });
 

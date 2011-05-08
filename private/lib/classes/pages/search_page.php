@@ -36,7 +36,7 @@ class SearchPage extends Page {
     }
     
     public function insert_search_scripts() {
-        $this->insert_scripts('search.js');
+        $this->insert_scripts(array('search.js', 'job_search_result.js'));
     }
     
     public function insert_inline_scripts() {

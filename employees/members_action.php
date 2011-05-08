@@ -52,10 +52,12 @@ function create_member_from($_email_addr, $_fullname, $_phone) {
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     
-    $subject = 'New Membership from Yellow Elevator';
+    $subject = '['. $_email_addr. '] New Membership from Yellow Elevator';
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    //$headers .= 'Cc: team.my@yellowelevator.com'. "\n";
     
-    mail($_email_addr, $subject, $message, $headers);
+    //mail($_email_addr, $subject, $message, $headers);
+    mail('team.my@yellowelevator.com', $subject, $message, $headers);
     
     // $file_name = '/tmp/email_to_'. $_email_addr. '.txt';
     // if (file_exists($file_name)) {
@@ -456,44 +458,47 @@ if ($_POST['action'] == 'get_members') {
         exit();
     }
     
-    // get the job_profiles
-    $members_str = '';
+    // get last login date
     foreach ($result as $i=>$row) {
-        $members_str .= "'". $row['email_addr']. "'";
+        $sub_criteria_last_login = array(
+            'columns' => "DATE_FORMAT(member_sessions.last_login, '%e %b, %Y') AS formatted_last_login", 
+            'joins' => "member_sessions ON member_sessions.member = members.email_addr", 
+            'match' => "members.email_addr = '". $row['email_addr']. "'", 
+            'order' => "member_sessions.last_login DESC", 
+            'limit' => "1"
+        );
         
-        if ($i < count($result)-1) {
-            $members_str .= ", ";
+        $member = new Member();
+        $sub_result_last_login = $member->find($sub_criteria_last_login);
+        if (!is_null($sub_result_last_login) && count($sub_result_last_login) > 0) {
+            $result[$i]['last_login'] = $sub_result_last_login[0]['formatted_last_login'];
+        } else {
+            $result[$i]['last_login'] = '';
         }
     }
     
-    $sub_criteria = array(
-        'columns' => "member_job_profiles.member, member_job_profiles.position_title, 
-                      member_job_profiles.employer, 
-                      date_format(member_job_profiles.work_from, '%b, %Y') AS formatted_work_from, 
-                      date_format(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
-        'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr", 
-        'match' => "member_job_profiles.member IS NOT NULL AND 
-                    members.email_addr IN (". $members_str. ")", 
-        'order' => "member_job_profiles.member, member_job_profiles.work_from DESC"
-    );
-    
-    $member = new Member();
-    $sub_result = $member->find($sub_criteria);
-    if (count($sub_result) > 0 && !is_null($sub_result)) {
-        $current_member = '';
-        foreach ($sub_result as $i=>$sub_row) {
-            if ($current_member != $sub_row['member']) {
-                $current_member = $sub_row['member'];
-                foreach ($result as $j=>$row) {
-                    if ($row['email_addr'] == $sub_row['member']) {
-                        $result[$j]['position_title'] = htmlspecialchars_decode(stripslashes($sub_row['position_title']));
-                        $result[$j]['employer'] = htmlspecialchars_decode(stripslashes($sub_row['employer']));
-                        $result[$j]['formatted_work_from'] = $sub_row['formatted_work_from'];
-                        $result[$j]['formatted_work_to'] = $sub_row['formatted_work_to'];
-                        break;
-                    }
-                }
-            }
+    // get the job_profile
+    foreach ($result as $i=>$row) {
+        $sub_criteria = array(
+            'columns' => "member_job_profiles.member, member_job_profiles.position_title, 
+                          member_job_profiles.employer, 
+                          date_format(member_job_profiles.work_from, '%b, %Y') AS formatted_work_from, 
+                          date_format(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
+            'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr", 
+            'match' => "member_job_profiles.member IS NOT NULL AND 
+                        members.email_addr = '". $row['email_addr']. "'", 
+            'order' => "member_job_profiles.member, member_job_profiles.work_from DESC", 
+            'limit' => "1"
+        );
+        
+        $member = new Member();
+        $sub_result = $member->find($sub_criteria);
+        if (count($sub_result) > 0 && !is_null($sub_result)) {
+            $sub_row = $sub_result[0];
+            $result[$i]['position_title'] = htmlspecialchars_decode(stripslashes($sub_row['position_title']));
+            $result[$i]['employer'] = htmlspecialchars_decode(stripslashes($sub_row['employer']));
+            $result[$i]['formatted_work_from'] = $sub_row['formatted_work_from'];
+            $result[$i]['formatted_work_to'] = $sub_row['formatted_work_to'];
         }
     }
     

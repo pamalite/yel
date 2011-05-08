@@ -8,5 +8,5 @@ $_SESSION['yel']['member']['id'] = "";
 $_SESSION['yel']['member']['hash'] = "";
 $_SESSION['yel']['member']['sid'] = "";
 
-redirect_to('login.php');
+redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']);
 ?>
