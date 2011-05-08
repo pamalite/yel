@@ -332,6 +332,16 @@ class MemberHomePage extends Page {
         $page = str_replace('%country%', Country::getCountryFrom($country), $page);
         $page = str_replace('%currency%', $currency, $page);
         
+        if (isset($_SESSION['yel']['member']['linkedin_id'])) {
+            if (!empty($_SESSION['yel']['member']['linkedin_id'])) {
+                $page = str_replace('%linkedin_copy_display%', 'block', $page);
+            } else {
+                $page = str_replace('%linkedin_copy_display%', 'none', $page);
+            }
+        } else {
+            $page = str_replace('%linkedin_copy_display%', 'none', $page);
+        }
+        
         // if (!empty($this->error_message)) {
         //     $page = str_replace('%error_message%', $this->error_message, $page);
         // } else {

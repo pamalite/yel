@@ -456,6 +456,20 @@ function show_upload_resume_popup(_resume_id) {
     // window.scrollTo(0, 0);
 }
 
+function import_from_linkedin() {
+    IN.API.Profile("me").fields().result(do_linkedin_import);
+}
+
+function do_linkedin_import(_profiles) {
+    var member = _profiles.values[0];
+    
+    var photo_url = '';
+    if (!isEmpty(member.pictureUrl)) {
+        photo_url = member.pictureUrl;
+    }
+    
+    
+}
 
 function onDomReady() {}
 
