@@ -78,6 +78,7 @@ div.tip_window div.tip_title {
     font-size: 14pt;
     padding: 5px 5px 5px 5px;
     background-color: #dfdfdf;
+    color: #000000;
 }
 
 div.tip_window div.tip_title a.close_tip {
@@ -90,4 +91,5 @@ div.tip_window div.tip_content {
     font-size: 12pt;
     padding: 5px 5px 5px 5px;
     background-color: #efefef;
+    color: #000000;
 }
