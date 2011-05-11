@@ -52,12 +52,13 @@ function create_member_from($_email_addr, $_fullname, $_phone) {
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     
-    $subject = '['. $_email_addr. '] New Membership from Yellow Elevator';
+    //$subject = '['. $_email_addr. '] New Membership from Yellow Elevator';
+    $subject = 'New Membership from Yellow Elevator';
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    //$headers .= 'Cc: team.my@yellowelevator.com'. "\n";
+    $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
     
-    //mail($_email_addr, $subject, $message, $headers);
-    mail('team.my@yellowelevator.com', $subject, $message, $headers);
+    mail($_email_addr, $subject, $message, $headers);
+    //mail('team.my@yellowelevator.com', $subject, $message, $headers);
     
     // $file_name = '/tmp/email_to_'. $_email_addr. '.txt';
     // if (file_exists($file_name)) {

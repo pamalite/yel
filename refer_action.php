@@ -170,7 +170,7 @@ if (!empty($_POST['candidate_current_emp'])) {
 }
 
 $message = str_replace('%employer_id%', $employer_id, $message);
-$message = str_replace('%employer%', htmlspecialchars_decode(stripslashes($employer_name)), $message);
+$message = str_replace('%employer%', $employer_name, $message);
 $message = str_replace('%referrer%', htmlspecialchars_decode(stripslashes($referrer['name'])), $message);
 $message = str_replace('%candidate%', htmlspecialchars_decode(stripslashes($candidate['name'])), $message);
 $message = str_replace('%candidate_phone%', $candidate['phone_num'], $message);
