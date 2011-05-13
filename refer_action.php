@@ -140,7 +140,8 @@ if (isset($_SESSION['yel']['member']['id']) &&
     $member = new Member($_SESSION['yel']['member']['id']);
     $country_code = strtolower($member->getCountry());
 }
-$branch_email = 'team.'. $country_code. '@yellowelevator.com';
+//$branch_email = 'team.'. $country_code. '@yellowelevator.com';
+$branch_email = 'team.my@yellowelevator.com';
 
 // get employer info
 $criteria = array(

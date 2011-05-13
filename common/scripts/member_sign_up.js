@@ -228,6 +228,13 @@ function sign_up() {
         onSuccess: function(txt, xml) {
             set_status('');
             
+            if (txt == 'ok - is_exists') {
+                alert('Congratulations! Your account was updated with the new sign in credentials you have just submitted.' + "\n\n" + 'An email is send to you to re-activate your account. Please also check your junk or spam mail boxes for the email.');
+
+                location.replace(root);
+                return;
+            }
+            
             if (txt == 'ok') {
                 $('div_sign_up').setStyle('display', 'none');
                 $('div_job_profile').setStyle('display', 'block');
@@ -315,7 +322,8 @@ function save_job_profile() {
                 return;
             }
             
-            alert('Congratulations! Your Current Career Profile has been successfully submitted.' + "\n\n" + 'One of our Recruitment Consultants will get in touch with you through email shortly to guide you how to sign into your account.');
+            //alert('Congratulations! Your Current Career Profile has been successfully submitted.' + "\n\n" + 'One of our Recruitment Consultants will get in touch with you through email shortly to guide you how to sign into your account.');
+            alert('Congratulations! Your Current Career Profile has been successfully submitted.' + "\n\n" + 'An email is send to you to activate your account. Please also check your junk or spam mail boxes for the email.');
             
             location.replace(root);
         },

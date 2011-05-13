@@ -3,8 +3,7 @@ Hi,
 You are receiving this e-mail because you have signed up as a member with 
 Yellow Elevator. However, you may disregard if you have received it by mistake. 
 
-To kick-start your membership at Yellow Elevator, please activate the account that
-you have created at the following link:
+%member_note%
 
 %protocol%://%root%/members/activate.php?id=%activation_id%
 

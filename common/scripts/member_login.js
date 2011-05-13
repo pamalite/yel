@@ -126,7 +126,7 @@ function onDomReady() {
     }
     
     if (activated) {
-        alert('Your account has been activated. You may now sign in using your registered e-mail address and the password that you have created during registration.');
+        alert('Your account has been activated. You may now sign in using your registered e-mail address and the password that you have created during sign up.');
     }
 }
 

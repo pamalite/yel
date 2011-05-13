@@ -39,7 +39,8 @@ if (isset($_SESSION['yel']['member']['id']) &&
         $country_code = 'my';
     }
 }
-$branch_email = 'team.'. $country_code. '@yellowelevator.com';
+//$branch_email = 'team.'. $country_code. '@yellowelevator.com';
+$branch_email = 'team.my@yellowelevator.com';
 
 $data = array();
 $data['requested_on'] = $today; 
