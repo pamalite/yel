@@ -60,28 +60,28 @@ if ($_POST['action'] == 'sign_up') {
         $data['updated_on'] = $joined_on;
         $data['checked_profile'] = 'Y';
         
-        if ($member->create($data) === false) {
-            echo 'ko - error_create';
-            exit();
-        }
+        // if ($member->create($data) === false) {
+        //     echo 'ko - error_create';
+        //     exit();
+        // }
     } else {
-        if ($member->update($data, true) === false) {
-            echo 'ko - error_update';
-            exit();
-        }
+        // if ($member->update($data, true) === false) {
+        //     echo 'ko - error_update';
+        //     exit();
+        // }
     }
     
     // 3. Create activation token and email
     $activation_id = microtime(true);
-    $mysqli = Database::connect();
-    $query = "INSERT INTO member_activation_tokens SET 
-              id = '". $activation_id. "', 
-              member = '". $_POST['email_addr']. "', 
-              joined_on = '". $joined_on. "'";
-    if ($mysqli->execute($query) === false) {
-        echo 'ko - error_activation';
-        exit();
-    }
+    // $mysqli = Database::connect();
+    // $query = "INSERT INTO member_activation_tokens SET 
+    //           id = '". $activation_id. "', 
+    //           member = '". $_POST['email_addr']. "', 
+    //           joined_on = '". $joined_on. "'";
+    // if ($mysqli->execute($query) === false) {
+    //     echo 'ko - error_activation';
+    //     exit();
+    // }
     
     $mail_lines = file('../private/mail/member_activation.txt');
     $message = '';
@@ -89,14 +89,19 @@ if ($_POST['action'] == 'sign_up') {
         $message .= $line;
     }
     
-    $member_note = 'To kick-start your membership at Yellow Elevator, please activate the account that'. "\r\n". 'you have created at the following link:'
+    $member_note = 'To kick-start your membership at Yellow Elevator, please activate the account that'. "\r\n". 'you have created at the following link:';
     if ($is_exists) {
-        $member_note = 'Also, according to our records, you have also previously'. "\r\n".
-'signed up with YellowElevator.com with the same email' ."\r\n". 
-'address. Please re-activate and update your account with the'. "\r\n". 
-'following link and sign in with the password you have just signed up with.';
+        $member_note = 'Also, according to our records, you have previously signed up with'. "\r\n".
+'YellowElevator.com with the same email address. Please re-activate and update' ."\r\n". 
+'your account with the following link and sign in with the password you have'. "\r\n". 
+'just signed up with.';
+        
+        $ps = 'If you received this re-activation email WITHOUT SIGNING UP with YellowElevator.com,'. "\r\n". 
+'please contact us at "team.my@yellowelevator.com" AS SOON AS POSSIBLE!';
+        $message = str_replace('%ps%', $ps, $message);
     }
     
+    $message = str_replace('%ps%', '', $message);
     $message = str_replace('%member_note%', $member_note, $message);
     $message = str_replace('%activation_id%', $activation_id, $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
@@ -105,13 +110,13 @@ if ($_POST['action'] == 'sign_up') {
     //$subject = "[". $_POST['email_addr']. "] Member Activation Required";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
-    mail($_POST['email_addr'], $subject, $message, $headers);
+    //mail($_POST['email_addr'], $subject, $message, $headers);
     //mail('team.my@yellowelevator.com', $subject, $message, $headers);
     
-    // $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
-    // fwrite($handle, 'Subject: '. $subject. "\n\n");
-    // fwrite($handle, $message);
-    // fclose($handle);
+    $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
+    fwrite($handle, 'Subject: '. $subject. "\n\n");
+    fwrite($handle, $message);
+    fclose($handle);
     
     if ($is_exists) {
         echo 'ok - is_exists';
@@ -121,7 +126,7 @@ if ($_POST['action'] == 'sign_up') {
     echo 'ok';
     exit();
 }
-
+exit();
 if ($_POST['action'] == 'add_job_profile') {
     $member = new Member($_POST['email_addr']);
     
