@@ -186,13 +186,40 @@ if ($_POST['action'] == 'import_linkedin') {
     $positions_xml = '<?xml version="1.0" encoding="UTF-8"?>'. "\n";
     $positions_xml .= $_POST['positions'];
     
-    if ($xml_dom->load_from_xml($positions_xml) === false) {
+    if (!$xml_dom->load_from_xml($positions_xml)) {
         echo 'ko';
         exit();
     }
     
-    print_r($xml_dom);
-    exit();
+    $nodes = $xml_dom->get('position');
+    foreach ($nodes as $node) {
+        $data = array();
+        foreach ($node->childNodes as $child) {
+            switch ($child->nodeName) {
+                case 'title':
+                    $data['position_title'] = sql_nullify($child->nodeValue);
+                    break;
+                case 'employer':
+                    $data['employer'] = sql_nullify($child->nodeValue);
+                    break;
+                case 'summary':
+                    $data['summary'] = sql_nullify($child->nodeValue);
+                    break;
+                case 'work_from':
+                    $data['work_from'] = sql_nullify($child->nodeValue);
+                    break;
+                case 'work_to':
+                    $data['work_to'] = sql_nullify($child->nodeValue);
+                    break;
+            }
+        }
+        
+        print_r($data);
+        // if ($member->addJobProfile($data) === false) {
+        //     echo 'ko';
+        //     exit();
+        // }
+    }
     
     echo 'ok';
     exit();
