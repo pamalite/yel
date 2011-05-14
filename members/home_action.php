@@ -169,4 +169,32 @@ if ($_POST['action'] == 'upload') {
     redirect_to('home.php');
     exit();
 }
+
+if ($_POST['action'] == 'import_linkedin') {
+    // update career profile
+    $data = array();
+    $data['seeking'] = $_POST['seeking'];
+    $data['updated_on'] = date('Y-m-d');
+    
+    $member = new Member($_POST['id']);
+    // if ($member->update($data) === false) {
+    //     echo 'ko';
+    //     exit();
+    // }
+    
+    // import job profiles
+    $positions_xml = '<?xml version="1.0" encoding="UTF-8"?>'. "\n";
+    $positions_xml .= $_POST['positions'];
+    
+    if ($xml_dom->load_from_xml($positions_xml) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    print_r($xml_dom);
+    exit();
+    
+    echo 'ok';
+    exit();
+}
 ?>

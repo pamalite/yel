@@ -1,3 +1,12 @@
+function htmlspecialchars(unsafe) {
+  return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+}
+
 function get_completeness_status() {
     var params = 'id=' + id + '&action=get_completeness_status';
     
@@ -457,18 +466,72 @@ function show_upload_resume_popup(_resume_id) {
 }
 
 function import_from_linkedin() {
-    IN.API.Profile("me").fields().result(do_linkedin_import);
-}
+    IN.API.Profile("me").fields("headline", "summary", "positions").result(function (_profiles) {
+        set_status('Importing... please wait...');
+        
+        // 1. get the data from linkedin
+        var member = _profiles.values[0];
+        var seeking_txt = member.headline + "\n\n" + member.summary;
+        
+        var positions = member.positions.values;
+        var positions_txt = '<positions>';
+        for (var i=0; i < parseInt(member.positions._total); i++) {
+            var position = '<position>' + "\n";
+            var title = '<title>'  + htmlspecialchars(positions[i].title) + '</title>' + "\n";
+            var employer = '<employer>' + htmlspecialchars(positions[i].company.name) + '</employer>' + "\n";
+            var summary = '<summary>' + htmlspecialchars(positions[i].summary) + '</summary>' + "\n";
+            
+            position = position + title + employer + summary;
+            
+            var start_date = '<work_from>' + positions[i].startDate.year; 
+            if (parseInt(positions[i].startDate.month) < 10) {
+                start_date = start_date + '-0' + positions[i].startDate.month + '-00';
+            } else {
+                start_date = start_date + '-' + positions[i].startDate.month + '-00';
+            }
+            start_date = start_date + '</work_from>' + "\n";
+            
+            var end_date = '<work_to>';
+            if (!positions[i].isCurrent) {
+                end_date = end_date + positions[i].endDate.year;
+                if (parseInt(positions[i].endDate.month) < 10) {
+                    end_date = end_date + '-0' + positions[i].endDate.month + '-00';
+                } else {
+                    end_date = end_date + '-' + positions[i].endDate.month + '-00';
+                }
+            }
+            end_date = end_date + '</work_to>' + "\n";
+            
+            position = position + start_date + end_date + '</position>' + "\n";
+            
+            positions_txt = positions_txt + position;
+        }
+        positions_txt = positions_txt + '</positions>';
+        
+        // 2. send it to action for processing
+        var params = 'id=' + id + '&action=import_linkedin';
+        params = params + '&seeking=' + encodeURIComponent(seeking_txt);
+        params = params + '&positions=' + encodeURIComponent(positions_txt);
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                return;
+                if (txt == 'ko') {
+                    alert('An error occured when importing from LinkedIn.' + "\n\n" + 'Please try again later.');
+                    return;
+                }
+                
+                // 3. reload page
+                location.reload(true);
+            }
+        });
 
-function do_linkedin_import(_profiles) {
-    var member = _profiles.values[0];
-    
-    var photo_url = '';
-    if (!isEmpty(member.pictureUrl)) {
-        photo_url = member.pictureUrl;
-    }
-    
-    
+        request.send(params);
+    });
 }
 
 function onDomReady() {}
