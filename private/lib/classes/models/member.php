@@ -318,7 +318,7 @@ class Member implements Model {
         $this->seed_id = 0;
         
         if (!empty($_id)) {
-            $this->id = sanitize($_id);
+            $this->id = trim(sanitize($_id));
         }
         
         if (!empty($_seed_id)) {
