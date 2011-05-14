@@ -53,7 +53,8 @@ if ($_POST['action'] == 'sign_up') {
     // 2. Create the member.
     $joined_on = today();
     $member = new Member($_POST['email_addr']);
-
+    $member->setAdmin(true);
+    
     $data = array();
     $data['firstname'] = $_POST['firstname'];
     $data['lastname'] = $_POST['lastname'];
@@ -132,7 +133,7 @@ if ($_POST['action'] == 'sign_up') {
     echo 'ok';
     exit();
 }
-exit();
+
 if ($_POST['action'] == 'add_job_profile') {
     $member = new Member($_POST['email_addr']);
     
