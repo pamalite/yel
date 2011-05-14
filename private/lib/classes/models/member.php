@@ -318,7 +318,7 @@ class Member implements Model {
         $this->seed_id = 0;
         
         if (!empty($_id)) {
-            $this->id = sanitize($_id);
+            $this->id = trim(sanitize($_id));
         }
         
         if (!empty($_seed_id)) {
@@ -384,6 +384,29 @@ class Member implements Model {
         $query = "SELECT active FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
         if ($result = $this->mysqli->query($query)) {
             if ($result[0]['active'] == 'Y') {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public function isSuspended() {
+        $query = "SELECT active FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
+        if ($result = $this->mysqli->query($query)) {
+            if ($result[0]['active'] == 'S') {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public function isExists() {
+        $query = "SELECT COUNT(email_addr) AS is_exists 
+                  FROM members WHERE email_addr = '". $this->id. "'";
+        if ($result = $this->mysqli->query($query)) {
+            if ($result[0]['is_exists'] > 0) {
                 return true;
             }
         }

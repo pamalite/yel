@@ -28,40 +28,45 @@ if ($_POST['action'] == 'sign_up') {
         exit();
     }
     
-    // 1. Check whether the e-mail has been taken. If taken, then inform user to use another.
+    // 1. Check whether the e-mail has been taken. If taken, then inform user, and resend Activation Email.
     $member = new Member();
     $criteria = array(
         'columns' => "COUNT(*) AS id_used",
         'match' => "email_addr = '". $_POST['email_addr']. "'"
     );
     $result = $member->find($criteria);
-    $inactive = false;
+    $is_exists = false;
     if ($result[0]['id_used'] != '0') {
         // 1.1 Check whether this e-mail was previously unsubscribed or not active.
         $member = new Member($_POST['email_addr']);
-        if ($member->isActive()) {
-            echo 'ko - email_taken';
-            exit();
-        } else {
-            $inactive = true;
+        if ($member->isExists()) {
+            $is_exists = true;
+            
+            // 1.2 Check whether the account has been suspended.
+            if ($member->isSuspended()) {
+                echo 'ko - suspended';
+                exit();
+            }
         }
     }
     
     // 2. Create the member.
     $joined_on = today();
     $member = new Member($_POST['email_addr']);
-
+    $member->setAdmin(true);
+    
     $data = array();
     $data['firstname'] = $_POST['firstname'];
     $data['lastname'] = $_POST['lastname'];
     $data['password'] = md5($_POST['password']);
     $data['phone_num'] = $_POST['phone_num'];
-    $data['joined_on'] = $joined_on;
-    $data['updated_on'] = $joined_on;
     $data['active'] = 'N';
-    $data['checked_profile'] = 'Y';
     
-    if (!$inactive) {
+    if (!$is_exists) {
+        $data['joined_on'] = $joined_on;
+        $data['updated_on'] = $joined_on;
+        $data['checked_profile'] = 'Y';
+        
         if ($member->create($data) === false) {
             echo 'ko - error_create';
             exit();
@@ -92,20 +97,39 @@ if ($_POST['action'] == 'sign_up') {
         $message .= $line;
     }
     
+    $member_note = 'To kick-start your membership at Yellow Elevator, please activate the account that'. "\r\n". 'you have created at the following link:';
+    if ($is_exists) {
+        $member_note = 'Also, according to our records, you have previously signed up with'. "\r\n".
+'YellowElevator.com with the same email address. Please re-activate and update' ."\r\n". 
+'your account with the following link and sign in with the password you have'. "\r\n". 
+'just signed up with.';
+        
+        $ps = 'If you received this re-activation email WITHOUT SIGNING UP with YellowElevator.com,'. "\r\n". 
+'please contact us at "team.my@yellowelevator.com" AS SOON AS POSSIBLE!';
+        $message = str_replace('%ps%', $ps, $message);
+    }
+    
+    $message = str_replace('%ps%', '', $message);
+    $message = str_replace('%member_note%', $member_note, $message);
     $message = str_replace('%activation_id%', $activation_id, $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
-    //$subject = "Member Activation Required";
-    $subject = "[". $_POST['email_addr']. "] Member Activation Required";
+    $subject = "Member Activation Required";
+    //$subject = "[". $_POST['email_addr']. "] Member Activation Required";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    //$headers .= 'Cc: team.my@yellowelevator.com'. "\n";
-    //mail($_POST['email_addr'], $subject, $message, $headers);
-    mail('team.my@yellowelevator.com', $subject, $message, $headers);
+    $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
+    mail($_POST['email_addr'], $subject, $message, $headers);
+    //mail('team.my@yellowelevator.com', $subject, $message, $headers);
     
     // $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
     // fwrite($handle, 'Subject: '. $subject. "\n\n");
     // fwrite($handle, $message);
     // fclose($handle);
+    
+    if ($is_exists) {
+        echo 'ok - is_exists';
+        exit();
+    }
     
     echo 'ok';
     exit();

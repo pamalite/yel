@@ -39,7 +39,8 @@ if (isset($_SESSION['yel']['member']['id']) &&
         $country_code = 'my';
     }
 }
-$branch_email = 'team.'. $country_code. '@yellowelevator.com';
+//$branch_email = 'team.'. $country_code. '@yellowelevator.com';
+$branch_email = 'team.my@yellowelevator.com';
 
 $data = array();
 $data['requested_on'] = $today; 
@@ -184,7 +185,7 @@ if (!empty($_POST['current_employer'])) {
 }
 
 $message = str_replace('%employer_id%', $employer_id, $message);
-$message = str_replace('%employer%', htmlspecialchars_decode(stripslashes($employer_name)), $message);
+$message = str_replace('%employer%', $employer_name, $message);
 $message = str_replace('%candidate%', htmlspecialchars_decode(stripslashes($candidate['name'])), $message);
 $message = str_replace('%candidate_phone%', $candidate['phone_num'], $message);
 $message = str_replace('%candidate_email%', $candidate['email_addr'], $message);
