@@ -388,6 +388,29 @@ class Member implements Model {
         return false;
     }
     
+    public function isSuspended() {
+        $query = "SELECT active FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
+        if ($result = $this->mysqli->query($query)) {
+            if ($result[0]['active'] == 'S') {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public function isExists() {
+        $query = "SELECT COUNT(email_addr) AS is_exists 
+                  FROM members WHERE email_addr = '". $this->id. "'";
+        if ($result = $this->mysqli->query($query)) {
+            if ($result[0]['is_exists'] > 0) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     public function isLoggedIn($_sha1) {
         if ($_sha1 != sanitize($_sha1)) return false; // A hacking attempt occured.
         

@@ -245,8 +245,8 @@ function sign_up() {
             }
             
             var responses = txt.split(' - ');
-            if (responses[1] == 'email_taken') {
-                alert('The e-mail address is already registered with YellowElevator.com.' + "\n\n" + 'If you do not remember your password, please click on Forget Password to reset it to a new password. Thank you.');
+            if (responses[1] == 'suspended') {
+                alert('The e-mail address is already registered with YellowElevator.com, but it is suspended by our consultants.' + "\n\n" + 'Please contact us at "team.my@yellowelevator.com" to re-activate your account.');
             } else if (responses[1] == 'error_create' || responses[1] == 'error_update') {
                 alert('An error occured when signing up.' + "\n\n" + 'Please try again later.');
             } else if (responses[1] == 'error_activation') {

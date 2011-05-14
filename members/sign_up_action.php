@@ -39,8 +39,14 @@ if ($_POST['action'] == 'sign_up') {
     if ($result[0]['id_used'] != '0') {
         // 1.1 Check whether this e-mail was previously unsubscribed or not active.
         $member = new Member($_POST['email_addr']);
-        if ($member->isActive()) {
+        if ($member->isExists()) {
             $is_exists = true;
+            
+            // 1.2 Check whether the account has been suspended.
+            if ($member->isSuspended()) {
+                echo 'ko - suspended';
+                exit();
+            }
         }
     }
     
@@ -60,28 +66,28 @@ if ($_POST['action'] == 'sign_up') {
         $data['updated_on'] = $joined_on;
         $data['checked_profile'] = 'Y';
         
-        // if ($member->create($data) === false) {
-        //     echo 'ko - error_create';
-        //     exit();
-        // }
+        if ($member->create($data) === false) {
+            echo 'ko - error_create';
+            exit();
+        }
     } else {
-        // if ($member->update($data, true) === false) {
-        //     echo 'ko - error_update';
-        //     exit();
-        // }
+        if ($member->update($data, true) === false) {
+            echo 'ko - error_update';
+            exit();
+        }
     }
     
     // 3. Create activation token and email
     $activation_id = microtime(true);
-    // $mysqli = Database::connect();
-    // $query = "INSERT INTO member_activation_tokens SET 
-    //           id = '". $activation_id. "', 
-    //           member = '". $_POST['email_addr']. "', 
-    //           joined_on = '". $joined_on. "'";
-    // if ($mysqli->execute($query) === false) {
-    //     echo 'ko - error_activation';
-    //     exit();
-    // }
+    $mysqli = Database::connect();
+    $query = "INSERT INTO member_activation_tokens SET 
+              id = '". $activation_id. "', 
+              member = '". $_POST['email_addr']. "', 
+              joined_on = '". $joined_on. "'";
+    if ($mysqli->execute($query) === false) {
+        echo 'ko - error_activation';
+        exit();
+    }
     
     $mail_lines = file('../private/mail/member_activation.txt');
     $message = '';
@@ -110,13 +116,13 @@ if ($_POST['action'] == 'sign_up') {
     //$subject = "[". $_POST['email_addr']. "] Member Activation Required";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
-    //mail($_POST['email_addr'], $subject, $message, $headers);
+    mail($_POST['email_addr'], $subject, $message, $headers);
     //mail('team.my@yellowelevator.com', $subject, $message, $headers);
     
-    $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);
+    // $handle = fopen('/tmp/email_to_'. $_POST['email_addr']. '_token.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     if ($is_exists) {
         echo 'ok - is_exists';
