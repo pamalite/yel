@@ -343,8 +343,7 @@ class EmployeeMemberPage extends Page {
         $criteria = array(
             'columns' => "member_job_profiles.id, member_job_profiles.position_title, 
                           member_job_profiles.position_superior_title, 
-                          member_job_profiles.employer, member_job_profiles.employer_description, 
-                          industries.industry AS specialization, 
+                          member_job_profiles.employer, industries.industry AS specialization, 
                           employer_industries.industry AS employer_specialization, 
                           DATE_FORMAT(member_job_profiles.work_from, '%b, %Y') AS formatted_work_from, 
                           DATE_FORMAT(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
@@ -359,10 +358,6 @@ class EmployeeMemberPage extends Page {
         $result = $this->member->find($criteria);
         if (is_null($result) || count($result) <= 0) {
             return array();
-        }
-        
-        foreach ($result as $i=>$row) {
-            $result[$i]['employer_description'] = $GLOBALS['emp_descs'][$row['employer_description']];
         }
         
         return $result;
@@ -741,7 +736,6 @@ class EmployeeMemberPage extends Page {
                                 
                                     $emp = htmlspecialchars_decode(stripslashes($job_profile['employer']));
                                     $emp .= '<br/><span class="mini_spec">'. $job_profile['employer_specialization']. '</span><br/>';
-                                    $emp .= '<span class="mini_emp_desc">'. $job_profile['employer_description']. '</span><br/>';
                                     $job_profiles_table->set($i+1, 3, $emp, '', 'cell');
                                 
                                     $pos = htmlspecialchars_decode(stripslashes($job_profile['position_title']));
@@ -1353,15 +1347,15 @@ class EmployeeMemberPage extends Page {
                             <td class="field"><input class="field" type="text" id="company" name="company" /></td>
                         </tr>
                         <tr>
-                            <td class="label"><label for="emp_desc">Employer Description:</label></td>
-                            <td class="field">
-                                <?php $this->generate_employer_description('emp_desc', -1); ?>
-                            </td>
-                        </tr>
-                        <tr>
                             <td class="label"><label for="emp_specialization">Employer Specialization:</label></td>
                             <td class="field">
                                 <?php $this->generate_industries('', 'emp_specialization'); ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label"><label for="job_summary">Job Summary:</label></td>
+                            <td class="field">
+                                <textarea id="job_summary" class="job_summary"></textarea>
                             </td>
                         </tr>
                     </table>

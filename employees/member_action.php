@@ -694,10 +694,10 @@ if ($_POST['action'] == 'save_job_profile') {
     $data['position_superior_title'] = $_POST['superior_title'];
     $data['organization_size'] = $_POST['organization_size'];
     $data['employer'] = $_POST['employer'];
-    $data['employer_description'] = $_POST['emp_desc'];
     $data['employer_specialization'] = $_POST['emp_specialization'];
     $data['work_from'] = $_POST['work_from'];
     $data['work_to'] = $_POST['work_to'];
+    $data['summary'] = $_POST['job_summary'];
     
     $member = new Member($_POST['member']);
     if ($_POST['id'] == 0) {
@@ -726,8 +726,7 @@ if ($_POST['action'] == 'get_job_profiles') {
     $criteria = array(
         'columns' => "member_job_profiles.id, member_job_profiles.position_title, 
                       member_job_profiles.position_superior_title, 
-                      member_job_profiles.employer, member_job_profiles.employer_description, 
-                      industries.industry AS specialization, 
+                      member_job_profiles.employer, industries.industry AS specialization, 
                       employer_industries.industry AS employer_specialization, 
                       DATE_FORMAT(member_job_profiles.work_from, '%b, %Y') AS formatted_work_from, 
                       DATE_FORMAT(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
@@ -755,7 +754,6 @@ if ($_POST['action'] == 'get_job_profiles') {
     $emp_descs = $GLOBALS['emp_descs'];
     foreach ($result as $i => $row) {
         $result[$i]['employer'] = htmlspecialchars_decode(stripslashes($row['employer']));
-        $result[$i]['employer_description'] = $emp_descs[$row['employer_description']];
     }
     
     $response = array('job_profiles' => array('job_profile' => $result));
@@ -776,7 +774,7 @@ if ($_POST['action'] == 'get_job_profile') {
     $result = $member->find($criteria);
     
     foreach ($result[0] as $key=>$value) {
-        $result[0][$key] = stripslashes($value);
+        $result[0][$key] = htmlspecialchars_decode(stripslashes($value));
     }
     
     $response = array('job_profile' => $result);

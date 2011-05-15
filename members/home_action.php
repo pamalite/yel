@@ -67,10 +67,10 @@ if ($_POST['action'] == 'save_job_profile') {
     $data['position_superior_title'] = $_POST['superior_title'];
     $data['organization_size'] = $_POST['organization_size'];
     $data['employer'] = $_POST['employer'];
-    $data['employer_description'] = $_POST['emp_desc'];
     $data['employer_specialization'] = $_POST['emp_specialization'];
     $data['work_from'] = $_POST['work_from'];
     $data['work_to'] = $_POST['work_to'];
+    $data['summary'] = $_POST['job_summary'];
     
     $member = new Member($_POST['member']);
     if ($_POST['id'] == 0) {
@@ -107,6 +107,10 @@ if ($_POST['action'] == 'get_job_profile') {
     
     $member = new Member();
     $result = $member->find($criteria);
+    
+    foreach ($result as $i=>$row) {
+        $result[$i]['summary'] = htmlspecialchars_decode(stripslashes($row['summary']));
+    }
     
     $response = array('job_profile' => $result);
     header('Content-type: text/xml');
@@ -171,16 +175,33 @@ if ($_POST['action'] == 'upload') {
 }
 
 if ($_POST['action'] == 'import_linkedin') {
+    $member = new Member($_POST['id']);
+    
+    // get the current seeking field to be concatenated
+    $criteria = array(
+        'columns' => "seeking",
+        'match' => "email_addr = '". $_POST['id']. "'", 
+        'limit' => "1"
+    );
+    $result = $member->find($criteria);
+    $seeking = $result[0]['seeking'];
+    
+    if (is_null($seeking) || empty($seeking)) {
+        $seeking = $_POST['seeking'];
+    } else {
+        $seeking = htmlspecialchars_decode(stripslashes($seeking)). "\n\n". $_POST['seeking'];
+    }
+    
     // update career profile
     $data = array();
-    $data['seeking'] = $_POST['seeking'];
+    $data['seeking'] = $seeking;
     $data['updated_on'] = date('Y-m-d');
     
-    $member = new Member($_POST['id']);
-    // if ($member->update($data) === false) {
-    //     echo 'ko';
-    //     exit();
-    // }
+    
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
     
     // import job profiles
     $positions_xml = '<?xml version="1.0" encoding="UTF-8"?>'. "\n";
@@ -214,11 +235,11 @@ if ($_POST['action'] == 'import_linkedin') {
             }
         }
         
-        print_r($data);
-        // if ($member->addJobProfile($data) === false) {
-        //     echo 'ko';
-        //     exit();
-        // }
+        // print_r($data);
+        if ($member->addJobProfile($data) === false) {
+            echo 'ko';
+            exit();
+        }
     }
     
     echo 'ok';

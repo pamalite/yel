@@ -380,6 +380,10 @@ div.job_profiles {
     width: 50px;
 }
 
+#job_profile_window textarea.job_summary {
+    width: 100%;
+    height: 150px;
+}
 .tips {
     font-size: 9pt;
     color: #666666;
