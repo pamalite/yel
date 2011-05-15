@@ -514,8 +514,8 @@ function import_from_linkedin() {
             url: uri,
             method: 'post',
             onSuccess: function(txt, xml) {
-                set_status('<pre>' + txt + '</pre>');
-                return;
+                // set_status('<pre>' + txt + '</pre>');
+                // return;
                 if (txt == 'ko') {
                     alert('An error occured when importing from LinkedIn.' + "\n\n" + 'Please try again later.');
                     return;
