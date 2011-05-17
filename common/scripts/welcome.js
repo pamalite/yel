@@ -66,15 +66,27 @@ function login() {
     request.send(params);
 }
 
+function show_login_progress() {
+    $('div_login_blanket').setStyle('display', 'block');
+    show_window('div_login_progress_window');
+}
+
+function hide_login_progress() {
+    $('div_login_blanket').setStyle('display', 'none');
+    close_window('div_login_progress_window');
+}
+
 function on_linkedin_auth() {
+    if ($('not_logged_in_bar').getStyle('display') == 'none') {
+        return;
+    }
+    
+    show_login_progress();
+    
     IN.API.Profile("me").result(function(me) {
         var linkedin_id = me.values[0].id;
         var linkedin_firstname = me.values[0].firstName;
         var linkedin_lastname = me.values[0].lastName;
-        
-        if (isEmpty(seed) || isEmpty(sid)) {
-            get_seed();
-        }
         
         if (isEmpty(linkedin_id) || linkedin_id == null) {
             alert('Cannot login from LinkedIn. Please use your normal login instead.');
@@ -87,6 +99,7 @@ function on_linkedin_auth() {
             onSuccess: function(txt, xml) {
                 if (txt == 'ko') {
                     alert('Cannot login from LinkedIn. Please use your normal login instead.');
+                    hide_login_progress();
                     return;
                 }
                 
@@ -96,17 +109,25 @@ function on_linkedin_auth() {
                     member_id = prompt('Please enter your email address again.');
                     if (member_id == false) {
                         alert('You have chosen not to sign in through LinkedIn.' + "\n\n" + 'Cannot login from LinkedIn. Please use your normal login instead.');
+                        hide_login_progress();
                         return;
                     }
                     
                     while (!isEmail(member_id)) {
                         member_id = prompt('The email address entered is invalid.' + "\n\n" + 'Please enter your email address again.');
+                        
+                        if (member_id == false) {
+                            alert('Sign In via LinkedIn was canceled.');
+                            hide_login_progress();
+                            return;
+                        }
                     }
                     
                     new_linkedin = true;
                 } else {
                     if (!isEmail(txt)) {
                         alert('Cannot login from LinkedIn. Please use your normal login instead.');
+                        hide_login_progress();
                         return;
                     }
                     
@@ -124,6 +145,10 @@ function on_linkedin_auth() {
 
 function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
                             _linkedin_lastname, _is_new) {
+    if (isEmpty(seed) || isEmpty(sid)) {
+        get_seed();
+    }
+    
     var params = 'id=' + _member_id + '&action=linkedin_login';
     params = params + '&linkedin_id=' + _linkedin_id;
     params = params + '&linkedin_firstname=' + _linkedin_firstname;
@@ -137,15 +162,11 @@ function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
         params = params + '&is_new=0';
     }
     
-    $('div_login_blanket').setStyle('display', 'block');
-    show_window('div_login_progress_window');
-    
     var request = new Request({
         url: 'members/login_action.php',
         onSuccess: function(txt, xml) {
             if (xml.getElementsByTagName('errors').length != 0) {
-                close_window('div_login_progress_window');
-                $('div_login_blanket').setStyle('display', 'none');
+                hide_login_progress();
                 
                 var errors = xml.getElementsByTagName('error');
                 var msg = errors[0].childNodes[0].nodeValue;

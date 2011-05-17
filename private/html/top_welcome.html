@@ -7,7 +7,7 @@
     </div>
 </div>
 <div class="loginbar">
-    <span style="display: %not_logged_in%;">
+    <span id="not_logged_in_bar" style="display: %not_logged_in%;">
         Sign In:&nbsp;
         <input type="text" id="login_email_addr" alt="Email" />
         <input type="password" id="login_password" alt="Password" />
@@ -19,7 +19,7 @@
         <script type="IN/Login" data-onAuth="on_linkedin_auth"></script>
     </span>
     <span style="display: %member_logged_in%;">
-        Go back to <span style="font-weight: bold;"><a href="%root%/members">Career Profile</a></span> or <span style="font-weight: bold;"><a href="%root%/members/logout.php">Logout</a></span>
+        Go back to <span style="font-weight: bold;"><a href="%root%/members">Career Profile</a></span> or <span style="font-weight: bold;"><a onClick="return logout_from_linkedin();" href="%root%/members/logout.php">Logout</a></span>
     </span>
     <span style="display: %employer_logged_in%;">
         Go back to <span style="font-weight: bold;"><a href="%root%/employers">Resumes Page</a></span> or <span style="font-weight: bold;"><a href="%root%/employers/logout.php">Logout</a></span>

@@ -15,7 +15,8 @@ $_SESSION['yel']['member']['sid'] = "";
 
 // if LinkedIn detected, then use linkedin logout
 if ($is_linkedin) {
-    redirect_to('https://www.linkedin.com/secure/login?session_full_logout=&trk=hb_signout');
+    // redirect_to('https://www.linkedin.com/secure/login?session_full_logout=&trk=hb_signout');
+    redirect_to('linkedin_logout.html');
     exit();
 }
 

@@ -530,7 +530,9 @@ function import_from_linkedin() {
     });
 }
 
-function onDomReady() {}
+function onDomReady() {
+    linkedin_authorize();
+}
 
 function onLoaded() {
     initialize_page();
