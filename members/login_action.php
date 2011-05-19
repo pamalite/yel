@@ -60,7 +60,7 @@ if ($_POST['action'] == 'login') {
     $id = $_POST['id'];
     $hash = $_POST['hash'];
     $sid = $_POST['sid'];
-
+    
     $_SESSION['yel']['member']['id'] = $id;
     $_SESSION['yel']['member']['hash'] = $hash;
     $_SESSION['yel']['member']['sid'] = $sid;
@@ -105,6 +105,12 @@ if ($_POST['action'] == 'linkedin_login') {
     $hash = $_POST['hash'];
     $sid = $_POST['sid'];
     $linkedin_id = $_POST['linkedin_id'];
+    
+    if (empty($sid)) {
+        $seed = Seed::generateSeed();
+        $hash = sha1($id. md5($linkedin_id). $seed['login']['seed']);
+        $sid = $seed['login']['id'];
+    }
     
     $_SESSION['yel']['member']['id'] = $id;
     $_SESSION['yel']['member']['hash'] = $hash;

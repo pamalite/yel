@@ -145,16 +145,16 @@ function on_linkedin_auth() {
 
 function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
                             _linkedin_lastname, _is_new) {
-    if (isEmpty(seed) || isEmpty(sid)) {
-        get_seed();
-    }
-    
     var params = 'id=' + _member_id + '&action=linkedin_login';
     params = params + '&linkedin_id=' + _linkedin_id;
     params = params + '&linkedin_firstname=' + _linkedin_firstname;
     params = params + '&linkedin_lastname=' + _linkedin_lastname;
-    var hash = sha1(_member_id + md5(_linkedin_id) + seed);
-    params = params + '&sid=' + sid + '&hash=' + hash;
+    if (isEmpty(seed) || isEmpty(sid)) {
+        params = params + '&sid=&hash=';
+    } else {
+        var hash = sha1(_member_id + md5(_linkedin_id) + seed);
+        params = params + '&sid=' + sid + '&hash=' + hash;
+    }
     
     if (_is_new) {
         params = params + '&is_new=1';
