@@ -129,9 +129,9 @@ table.details td.side_content {
 div.join_now {
     margin: 3px 3px 3px 3px;
     padding-top: 20px;
-    padding-bottom: 20px;
+    /*padding-bottom: 20px;*/
     padding-left: 15px;
-    border-bottom: 1px solid #d9d9d9;
+    /*border-bottom: 1px solid #d9d9d9;*/
 }
 
 div.for_employers {
@@ -167,6 +167,11 @@ div.youtube {
     padding-bottom: 20px;
     padding-left: 15px;
     border-bottom: 1px solid #d9d9d9;
+}
+
+div.social {
+    padding-top: 0px;
+    margin-top: -10px;
 }
 
 div.search {
