@@ -172,23 +172,22 @@ function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
                 var msg = errors[0].childNodes[0].nodeValue;
                 if (msg == 'create_error') {
                     alert('An error occured while signing up with LinkedIn account.');
-                    return;
                 }
 
                 if (msg == 'update_error') {
                     alert('An error occured while associating your existing account with LinkedIn.');
-                    return;
                 }
 
                 if (msg == 'hacking_detected') {
                     alert('Another LinkedIn user has already used this email address.');
-                    return;
                 }
 
                 if (msg == "bad_login") {
                     location.replace(root + '/errors/failed_login.php?dir=members');
-                    return;
                 }
+                
+                logout_from_linkedin();
+                return;
             }
             
             var status = xml.getElementsByTagName('status');

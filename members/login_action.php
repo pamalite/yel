@@ -131,10 +131,10 @@ if ($_POST['action'] == 'linkedin_login') {
         // sign the member up
         $joined_on = today();
         $data = array();
-        $data['password'] = generate_random_string_of(6);
+        $data['password'] = md5(generate_random_string_of(6));
         $data['phone_num'] = '0';
-        $data['firstname'] = sanitize($_POST['linkedin_firstname']);
-        $data['lastname'] = sanitize($_POST['linkedin_lastname']);
+        $data['firstname'] = $_POST['linkedin_firstname'];
+        $data['lastname'] = $_POST['linkedin_lastname'];
         $data['linkedin_id'] = $linkedin_id;
         $data['joined_on'] = $joined_on;
         $data['updated_on'] = $joined_on;
