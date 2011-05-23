@@ -97,35 +97,37 @@ td.left_content div.linkedin_copy a.no_link {
     border-bottom: 1px solid #CCCCCC;
 }
 
-.progress {
+table.progress {
+    margin: auto;
+    width: 75%;
+}
+
+table.progress td {
+    vertical-align: middle;
+    width: 50%;
+}
+
+div.progress {
     border: 1px solid #000000;
     background-color: #FFFFFF;
     padding: 1px 1px 1px 1px;
-    width: 260px;
+    width: 98%;
     height: 16px;
-    margin-top: 5px;
-    margin-left: 210px;
+    margin: auto;
 }
 
 #progress_bar {
     border: 1px solid #FC8F02;
     background-color: #FC8F02;
     height: 14px;
-}
-
-#percent {
-    float: left;
-    margin-left: 155px;
-    margin-top: -18px;
+    text-align: center;
     font-weight: bold;
 }
 
 .progress_details {
     text-align: center;
     font-size: 9pt;
-    float: left;
-    margin-left: 350px;
-    margin-top: -19px;
+    margin: auto;
 }
 
 #div_resumes {

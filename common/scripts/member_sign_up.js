@@ -356,7 +356,16 @@ function update_overtexts() {
     new OverText($('birthdate_year'));
 }
 
-function onDomReady() {}
+function show_promo_tnc() {
+    window.open(root + '/common/images/promotions/starbucks/t_n_c.jpg', '', 'width=420px,height=810px,scrollbar=no,menubar=no,location=no');
+}
+
+function onDomReady() {
+    $('promo_button').addEvent('click', show_promo_tnc);
+    $('promo_button').addEvent('mouseover', function(_event) {
+        $('promo_button').setStyle('cursor', 'pointer');
+    });
+}
 
 function onLoaded() {
     initialize_page();
