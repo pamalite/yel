@@ -384,8 +384,21 @@ class MemberHomePage extends Page {
             $page = str_replace('%resumes_table%', $resumes_table->get_html(), $page);
         }
         
-        
         // career profile
+        $criteria = array(
+            'columns' => "DATE_FORMAT(imported_on, '%e %b, %Y') AS formatted_last_imported_on", 
+            'match' => "email_addr = '". $this->member->getId(). "'"
+        );
+        
+        $result = $this->member->find($criteria);
+        
+        if (!is_null($result[0]['formatted_last_imported_on']) || 
+            !empty($result[0]['formatted_last_imported_on'])) {
+            $page = str_replace('%last_imported_on%', 'Last imported on '. $result[0]['formatted_last_imported_on'], $page);
+        } else {
+            $page = str_replace('%last_imported_on%', 'Not yet imported', $page);
+        }
+        
         $is_active_str = 'No';
         if ($is_active) {
             $is_active_str = 'Yes';

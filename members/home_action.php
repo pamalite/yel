@@ -196,7 +196,7 @@ if ($_POST['action'] == 'import_linkedin') {
     $data = array();
     $data['seeking'] = $seeking;
     $data['updated_on'] = date('Y-m-d');
-    
+    $data['imported_on'] = $data['updated_on'];
     
     if ($member->update($data) === false) {
         echo 'ko';
