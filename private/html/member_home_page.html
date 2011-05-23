@@ -7,13 +7,22 @@
         <td class="left_content">
             <div class="profile_completeness">
                 <div class="completeness_title">Profile Completeness:</div>
-                <div class="progress">
-                    <div id="progress_bar" style="width: %completeness_percent%%;"></div>
-                </div>
-                <div id="percent">%lbl_completeness_percent%%</div>
-                <div class="progress_details">
-                    Tip: <span id="details">%next_step%</span>
-                </div>
+                <table class="progress">
+                    <tr>
+                        <td>
+                            <div class="progress">
+                                <div id="progress_bar" style="width: %completeness_percent%%;">
+                                    %lbl_completeness_percent%%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="progress_details">
+                                Tip: <span id="details">%next_step%</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </div>
             
             <table>
