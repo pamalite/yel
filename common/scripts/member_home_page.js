@@ -462,8 +462,12 @@ function show_upload_resume_popup(_resume_id) {
 }
 
 function import_from_linkedin() {
+    set_status('Importing profile...');
+    
     IN.API.Profile("me").fields("headline", "summary", "positions").result(function (_profiles) {
-        set_status('Importing... please wait...');
+        set_status('');
+        $('div_blanket').setStyle('display', 'block');
+        show_window('div_import_progress_window');
         
         // 1. get the data from linkedin
         var member = _profiles.values[0];
@@ -518,6 +522,8 @@ function import_from_linkedin() {
                 // return;
                 if (txt == 'ko') {
                     alert('An error occured when importing from LinkedIn.' + "\n\n" + 'Please try again later.');
+                    close_window('div_import_progress_window');
+                    $('div_blanket').setStyle('display', 'none');
                     return;
                 }
                 

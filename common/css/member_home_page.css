@@ -450,3 +450,27 @@ div.job_profiles {
     padding-top: 5px;
     text-align: center;
 }
+
+#div_blanket {
+    background-color: #ffffff;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: none;
+}
+
+#div_import_progress_window {
+    display: none;
+    width: 350px;
+}
+
+#div_import_progress_window div.import_progress {
+    margin: auto;
+    width: 98%;
+    text-align: center;
+    font-size: 18pt;
+}
