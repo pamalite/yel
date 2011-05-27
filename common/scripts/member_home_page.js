@@ -465,6 +465,7 @@ function import_from_linkedin() {
     set_status('Importing profile...');
     
     if (!confirm("If you have imported your profile before, this import will result in duplication.\n\nClick OK to continue, or Cancel to stop here.")) {
+        set_status('');
         return;
     }
     
