@@ -465,7 +465,8 @@ div.job_profiles {
 
 #div_import_progress_window {
     display: none;
-    width: 350px;
+    color: #8B8987;;
+    width: 400px;
 }
 
 #div_import_progress_window div.import_progress {

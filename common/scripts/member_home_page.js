@@ -464,6 +464,10 @@ function show_upload_resume_popup(_resume_id) {
 function import_from_linkedin() {
     set_status('Importing profile...');
     
+    if (!confirm("If you have imported your profile before, this import will result in duplication.\n\nClick OK to continue, or Cancel to stop here.")) {
+        return;
+    }
+    
     IN.API.Profile("me").fields("headline", "summary", "positions").result(function (_profiles) {
         set_status('');
         $('div_blanket').setStyle('display', 'block');
