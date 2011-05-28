@@ -134,11 +134,12 @@ class MemberHomePage extends Page {
     private function get_job_profiles() {
         $criteria = array(
             'columns' => "member_job_profiles.id, member_job_profiles.position_title, 
-                          member_job_profiles.position_superior_title, 
+                          member_job_profiles.position_superior_title,  
                           member_job_profiles.employer, industries.industry AS specialization, 
                           employer_industries.industry AS employer_specialization, 
                           DATE_FORMAT(member_job_profiles.work_from, '%b, %Y') AS formatted_work_from, 
-                          DATE_FORMAT(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to", 
+                          DATE_FORMAT(member_job_profiles.work_to, '%b, %Y') AS formatted_work_to, 
+                          member_job_profiles.summary", 
             'joins' => "member_job_profiles ON member_job_profiles.member = members.email_addr, 
                         industries ON industries.id = member_job_profiles.specialization, 
                         industries AS employer_industries ON employer_industries.id = member_job_profiles.employer_specialization",
@@ -354,7 +355,7 @@ class MemberHomePage extends Page {
         $page = str_replace('%next_step%', $next_step, $page);
         
         // photo
-        $photo_html = '<div style="text-align: center; margin: auto;">Upload your photo here by clicking the "Upload Photo" button.</div>';
+        $photo_html = '<div style="text-align: center; margin: auto;">Max resolution: 200x220 pixels<br/>Max size: 150KB</div>';
         if ($this->member->hasPhoto()) {
             $photo_html = '<img id="photo_image" class="photo_image" src="candidate_photo.php?id='. $this->member->getId(). '" />';
         }
@@ -475,10 +476,25 @@ class MemberHomePage extends Page {
                 
                 $pos = htmlspecialchars_decode(stripslashes($job_profile['position_title']));
                 $pos .= '<br/><span class="mini_spec">reporting to</span><br/>';
-                $pos .= '<span class="mini_superior">'. $job_profile['position_superior_title']. '</span>';
+                if (is_null($job_profile['position_superior_title']) || 
+                    empty($job_profile['position_superior_title'])) {
+                    $pos .= '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">edit reporting structure</a>';
+                } else {
+                    $pos .= '<span class="mini_superior">'. $job_profile['position_superior_title']. '</span>';
+                }
+                
                 $job_profiles_table->set($i+1, 4, $pos, '', 'cell');
                 
-                $job_profiles_table->set($i+1, 5, '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">edit</a>', '', 'cell action');
+                $edit = '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">finish incomplete profile</a>';
+                if (!is_null($job_profile['summary']) && 
+                    !empty($job_profile['summary']) && 
+                    !is_null($job_profile['position_superior_title']) && 
+                    !empty($job_profile['position_superior_title']) &&
+                    !is_null($job_profile['employer_specialization']) && 
+                    !empty($job_profile['employer_specialization'])) {
+                    $edit = '<a class="no_link" onClick="show_job_profile_popup('. $job_profile['id']. ')">update</a>';
+                }
+                $job_profiles_table->set($i+1, 5, $edit, '', 'cell action');
             }
             
             $page = str_replace('%job_profiles_table%', $job_profiles_table->get_html(), $page);

@@ -318,9 +318,7 @@ function set_employers_mouse_events() {
 
 function onDomReady() {
     set_employers_mouse_events();
-}
-
-function onLoaded() {
+    
     if ($('login_email_addr') != null) {
         new OverText($('login_email_addr'));
         new OverText($('login_password'));
@@ -333,6 +331,10 @@ function onLoaded() {
         $('login').addEvent('click', login);
         $('login_password').addEvent('keypress:keys(enter)', login);
     }
+}
+
+function onLoaded() {
+    OverText.update();
 }
 
 window.addEvent('domready', onDomReady);

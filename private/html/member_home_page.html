@@ -63,7 +63,7 @@
                         <div class="profile">
                             <div class="profile_title">Career Profile [<a class="no_link" onClick="show_career_summary_popup();">edit</a>]</div>
                             <div class="profile_form">
-                                Our recruitment consultants will identify relevant opportunities for you based on your Career Profile. Please keep your Career Profile as up-to-date as possible.<br/>
+                                Our recruitment consultants will identify relevant opportunities for you based on your Career Profile. Please keep your Career Profile as up-to-date as possible.<br/><br/>
                                 <table class="profile_form_table">
                                     <tr>
                                         <td class="field">Currently looking for a job:</td>
@@ -322,7 +322,7 @@
 </div>
 
 <div id="job_profile_window" class="popup_window">
-    <div class="popup_window_title">Job Profile</div>
+    <div class="popup_window_title">Job Position</div>
     <form onSubmit="return false;">
         <input type="hidden" id="job_profile_id" value="0" />
         <div class="job_profile_form">
@@ -332,7 +332,7 @@
                     <td class="field">
                         <input class="field" type="text" id="position_title" name="position_title" />
                         <br/>
-                        <span class="tips">eg: Financial Controller,  VP of Operations, etc.</span>
+                        <span class="tips">eg: Finance Manager, Operations Manager, etc.</span>
                     </td>
                 </tr>
                 <tr>
@@ -345,7 +345,11 @@
                 </tr>
                 <tr>
                     <td class="label"><label for="organization_size">Positions reporting to you:</label></td>
-                    <td class="field"><input class="field" type="text" id="organization_size" name="organization_size" /></td>
+                    <td class="field">
+                        <input class="field" type="text" id="organization_size" name="organization_size" />
+                        <br/>
+                        <span class="tips">eg: 3 Finance Section Heads, 2 Operations Managers, etc.</span>
+                    </td>
                 </tr>
                 <tr>
                     <td class="label"><label for="work_from_month">Duration:</label></td>
