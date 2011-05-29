@@ -72,7 +72,8 @@ if ($_POST['action'] == 'sign_up') {
             exit();
         }
     } else {
-        if ($member->update($data, true) === false) {
+        $member->setAdmin(true);
+        if ($member->update($data) === false) {
             echo 'ko - error_update';
             exit();
         }

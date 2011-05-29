@@ -358,7 +358,7 @@ class Member implements Model {
         return $result[0]['question'];
     }
     
-    public function isRegistered($_sha1) {
+    public function isRegistered($_sha1, $_linkedin_id='') {
         if ($this->seed_id == 0) {
             return false;
         } else {
@@ -369,6 +369,9 @@ class Member implements Model {
         if ($result = $this->mysqli->query($query)) {
             $seed = $result[0]['seed'];
             $sha1 = sha1($this->id. $this->getPasswordHash(). $seed);
+            if (!empty($_linkedin_id)) {
+                $sha1 = sha1($this->id. md5($_linkedin_id). $seed);
+            }
             if ($sha1 == $_sha1) {
                 return true;
             }
@@ -1104,6 +1107,41 @@ class Member implements Model {
         $query = "UPDATE member_jobs SET remind_on = NULL 
                   WHERE id = ". $_id;
         return $this->mysqli->execute($query);
+    }
+    
+    public function getLinkedInId() {
+        $query = "SELECT linkedin_id FROM members WHERE email_addr = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        
+        if ($result === false) {
+            return false;
+        }
+
+        if (is_null($result) || empty($result)) {
+            return NULL;
+        } 
+        
+        return $result[0]['linkedin_id'];
+    }
+    
+    public function getEmailFromLinkedIn($_linkedin_id) {
+        if (is_null($_linkedin_id) || empty($_linkedin_id)) {
+            return false;
+        }
+        
+        $query = "SELECT email_addr FROM members WHERE linkedin_id = '". $_linkedin_id. "'";
+        $result = $this->mysqli->query($query);
+        
+        if ($result === false) {
+            return false;
+        }
+
+        if (is_null($result) || empty($result)) {
+            return NULL;
+        } 
+        
+        $this->id = $result[0]['email_addr'];
+        return $this->id;
     }
 }
 ?>

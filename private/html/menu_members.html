@@ -3,8 +3,9 @@
         <li style="background-color: %member_home%;"><a class="menu" href="%root%/members/home.php">Career Profile</a></li>
         <li style="background-color: %member_job_apps%;"><a class="menu" href="%root%/members/job_applications.php">Job Applications</a></li>
         <li style="background-color: %member_recommendations%;"><a class="menu" href="%root%/members/recommendations.php">My Recommendations</a></li>
-        <li class="logout"><a class="menu" href="%root%/members/logout.php">Logout</a></li>
+        <li class="logout"><a class="menu" onClick="return logout_from_linkedin();" href="%root%/members/logout.php">Logout</a></li>
         <li class="logout" style="background-color: %member_profile%;"><a class="menu" href="%root%/members/profile.php">My Account</a></li>
         <li class="logout"><a class="menu" style="cursor: pointer;" onClick="toggle_howitworks();">How Yellow Elevator Works? <img id="howitworks_arrow" src="%root%/common/images/howitworks_down.gif" /></a></li>
     </ul>
 </div>
+<div style="display: none;"><script type="IN/Login"></script></div>

@@ -67,10 +67,10 @@ if ($_POST['action'] == 'save_job_profile') {
     $data['position_superior_title'] = $_POST['superior_title'];
     $data['organization_size'] = $_POST['organization_size'];
     $data['employer'] = $_POST['employer'];
-    $data['employer_description'] = $_POST['emp_desc'];
     $data['employer_specialization'] = $_POST['emp_specialization'];
     $data['work_from'] = $_POST['work_from'];
     $data['work_to'] = $_POST['work_to'];
+    $data['summary'] = $_POST['job_summary'];
     
     $member = new Member($_POST['member']);
     if ($_POST['id'] == 0) {
@@ -107,6 +107,10 @@ if ($_POST['action'] == 'get_job_profile') {
     
     $member = new Member();
     $result = $member->find($criteria);
+    
+    foreach ($result as $i=>$row) {
+        $result[$i]['summary'] = htmlspecialchars_decode(stripslashes($row['summary']));
+    }
     
     $response = array('job_profile' => $result);
     header('Content-type: text/xml');
@@ -167,6 +171,78 @@ if ($_POST['action'] == 'upload') {
     }
     
     redirect_to('home.php');
+    exit();
+}
+
+if ($_POST['action'] == 'import_linkedin') {
+    $member = new Member($_POST['id']);
+    
+    // get the current seeking field to be concatenated
+    $criteria = array(
+        'columns' => "seeking",
+        'match' => "email_addr = '". $_POST['id']. "'", 
+        'limit' => "1"
+    );
+    $result = $member->find($criteria);
+    $seeking = $result[0]['seeking'];
+    
+    if (is_null($seeking) || empty($seeking)) {
+        $seeking = $_POST['seeking'];
+    } else {
+        $seeking = htmlspecialchars_decode(stripslashes($seeking)). "\n\n". $_POST['seeking'];
+    }
+    
+    // update career profile
+    $data = array();
+    $data['seeking'] = $seeking;
+    $data['updated_on'] = date('Y-m-d');
+    $data['imported_on'] = $data['updated_on'];
+    
+    if ($member->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    // import job profiles
+    $positions_xml = '<?xml version="1.0" encoding="UTF-8"?>'. "\n";
+    $positions_xml .= $_POST['positions'];
+    
+    if (!$xml_dom->load_from_xml($positions_xml)) {
+        echo 'ko';
+        exit();
+    }
+    
+    $nodes = $xml_dom->get('position');
+    foreach ($nodes as $node) {
+        $data = array();
+        foreach ($node->childNodes as $child) {
+            switch ($child->nodeName) {
+                case 'title':
+                    $data['position_title'] = sql_nullify($child->nodeValue);
+                    break;
+                case 'employer':
+                    $data['employer'] = sql_nullify($child->nodeValue);
+                    break;
+                case 'summary':
+                    $data['summary'] = sql_nullify($child->nodeValue);
+                    break;
+                case 'work_from':
+                    $data['work_from'] = sql_nullify($child->nodeValue);
+                    break;
+                case 'work_to':
+                    $data['work_to'] = sql_nullify($child->nodeValue);
+                    break;
+            }
+        }
+        
+        // print_r($data);
+        if ($member->addJobProfile($data) === false) {
+            echo 'ko';
+            exit();
+        }
+    }
+    
+    echo 'ok';
     exit();
 }
 ?>

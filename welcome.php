@@ -13,8 +13,10 @@ if (isset($_SESSION['yel']['employer'])) {
     //redirect_to('employers/index.php');
 }
 
-if (isset($_SESSION['yel']['member'])) {
-    //redirect_to('members/index.php');
+if (!isset($_SESSION['yel']['member'])) {
+    $_SESSION['yel']['member']['id'] = "";
+    $_SESSION['yel']['member']['sid'] = "";
+    $_SESSION['yel']['member']['hash'] = "";
 }
 
 // 1.5 Log visitor
@@ -42,7 +44,6 @@ $welcome->header(array('title' => 'Welcome'));
 $welcome->insert_welcome_css();
 $welcome->insert_welcome_scripts();
 $welcome->insert_inline_scripts();
-// $welcome->insert_linkedin_jsscript();
 $welcome->show();
 $welcome->footer();
 ?>

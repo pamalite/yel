@@ -1,3 +1,12 @@
+function htmlspecialchars(unsafe) {
+  return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+}
+
 function get_completeness_status() {
     var params = 'id=' + id + '&action=get_completeness_status';
     
@@ -167,11 +176,6 @@ function validate_job_profile() {
         return false;
     }
     
-    if ($('emp_desc').selectedIndex == 0) {
-        alert('You need to select your employer\'s description.');
-        return false;
-    }
-    
     if ($('emp_specialization').selectedIndex == 0) {
         alert('You need to select your employer\'s specialization.');
         return false;
@@ -209,7 +213,7 @@ function show_job_profile_popup(_id) {
         $('work_to_month').selectedIndex = 0;
         $('work_to_year').value = 'yyyy';
         $('company').value = '';
-        $('emp_desc').selectedIndex = 0;
+        $('job_summary').value = '';
         $('emp_specialization').selectedIndex = 0;
         
         show_window('job_profile_window');
@@ -237,7 +241,7 @@ function show_job_profile_popup(_id) {
                 var work_from = xml.getElementsByTagName('work_from');
                 var work_to = xml.getElementsByTagName('work_to');
                 var company = xml.getElementsByTagName('employer');
-                var emp_desc = xml.getElementsByTagName('employer_description');
+                var job_summary = xml.getElementsByTagName('summary');
                 var emp_specialization = xml.getElementsByTagName('employer_specialization');
                 
                 $('job_profile_id').value = _id;
@@ -266,6 +270,12 @@ function show_job_profile_popup(_id) {
                 }
                 $('company').value = company_name.replace('&amp;', '&');
                 
+                var summary = '';
+                if (job_summary[0].childNodes.length > 0) {
+                    summary = job_summary[0].childNodes[0].nodeValue;
+                }
+                $('job_summary').value = summary.replace('&amp;', '&').replace('&quot;', '"').replace('&#39;', "'");
+                
                 // for (var i=0; i < $('specialization').options.length; i++) {
                 //     if ($('specialization').options[i].value == specialization[0].childNodes[0].nodeValue) {
                 //         $('specialization').selectedIndex = i;
@@ -273,17 +283,12 @@ function show_job_profile_popup(_id) {
                 //     }
                 // }
                 
-                for (var i=0; i < $('emp_desc').options.length; i++) {
-                    if ($('emp_desc').options[i].value == emp_desc[0].childNodes[0].nodeValue) {
-                        $('emp_desc').selectedIndex = i;
-                        break;
-                    }
-                }
-                
-                for (var i=0; i < $('emp_specialization').options.length; i++) {
-                    if ($('emp_specialization').options[i].value == emp_specialization[0].childNodes[0].nodeValue) {
-                        $('emp_specialization').selectedIndex = i;
-                        break;
+                if (emp_specialization[0].childNodes.length > 0) {
+                    for (var i=0; i < $('emp_specialization').options.length; i++) {
+                        if ($('emp_specialization').options[i].value == emp_specialization[0].childNodes[0].nodeValue) {
+                            $('emp_specialization').selectedIndex = i;
+                            break;
+                        }
                     }
                 }
                 
@@ -356,8 +361,8 @@ function close_job_profile_popup(_is_save) {
         params = params + '&work_from=' + work_from;
         params = params + '&work_to=' + work_to;
         params = params + '&employer=' + encodeURIComponent($('company').value);
-        params = params + '&emp_desc=' + $('emp_desc').value;
         params = params + '&emp_specialization=' + $('emp_specialization').value;
+        params = params + '&job_summary=' + encodeURIComponent($('job_summary').value);
         
         var uri = root + "/members/home_action.php";
         var request = new Request({
@@ -450,8 +455,89 @@ function show_upload_resume_popup(_resume_id) {
     // window.scrollTo(0, 0);
 }
 
+function import_from_linkedin() {
+    set_status('Importing profile...');
+    
+    if (!confirm("If you have imported your profile before, this import will result in duplication.\n\nClick OK to continue, or Cancel to stop here.")) {
+        set_status('');
+        return;
+    }
+    
+    IN.API.Profile("me").fields("headline", "summary", "positions").result(function (_profiles) {
+        set_status('');
+        $('div_blanket').setStyle('display', 'block');
+        show_window('div_import_progress_window');
+        
+        // 1. get the data from linkedin
+        var member = _profiles.values[0];
+        var seeking_txt = member.headline + "\n\n" + member.summary;
+        
+        var positions = member.positions.values;
+        var positions_txt = '<positions>';
+        for (var i=0; i < parseInt(member.positions._total); i++) {
+            var position = '<position>' + "\n";
+            var title = '<title>'  + htmlspecialchars(positions[i].title) + '</title>' + "\n";
+            var employer = '<employer>' + htmlspecialchars(positions[i].company.name) + '</employer>' + "\n";
+            var summary = '<summary>' + htmlspecialchars(positions[i].summary) + '</summary>' + "\n";
+            
+            position = position + title + employer + summary;
+            
+            var start_date = '<work_from>' + positions[i].startDate.year; 
+            if (parseInt(positions[i].startDate.month) < 10) {
+                start_date = start_date + '-0' + positions[i].startDate.month + '-00';
+            } else {
+                start_date = start_date + '-' + positions[i].startDate.month + '-00';
+            }
+            start_date = start_date + '</work_from>' + "\n";
+            
+            var end_date = '<work_to>';
+            if (!positions[i].isCurrent) {
+                end_date = end_date + positions[i].endDate.year;
+                if (parseInt(positions[i].endDate.month) < 10) {
+                    end_date = end_date + '-0' + positions[i].endDate.month + '-00';
+                } else {
+                    end_date = end_date + '-' + positions[i].endDate.month + '-00';
+                }
+            }
+            end_date = end_date + '</work_to>' + "\n";
+            
+            position = position + start_date + end_date + '</position>' + "\n";
+            
+            positions_txt = positions_txt + position;
+        }
+        positions_txt = positions_txt + '</positions>';
+        
+        // 2. send it to action for processing
+        var params = 'id=' + id + '&action=import_linkedin';
+        params = params + '&seeking=' + encodeURIComponent(seeking_txt);
+        params = params + '&positions=' + encodeURIComponent(positions_txt);
+        
+        var uri = root + "/members/home_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                // set_status('<pre>' + txt + '</pre>');
+                // return;
+                if (txt == 'ko') {
+                    alert('An error occured when importing from LinkedIn.' + "\n\n" + 'Please try again later.');
+                    close_window('div_import_progress_window');
+                    $('div_blanket').setStyle('display', 'none');
+                    return;
+                }
+                
+                // 3. reload page
+                location.reload(true);
+            }
+        });
 
-function onDomReady() {}
+        request.send(params);
+    });
+}
+
+function onDomReady() {
+    linkedin_authorize();
+}
 
 function onLoaded() {
     initialize_page();

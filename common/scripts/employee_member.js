@@ -1267,11 +1267,6 @@ function validate_job_profile() {
         return false;
     }
     
-    if ($('emp_desc').selectedIndex == 0) {
-        alert('You need to select your employer\'s description.');
-        return false;
-    }
-    
     if ($('emp_specialization').selectedIndex == 0) {
         alert('You need to select your employer\'s specialization.');
         return false;
@@ -1310,7 +1305,7 @@ function show_job_profile_popup(_id) {
         $('work_to_year').value = 'yyyy';
         $('company').value = '';
         $('emp_desc').selectedIndex = 0;
-        $('emp_specialization').selectedIndex = 0;
+        $('job_summary').value = '';
         
         show_window('job_profile_window');
         // window.scrollTo(0, 0);
@@ -1337,8 +1332,8 @@ function show_job_profile_popup(_id) {
                 var work_from = xml.getElementsByTagName('work_from');
                 var work_to = xml.getElementsByTagName('work_to');
                 var company = xml.getElementsByTagName('employer');
-                var emp_desc = xml.getElementsByTagName('employer_description');
                 var emp_specialization = xml.getElementsByTagName('employer_specialization');
+                var job_summary = xml.getElementsByTagName('summary');
                 
                 $('job_profile_id').value = _id;
                 $('position_title').value = position_title[0].childNodes[0].nodeValue;
@@ -1361,6 +1356,12 @@ function show_job_profile_popup(_id) {
                     $('company').value = '';
                 }
                 
+                if (job_summary[0].childNodes.length > 0) {
+                    $('job_summary').value = job_summary[0].childNodes[0].nodeValue.replace('&amp;', '&').replace('&quot;', '"').replace('&#039;', "'");
+                } else {
+                    $('job_summary').value = '';
+                }
+                
                 // for (var i=0; i < $('specialization').options.length; i++) {
                 //     if ($('specialization').options[i].value == specialization[0].childNodes[0].nodeValue) {
                 //         $('specialization').selectedIndex = i;
@@ -1368,17 +1369,12 @@ function show_job_profile_popup(_id) {
                 //     }
                 // }
                 
-                for (var i=0; i < $('emp_desc').options.length; i++) {
-                    if ($('emp_desc').options[i].value == emp_desc[0].childNodes[0].nodeValue) {
-                        $('emp_desc').selectedIndex = i;
-                        break;
-                    }
-                }
-                
-                for (var i=0; i < $('emp_specialization').options.length; i++) {
-                    if ($('emp_specialization').options[i].value == emp_specialization[0].childNodes[0].nodeValue) {
-                        $('emp_specialization').selectedIndex = i;
-                        break;
+                if (emp_specialization[0].childNodes.length > 0) {
+                    for (var i=0; i < $('emp_specialization').options.length; i++) {
+                        if ($('emp_specialization').options[i].value == emp_specialization[0].childNodes[0].nodeValue) {
+                            $('emp_specialization').selectedIndex = i;
+                            break;
+                        }
                     }
                 }
                 
@@ -1451,8 +1447,8 @@ function close_job_profile_popup(_is_save) {
         params = params + '&work_from=' + work_from;
         params = params + '&work_to=' + work_to;
         params = params + '&employer=' + encodeURIComponent($('company').value);
-        params = params + '&emp_desc=' + $('emp_desc').value;
         params = params + '&emp_specialization=' + $('emp_specialization').value;
+        params = params + '&job_summary=' + encodeURIComponent($('job_summary').value);
         
         $('job_profile_id').value = '0';
         

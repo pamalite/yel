@@ -42,10 +42,7 @@ class Page {
     }
     
     public function insert_linkedin_jsscript() {
-        $this->header .= '<script type="text/javascript" src="http://platform.linkedin.com/in.js">'. "\n";
-        $this->header .= 'api_key: '. $GLOBALS['linkedin_api_key']. ";\n";
-        $this->header .= 'authorize: true'. ";\n";
-        $this->header .= '</script>';
+        $this->header = str_replace('%linkedin_api_key%', $GLOBALS['linkedin_api_key'], $this->header);
     }
     
     public function header($hashes = "") {
@@ -60,6 +57,8 @@ class Page {
         } else {
             $this->header = str_replace('%page_title%', $GLOBALS['COMPANYNAME']. ' - '.$title, $this->header);
         }
+        
+        $this->insert_linkedin_jsscript();
     }
     
     public function begin() {

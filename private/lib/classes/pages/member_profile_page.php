@@ -132,7 +132,7 @@ class MemberProfilePage extends Page {
                     <?php
                     if ($this->member->hasPhoto()) {
                     ?>
-                        <img id="photo_image" class="photo_image" src="candidate_photo.php?id=<?php echo $this->member->getId(); ?>" style="width: <?php echo $GLOBALS['max_photo_resolution']['width']; ?>; height: <?php echo $GLOBALS['max_photo_resolution']['height']; ?>;" />
+                        <img id="photo_image" class="photo_image" src="candidate_photo.php?id=<?php echo $this->member->getId(); ?>" />
                     <?php
                     } else {
                     ?>
