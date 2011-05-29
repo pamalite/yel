@@ -210,6 +210,7 @@ class EmployeeMembersPage extends Page {
                         <br/>
                         <input type="button" class="main_filter_button" id="search_resume_btn" value="Trace Resume" onClick="trace_resume();"/>
                         <input type="button" class="main_filter_button" id="add_new_btn" value="Add New Applicant" onClick="show_new_application_popup();" disabled />
+                        <input type="button" class="main_filter_button" id="bulk_add_new_btn" value="Bulk Add New Applicants" onClick="show_bulk_new_applications_popup();" disabled />
                     </td>
                 </tr>
                 <tr>
@@ -605,6 +606,36 @@ class EmployeeMembersPage extends Page {
                 <input type="button" value="Cancel" onClick="close_reminder_popup(false);" />
             </div>
         </div>
+        
+        <div id="upload_new_applicants_window" class="popup_window">
+            <div class="popup_window_title">Upload New Applicants (CSV)</div>
+            <form id="upload_csv_form" action="members_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_bulk_new_applications_popup(true);">
+                <div class="upload_csv_form">
+                    <br/>
+                    <input type="hidden" id="id" name="id" value="<?php echo $this->employee->getUserId(); ?>" />
+                    <input type="hidden" id="bulk_new_applicant_jobs" name="bulk_new_applicant_jobs" value="0" />
+                    <input type="hidden" name="action" value="bulk_add_new_applicants" />
+                    <div id="upload_progress" style="text-align: center; width: 99%; margin: auto;">
+                        Please wait while new applicants are being uploaded... <br/><br/>
+                        <img src="%root%/common/images/progress/circle_big.gif" /><br/><br/>
+                        NOTE: To Safari/Chrome (WebKit) on Mac OS X users, the mentioned browsers have a problem uploading any file through this page. Please try Firefox to upload your resume.
+                    </div>
+                    <div id="upload_field" class="upload_field">
+                        <input id="csv_file" name="csv_file" type="file" />
+                        <div style="font-size: 9pt; margin-top: 15px;">
+                            <ol>
+                                <li>Only Comma Separated Verbose (CSV) file with less than 2MB are allowed.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup_window_buttons_bar">
+                    <input type="submit" value="Add" />
+                    <input type="button" value="Close" onClick="close_bulk_new_applications_popup(false);" />
+                </div>
+            </form>
+        </div>
+        
         <?php
     }
 }

@@ -238,8 +238,10 @@ function toggle_add_button() {
     
     if (has_selected) {
         $('add_new_btn').disabled = false;
+        $('bulk_add_new_btn').disabled = false;
     } else {
         $('add_new_btn').disabled = true;
+        $('bulk_add_new_btn').disabled = true;
     }
 }
 
@@ -1627,6 +1629,37 @@ function close_new_application_popup(_is_save) {
         request.send(params);
     } else {
         close_window('new_application_window');
+    }
+}
+
+function show_bulk_new_applications_popup() {
+    $('new_applicant_jobs').value = '';
+    
+    var jobs = '';
+    for (var i=0; i < $('jobs').options.length; i++) {
+        if ($('jobs').options[i].selected) {
+            jobs = jobs + $('jobs').options[i].value + ',';
+        }
+    }
+    jobs = jobs.substr(0, jobs.length-1);
+    
+    $('bulk_new_applicant_jobs').value = jobs;
+    
+    show_window('upload_new_applicants_window');
+    // window.scrollTo(0, 0);
+}
+
+function close_bulk_new_applications_popup(_is_upload) {
+    if (_is_upload) {
+        if (isEmpty($('csv_file').value)) {
+            alert('You need to select a CSV file to upload.');
+            return false;
+        }
+        
+        close_safari_connection();
+        return true;
+    } else {
+        close_window('upload_new_applicants_window');
     }
 }
 

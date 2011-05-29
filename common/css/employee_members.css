@@ -486,3 +486,26 @@ span.remind {
 span.remind.warn {
     color: #00CC00;
 }
+
+#upload_new_applicants_window {
+    width: 450px;
+    display: none;
+}
+
+#upload_progress {
+    display: none;
+}
+
+.upload_csv_form {
+    width: 99%;
+    height: 165px;
+    margin: auto;
+    overflow: auto;
+}
+
+.upload_field {
+    margin-top: 3px;
+    text-align: center;
+    margin: auto;
+    width: 100%;
+}

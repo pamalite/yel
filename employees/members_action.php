@@ -1667,4 +1667,47 @@ if ($_POST['action'] == 'reset_reminder') {
     exit();
 }
 
+if ($_POST['action'] == 'bulk_add_new_applicants') {
+    $employee = new Employee($_POST['id']);
+    $branch = $employee->getBranch();
+    $yel_email = 'team.'. strtolower($branch[0]['country']). '@yellowelevator.com';
+    
+    if (move_uploaded_file($_FILES['csv_file']['tmp_name'], "/tmp/". basename($_FILES['csv_file']['tmp_name']))) {
+        $handle = fopen("/tmp/". basename($_FILES['csv_file']['tmp_name']), 'r');
+        if ($handle !== false) {
+            while ($row = fgetcsv($handle) !== false) {
+                // if (count($row) < 6) {
+                //     continue;
+                // }
+
+                $data = array();
+                $data['requested_on'] = now();
+                $data['referrer_email'] = $yel_email;
+                $data['candidate_email'] = sql_nullify($row[0]);
+                $data['candidate_name'] = sql_nullify($row[1]);
+                $data['candidate_phone'] = sql_nullify($row[2]);
+                $data['current_position'] = sql_nullify($row[3]);
+                $data['current_employer'] = sql_nullify($row[4]);
+                $data['progress_notes'] = sql_nullify($row[5]);
+
+                echo '<pre>';
+                print_r($data);
+                echo '</pre>';
+
+                $jobs = explode(',', $_POST['bulk_new_applicant_jobs']);
+
+                $buffer = new ReferralBuffer();
+                foreach ($jobs as $job) {
+                    $data['job'] = $job;
+                    $buffer->create($data);
+                }
+            }
+        }
+        fclose($handle);
+    }
+    
+    //redirect_to('members.php');
+    exit();
+}
+
 ?>
