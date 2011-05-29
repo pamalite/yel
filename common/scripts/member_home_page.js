@@ -70,30 +70,24 @@ function close_career_summary_popup(_is_save) {
             contact_me = '1';
         }
         
-        if (!isEmpty($('expected_sal_start').value) && isNaN($('expected_sal_start').value)) {
+        if (!isEmpty($('expected_sal').value) && isNaN($('expected_sal').value)) {
             alert('Expected salary must be a number.');
             return;
-        } else if (!isEmpty($('expected_sal_end').value) && isNaN($('expected_sal_end').value)) {
-            alert('Expected salary must be a number.');
-            return;
-        } else if (!isEmpty($('expected_sal_start').value) && !isEmpty($('expected_sal_end').value)) {
-            if (parseInt($('expected_sal_start').value) > parseInt($('expected_sal_end').value)) {
-                alert('Expected salary range is invalid.');
-                return;
-            }
         }
         
-        if (!isEmpty($('current_sal_start').value) && isNaN($('current_sal_start').value)) {
-            alert('Expected salary must be a number.');
+        if (!isEmpty($('expected_total').value) && isNaN($('expected_total').value)) {
+            alert('Expected total annual package must be a number.');
             return;
-        } else if (!isEmpty($('current_sal_end').value) && isNaN($('current_sal_end').value)) {
-            alert('Expected salary must be a number.');
+        }
+        
+        if (!isEmpty($('current_sal').value) && isNaN($('current_sal').value)) {
+            alert('Current salary must be a number.');
             return;
-        } else if (!isEmpty($('current_sal_start').value) && !isEmpty($('current_sal_end').value)) {
-            if (parseInt($('current_sal_start').value) > parseInt($('current_sal_end').value)) {
-                alert('Expected salary range is invalid.');
-                return;
-            }
+        }
+        
+        if (!isEmpty($('current_total').value) && isNaN($('current_total').value)) {
+            alert('Current total annual package must be a number.');
+            return;
         }
         
         var params = 'id=' + id + '&action=save_career_summary';
@@ -108,10 +102,10 @@ function close_career_summary_popup(_is_save) {
         // params = params + '&current_pos=' + current_pos;
         params = params + '&reason_leaving=' + reason_leaving;
         params = params + '&notice_period=' + $('notice_period').value;
-        params = params + '&expected_sal_start=' + $('expected_sal_start').value;
-        params = params + '&expected_sal_end=' + $('expected_sal_end').value;
-        params = params + '&current_sal_start=' + $('current_sal_start').value;
-        params = params + '&current_sal_end=' + $('current_sal_end').value;
+        params = params + '&expected_sal=' + $('expected_sal').value;
+        params = params + '&expected_total_annual_package=' + $('expected_total').value;
+        params = params + '&current_sal=' + $('current_sal').value;
+        params = params + '&current_total_annual_package=' + $('current_total').value;
         
         var uri = root + "/members/home_action.php";
         var request = new Request({

@@ -99,10 +99,10 @@ class MemberHomePage extends Page {
         $criteria = array(
             'columns' => "members.is_active_seeking_job, members.seeking, 
                           members.expected_salary_currency, members.expected_salary, 
-                          members.expected_salary_end, members.can_travel_relocate, 
+                          members.expected_total_annual_package, members.can_travel_relocate, 
                           members.reason_for_leaving, members.current_position, 
                           members.current_salary_currency, members.current_salary, 
-                          members.current_salary_end, members.notice_period, 
+                          members.current_total_annual_package, members.notice_period, 
                           members.preferred_job_location_1 AS pref_job_loc_1, 
                           members.preferred_job_location_2 AS pref_job_loc_2, 
                           countries.country AS pref_job_location_1, 
@@ -403,14 +403,18 @@ class MemberHomePage extends Page {
         $page = str_replace('%seeking%', $seeking_txt, $page);
         
         $page = str_replace('%expected_salary_currency%', $answers['expected_salary_currency'], $page);
-        $exp_sal_range = $answers['expected_salary'];
-        $exp_sal_range .= ($answers['expected_salary_end'] <= 0) ? '' : ' - '. $answers['expected_salary_end'];
-        $page = str_replace('%expected_salary_range%', $exp_sal_range, $page);
+        $exp_sal = ($answers['expected_salary'] <= 0) ? '(None provided)' : $answers['expected_salary'];
+        $page = str_replace('%expected_salary%', $exp_sal, $page);
+        
+        $exp_total = ($answers['expected_total_annual_package'] <= 0) ? '(None provided)' : $answers['expected_total_annual_package'];
+        $page = str_replace('%expected_total_annual_package%', $exp_total, $page);
         
         $page = str_replace('%current_salary_currency%', $answers['current_salary_currency'], $page);
-        $cur_sal_range = $answers['current_salary'];
-        $cur_sal_range .= ($answers['current_salary_end'] <= 0) ? '' : ' - '. $answers['current_salary_end'];
-        $page = str_replace('%current_salary_range%', $cur_sal_range, $page);
+        $cur_sal = ($answers['current_salary'] <= 0) ? '(None provided)' : $answers['current_salary'];
+        $page = str_replace('%current_salary%', $cur_sal, $page);
+        
+        $cur_total = ($answers['current_total_annual_package'] <= 0) ? '(None provided)' : $answers['current_total_annual_package'];
+        $page = str_replace('%current_total_annual_package%', $cur_total, $page);
         
         $page = str_replace('%pref_job_loc_1%', $answers['pref_job_location_1'], $page);
         $page = str_replace('%pref_job_loc_2%', $answers['pref_job_location_2'], $page);
@@ -492,8 +496,7 @@ class MemberHomePage extends Page {
         }
         $page = str_replace('%expected_salary_currency_options%', $exp_currency_options_str, $page);
         $page = str_replace('%expected_salary_txt%', $answers['expected_salary'], $page);
-        $exp_sal_end = ($answers['expected_salary_end'] <= 0) ? '' : $answers['expected_salary_end'];
-        $page = str_replace('%expected_salary_end_txt%', $exp_sal_end, $page);
+        $page = str_replace('%expected_total_txt%', $answers['expected_total_annual_package'], $page);
         
         $cur_currency_options_str = '';
         foreach ($GLOBALS['currencies'] as $i=>$currency) {
@@ -505,8 +508,7 @@ class MemberHomePage extends Page {
         }
         $page = str_replace('%current_salary_currency_options%', $cur_currency_options_str, $page);
         $page = str_replace('%current_salary_txt%', $answers['current_salary'], $page);
-        $cur_sal_end = ($answers['current_salary_end'] <= 0) ? '' : $answers['current_salary_end'];
-        $page = str_replace('%current_salary_end_txt%', $cur_sal_end, $page);
+        $page = str_replace('%current_total_txt%', $answers['current_total_annual_package'], $page);
         
         $page = str_replace('%pref_job_loc_1_select%', $this->generate_countries($answers['pref_job_loc_1'], 'pref_job_loc_1'), $page);
         $page = str_replace('%pref_job_loc_2_select%', $this->generate_countries($answers['pref_job_loc_2'], 'pref_job_loc_2'), $page);

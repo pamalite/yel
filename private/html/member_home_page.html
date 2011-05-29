@@ -71,7 +71,8 @@
                                         <td class="field">Current salary:</td>
                                         <td>
                                             <span id="current_salary_field">
-                                                %current_salary_currency%$ %current_salary_range%
+                                                Monthly Basic: %current_salary_currency%$ %current_salary%<br/>
+                                                Total Annual Package: %current_salary_currency%$ %current_total_annual_package%<br/>
                                             </span>
                                         </td>
                                     </tr>
@@ -79,7 +80,8 @@
                                         <td class="field">Expected salary:</td>
                                         <td>
                                             <span id="expected_salary_field">
-                                                %expected_salary_currency%$ %expected_salary_range%
+                                                Monthly Basic: %expected_salary_currency%$ %expected_salary%<br/>
+                                                Total Annual Package: %expected_salary_currency%$ %expected_total_annual_package%
                                             </span>
                                         </td>
                                     </tr>
@@ -254,23 +256,27 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="field">What is your current salary? (please provide an estimated range)</td>
+                    <td class="field">What is your current salary? (You can provide an approx. figure.)</td>
                     <td>
                         <select id="current_sal_currency">
                             %current_salary_currency_options%
-                        </select>
-                        $&nbsp;
-                        <input type="text" id="current_sal_start" value="%current_salary_txt%" /> to <input type="text" id="current_sal_end" value="%current_salary_end_txt%" />
+                        </select><br/>
+                        Monthly Basic: $&nbsp;
+                        <input type="text" id="current_sal" value="%current_salary_txt%" />
+                        <br/>
+                        Total Annual Package: $&nbsp;<input type="text" id="current_total" value="%current_total_txt%" />
                     </td>
                 </tr>
                 <tr>
-                    <td class="field">What is your expected salary? (please provide an estimated range)</td>
+                    <td class="field">What is your expected salary? (You can Provide an approx. figure.)</td>
                     <td>
                         <select id="expected_sal_currency">
                             %expected_salary_currency_options%
-                        </select>
-                        $&nbsp;
-                        <input type="text" id="expected_sal_start" value="%expected_salary_txt%" /> to <input type="text" id="expected_sal_end" value="%expected_salary_end_txt%" />
+                        </select><br/>
+                        Monthly Basic: $&nbsp;
+                        <input type="text" id="expected_sal" value="%expected_salary_txt%" />
+                        <br/>
+                        Total Annual Package: $&nbsp;<input type="text" id="expected_total" value="%expected_total_txt%" />
                     </td>
                 </tr>
                 <tr>
