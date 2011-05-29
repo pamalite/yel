@@ -669,10 +669,10 @@ if ($_POST['action'] == 'save_career') {
     $data['total_work_years'] = $_POST['total_years'];
     $data['expected_salary_currency'] = $_POST['expected_currency'];
     $data['expected_salary'] = $_POST['expected_salary'];
-    $data['expected_salary_end'] = $_POST['expected_salary_end'];
+    $data['expected_total_annual_package'] = $_POST['expected_total_annual_package'];
     $data['current_salary_currency'] = $_POST['current_currency'];
     $data['current_salary'] = $_POST['current_salary'];
-    $data['current_salary_end'] = $_POST['current_salary_end'];
+    $data['current_total_annual_package'] = $_POST['current_total_annual_package'];
     $data['preferred_job_location_1'] = sql_nullify($_POST['pref_job_loc_1']);
     $data['preferred_job_location_2'] = sql_nullify($_POST['pref_job_loc_2']);
     $data['updated_on'] = date('Y-m-d');

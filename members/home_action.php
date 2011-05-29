@@ -212,6 +212,7 @@ if ($_POST['action'] == 'import_linkedin') {
         exit();
     }
     
+    $mysqli = Database::connect();
     $nodes = $xml_dom->get('position');
     foreach ($nodes as $node) {
         $data = array();
@@ -222,6 +223,20 @@ if ($_POST['action'] == 'import_linkedin') {
                     break;
                 case 'employer':
                     $data['employer'] = sql_nullify($child->nodeValue);
+                    break;
+                case 'employer_industry':
+                    // match to YE industry
+                    $query = "SELECT industries.id 
+                              FROM industries 
+                              LEFT JOIN linkedin_industry_map ON industries.industry = linkedin_industry_map.ye_industry
+                              WHERE linkedin_industry_map.linkedin_industry = '". $child->nodeValue. "' 
+                              LIMIT 1";
+                    $industry_results = $mysqli->query($query);
+                    if (is_null($industry_results) || empty($industry_results)) {
+                        $data['employer_specialization'] = 'NULL';
+                    } else {
+                        $data['employer_specialization'] = $industry_results[0]['id'];
+                    }
                     break;
                 case 'summary':
                     $data['summary'] = sql_nullify($child->nodeValue);

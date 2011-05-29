@@ -323,8 +323,8 @@ function show_career() {
 }
 
 function save_career() {
-    if (isNaN($('expected_salary').value) || isNaN($('expected_salary_end').value) ||
-        isNaN($('current_salary').value) || isNaN($('current_salary_end').value)) {
+    if (isNaN($('expected_salary').value) || isNaN($('expected_total').value) ||
+        isNaN($('current_salary').value) || isNaN($('current_total').value)) {
         alert('Salary fields must be a number.' + "\n\nEnter 0 if no value required.");
         return false;
     }
@@ -354,10 +354,10 @@ function save_career() {
     params = params + '&total_years=' + $('total_years').value;
     params = params + '&expected_currency=' + $('expected_salary_currency').options[$('expected_salary_currency').selectedIndex].value;
     params = params + '&expected_salary=' + $('expected_salary').value;
-    params = params + '&expected_salary_end=' + $('expected_salary_end').value;
+    params = params + '&expected_total_annual_package=' + $('expected_total').value;
     params = params + '&current_currency=' + $('current_salary_currency').options[$('current_salary_currency').selectedIndex].value;
     params = params + '&current_salary=' + $('current_salary').value;
-    params = params + '&current_salary_end=' + $('current_salary_end').value;
+    params = params + '&current_total_annual_package=' + $('current_total').value;
     
     var pref_country_1 = $('pref_job_loc_1').options[$('pref_job_loc_1').selectedIndex].value;
     if (pref_country_1 == '0') {

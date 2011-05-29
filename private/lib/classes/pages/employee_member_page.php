@@ -826,17 +826,18 @@ class EmployeeMemberPage extends Page {
                                     <td class="field">
                                         <?php 
                                             $this->generate_currencies('current_salary_currency', $profile['current_salary_currency']); 
-                                        ?>$ &nbsp;<input class="salary" type="text" id="current_salary" value="<?php echo $profile['current_salary'] ?>" /> - <input class="salary" type="text" id="current_salary_end" value="<?php echo $profile['current_salary_end'] ?>" /></td>
+                                        ?><br/>
+                                        Basic Monthly: $ &nbsp;<input class="salary" type="text" id="current_salary" value="<?php echo $profile['current_salary'] ?>" /><br/>
+                                        Total Annual Package: $ &nbsp;<input class="salary" type="text" id="current_total" value="<?php echo $profile['current_total_annual_package'] ?>" /></td>
                                 </tr>
                                 <tr>
                                     <td class="label"><label for="expected_salary">Expected Salary:</label></td>
                                     <td class="field">
                                         <?php 
                                             $this->generate_currencies('expected_salary_currency', $profile['expected_salary_currency']); 
-                                        ?>$&nbsp;
-                                        <input class="salary" type="text" id="expected_salary" value="<?php echo $profile['expected_salary'] ?>" /> 
-                                        - 
-                                        <input class="salary" type="text" id="expected_salary_end" value="<?php echo $profile['expected_salary_end'] ?>" />
+                                        ?><br/>
+                                        Basic Monthly: $ &nbsp;<input class="salary" type="text" id="expected_salary" value="<?php echo $profile['expected_salary'] ?>" /><br/>
+                                        Total Annual Package: $ &nbsp;<input class="salary" type="text" id="expected_total" value="<?php echo $profile['expected_total_annual_package'] ?>" />
                                     </td>
                                 </tr>
                                 <tr>

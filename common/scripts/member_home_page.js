@@ -478,9 +478,10 @@ function import_from_linkedin() {
             var position = '<position>' + "\n";
             var title = '<title>'  + htmlspecialchars(positions[i].title) + '</title>' + "\n";
             var employer = '<employer>' + htmlspecialchars(positions[i].company.name) + '</employer>' + "\n";
+            var emp_industry = '<employer_industry>' + htmlspecialchars(positions[i].company.industry) + '</employer_industry>' + "\n";
             var summary = '<summary>' + htmlspecialchars(positions[i].summary) + '</summary>' + "\n";
             
-            position = position + title + employer + summary;
+            position = position + title + employer + emp_industry + summary;
             
             var start_date = '<work_from>' + positions[i].startDate.year; 
             if (parseInt(positions[i].startDate.month) < 10) {
