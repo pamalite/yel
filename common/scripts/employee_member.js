@@ -1180,7 +1180,6 @@ function update_job_profiles() {
                 var work_froms = xml.getElementsByTagName('formatted_work_from');
                 var work_tos = xml.getElementsByTagName('formatted_work_to');
                 var companies = xml.getElementsByTagName('employer');
-                var emp_descs = xml.getElementsByTagName('employer_description');
                 var emp_specializations = xml.getElementsByTagName('employer_specialization');
                 
                 var profiles_table = new FlexTable('job_profiles_table', 'job_profiles');
@@ -1207,8 +1206,7 @@ function update_job_profiles() {
                     row.set(2, new Cell(work_to, '', 'cell date'));
                     
                     var employer = companies[i].childNodes[0].nodeValue;
-                    employer = employer + '<br/><span class="mini_spec">' + emp_specializations[i].childNodes[0].nodeValue + '</span><br/>';
-                    employer = employer + '<span class="mini_emp_desc">' + emp_descs[i].childNodes[0].nodeValue + '</span>'
+                    employer = employer + '<br/><span class="mini_spec">' + emp_specializations[i].childNodes[0].nodeValue + '</span>';
                     row.set(3, new Cell(employer, '', 'cell'));
                     
                     var position = position_titles[i].childNodes[0].nodeValue;
@@ -1304,7 +1302,6 @@ function show_job_profile_popup(_id) {
         $('work_to_month').selectedIndex = 0;
         $('work_to_year').value = 'yyyy';
         $('company').value = '';
-        $('emp_desc').selectedIndex = 0;
         $('job_summary').value = '';
         
         show_window('job_profile_window');
