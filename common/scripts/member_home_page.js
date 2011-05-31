@@ -470,24 +470,53 @@ function import_from_linkedin() {
         
         // 1. get the data from linkedin
         var member = _profiles.values[0];
-        var seeking_txt = member.headline + "\n\n" + member.summary;
+        var seeking_txt = ''; 
+        if (member.headline != null) {
+            seeking_txt = member.headline;
+        }
+        
+        if (member.summary != null) {
+            seeking_txt = seeking_txt + "\n\n" + member.summary;
+        }
         
         var positions = member.positions.values;
         var positions_txt = '<positions>';
         for (var i=0; i < parseInt(member.positions._total); i++) {
             var position = '<position>' + "\n";
-            var title = '<title>'  + htmlspecialchars(positions[i].title) + '</title>' + "\n";
-            var employer = '<employer>' + htmlspecialchars(positions[i].company.name) + '</employer>' + "\n";
-            var emp_industry = '<employer_industry>' + htmlspecialchars(positions[i].company.industry) + '</employer_industry>' + "\n";
-            var summary = '<summary>' + htmlspecialchars(positions[i].summary) + '</summary>' + "\n";
+            var title = '<title>';
+            if (positions[i].title != null) {
+                title = title + htmlspecialchars(positions[i].title);
+            }
+            title = title + '</title>' + "\n";
+            
+            var employer = '<employer>';
+            if (positions[i].company.name != null) {
+                employer = employer + htmlspecialchars(positions[i].company.name)
+            }
+            employer = employer + '</employer>' + "\n";
+            
+            var emp_industry = '<employer_industry>';
+            if (positions[i].company.industry) {
+                emp_industry = emp_industry + htmlspecialchars(positions[i].company.industry);
+            }
+            emp_industry = emp_industry + '</employer_industry>' + "\n";
+            
+            var summary = '<summary>';
+            if (positions[i].summary) {
+                summary = summary + htmlspecialchars(positions[i].summary);
+            }
+            summary = summary  + '</summary>' + "\n";
             
             position = position + title + employer + emp_industry + summary;
             
-            var start_date = '<work_from>' + positions[i].startDate.year; 
-            if (parseInt(positions[i].startDate.month) < 10) {
-                start_date = start_date + '-0' + positions[i].startDate.month + '-00';
-            } else {
-                start_date = start_date + '-' + positions[i].startDate.month + '-00';
+            var start_date = '<work_from>';
+            if (positions[i].startDate != null) {
+                start_date = start_date + positions[i].startDate.year; 
+                if (parseInt(positions[i].startDate.month) < 10) {
+                    start_date = start_date + '-0' + positions[i].startDate.month + '-00';
+                } else {
+                    start_date = start_date + '-' + positions[i].startDate.month + '-00';
+                }
             }
             start_date = start_date + '</work_from>' + "\n";
             
