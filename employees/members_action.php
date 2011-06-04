@@ -8,10 +8,12 @@ session_start();
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
-function create_member_from($_email_addr, $_fullname, $_phone) {
+function create_member_from($_email_addr, $_fullname, $_phone, $_employee_id) {
     if (empty($_email_addr) || empty($_fullname) || empty($_phone)) {
         return false;
     }
+    
+    $employee = new Employee($_employee_id);
     
     $password = generate_random_string_of(6);
     $timestamp = now();
@@ -55,6 +57,12 @@ function create_member_from($_email_addr, $_fullname, $_phone) {
     //$subject = '['. $_email_addr. '] New Membership from Yellow Elevator';
     $subject = 'New Membership from Yellow Elevator';
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    if (!is_null($employee)) {
+        $emp_email = $employee->getEmailAddress();
+        if ($emp_email !== false && !empty($emp_email)) {
+            $headers .= 'Reply-To: '. $emp_email. "\n";
+        }
+    }
     $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
     
     mail($_email_addr, $subject, $message, $headers);
@@ -740,7 +748,8 @@ if ($_POST['action'] == 'sign_up') {
             if (is_null($result) || count($result) <= 0) {
                 if (create_member_from($buffer_result[0]['referrer_email'], 
                                        $buffer_result[0]['referrer_name'], 
-                                       $buffer_result[0]['referrer_phone']) === false) {
+                                       $buffer_result[0]['referrer_phone'], 
+                                       $_POST['employee_id']) === false) {
                     $needs_to_be_connected = false;
                     $referrer_successfully_created = false;
                 } else {
@@ -760,7 +769,8 @@ if ($_POST['action'] == 'sign_up') {
         if (is_null($result) || count($result) <= 0) {
             if (create_member_from($buffer_result[0]['candidate_email'], 
                                    $buffer_result[0]['candidate_name'], 
-                                   $buffer_result[0]['candidate_phone']) === false) {
+                                   $buffer_result[0]['candidate_phone'], 
+                                   $_POST['employee_id']) === false) {
                 echo 'ko:member';
                 exit();
             }

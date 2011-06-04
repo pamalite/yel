@@ -1247,6 +1247,7 @@ function make_member_from(_app_id) {
     
     var params = 'id=' + _app_id;
     params = params + '&action=sign_up';
+    params = params + '&employee_id=' + user_id;
     
     var uri = root + "/employees/members_action.php";
     var request = new Request({
@@ -1291,6 +1292,7 @@ function transfer_to_member(_app_id) {
     // separting them is to manage them more easily
     var params = 'id=' + _app_id;
     params = params + '&action=sign_up';
+    params = params + '&employee_id=' + user_id;
     
     var uri = root + "/employees/members_action.php";
     var request = new Request({
