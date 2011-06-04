@@ -99,10 +99,7 @@ if ($_POST['action'] == 'sign_up') {
     
     $member_note = 'To kick-start your membership at Yellow Elevator, please activate the account that'. "\r\n". 'you have created at the following link:';
     if ($is_exists) {
-        $member_note = 'Also, according to our records, you have previously signed up with'. "\r\n".
-'YellowElevator.com with the same email address. Please re-activate and update' ."\r\n". 
-'your account with the following link and sign in with the password you have'. "\r\n". 
-'just signed up with.';
+        $member_note = 'According to our records, it looks like we already have your profile in our system.'. "\r\n". 'Please click on the link below to re-activate your account:';
         
         $ps = 'If you received this re-activation email WITHOUT SIGNING UP with YellowElevator.com,'. "\r\n". 
 'please contact us at "team.my@yellowelevator.com" AS SOON AS POSSIBLE!';
