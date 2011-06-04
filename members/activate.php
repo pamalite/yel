@@ -71,5 +71,6 @@ $subject = "Welcome to YellowElevator.com";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
 mail($_POST['email_addr'], $subject, $message, $headers);
 
-redirect_to('login.php?signed_up=activated');
+// redirect_to('login.php?signed_up=activated');
+redirect_to('../welcome.php');
 ?>
