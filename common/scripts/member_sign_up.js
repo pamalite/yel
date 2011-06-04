@@ -228,7 +228,7 @@ function sign_up() {
         onSuccess: function(txt, xml) {
             set_status('');
             if (txt == 'ok - is_exists') {
-                alert('Congratulations! You have successfully signed up with us.' + "\n\n" + 'It looks like we already have your profile in our system. Please sign in to check it out.' + "\n\n" + 'An activation e-mail has been sent to your registered email account to re-activate your account with us. Upon re-activation, please sign in with your registered email address and your newly created password.' "\n\n" +  'Please check your Junk / Spam mail boxes if you do not receive the activation e-mail in your Inbox. Thank you.');
+                alert('Congratulations! You have successfully signed up with us.' + "\n\n" + 'It looks like we already have your profile in our system. Please sign in to check it out.' + "\n\n" + 'An activation e-mail has been sent to your registered email account to re-activate your account with us. Upon re-activation, please sign in with your registered email address and your newly created password.' + "\n\n" +  'Please check your Junk / Spam mail boxes if you do not receive the activation e-mail in your Inbox. Thank you.');
 
                 location.replace(root);
                 return;
