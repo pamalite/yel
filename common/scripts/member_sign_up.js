@@ -1,3 +1,6 @@
+var seed = "";
+var sid = "";
+
 function reset_field(_field) {
     _field.style.borderColor = '';
     _field.style.borderStyle = '';
@@ -359,7 +362,153 @@ function show_promo_tnc() {
     window.open(root + '/common/images/promotions/starbucks/t_n_c.jpg', '', 'width=420px,height=810px,scrollbar=no,menubar=no,location=no');
 }
 
+function on_linkedin_auth() {
+    set_status('Please wait... Signing up through LinkedIn...');
+    
+    IN.API.Profile("me").result(function(me) {
+        var linkedin_id = me.values[0].id;
+        var linkedin_firstname = me.values[0].firstName;
+        var linkedin_lastname = me.values[0].lastName;
+        
+        if (isEmpty(linkedin_id) || linkedin_id == null) {
+            alert('Cannot sign up through LinkedIn. Please use normal sign up instead.');
+            set_status('');
+            return;
+        }
+        
+        var params = 'id=' + linkedin_id + '&action=linkedin_auth';
+        var request = new Request({
+            url: 'login_action.php',
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('Cannot sign up through LinkedIn. Please use normal sign up instead.');
+                    set_status('');
+                    return;
+                }
+                
+                var new_linkedin = false;
+                var member_id = '';
+                if (isEmpty(txt)) {
+                    member_id = prompt('Please enter your email address again.');
+                    if (member_id == false) {
+                        alert('You have chosen not to sign up through LinkedIn.' + "\n\n" + 'Cannot sign up through LinkedIn. Please use normal sign up instead.');
+                        set_status('');
+                        return;
+                    }
+                    
+                    while (!isEmail(member_id)) {
+                        member_id = prompt('The email address entered is invalid.' + "\n\n" + 'Please enter your email address again.');
+                        
+                        if (member_id == false) {
+                            alert('Sign Up via LinkedIn was canceled.');
+                            set_status('');
+                            return;
+                        }
+                    }
+                    
+                    new_linkedin = true;
+                } else {
+                    if (!isEmail(txt)) {
+                        alert('Cannot sign up through LinkedIn. Please use normal sign up instead.');
+                        set_status('');
+                        return;
+                    }
+                    
+                    member_id = txt;
+                }
+                
+                login_via_linkedin(member_id, linkedin_id, linkedin_firstname, 
+                                   linkedin_lastname, new_linkedin);
+            }
+        });
+
+        request.send(params);
+    });
+}
+
+function login_via_linkedin(_member_id, _linkedin_id, _linkedin_firstname,
+                            _linkedin_lastname, _is_new) {
+    var params = 'id=' + _member_id + '&action=linkedin_login';
+    params = params + '&linkedin_id=' + _linkedin_id;
+    params = params + '&linkedin_firstname=' + _linkedin_firstname;
+    params = params + '&linkedin_lastname=' + _linkedin_lastname;
+    if (isEmpty(seed) || isEmpty(sid)) {
+        params = params + '&sid=&hash=';
+    } else {
+        var hash = sha1(_member_id + md5(_linkedin_id) + seed);
+        params = params + '&sid=' + sid + '&hash=' + hash;
+    }
+    
+    if (_is_new) {
+        params = params + '&is_new=1';
+    } else {
+        params = params + '&is_new=0';
+    }
+    
+    var request = new Request({
+        url: 'login_action.php',
+        onSuccess: function(txt, xml) {
+            if (xml.getElementsByTagName('errors').length != 0) {
+                
+                var errors = xml.getElementsByTagName('error');
+                var msg = errors[0].childNodes[0].nodeValue;
+                if (msg == 'create_error') {
+                    alert('An error occured while signing up with LinkedIn account.');
+                }
+
+                if (msg == 'update_error') {
+                    alert('An error occured while associating your existing account with LinkedIn.');
+                }
+
+                if (msg == 'hacking_detected') {
+                    alert('Another LinkedIn user has already used this email address.');
+                }
+
+                if (msg == "bad_login") {
+                    location.replace(root + '/errors/failed_login.php?dir=members');
+                }
+                
+                set_status('');
+                logout_from_linkedin();
+                return;
+            }
+            
+            var status = xml.getElementsByTagName('status');
+            
+            if (status[0].childNodes[0].nodeValue == 'ok') {
+                location.replace('home.php');
+            }
+        }
+    });
+
+    request.send(params);
+}
+
+function get_seed() {
+    var seed_uri = 'members/seed.php';
+    var request = new Request({
+        url: seed_uri,
+        onSuccess: function(txt, xml) {
+            // set_status("");
+            
+            if (xml.getElementsByTagName('errors').length != 0) {
+                location.replace(root + '/errors/temporarily_down.php');
+            }
+            
+            var sids = xml.getElementsByTagName('id');
+            var seeds = xml.getElementsByTagName('seed');
+            
+            sid = sids[0].childNodes[0].nodeValue;
+            seed = seeds[0].childNodes[0].nodeValue;
+        }
+    });
+    
+    request.send();
+}
+
 function onDomReady() {
+    get_seed();
+    
     $('promo_button').addEvent('click', show_promo_tnc);
     $('promo_button').addEvent('mouseover', function(_event) {
         $('promo_button').setStyle('cursor', 'pointer');

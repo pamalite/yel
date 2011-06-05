@@ -221,7 +221,7 @@ class JobPage extends Page {
         } else if ($job === false) {
             $error_message = 'An error occured while loading the job details.';
         } else if ($job['expired'] >= 0 || $job['closed'] == 'Y') {
-            $error_message = 'The job that you are looking for is no longer available.';
+            // $error_message = 'The job that you are looking for is no longer available.';
         }
         
         // format tags to HTML
