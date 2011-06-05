@@ -1981,6 +1981,7 @@ function close_employment_popup(_to_confirm) {
         params = params + '&employed_on=' + $('employment_year_label').get('html') + '-' + $('employment_month').options[$('employment_month').selectedIndex].value + '-' + $('employment_day').options[$('employment_day').selectedIndex].value;
         params = params + '&work_commence_on=' + $('work_year_label').get('html') + '-' + $('work_month').options[$('work_month').selectedIndex].value + '-' + $('work_day').options[$('work_day').selectedIndex].value;
         params = params + '&salary=' + $('salary').value;
+        params = params + '&employee_id=' + user_id;
         
         var uri = root + "/employees/members_action.php";
         var request = new Request({

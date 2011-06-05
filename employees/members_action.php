@@ -1099,6 +1099,12 @@ if ($_POST['action'] == 'confirm_employed') {
     $previous_referral = '0';
     $previous_invoice = '0';
     
+    $employee = new Employee($_POST['employee_id']);
+    $employee_email = $employee->getEmailAddress();
+    if (is_null($employee_email) || empty($employee_email) || $employee_email === false) {
+        $employee_email = '';
+    }
+    
     // 1. Update the referral to employed
     $referral = new Referral($_POST['id']);
     
@@ -1406,6 +1412,9 @@ if ($_POST['action'] == 'confirm_employed') {
 
         $subject = "Notice of Invoice ". pad($invoice, 11, '0');
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+        if (!empty($employee_email)) {
+            $headers .= 'Reply-To: '. $employee_email. "\n";
+        }
         $headers .= 'Bcc: '. $sales. "\n";
         $headers .= 'MIME-Version: 1.0'. "\n";
         $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $filename. '";'. "\n\n";
@@ -1527,6 +1536,9 @@ if ($_POST['action'] == 'confirm_employed') {
 
             $subject = "Balance Refund Notice of Invoice ". pad($previous_invoice, 11, '0');
             $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+            if (!empty($employee_email)) {
+                $headers .= 'Reply-To: '. $employee_email. "\n";
+            }
             $headers .= 'Bcc: '. $sales. "\n";
             $headers .= 'MIME-Version: 1.0'. "\n";
             $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $filename. '";'. "\n\n";
