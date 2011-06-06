@@ -342,7 +342,7 @@ class MemberSearch {
         if (!empty($this->position) || !empty($this->employer) || 
             $this->specialization > 0 || $this->emp_specialization > 0 || 
             $this->emp_desc > 0) {
-            $joins .= "LEFT JOIN member_job_profiles ON member_job_profiles.member = members.email_addr";
+            $joins .= " LEFT JOIN member_job_profiles ON member_job_profiles.member = members.email_addr";
         }
         
         if (array_key_exists('seeking', $match_against)) {
