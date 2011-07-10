@@ -162,7 +162,7 @@
                             Thank you for choosing Yellow Elevator.<br/><br/>
             
                             Yellow Elevator<br/>
-                            Refer a job
+                            The Fast Way Up
                             </font>
                         </td>
                     </tr>

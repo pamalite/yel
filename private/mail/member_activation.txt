@@ -1,4 +1,4 @@
-Hi,
+Congratulations!
 
 You have successfully signed up with YellowElevator.com. However, you may 
 disregard this e-mail if you have received it by mistake. 
@@ -11,6 +11,6 @@ Then, please sign in using your registered e-mail address and newly created
 password. Thank you.
 
 Yellow Elevator
-Refer a job
+The Fast Way Up
 
 %ps%

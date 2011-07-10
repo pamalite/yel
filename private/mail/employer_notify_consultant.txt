@@ -25,4 +25,4 @@ Applied On: %referred_on%
 === Application Details end ===
 
 Yellow Elevator
-Refer a job
+The Fast Way Up

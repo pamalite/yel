@@ -10,4 +10,4 @@ Candidate Current Position: %candidate_current_position%
 Has Resume: %has_resume%
 
 Yellow Elevator
-Refer a job
+The Fast Way Up

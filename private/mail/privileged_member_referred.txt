@@ -19,4 +19,4 @@ application will only automatically be submitted once the account is
 activated.
 
 Yellow Elevator
-Refer a job
+The Fast Way Up

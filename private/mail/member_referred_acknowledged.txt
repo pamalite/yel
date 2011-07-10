@@ -11,4 +11,4 @@ To sign into your account, go to: %protocol%://%root%/members/
 We wish you good luck in your new job application!
 
 Yellow Elevator
-Refer a job
+The Fast Way Up

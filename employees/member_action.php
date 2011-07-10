@@ -82,8 +82,7 @@ if ($_POST['action'] == 'save_profile') {
         $message = str_replace('%temporary_password%', $new_password, $message);
         $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
         $message = str_replace('%root%', $GLOBALS['root'], $message);
-        $subject = "Welcome To Yellow Elevator!";
-        //$subject = "[". $_POST['email_addr']. "] Welcome To Yellow Elevator!";
+        $subject = 'YellowElevator.com Job Recruitment Agency ('. $_POST['firstname']. ', '. $_POST['lastname']. ')' ;
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
         mail($_POST['email_addr'], $subject, $message, $headers);

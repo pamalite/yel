@@ -7,4 +7,4 @@ Please go to to the following URL to check it out.
 %protocol%://%root%/members/
 
 Yellow Elevator
-Refer a job
+The Fast Way Up

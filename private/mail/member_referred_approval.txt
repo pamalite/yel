@@ -14,4 +14,4 @@ Please click on the following link to go to:
 %protocol%://%root%/members/
 
 Yellow Elevator
-Refer a job
+The Fast Way Up
