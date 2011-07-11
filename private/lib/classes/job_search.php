@@ -67,10 +67,13 @@ class JobSearch {
         $this->log_search_criteria();
         $boolean_mode = '';
         
-        $match_against = "MATCH (job_index.title, 
-                                 job_index.description, 
-                                 job_index.state) 
-                          AGAINST ('". $this->keywords. "' IN BOOLEAN MODE)";
+        // $match_against = "MATCH (job_index.title, 
+        //                          job_index.description, 
+        //                          job_index.state) 
+        //                   AGAINST ('". $this->keywords. "' IN BOOLEAN MODE)";
+        
+        $match_against = "MATCH (job_index.title) 
+                          AGAINST ('". str_replace(' ', ' +', $this->keywords). "' IN BOOLEAN MODE)";
         
         $filter_job_status = "jobs.closed = 'N' AND jobs.deleted = FALSE AND jobs.expire_on >= CURDATE()";
         
