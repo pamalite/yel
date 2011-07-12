@@ -88,17 +88,17 @@ function close_apply_popup(_proceed_refer) {
             return false;
         }
         
-        // if ($('apply_resume').disabled) {
-        //     if ($('existing_resume').selectedIndex == 0) {
-        //         alert('You need to supply us a resume for screening.');
-        //         return false;
-        //     }
-        // } else {
-        //     if (isEmpty($('apply_resume').value)) {
-        //         alert('You need to supply us a resume for screening.');
-        //         return false;
-        //     }
-        // }
+        if ($('apply_resume').disabled) {
+            if ($('existing_resume').selectedIndex == 0) {
+                alert('You need to supply us a resume for screening.');
+                return false;
+            }
+        } else {
+            if (isEmpty($('apply_resume').value)) {
+                alert('You need to supply us a resume for screening.');
+                return false;
+            }
+        }
         
         close_safari_connection();
         // $('apply_form').submit();
