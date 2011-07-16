@@ -1816,12 +1816,12 @@ if ($_POST['action'] == 'bulk_add_new_candidates') {
         $subject = 'YellowElevator.com Job Recruitment Agency ('. $data['firstname']. ', '. $data['lastname']. ')' ;
         $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
         $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
-        // mail($candidate['email_addr'], $subject, $message, $headers);
+        mail($candidate['email_addr'], $subject, $message, $headers);
         
-        $handle = fopen('/tmp/email_to_'. $candidate['email_addr']. '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $message);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_'. $candidate['email_addr']. '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
         
         $members[] = $candidate;
     }
@@ -1877,12 +1877,12 @@ if ($_POST['action'] == 'bulk_add_new_candidates') {
             $message = 'ALL candidates career profiles were successfully added!!!'. "\n\n";
         }
         
-        // mail('team.my@yellowelevator.com', $subject, $message, $headers);
+        mail('team.my@yellowelevator.com', $subject, $message, $headers);
         
-        $handle = fopen('/tmp/email_to_team.yel'. '.txt', 'w');
-        fwrite($handle, 'Subject: '. $subject. "\n\n");
-        fwrite($handle, $message);
-        fclose($handle);
+        // $handle = fopen('/tmp/email_to_team.yel'. '.txt', 'w');
+        // fwrite($handle, 'Subject: '. $subject. "\n\n");
+        // fwrite($handle, $message);
+        // fclose($handle);
         
         redirect_to('members.php?page=members&error=c3');
         exit();
