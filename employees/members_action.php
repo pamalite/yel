@@ -1729,4 +1729,167 @@ if ($_POST['action'] == 'bulk_add_new_applicants') {
     exit();
 }
 
+if ($_POST['action'] == 'bulk_add_new_candidates') {
+    $employee = new Employee($_POST['id']);
+    $branch = $employee->getBranch();
+    $yel_email = 'team.'. strtolower($branch[0]['country']). '@yellowelevator.com';
+    
+    // 1. convert from CSV to array
+    $candidates = array();
+    $joined_on = now();
+    if (move_uploaded_file($_FILES['members_csv_file']['tmp_name'], "/tmp/". basename($_FILES['members_csv_file']['tmp_name']))) {
+        $handle = fopen("/tmp/". basename($_FILES['members_csv_file']['tmp_name']), 'r');
+        if ($handle !== false) {
+            while (($row = fgetcsv($handle)) !== false) {
+                if (count($row) < 11) {
+                    continue;
+                }
+                
+                $candidate = array();
+                $candidate['joined_on'] = $joined_on;
+                $candidate['updated_on'] = $joined_on;
+                $candidate['added_by'] = $employee->getId();
+                $candidate['email_addr'] = $row[0];
+                $candidate['firstname'] = $row[1];
+                $candidate['lastname'] = $row[2];
+                $candidate['phone_num'] = $row[3];
+                $candidate['citizenship'] = strtoupper($row[4]);
+                $candidate['total_work_years'] = sql_nullify($row[5]);
+                $candidate['position_title'] = sql_nullify($row[6]);
+                $candidate['work_from'] = sql_nullify($row[7]);
+                $candidate['work_to'] = sql_nullify($row[8]);
+                $candidate['employer'] = sql_nullify($row[9]);
+                $candidate['employer_specialization'] = sql_nullify($row[10]);
+                
+                $candidates[] = $candidate;
+            }
+        }
+        fclose($handle);
+        
+        @unlink("/tmp/". basename($_FILES['members_csv_file']['tmp_name']));
+    } else {
+        redirect_to('members.php?page=members&error=c1');
+        exit();
+    }
+    
+    // 2. add candidates by creating passwords and send out email
+    $failed_members = array();
+    $members = array();
+    
+    foreach ($candidates as $candidate) {
+        $member = new Member($candidate['email_addr']);
+        
+        $data = array();
+        $data['firstname'] = $candidate['firstname'];
+        $data['lastname'] = $candidate['lastname'];
+        $data['phone_num'] = $candidate['phone_num'];
+        $data['citizenship'] = $candidate['citizenship'];
+        $data['total_work_years'] = $candidate['total_work_years'];
+        $data['updated_on'] = $candidate['updated_on'];
+        $data['joined_on'] = $candidate['joined_on'];
+        $data['added_by'] = $candidate['added_by'];
+        
+        $new_password = generate_random_string_of(6);
+        $hash = md5($new_password);
+        $data['password'] = $hash;
+        $data['forget_password_question'] = '1';
+        $data['forget_password_answer'] = 'system picked';
+        $data['active'] = 'Y';
+        $data['invites_available'] = '10';
+        
+        if ($member->create($data) === false) {
+            $failed_members[] = $candidate['email_addr'];
+            continue;
+        }
+        
+        $lines = file(dirname(__FILE__). '/../private/mail/member_welcome_with_password.txt');
+        $message = '';
+        foreach($lines as $line) {
+            $message .= $line;
+        }
+
+        $message = str_replace('%member%', $data['firstname']. ', '. $data['lastname'], $message);
+        $message = str_replace('%email_addr%', $candidate['email_addr'], $message);
+        $message = str_replace('%temporary_password%', $new_password, $message);
+        $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+        $message = str_replace('%root%', $GLOBALS['root'], $message);
+        $subject = 'YellowElevator.com Job Recruitment Agency ('. $data['firstname']. ', '. $data['lastname']. ')' ;
+        $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+        $headers .= 'Cc: team.my@yellowelevator.com'. "\n";
+        // mail($candidate['email_addr'], $subject, $message, $headers);
+        
+        $handle = fopen('/tmp/email_to_'. $candidate['email_addr']. '.txt', 'w');
+        fwrite($handle, 'Subject: '. $subject. "\n\n");
+        fwrite($handle, $message);
+        fclose($handle);
+        
+        $members[] = $candidate;
+    }
+    
+    // 3. add career profiles and experiences
+    $failed_careers = array();
+    
+    if (!empty($members)) {
+        foreach ($members as $candidate) {
+            $member = new Member($candidate['email_addr']);
+            
+            $data = array();
+            $data['position_title'] = $candidate['position_title'];
+            $data['employer'] = $candidate['employer'];
+            $data['employer_specialization'] = $candidate['employer_specialization'];
+            $data['work_from'] = $candidate['work_from'];
+            $data['work_to'] = $candidate['work_to'];
+            
+            if ($member->addJobProfile($data) === false) {
+                $failed_careers[] = $candidate['email_addr'];
+                continue;
+            }
+        }
+    } else {
+        redirect_to('members.php?page=members&error=c2');
+        exit();
+    }
+    
+    // 4. send the failed members to the executive
+    if (!empty($failed_members) || !empty($failed_careers)) {
+        $subject = 'Failure to bulk add these email addresses';
+        $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+        
+        $message = '';
+        if (!empty($failed_members)) {
+            $message = 'The following candidates failed to be added:'. "\n\n";
+            
+            foreach ($failed_members as $f_member) {
+                $message .= $f_member. "\n";
+            }
+        } else {
+            $message = 'ALL candidates were successfully added!!!'. "\n\n";
+        }
+        
+        $message .= "\n";
+        if (!empty($failed_careers)) {
+            $message .= 'The following candidates failed have their career profiles added:'. "\n\n";
+            
+            foreach ($failed_careers as $f_career) {
+                $message .= $f_career. "\n";
+            }
+        } else {
+            $message = 'ALL candidates career profiles were successfully added!!!'. "\n\n";
+        }
+        
+        // mail('team.my@yellowelevator.com', $subject, $message, $headers);
+        
+        $handle = fopen('/tmp/email_to_team.yel'. '.txt', 'w');
+        fwrite($handle, 'Subject: '. $subject. "\n\n");
+        fwrite($handle, $message);
+        fclose($handle);
+        
+        redirect_to('members.php?page=members&error=c3');
+        exit();
+    }
+    
+    redirect_to('members.php?page=members');
+    exit();
+}
+
 ?>

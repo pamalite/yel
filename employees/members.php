@@ -46,8 +46,14 @@ if (isset($_POST['page'])) {
     $section = $_GET['page'];
 }
 
+$error_code = '';
+if (isset($_GET['error'])) {
+    $error_code = $_GET['error'];
+}
+
 $home = new EmployeeMembersPage($_SESSION['yel']['employee']);
 $home->set_page($section);
+$home->set_error($error_code);
 $home->header(array('root_dir' => '../', 
                     'title' => 'Members'));
 $home->insert_employee_members_css();

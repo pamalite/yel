@@ -1665,6 +1665,25 @@ function close_bulk_new_applications_popup(_is_upload) {
     }
 }
 
+function show_bulk_new_members_popup() {
+    show_window('upload_new_members_window');
+    // window.scrollTo(0, 0);
+}
+
+function close_bulk_new_members_popup(_is_upload) {
+    if (_is_upload) {
+        if (isEmpty($('members_csv_file').value)) {
+            alert('You need to select a CSV file to upload.');
+            return false;
+        }
+        
+        close_safari_connection();
+        return true;
+    } else {
+        close_window('upload_new_members_window');
+    }
+}
+
 function show_referrer_popup(_id) {
     $('referral_buffer_id').value = _id;
     
@@ -2127,9 +2146,28 @@ function reset_reminder(_id, _is_buffer, _idx) {
     request.send(params);
 }
 
+function notify_error() {
+    if (!isEmpty(error)) {
+        if (error.substr(0, 1) == 'c') {
+            // adding candidates error
+            switch (error.substr(1, error.length-1)) {
+                case '1':
+                    alert('CSV file error. Cannot read/move file.');
+                    return;
+                case '2':
+                    alert('ERROR: NONE of the candidates were added!');
+                    return;
+                case '3':
+                    alert('There were errors occurred. Please check team.my inbox for details.');
+                    return;
+            }
+        }
+    }
+}
 
 function onDomReady() {
     initialize_page();
+    notify_error();
     
     switch (current_page) {
         case 'members':

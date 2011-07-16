@@ -8,6 +8,7 @@ class EmployeeMembersPage extends Page {
     private $current_page = 'applications';
     private $total_applications = 0;
     private $total_members = 0;
+    private $error_code = '';
     
     function __construct($_session) {
         parent::__construct();
@@ -17,6 +18,10 @@ class EmployeeMembersPage extends Page {
     
     public function set_page($_page) {
         $this->current_page = $_page;
+    }
+    
+    public function set_error($_error_code) {
+        $this->error_code = $_error_code;
     }
     
     public function insert_inline_css() {
@@ -35,6 +40,12 @@ class EmployeeMembersPage extends Page {
         $script = 'var id = "'. $this->employee->getId(). '";'. "\n";
         $script .= 'var user_id = "'. $this->employee->getUserId(). '";'. "\n";
         $script .= 'var current_page = "'. $this->current_page. '";'. "\n";
+        
+        if (!empty($this->error_code)) {
+            $script .= 'var error = "'. $this->error_code. '";'. "\n";
+        } else {
+            $script .= 'var error = "";'. "\n";
+        }
         
         $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }
@@ -332,6 +343,7 @@ class EmployeeMembersPage extends Page {
                         </select>
                         of <span id="total_members_pages">0</span>
                     </div>
+                    <input class="button" type="button" id="add_new_member" name="add_new_member" value="Bulk Add New Candidates" onClick="show_bulk_new_members_popup();">
                     <input class="button" type="button" id="add_new_member" name="add_new_member" value="Add New Candidate" onClick="add_new_member();">
                 </div>
                 <div id="div_members">
@@ -617,8 +629,7 @@ class EmployeeMembersPage extends Page {
                     <input type="hidden" name="action" value="bulk_add_new_applicants" />
                     <div id="upload_progress" style="text-align: center; width: 99%; margin: auto;">
                         Please wait while new applicants are being uploaded... <br/><br/>
-                        <img src="%root%/common/images/progress/circle_big.gif" /><br/><br/>
-                        NOTE: To Safari/Chrome (WebKit) on Mac OS X users, the mentioned browsers have a problem uploading any file through this page. Please try Firefox to upload your resume.
+                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" /><br/><br/>
                     </div>
                     <div id="upload_field" class="upload_field">
                         <input id="csv_file" name="csv_file" type="file" />
@@ -630,12 +641,38 @@ class EmployeeMembersPage extends Page {
                     </div>
                 </div>
                 <div class="popup_window_buttons_bar">
-                    <input type="submit" value="Add" />
+                    <input type="submit" value="Bulk Add" />
                     <input type="button" value="Close" onClick="close_bulk_new_applications_popup(false);" />
                 </div>
             </form>
         </div>
         
+        <div id="upload_new_members_window" class="popup_window">
+            <div class="popup_window_title">Upload New Candidates (CSV)</div>
+            <form id="upload_csv_form" action="members_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_bulk_new_members_popup(true);">
+                <div class="upload_csv_form">
+                    <br/>
+                    <input type="hidden" id="id" name="id" value="<?php echo $this->employee->getUserId(); ?>" />
+                    <input type="hidden" name="action" value="bulk_add_new_candidates" />
+                    <div id="upload_progress" style="text-align: center; width: 99%; margin: auto;">
+                        Please wait while new candidates are being uploaded... <br/><br/>
+                        <img src="<?php echo $GLOBALS['protocol']. '://'. $GLOBALS['root']; ?>/common/images/progress/circle_big.gif" /><br/><br/>
+                    </div>
+                    <div id="upload_field" class="upload_field">
+                        <input id="members_csv_file" name="members_csv_file" type="file" />
+                        <div style="font-size: 9pt; margin-top: 15px;">
+                            <ol>
+                                <li>Only Comma Separated Verbose (CSV) file with less than 2MB are allowed.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup_window_buttons_bar">
+                    <input type="submit" value="Bulk Add" />
+                    <input type="button" value="Close" onClick="close_bulk_new_members_popup(false);" />
+                </div>
+            </form>
+        </div>
         <?php
     }
 }

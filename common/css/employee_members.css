@@ -487,7 +487,8 @@ span.remind.warn {
     color: #00CC00;
 }
 
-#upload_new_applicants_window {
+#upload_new_applicants_window,
+#upload_new_members_window {
     width: 450px;
     display: none;
 }
