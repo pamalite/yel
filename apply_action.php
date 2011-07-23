@@ -3,6 +3,11 @@ require_once dirname(__FILE__). '/private/lib/utilities.php';
 
 session_start();
 
+if (empty($_POST) && empty($_GET)) {
+    echo 'Error processing application.';
+    exit();
+}
+
 // 1. initialize the parameters
 $candidate = array();
 $candidate['email_addr'] = sanitize($_POST['apply_email']);
@@ -65,15 +70,19 @@ if ($buffer_id === false) {
 $has_resume = 'NO';
 $file_path = '';
 $resume_text = '';
+$file_type = '';
+$filename = '';
 if (!empty($_FILES['apply_resume']['name'])) {
     $type = $_FILES['apply_resume']['type'];
     $size = $_FILES['apply_resume']['size'];
     $name = $_FILES['apply_resume']['name'];
+    $filename = basename($name);
     $temp = $_FILES['apply_resume']['tmp_name'];
     
     if ($size <= $GLOBALS['resume_size_limit'] && $size > 0) {
         foreach ($GLOBALS['allowable_resume_types'] as $mime_type) {
             if ($type == $mime_type) {
+                $file_type = $type;
                 $hash = generate_random_string_of(6);
                 $new_name = $buffer_id. ".". $hash;
                 $file_path = $GLOBALS['buffered_resume_dir']. "/". $new_name;
@@ -185,7 +194,7 @@ if (!empty($_POST['current_employer'])) {
 }
 
 $message = str_replace('%employer_id%', $employer_id, $message);
-$message = str_replace('%employer%', $employer_name, $message);
+$message = str_replace('%employer%', $candidate['current_employer'], $message);
 $message = str_replace('%candidate%', htmlspecialchars_decode(stripslashes($candidate['name'])), $message);
 $message = str_replace('%candidate_phone%', $candidate['phone_num'], $message);
 $message = str_replace('%candidate_email%', $candidate['email_addr'], $message);
@@ -196,12 +205,37 @@ $message = str_replace('%has_resume%', $has_resume, $message);
 
 $subject = "New Application for ". $job->getTitle(). " position";
 $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-mail($branch_email, $subject, $message, $headers);
 
-// $handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
-// fwrite($handle, 'Subject: '. $subject. "\n\n");
-// fwrite($handle, $message);
-// fclose($handle);
+$body = '';
+if (!empty($file_type)) {
+    $headers .= 'MIME-Version: 1.0'. "\n";
+    $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $filename. '";'. "\n\n";
+    
+    $body = '--yel_mail_sep_'. $filename. "\n";
+    $body .= 'Content-Type: multipart/alternative; boundary="yel_mail_sep_alt_'. $filename. '"'. "\n";
+    $body .= '--yel_mail_sep_alt_'. $filename. "\n";
+    $body .= 'Content-Type: text/plain; charset="iso-8859-1"'. "\n";
+    $body .= 'Content-Transfer-Encoding: 7bit"'. "\n";
+}
+
+$body .= $message. "\n";
+
+if (!empty($file_type)) {
+    $body .= '--yel_mail_sep_alt_'. $filename. "--\n\n";
+    $body .= '--yel_mail_sep_'. $filename. "\n";
+    $body .= 'Content-Type: '. $file_type. '; name="'. $filename. '"'.  "\n";
+    $body .= 'Content-Transfer-Encoding: base64'. "\n";
+    $body .= 'Content-Disposition: attachment'. "\n";
+    $body .= chunk_split(base64_encode(file_get_contents($file_path))). "\n";
+    $body .= '--yel_mail_sep_'. $filename. "--\n\n";
+}
+
+// mail($branch_email, $subject, $body, $headers);
+
+$handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
+fwrite($handle, 'Subject: '. $subject. "\n\n");
+fwrite($handle, $body);
+fclose($handle);
 
 redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?success=1');
 exit();
