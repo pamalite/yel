@@ -3,9 +3,8 @@ require_once dirname(__FILE__). '/private/lib/utilities.php';
 
 session_start();
 
-if (empty($_POST) && empty($_GET)) {
-    echo 'Error processing application.';
-    exit();
+if (!isset($_POST['job_id'])) {
+    redirect_to('welcome.php');
 }
 
 // 1. initialize the parameters
@@ -21,7 +20,7 @@ $job = new Job($job_id);
 
 // get employer info
 $criteria = array(
-    'criteria' => "jobs.employer, employers.name AS employer_name", 
+    'columns' => "jobs.employer, employers.name AS employer_name", 
     'joins' => "employers ON employers.id = jobs.employer", 
     'match' => "jobs.id = ". $job->getId(), 
     'limit' => "1"
@@ -170,6 +169,18 @@ if (!empty($_FILES['apply_resume']['name'])) {
         $data['resume_file_size'] = 'NULL';
         $data['resume_file_text'] = 'NULL';
         $referral_buffer->update($data);
+        
+        $criteria = array(
+            'columns' => "file_hash, file_type, file_name",
+            'match' => "id = ". $data['existing_resume_id']
+        );
+        
+        $cv = new Resume();
+        $result = $cv->find($criteria);
+        $file_path = $GLOBALS['resume_dir']. "/". $data['existing_resume_id']. '.'. $result[0]['file_hash'];
+        $filename = $result[0]['file_name'];
+        $file_type = $result[0]['file_type'];
+        $has_resume = 'EXISTING';
     } 
     // else {
     //     redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=3');
@@ -230,12 +241,12 @@ if (!empty($file_type)) {
     $body .= '--yel_mail_sep_'. $filename. "--\n\n";
 }
 
-// mail($branch_email, $subject, $body, $headers);
+mail($branch_email, $subject, $body, $headers);
 
-$handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
-fwrite($handle, 'Subject: '. $subject. "\n\n");
-fwrite($handle, $body);
-fclose($handle);
+// $handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
+// fwrite($handle, 'Subject: '. $subject. "\n\n");
+// fwrite($handle, $body);
+// fclose($handle);
 
 redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?success=1');
 exit();
