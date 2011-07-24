@@ -47,15 +47,16 @@ class JobPage extends Page {
         $this->insert_scripts(array('job.js', 'job_search_result.js'));
     }
     
-    public function insert_inline_scripts($_show_popup = '') {
+    public function insert_inline_scripts($_show_popup = '', $_buffer_id = '') {
         $script = 'var job_id = "'. $this->job_id. '";'. "\n";
         
         if (count($this->job) <= 0 || is_null($this->job) || $this->job === false) {
             $script .= 'var show_popup = "";'. "\n";
-        } else if ($this->job['expired'] >= 0 || $this->job['closed'] == 'Y') {
-            $script .= 'var show_popup = "";'. "\n";
+        // } else if ($this->job['expired'] >= 0 || $this->job['closed'] == 'Y') {
+        //     $script .= 'var show_popup = "";'. "\n";
         } else {
             $script .= 'var show_popup = "'. $_show_popup. '";'. "\n";
+            $script .= 'var buffer_id = "'. $_buffer_id. '";'. "\n";
         }
         
         if (!is_null($this->member)) {

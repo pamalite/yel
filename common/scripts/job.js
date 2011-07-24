@@ -111,6 +111,7 @@ function close_apply_popup(_proceed_refer) {
 }
 
 function show_apply_popup() {
+    $('buffer_id').value = buffer_id;
     show_window('apply_window');
     // window.scrollTo(0, 0);
 }
