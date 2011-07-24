@@ -67,6 +67,9 @@ if (empty($buffer_id)) {
         exit();
     }
 } else {
+    $referral_buffer = new ReferralBuffer($buffer_id);
+    $data['candidate_response'] = 'yes';
+    $data['candidate_responded_on'] = $today;
     if (($referral_buffer->update($data)) === false) {
         redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
         exit();
