@@ -211,6 +211,7 @@ class JobPage extends Page {
         if (!is_null($this->member)) {
             $this->menu('member');
         }
+        $this->howitworks();
         
         $job = $this->job;
         $career = $this->get_member_career();
@@ -230,6 +231,16 @@ class JobPage extends Page {
         $page = file_get_contents(dirname(__FILE__). '/../../../html/job_page.html');
         $page = str_replace('%root%', $this->url_root, $page);
         $page = str_replace('%job_id%', $this->job_id, $page);
+        
+        $toggle = '';
+        if (is_null($this->member)) {
+            $toggle = '<div class="howitworks_pulldown_bar">
+                <div class="pulldown job_page">
+                    <a class="no_link how_it_works" onClick="toggle_howitworks();">How Yellow Elevator Works? <img id="howitworks_arrow" src="../common/images/howitworks_down.gif" /></a>
+                </div>
+            </div>';
+        }
+        $page = str_replace('%howitworks_toggler%', $toggle, $page);
         
         if (!empty($error_message)) {
             $page = str_replace('%error_message%', $error_message, $page);

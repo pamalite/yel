@@ -13,6 +13,10 @@ div.howitworks_pulldown_bar div.pulldown {
     text-align: center;
 }
 
+div.howitworks_pulldown_bar div.job_page {
+    margin-left: 610px;
+}
+
 a.how_it_works {
     color: #666666;
 }
