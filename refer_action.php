@@ -3,6 +3,28 @@ require_once dirname(__FILE__). '/private/lib/utilities.php';
 
 session_start();
 
+function parse_candidates($_xml_str) {
+    if (empty($_xml_str)) {
+        return null;
+    }
+    
+    $candidates = array();
+    $dom = new XMLDOM();
+    $xml_dom = $dom->load_from_xml($_xml_str);
+    if (!empty($xml_dom)) {
+        $tags = array('email_addr', 'phone_num', 'name', 'current_position', 'current_employer');
+        $candidates = $dom->get_assoc($tags);
+        
+        foreach ($candidates as $i=>$candidate) {
+            $candidates[$i]['name'] = sanitize(stripslashes($_POST['candidate_name']));
+            $candidates[$i]['current_position'] = sanitize(stripslashes($_POST['current_position']));
+            $candidates[$i]['current_employer'] = sanitize(stripslashes($_POST['current_employer']));
+        }
+    }
+    
+    return $candidates;
+}
+
 if (!isset($_POST['job_id'])) {
     redirect_to('welcome.php');
 }
@@ -12,11 +34,14 @@ $referrer = array();
 $referrer['email_addr'] = sanitize($_POST['referrer_email']);
 $referrer['phone_num'] = sanitize($_POST['referrer_phone']);
 $referrer['name'] = sanitize(stripslashes($_POST['referrer_name']));
+$referrer['is_reveal_name'] = ($_POST['is_reveal_name'] == '1') ? '1' : '0';
 
-$candidate = array();
-$candidate['email_addr'] = sanitize($_POST['candidate_email']);
-$candidate['phone_num'] = sanitize($_POST['candidate_phone']);
-$candidate['name'] = sanitize(stripslashes($_POST['candidate_name']));
+$candidates = get_candidates($_POST['payload']);
+
+// $candidate = array();
+// $candidate['email_addr'] = sanitize($_POST['candidate_email']);
+// $candidate['phone_num'] = sanitize($_POST['candidate_phone']);
+// $candidate['name'] = sanitize(stripslashes($_POST['candidate_name']));
 
 $job_id = $_POST['job_id'];
 $job = new Job($job_id);
@@ -28,6 +53,9 @@ $data['requested_on'] = $today;
 $data['referrer_email'] = $referrer['email_addr'];
 $data['referrer_phone'] = $referrer['phone_num'];
 $data['referrer_name'] = $referrer['name'];
+$data['is_reveal_name'] = $referrer['is_reveal_name'];
+
+// TODO: loop through the number of candidates
 $data['candidate_email'] = $candidate['email_addr'];
 $data['candidate_phone'] = $candidate['phone_num'];
 $data['candidate_name'] = $candidate['name'];
@@ -40,6 +68,10 @@ if ($buffer_id === false) {
     redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
     exit();
 }
+
+// TODO: Send to team.my for reference
+// TODO: Send a yes/no email to each candidate. reveal the name of the referrer if is_reveal_name is set to 1
+
 
 // 2. check any files to upload
 $has_resume = 'NO';
