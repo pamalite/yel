@@ -16,9 +16,9 @@ function parse_candidates($_xml_str) {
         $candidates = $dom->get_assoc($tags);
         
         foreach ($candidates as $i=>$candidate) {
-            $candidates[$i]['name'] = sanitize(stripslashes($_POST['candidate_name']));
-            $candidates[$i]['current_position'] = sanitize(stripslashes($_POST['current_position']));
-            $candidates[$i]['current_employer'] = sanitize(stripslashes($_POST['current_employer']));
+            $candidates[$i]['name'] = sanitize(stripslashes($candidate['name']));
+            $candidates[$i]['current_position'] = sanitize(stripslashes($candidate['current_position']));
+            $candidates[$i]['current_employer'] = sanitize(stripslashes($candidate['current_employer']));
         }
     }
     
@@ -36,12 +36,7 @@ $referrer['phone_num'] = sanitize($_POST['referrer_phone']);
 $referrer['name'] = sanitize(stripslashes($_POST['referrer_name']));
 $referrer['is_reveal_name'] = ($_POST['is_reveal_name'] == '1') ? '1' : '0';
 
-$candidates = get_candidates($_POST['payload']);
-
-// $candidate = array();
-// $candidate['email_addr'] = sanitize($_POST['candidate_email']);
-// $candidate['phone_num'] = sanitize($_POST['candidate_phone']);
-// $candidate['name'] = sanitize(stripslashes($_POST['candidate_name']));
+$candidates = parse_candidates($_POST['payload']);
 
 $job_id = $_POST['job_id'];
 $job = new Job($job_id);
@@ -55,24 +50,46 @@ $data['referrer_phone'] = $referrer['phone_num'];
 $data['referrer_name'] = $referrer['name'];
 $data['is_reveal_name'] = $referrer['is_reveal_name'];
 
-// TODO: loop through the number of candidates
-$data['candidate_email'] = $candidate['email_addr'];
-$data['candidate_phone'] = $candidate['phone_num'];
-$data['candidate_name'] = $candidate['name'];
-$data['job'] = $job->getId();
-$data['referrer_remarks'] = '<b>Current Position:</b><br/>'. $_POST['candidate_current_pos']. '<br/><br/><b>Current Employer:</b><br/>'. $_POST['candidate_current_emp']. '<br/><br/><b>Other Remarks:</b><br/>'. str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['candidate_remarks']);
+$via_social = 'NULL';
+if (!$_POST['via_social'] == '') {
+    $via_social = $_POST['via_social'];
+}
+$data['via_social_connection'] = $via_social;
 
-$referral_buffer = new ReferralBuffer();
-$buffer_id = $referral_buffer->create($data);
-if ($buffer_id === false) {
-    redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
-    exit();
+// loop through the number of candidates
+$has_error = false;
+$error_candidates = array();
+foreach ($candidates as $i=>$candidate) {
+    $data['candidate_email'] = $candidate['email_addr'];
+    $data['candidate_phone'] = $candidate['phone_num'];
+    $data['candidate_name'] = $candidate['name'];
+    $data['job'] = $job->getId();
+    // $data['referrer_remarks'] = '<b>Current Position:</b><br/>'. $_POST['candidate_current_pos']. '<br/><br/><b>Current Employer:</b><br/>'. $_POST['candidate_current_emp']. '<br/><br/><b>Other Remarks:</b><br/>'. str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['candidate_remarks']);
+    $data['referrer_remarks'] = '<b>Current Position:</b><br/>'. $candidate['current_position']. '<br/><br/><b>Current Employer:</b><br/>'. $candidate['current_employer'];
+    
+    $referral_buffer = new ReferralBuffer();
+    $buffer_id = $referral_buffer->create($data);
+    if ($buffer_id === false) {
+        $has_error = true;
+        $error_candidates[] = array(
+            'email_addr' => $candidate['email_addr'], 
+            'name' => $candidate['name']
+        );
+    }
+    
+    // TODO: Send a yes/no email to each candidate. reveal the name of the referrer if is_reveal_name is set to 1
+    
 }
 
+// TODO: handle error candidates
+// redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
+// exit();
+
+
 // TODO: Send to team.my for reference
-// TODO: Send a yes/no email to each candidate. reveal the name of the referrer if is_reveal_name is set to 1
 
 
+exit();
 // 2. check any files to upload
 $has_resume = 'NO';
 $file_path = '';
