@@ -1,0 +1,24 @@
+<html>
+    <body>
+        Hi %candidate_name%, <br/>
+        <br/>
+        %referrer_name% referred you to %job_title% (%employer%) from YellowElevator.com on %requested_on%.<br/>
+        <br/>
+        Please acknowledge by clicking one of the following links:<br/>
+        <br/>
+        <a href="%protocol%://%root%/job/%job_id%?apply=1&buffer_id=%buffer_id%">
+            Yes, I would like try out for this position.
+        </a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="%protocol%://%root%/reject_referral.php?id=%buffer_id%">
+            No, thank you. I am happy with my current job.
+        </a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="%protocol%://%root%/job/%job_id%">
+            Let me see the job description. Then, I decide.
+        </a><br/>
+        <br/>
+        Yellow Elevator<br/>
+        The Fast Way Up
+    </body>
+</html>
