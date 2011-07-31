@@ -74,6 +74,7 @@ foreach ($candidates as $i=>$candidate) {
             'email_addr' => $candidate['email_addr'], 
             'name' => $candidate['name']
         );
+        continue;
     }
     
     // Send a yes/no email to each candidate. reveal the name of the referrer if is_reveal_name is set to 1
@@ -83,10 +84,10 @@ foreach ($candidates as $i=>$candidate) {
         $message .= $line;
     }
     
-    $message = str_replace('%requested_on%', $today, $message);
+    $message = str_replace('%requested_on%', date('M j, Y'), $message);
     $message = str_replace('%job_title%', $job->getTitle(), $message);
     $message = str_replace('%job_id%', $job->getId(), $message);
-    $message = str_replace('%employer%', $employer_name, $message);
+    $message = str_replace('%employer%', $candidate['current_employer'], $message);
     $message = str_replace('%buffer_id%', $buffer_id, $message);
     $message = str_replace('%candidate_name%', htmlspecialchars_decode(stripslashes($candidate['name'])), $message);
     $referrer_name = 'A friend of yours';
@@ -136,14 +137,8 @@ foreach ($candidates as $i=>$candidate) {
         $message .= $line;
     }
 
-    $candidate_current_position = '(None provided)';
-    if (!empty($_POST['candidate_current_pos'])) {
-        $candidate_current_position = htmlspecialchars_decode(stripslashes($_POST['candidate_current_pos']));
-    }
-
-    if (!empty($_POST['candidate_current_emp'])) {
-        $candidate_current_position .= '('. htmlspecialchars_decode(stripslashes($_POST['candidate_current_emp'])). ')';
-    }
+    $candidate_current_position = htmlspecialchars_decode(stripslashes($candidate['current_position']));
+    $candidate_current_position .= '('. htmlspecialchars_decode(stripslashes($candidate['current_employer'])). ')';
 
     $message = str_replace('%employer_id%', $employer_id, $message);
     $message = str_replace('%employer%', $employer_name, $message);
@@ -166,11 +161,25 @@ foreach ($candidates as $i=>$candidate) {
     fclose($handle);
 }
 
-// TODO: handle error candidates
-// redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
-// exit();
+// handle error candidates
+if ($has_error) {
+    $payload = '';
+    $i = 0;
+    foreach ($error_candidates as $error_candidate) {
+        $payload .= $error_candidate['email_addr'];
+        
+        if ($i < count($error_candidates)-1) {
+            $payload .= ',';
+        }
+    }
+    
+    print_r($error_candidates);
+    
+    // redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1&payload='. $payload);
+    exit();
+}
 
-
-redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?success=1');
+echo 'ok';
+// redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?success=1');
 exit();
 ?>

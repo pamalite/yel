@@ -57,6 +57,26 @@ class JobPage extends Page {
         } else {
             $script .= 'var show_popup = "'. $_show_popup. '";'. "\n";
             $script .= 'var buffer_id = "'. $_buffer_id. '";'. "\n";
+            
+            if (!empty($_buffer_id)) {
+                // try to pre-fill the information
+                $criteria = array(
+                    'columns' => "candidate_email, candidate_name, candidate_phone, 
+                                  current_position, current_employer", 
+                    'match' => "id = ". $_buffer_id, 
+                    'limit' => "1"
+                );
+                
+                $ref_buf = new ReferralBuffer();
+                $result = $ref_buf->find($criteria);
+                if ($result !== false && !is_null($result) && !empty($result)) {
+                    $script .= 'var candidate_name ="'. $result[0]['candidate_name']. '"'. "\n";
+                    $script .= 'var candidate_email ="'. $result[0]['candidate_email']. '"'. "\n";
+                    $script .= 'var candidate_phone ="'. $result[0]['candidate_phone']. '"'. "\n";
+                    $script .= 'var current_position ="'. $result[0]['current_position']. '"'. "\n";
+                    $script .= 'var current_employer ="'. $result[0]['current_employer']. '"'. "\n";
+                }
+            }
         }
         
         if (!is_null($this->member)) {
@@ -86,8 +106,6 @@ class JobPage extends Page {
                 $script .= 'var alert_success = false;'; 
             }
         }
-        
-        $script .= '</script>'. "\n";
         
         $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
     }

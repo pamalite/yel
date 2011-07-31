@@ -112,6 +112,18 @@ function close_apply_popup(_proceed_refer) {
 
 function show_apply_popup() {
     $('buffer_id').value = buffer_id;
+    
+    if (!isEmpty(buffer_id)) {
+        $('apply_current_emp').value = current_employer;
+        $('apply_current_pos').value = current_position;
+        
+        if (id == '0') {
+            $('apply_name').value = candidate_name;
+            $('apply_email').value = candidate_email;
+            $('apply_phone').value = candidate_phone;
+        }
+    }
+    
     show_window('apply_window');
     // window.scrollTo(0, 0);
 }
