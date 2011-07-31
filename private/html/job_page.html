@@ -68,6 +68,79 @@
     </div>
     <form id="refer_form" action="%root%/refer_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_refer_popup(true);">
         <input type="hidden" name="job_id" value="%job_id%" />
+        <div class="refer_form">
+            <div id="refer_referrer_contacts" class="wizard_page">
+                <table class="referrer">
+                    <tr>
+                        <td colspan="2" class="title">Your Contact Details</td>
+                    </tr>
+                    
+                    <!-- %refer_form% -->
+                    
+                </table>
+            </div>
+            
+            <div id="refer_candidates_social" class="wizard_page">
+                <table class="candidates">
+                    <tr>
+                        <td class="candidates_listing">
+                            <div id="list_placeholder" class="list_placeholder">
+                                Cannot retrieve your connections.
+                            </div>
+                            <div class="list_functions">
+                                <input type="button" value="Add" onClick="add_candidates_to_list();" />
+                            </div>
+                        </td>
+                        <td class="border">&nbsp;</td>
+                        <td class="candidates_info_list">
+                            <div class="list_functions">
+                                <input type="button" value="Add a Friend" onClick="add_candidates_to_list(true);" />
+                            </div>
+                            <div id="info_list_placeholder" class="info_list_placeholder">
+                                <div id="info_list_tip">
+                                    To add a candidate, you can either:
+                                    <br/><br/>
+                                    <ol>
+                                        <li>Select your connections on the left and click the "Add" button at the bottom; or</li>
+                                        <li>Click the "Add a Friend" button on top to add someone who cannot be found in your list of connections.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                <table>
+            </div>
+            
+            <div id="refer_candidates_default" class="wizard_page">
+                <table class="candidate">
+                    <tr>
+                        <td colspan="2" class="title">Candidate's Contact Details &amp; Resume</td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_email">E-mail Address:</label></td>
+                        <td><input type="text" class="field" name="candidate_email" id="candidate_email" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_phone">Telephone:</label></td>
+                        <td><input type="text" class="field" name="candidate_phone" id="candidate_phone" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_name">Name:</label></td>
+                        <td><input type="text" class="field" name="candidate_name" id="candidate_name" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_current_pos">Current Position:</label></td>
+                        <td><input type="text" class="field" name="candidate_current_pos" id="candidate_current_pos" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_current_emp">Current Employer:</label></td>
+                        <td><input type="text" class="field" name="candidate_current_emp" id="candidate_current_emp" value="" /></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- old form -->
         <table class="refer_form">
             <tr>
                 <td class="referrer">

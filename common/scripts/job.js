@@ -49,6 +49,9 @@ function close_refer_popup(_proceed_refer) {
 }
 
 function show_refer_popup() {
+    // TODO: get connection names from LinkedIn
+    // TODO: update the the list
+    
     show_window('refer_window');
     // window.scrollTo(0, 0);
 }
