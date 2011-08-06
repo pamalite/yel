@@ -812,6 +812,10 @@ function update_new_applicants() {
                 var current_emps = xml.getElementsByTagName('current_employer');
                 var remind_ons = xml.getElementsByTagName('formatted_remind_on');
                 var remind_days_left = xml.getElementsByTagName('days_left');
+                var is_reveal_names = xml.getElementsByTagName('is_reveal_name');
+                var via_socials = xml.getElementsByTagName('via_social_connection');
+                var candidate_responses = xml.getElementsByTagName('candidate_response');
+                var candidate_responded_ons = xml.getElementsByTagName('formatted_candidate_responded_on');
                 
                 var new_applicants_table = new FlexTable('new_applicants_table', 'new_applicants');
 
@@ -841,6 +845,9 @@ function update_new_applicants() {
                     } else {
                         var referrer_phone_num = '';
                         var referrer_email = '';
+                        var via_social = '';
+                        var revealed_name = 'Revealed Name: No';
+                        
                         if (referrer_phones[i].childNodes.length > 0) {
                             referrer_phone_num = referrer_phones[i].childNodes[0].nodeValue;
                         }
@@ -848,12 +855,24 @@ function update_new_applicants() {
                         if (referrer_emails[i].childNodes.length > 0) {
                             referrer_email = referrer_emails[i].childNodes[0].nodeValue;
                         }
-
+                        
+                        if (is_reveal_names[i].childNodes[0].nodeValue == '1') {
+                            revealed_name = 'Revealed Name: Yes';
+                        }
+                        
+                        if (via_socials[i].childNodes.length > 0) {
+                            if (via_socials[i].childNodes[0].nodeValue == 'linkedin') {
+                                via_social = 'Via: LinkedIn';
+                            } else {
+                                via_social = 'Via: FaceBook';
+                            }
+                        }
+                        
                         if (isEmpty(referrer_phone_num) || isEmpty(referrer_email)) {
                             is_cannot_signup = true;
-                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + ' (Incomplete!)</a></div>' + "\n";
+                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + ' (Incomplete!)</a><br/>' + via_social + '<br/>' + revealed_name + '</div>' + "\n";
                         } else {
-                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + '</a></div>' + "\n";
+                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + '</a><br/>' + via_social + '<br/>' + revealed_name + '</div>' + "\n";
                         }
                     }
                     
@@ -898,7 +917,19 @@ function update_new_applicants() {
                     }
                     short_desc = short_desc + mini_career_profile;
                     
+                    var candidate_response = '';
+                    if (via_socials[i].childNodes.length > 0) {
+                        candidate_response = '<div class="small_contact"><span style="font-weight: bold;">Response:</span> Not Yet</div>';
+                    }
+                    
+                    if (candidate_responses[i].childNodes.length > 0) {
+                        candidate_response = '<div class="small_contact"><span style="font-weight: bold;">Response:</span> ' + candidate_responses[i].childNodes[0].nodeValue + ' on ' + candidate_responded_ons[i].childNodes[0].nodeValue + '</div>';
+                    }
+                    
                     var candidate_details = short_desc + '<br />' + referrer_short_details;
+                    if (!isEmpty(candidate_response)) {
+                        candidate_details = candidate_details + '<br />' + candidate_response;
+                    }
                     row.set(1, new Cell(candidate_details, '', 'cell'));
                     
                     // job applied
