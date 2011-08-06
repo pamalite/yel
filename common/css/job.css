@@ -88,7 +88,6 @@
 
 #refer_window, #apply_window {
     display: none;
-    width: 800px;
 }
 
 #refer_window textarea.field {
@@ -117,7 +116,7 @@
 }
 
 .referrer, .candidate {
-    width: 100%;
+    width: 97%;
     margin: auto;
 }
 
@@ -129,12 +128,15 @@
 }
 
 .referrer td.label, 
-.candidate td.label {
+.candidate td.label,
+.candidates td.label {
     width: 35%;
+    text-align: right;
 }
 
 .referrer td.title,
-.candidate td.title {
+.candidate td.title, 
+.candidates td.title {
     background-color: #EEEEEE;
     font-weight: bold;
     font-size: 11pt;
@@ -155,4 +157,48 @@
     margin: auto;
     padding-top: 15px;
     padding-bottom: 15px;
+}
+
+div.wizard_page {
+    width: 750px;
+}
+
+select.connections_list {
+    width: 99%;
+    font-size: 12pt;
+    height: 380px;
+}
+
+div.list_placeholder {
+    width: 100%;
+    text-align: center;
+}
+
+div.list_functions {
+    text-align: right;
+}
+
+table.candidates,
+table.candidate {
+    margin: auto;
+    width: 97%;
+}
+
+table.candidates td.candidates_listing {
+    width: 50%;
+}
+
+table.candidates td.border {
+    width: 1px;
+    border-left: 1px solid #CCCCCC;
+}
+
+div.info_list_placeholder {
+    overflow: auto;
+    height: 400px;
+}
+
+div.refer_candidates {
+    margin: 5px 3px 5px 3px;
+    border-bottom: 1px solid #666666;
 }

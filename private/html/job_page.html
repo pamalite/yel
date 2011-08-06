@@ -83,38 +83,39 @@
             <div id="refer_candidates_social" class="wizard_page">
                 <table class="candidates">
                     <tr>
+                        <td colspan="3" class="title">Your Potential Candidates</td>
+                    </tr>
+                    <tr>
                         <td class="candidates_listing">
                             <div id="list_placeholder" class="list_placeholder">
                                 Cannot retrieve your connections.
                             </div>
                             <div class="list_functions">
+                                <input type="button" value="Add a Friend" onClick="add_candidates_to_list(true);" />&nbsp;
                                 <input type="button" value="Add" onClick="add_candidates_to_list();" />
                             </div>
                         </td>
-                        <td class="border">&nbsp;</td>
+                        <td class="border"></td>
                         <td class="candidates_info_list">
-                            <div class="list_functions">
-                                <input type="button" value="Add a Friend" onClick="add_candidates_to_list(true);" />
-                            </div>
                             <div id="info_list_placeholder" class="info_list_placeholder">
                                 <div id="info_list_tip">
                                     To add a candidate, you can either:
                                     <br/><br/>
                                     <ol>
-                                        <li>Select your connections on the left and click the "Add" button at the bottom; or</li>
-                                        <li>Click the "Add a Friend" button on top to add someone who cannot be found in your list of connections.</li>
+                                        <li>Select your connections on the left and click the "Add" button; or</li>
+                                        <li>Click the "Add a Friend" button add someone who cannot be found in your list of connections.</li>
                                     </ol>
                                 </div>
                             </div>
                         </td>
                     </tr>
-                <table>
+                </table>
             </div>
             
             <div id="refer_candidates_default" class="wizard_page">
                 <table class="candidate">
                     <tr>
-                        <td colspan="2" class="title">Candidate's Contact Details &amp; Resume</td>
+                        <td colspan="2" class="title">Your Potential Candidate</td>
                     </tr>
                     <tr>
                         <td class="label"><label for="candidate_email">E-mail Address:</label></td>
@@ -140,62 +141,9 @@
             </div>
         </div>
         
-        <!-- old form -->
-        <table class="refer_form">
-            <tr>
-                <td class="referrer">
-                    <table class="referrer">
-                        <tr>
-                            <td colspan="2" class="title">Your Contact Details</td>
-                        </tr>
-                        
-                        <!-- %refer_form% -->
-                        
-                        <tr>
-                            <td colspan="2" class="title">Candidate's Contact Details &amp; Resume</td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_email">E-mail Address:</label></td>
-                            <td><input type="text" class="field" name="candidate_email" id="candidate_email" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_phone">Telephone:</label></td>
-                            <td><input type="text" class="field" name="candidate_phone" id="candidate_phone" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_name">Name:</label></td>
-                            <td><input type="text" class="field" name="candidate_name" id="candidate_name" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_resume">Resume:</label></td>
-                            <td><input type="file" class="field" name="candidate_resume" id="candidate_resume" value="" /></td>
-                        </tr>
-                    </table>
-                </td>
-                <td class="candidate">
-                    <table class="candidate">
-                        <tr>
-                            <td colspan="2" class="title">Candidate's Extra Info (Optional)</td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_current_pos">Current Position:</label></td>
-                            <td><input type="text" class="field" name="candidate_current_pos" id="candidate_current_pos" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_current_emp">Current Employer:</label></td>
-                            <td><input type="text" class="field" name="candidate_current_emp" id="candidate_current_emp" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_remarks">Other Remarks:</label></td>
-                            <td><textarea class="field" name="candidate_remarks" id="candidate_remarks"></textarea></td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
         <div class="popup_window_buttons_bar">
-             <input type="submit" value="Recommend Now" />
-             <input type="button" value="Cancel" onClick="close_refer_popup(false);" />
+            <input type="button" value="Cancel" onClick="close_refer_popup(false);" />
+            <input type="button" id="refer_next_btn" value="Next &gt;" onClick="show_next_refer_wizard_page();" />
         </div>
     </form>
 </div>
