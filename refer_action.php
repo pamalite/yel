@@ -12,13 +12,19 @@ function parse_candidates($_xml_str) {
     $dom = new XMLDOM();
     $xml_dom = $dom->load_from_xml($_xml_str);
     if (!empty($xml_dom)) {
-        $tags = array('email_addr', 'phone_num', 'name', 'current_position', 'current_employer');
+        $tags = array('email_addr', 'phone_num', 'name', 'social', 'current_position', 'current_employer');
         $candidates = $dom->get_assoc($tags);
         
         foreach ($candidates as $i=>$candidate) {
             $candidates[$i]['name'] = sanitize(stripslashes($candidate['name']));
             $candidates[$i]['current_position'] = sanitize(stripslashes($candidate['current_position']));
             $candidates[$i]['current_employer'] = sanitize(stripslashes($candidate['current_employer']));
+            
+            if (is_null($candidate['social']) || empty($candidate['social'])) {
+                $candidates[$i]['social'] = 'NULL';
+            } else {
+                $candidates[$i]['social'] = strtolower($candidate['social']);
+            }
         }
     }
     
@@ -64,6 +70,7 @@ foreach ($candidates as $i=>$candidate) {
     $data['candidate_phone'] = $candidate['phone_num'];
     $data['candidate_name'] = $candidate['name'];
     $data['job'] = $job->getId();
+    $data['via_social_connection'] = $candidate['social'];
     $data['referrer_remarks'] = '<b>Current Position:</b><br/>'. $candidate['current_position']. '<br/><br/><b>Current Employer:</b><br/>'. $candidate['current_employer'];
     
     $referral_buffer = new ReferralBuffer();

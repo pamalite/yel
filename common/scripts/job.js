@@ -1,8 +1,6 @@
 var refer_wizard_page = 'referrer';
 var is_linkedin = false;
 var is_facebook = false;
-
-var refer_candidates = new Array();
 var refer_num_candidates = 0;
 
 function close_refer_popup(_proceed_refer) {
@@ -11,30 +9,8 @@ function close_refer_popup(_proceed_refer) {
     if (_proceed_refer) {
         
         
-        if (!isEmail($('candidate_email').value)) {
-            alert('Candidate e-mail address is empty or not valid.');
-            return false;
-        }
         
-        if (isEmpty($('candidate_phone').value)) {
-            alert('Candidate telephone number is empty.');
-            return false;
-        }
         
-        if (isEmpty($('candidate_name').value)) {
-            alert('You need to at least provide candidate\'s name for us to contact.');
-            return false;
-        }
-        
-        if (isEmpty($('candidate_resume').value)) {
-            var proceed = confirm("It will be better if you provide us the candidate's resume. However, you may choose to proceed if you do not have it now.\n\nClick 'OK' to proceed, 'Cancel' otherwise.");
-            
-            if (!proceed) {
-                return false;
-            }
-        }
-        
-        close_safari_connection();
         // $('refer_form').submit();
         $('refer_progress').setStyle('display', 'block');
         $('refer_form').setStyle('display', 'none');
@@ -47,7 +23,7 @@ function close_refer_popup(_proceed_refer) {
 function show_refer_popup() {
     // reset the wizard page
     refer_wizard_page = 'referrer';
-    $('refer_next_btn').setStyle('display', 'show');
+    $('refer_next_btn').value = 'Next >';
     $('refer_next_btn').disabled = true;
     
     // get connection names from LinkedIn and update the list
@@ -81,7 +57,11 @@ function show_refer_popup() {
             
             $('list_placeholder').set('html', html);
             $('refer_next_btn').disabled = false;
-    });
+        })
+        .error(function() {
+            is_linkedin = false;
+            $('refer_next_btn').disabled = false;
+        });
     
     $('refer_referrer_contacts').setStyle('display', 'block');
     $('refer_candidates_social').setStyle('display', 'none');
@@ -124,11 +104,131 @@ function show_next_refer_wizard_page() {
             }
             
             $('refer_next_btn').disabled = true;
+            if (refer_num_candidates > 0 && (is_linkedin || is_facebook)) {
+                $('refer_next_btn').disabled = false;
+            } else if (refer_num_candidates <= 0 && !is_linkedin && !is_facebook) {
+                $('refer_next_btn').disabled = false;
+            }
             $('refer_next_btn').value = 'Recommend Now';
             break;
         case 'candidates':
-            // TODO: validate the candiates list
-            break;
+            // validate
+            var is_single_candidate = true;
+            if (refer_num_candidates <= 0) {
+                if (is_linkedin || is_facebook) {
+                    alert('You need to add at least one candidate.');
+                    return false;
+                }
+                
+                // normal validate
+                if (!isEmail($('candidate_email').value)) {
+                    alert('Candidate e-mail address is empty or not valid.');
+                    return false;
+                }
+
+                if (isEmpty($('candidate_phone').value)) {
+                    alert('Candidate telephone number is empty.');
+                    return false;
+                }
+
+                if (isEmpty($('candidate_name').value)) {
+                    alert('You need to at least provide candidate\'s name for us to contact.');
+                    return false;
+                }
+                
+                if (isEmpty($('candidate_current_pos').value)) {
+                    alert('Candidate current job position is empty.');
+                    return false;
+                }
+
+                if (isEmpty($('candidate_current_emp').value)) {
+                    alert('Candidate current employer is empty.');
+                    return false;
+                }
+            } else {
+                // mass validate
+                is_single_candidate = false;
+                
+                for (var i=0; i < refer_num_candidates; i++) {
+                    if (!isEmail($('refer_candidate_email_' + i).value)) {
+                        alert('Candidate e-mail address is empty or not valid.');
+                        return false;
+                    }
+
+                    if (isEmpty($('refer_candidate_phone_' + i).value)) {
+                        alert('Candidate telephone number is empty.');
+                        return false;
+                    }
+
+                    if (isEmpty($('refer_candidate_name_' + i).value)) {
+                        alert('You need to at least provide candidate\'s name for us to contact.');
+                        return false;
+                    }
+                    
+                    if (isEmpty($('refer_candidate_pos_' + i).value)) {
+                        alert('Candidate current position is empty.');
+                        return false;
+                    }
+                    
+                    
+                    if (isEmpty($('refer_candidate_emp_' + i).value)) {
+                        alert('Candidate current employer is empty.');
+                        return false;
+                    }
+                }
+            }
+            
+            // ask whether to reveal referrer name
+            var is_reveal_name = confirm('Perhaps do you want to let the candidates know who are you by revealing your name?');
+            
+            // confirm submission
+            if (!confirm('Confirm to submit your recommendations?')) {
+                return false;
+            }
+            
+            // submit and close popup
+            var params = 'job_id=' + $('job_id').value;
+            params = params + '&referrer_email=' + $('referrer_email').value;
+            params = params + '&referrer_phone=' + $('referrer_phone').value;
+            params = params + '&referrer_name=' + $('referrer_name').value;
+            
+            if (is_reveal_name) {
+                params = params + '&is_reveal_name=1';
+            } else {
+                params = params + '&is_reveal_name=0';
+            }
+            
+            var xml = '<candidates>';
+            if (is_single_candidate) {
+                xml = xml + '<candidate>';
+                xml = xml + '<email_addr>' + $('candidate_email').value + '</email_addr>';
+                xml = xml + '<phone_num>' + $('candidate_phone').value + '</phone_num>';
+                xml = xml + '<name>' + $('candidate_name').value + '</name>';
+                xml = xml + '<current_position>' + $('candidate_current_pos').value + '</current_position>';
+                xml = xml + '<current_employer>' + $('candidate_current_emp').value + '</current_employer>';
+                xml = xml + '<social></social>';
+                xml = xml + '</candidate>';
+            } else {
+                for (var i=0; i < refer_num_candidates; i++) {
+                    xml = xml + '<candidate>';
+                    xml = xml + '<email_addr>' + $('refer_candidate_email_' + i).value + '</email_addr>';
+                    xml = xml + '<phone_num>' + $('refer_candidate_phone_' + i).value + '</phone_num>';
+                    xml = xml + '<name>' + $('refer_candidate_name_' + i).value + '</name>';
+                    xml = xml + '<current_position>' + $('refer_candidate_pos_' + i).value + '</current_position>';
+                    xml = xml + '<current_employer>' + $('refer_candidate_emp_' + i).value + '</current_employer>';
+                    xml = xml + '<social>' + $('refer_candidate_social_' + i).value + '</social>';
+                    xml = xml + '</candidate>';
+                }
+                
+            }
+            xml = xml + '</candidates>';
+            params = params + '&payload=' + xml;
+            
+            alert(params);
+            
+            close_window('refer_window');
+            
+            return true;
     }
     
     show_window('refer_window');
@@ -140,6 +240,7 @@ function add_candidates_to_list(_is_not_from_list) {
     
     if (_is_not_from_list) {
         html = '<div class="refer_candidates" id="refer_candidate_' + refer_num_candidates + '">' + "\n";
+        html = html + '<input type="hidden" id="refer_candidate_social_' + refer_num_candidates + '" value="" />' + "\n";
         html = html + 'Name: <input type="text" id="refer_candidate_name_' + refer_num_candidates + '" /><br/>' + "\n";
         html = html + 'Email: <input type="text" id="refer_candidate_email_' + refer_num_candidates + '" /><br/>' + "\n";
         html = html + 'Phone: <input type="text" id="refer_candidate_phone_' + refer_num_candidates + '" /><br/>' + "\n";
@@ -158,32 +259,45 @@ function add_candidates_to_list(_is_not_from_list) {
         }
         
         // check any new one
-        if (refer_candidates.length > 0) {
+        if (refer_num_candidates > 0) {
             for (var i=0; i < selected_candidates.length; i++) {
                 var is_exists = false;
-                for (var j=0; j < refer_candidates.length; j++) {
-                    if (selected_candidates[i].value == refer_candidates[j].name) {
+                var candidate_name = selected_candidates[i].value;
+                var candidate_social = 'LinkedIn';
+                if (selected_candidates[i].text.charAt(0) == 'F') {
+                    candidate_social = 'Facebook';
+                }
+                
+                for (var j=0; j < refer_new_candidates; j++) {
+                    if (candidate_name == $('refer_candidate_name_' + j).value) {
                         is_exists = true;
                         break;
                     }
                 }
                 
                 if (!is_exists) {
-                    refer_candidates[refer_candidates.length] = new ReferCandidate(selected_candidates[i].value, '', '', '', '');
-                    new_candidates[new_candidates.length] = selected_candidates[i].value;
+                    new_candidates[new_candidates.length] = candidate_social + '|' + candidate_name;
                 }
             }
         } else {
             for (var i=0; i < selected_candidates.length; i++) {
-                refer_candidates[refer_candidates.length] = new ReferCandidate(selected_candidates[i].value, '', '', '', '');
-                new_candidates[new_candidates.length] = selected_candidates[i].value;
+                var candidate_name = selected_candidates[i].value;
+                var candidate_social = 'LinkedIn';
+                if (selected_candidates[i].text.charAt(0) == 'F') {
+                    candidate_social = 'Facebook';
+                }
+                
+                new_candidates[new_candidates.length] = candidate_social + '|' + candidate_name;
             }
         }
         
         // add to list
         for (var i=0; i < new_candidates.length; i++) {
+            var items = new_candidates[i].split('|');
+            
             html = html + '<div class="refer_candidates" id="refer_candidate_' + refer_num_candidates + '">' + "\n";
-            html = html + 'Name: <input type="text" id="refer_candidate_name_' + refer_num_candidates + '" value="' + new_candidates[i] + '" /><br/>' + "\n";
+            html = html + '<input type="hidden" id="refer_candidate_social_' + refer_num_candidates + '" value="' + items[0] + '" />' + "\n";
+            html = html + 'Name: <input type="text" id="refer_candidate_name_' + refer_num_candidates + '" value="' + items[1] + '" /><br/>' + "\n";
             html = html + 'Email: <input type="text" id="refer_candidate_email_' + refer_num_candidates + '" /><br/>' + "\n";
             html = html + 'Phone: <input type="text" id="refer_candidate_phone_' + refer_num_candidates + '" /><br/>' + "\n";
             html = html + 'Current Position: <input type="text" id="refer_candidate_pos_' + refer_num_candidates + '" /><br/>' + "\n";
@@ -207,22 +321,11 @@ function add_candidates_to_list(_is_not_from_list) {
 
 function remove_candidate_from_list(_idx) {
     var html = '';
-    
-    // remove from array
-    var new_refer_candidates = new Array();
-    var name = $('refer_candidate_name_' + _idx).value;
-    for (var i=0; i < refer_candidates.length; i++) {
-        if (refer_candidates[i].name != name) {
-            new_refer_candidates[new_refer_candidates.length] = refer_candidates[i];
-        }
-    }
-    refer_candidates = new_refer_candidates;
-    
-    // remove from visible list
     var new_idx = 0;
     for (var i=0; i < refer_num_candidates; i++) {
         if (i != _idx) {
             html = html + '<div class="refer_candidates" id="refer_candidate_' + new_idx + '">' + "\n";
+            html = html + '<input type="hidden" id="refer_candidate_social_' + new_idx + '" value="' + $('refer_candidate_social_' + i).value + '" />' + "\n";
             html = html + 'Name: <input type="text" id="refer_candidate_name_' + new_idx + '" value="' + $('refer_candidate_name_' + i).value + '" /><br/>' + "\n";
             html = html + 'Email: <input type="text" id="refer_candidate_email_' + new_idx + '" value="' + $('refer_candidate_email_' + i).value + '" /><br/>' + "\n";
             html = html + 'Phone: <input type="text" id="refer_candidate_phone_' + new_idx + '" value="' + $('refer_candidate_phone_' + i).value + '" /><br/>' + "\n";
