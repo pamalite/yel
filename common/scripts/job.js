@@ -4,19 +4,7 @@ var is_facebook = false;
 var refer_num_candidates = 0;
 
 function close_refer_popup(_proceed_refer) {
-    refer_wizard_page = 'referrer';
-    
-    if (_proceed_refer) {
-        
-        
-        
-        
-        // $('refer_form').submit();
-        $('refer_progress').setStyle('display', 'block');
-        $('refer_form').setStyle('display', 'none');
-        
-        return true;
-    }
+    refer_wizard_page = 'referrer';    
     close_window('refer_window');
 }
 
@@ -28,7 +16,7 @@ function show_refer_popup() {
     
     // get connection names from LinkedIn and update the list
     IN.API.Connections("me")
-        .fields("id", "firstName", "lastName")
+        .fields("id", "firstName", "lastName", "threeCurrentPositions")
         .result(function(_connections, _metadata) {
             var connections = _connections.values;
             
@@ -46,9 +34,13 @@ function show_refer_popup() {
                 var first_name = connections[i].firstName;
                 var last_name = connections[i].lastName;
                 var id = connections[i].id;
+                var positions = connections[i].threeCurrentPositions.values;
                 
                 var option = '<option value="' + last_name + ', ' + first_name + '">';
                 option = option + 'LinkedIn: ' + last_name + ', ' + first_name;
+                if (connections[i].threeCurrentPositions._total > 0) {
+                    option = option + ' (' + positions[0].title + ' @ ' + positions[0].company.name + ')';
+                }
                 option = option + '</option>' + "\n";
                 
                 html = html + option;
@@ -224,9 +216,27 @@ function show_next_refer_wizard_page() {
             xml = xml + '</candidates>';
             params = params + '&payload=' + xml;
             
-            alert(params);
-            
-            close_window('refer_window');
+            var uri = root + "/refer_action.php";
+            var request = new Request({
+                url: uri,
+                method: 'post',
+                onSuccess: function(txt, xml) {
+                    set_status('<pre>' + txt + '</pre>');
+                    return;
+                    if (txt != 'ok') {
+                        var msg = 'An error occured while submitting the following candidates. Please try again later.' + "\n";
+                        var error_candidates = txt.split(',');
+                        for (var i=0; i < error_candidates.length; i++) {
+                            msg = msg + "\n" + error_candidates[i];
+                        }
+                        
+                        alert(msg);
+                        return false;
+                    }
+                    close_window('refer_window');
+                }
+            });
+            request.send(params);
             
             return true;
     }

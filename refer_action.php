@@ -56,12 +56,6 @@ $data['referrer_phone'] = $referrer['phone_num'];
 $data['referrer_name'] = $referrer['name'];
 $data['is_reveal_name'] = $referrer['is_reveal_name'];
 
-$via_social = 'NULL';
-if (!$_POST['via_social'] == '') {
-    $via_social = $_POST['via_social'];
-}
-$data['via_social_connection'] = $via_social;
-
 // loop through the number of candidates
 $has_error = false;
 $error_candidates = array();
@@ -109,12 +103,12 @@ foreach ($candidates as $i=>$candidate) {
     $headers .= 'Reply-To: '. $referrer['email_addr']. "\n";
     $headers .= 'MIME-Version: 1.0'. "\n";
     $headers .= 'Content-Type: text/html; charset="iso-8859-1"'. "\n";
-    // mail($candidate['email_addr'], $subject, $message, $headers);
+    mail($candidate['email_addr'], $subject, $message, $headers);
     
-    $handle = fopen('/tmp/email_to_'. $candidate['email_addr']. '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);
+    // $handle = fopen('/tmp/email_to_'. $candidate['email_addr']. '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
     
     // Send email to team.xx@yellowelevator.com
     $country_code = strtolower($_SESSION['yel']['country_code']);
@@ -160,12 +154,12 @@ foreach ($candidates as $i=>$candidate) {
 
     $subject = "New Referral for ". $job->getTitle(). " position";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
-    // mail($branch_email, $subject, $message, $headers);
+    mail($branch_email, $subject, $message, $headers);
 
-    $handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
-    fwrite($handle, 'Subject: '. $subject. "\n\n");
-    fwrite($handle, $message);
-    fclose($handle);
+    // $handle = fopen('/tmp/email_to_'. $branch_email. '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $message);
+    // fclose($handle);
 }
 
 // handle error candidates
@@ -180,13 +174,10 @@ if ($has_error) {
         }
     }
     
-    print_r($error_candidates);
-    
-    // redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1&payload='. $payload);
+    echo $payload;
     exit();
 }
 
 echo 'ok';
-// redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?success=1');
 exit();
 ?>
