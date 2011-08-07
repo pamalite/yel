@@ -202,3 +202,8 @@ div.refer_candidates {
     margin: 5px 3px 5px 3px;
     border-bottom: 1px solid #666666;
 }
+
+span.lbl_loading_status {
+    color: #CCCCCC;
+    font-size: 9pt;
+}

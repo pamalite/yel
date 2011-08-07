@@ -13,47 +13,57 @@ function show_refer_popup() {
     refer_wizard_page = 'referrer';
     $('refer_next_btn').value = 'Next >';
     $('refer_next_btn').disabled = true;
+    $('lbl_loading_status').set('html', 'Preparing next page...');
     
     // get connection names from LinkedIn and update the list
-    IN.API.Connections("me")
-        .fields("id", "firstName", "lastName", "threeCurrentPositions")
-        .result(function(_connections, _metadata) {
-            var connections = _connections.values;
-            
-            // check are there any connections. if not, default to form-based
-            if (connections.length <= 0) {
+    if (typeof IN.API == 'undefined') {
+        is_linkedin = false;
+        $('refer_next_btn').disabled = false;
+        $('lbl_loading_status').set('html', 'Done! Press Next to continue.');
+    } else {
+        IN.API.Connections("me")
+            .fields("id", "firstName", "lastName", "threeCurrentPositions")
+            .result(function(_connections, _metadata) {
+                var connections = _connections.values;
+
+                // check are there any connections. if not, default to form-based
+                if (connections.length <= 0) {
+                    is_linkedin = false;
+                    $('refer_next_btn').disabled = false;
+                    $('lbl_loading_status').set('html', 'Done! Press Next to continue.');
+                    return;
+                }
+
+                is_linkedin = true;
+                var html = '<select class="connections_list" id="connections_list" multiple="1">';
+                var i = 0;
+                for (i=0; i < connections.length; i++) {
+                    var first_name = connections[i].firstName;
+                    var last_name = connections[i].lastName;
+                    var id = connections[i].id;
+                    var positions = connections[i].threeCurrentPositions.values;
+
+                    var option = '<option value="' + last_name + ', ' + first_name + '">';
+                    option = option + 'LinkedIn: ' + last_name + ', ' + first_name;
+                    if (connections[i].threeCurrentPositions._total > 0) {
+                        option = option + ' (' + positions[0].title + ' @ ' + positions[0].company.name + ')';
+                    }
+                    option = option + '</option>' + "\n";
+
+                    html = html + option;
+                }
+                html = html + "</select>";
+
+                $('list_placeholder').set('html', html);
+                $('refer_next_btn').disabled = false;
+                $('lbl_loading_status').set('html', 'Done! Press Next to continue.');
+            })
+            .error(function() {
                 is_linkedin = false;
                 $('refer_next_btn').disabled = false;
-                return;
-            }
-            
-            is_linkedin = true;
-            var html = '<select class="connections_list" id="connections_list" multiple="1">';
-            var i = 0;
-            for (i=0; i < connections.length; i++) {
-                var first_name = connections[i].firstName;
-                var last_name = connections[i].lastName;
-                var id = connections[i].id;
-                var positions = connections[i].threeCurrentPositions.values;
-                
-                var option = '<option value="' + last_name + ', ' + first_name + '">';
-                option = option + 'LinkedIn: ' + last_name + ', ' + first_name;
-                if (connections[i].threeCurrentPositions._total > 0) {
-                    option = option + ' (' + positions[0].title + ' @ ' + positions[0].company.name + ')';
-                }
-                option = option + '</option>' + "\n";
-                
-                html = html + option;
-            }
-            html = html + "</select>";
-            
-            $('list_placeholder').set('html', html);
-            $('refer_next_btn').disabled = false;
-        })
-        .error(function() {
-            is_linkedin = false;
-            $('refer_next_btn').disabled = false;
-        });
+                $('lbl_loading_status').set('html', 'Done! Press Next to continue.');
+            });
+    }
     
     $('refer_referrer_contacts').setStyle('display', 'block');
     $('refer_candidates_social').setStyle('display', 'none');
@@ -102,6 +112,7 @@ function show_next_refer_wizard_page() {
                 $('refer_next_btn').disabled = false;
             }
             $('refer_next_btn').value = 'Recommend Now';
+            $('lbl_loading_status').set('html', 'Press Recommend Now to finish.');
             break;
         case 'candidates':
             // validate
