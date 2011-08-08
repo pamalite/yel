@@ -41,14 +41,16 @@ function show_refer_popup() {
                     var first_name = connections[i].firstName;
                     var last_name = connections[i].lastName;
                     var id = connections[i].id;
-                    var positions = connections[i].threeCurrentPositions.values;
-
-                    var option = '<option value="' + last_name + ', ' + first_name + '">';
-                    option = option + 'LinkedIn: ' + last_name + ', ' + first_name;
-                    if (connections[i].threeCurrentPositions._total > 0) {
-                        option = option + ' (' + positions[0].title + ' @ ' + positions[0].company.name + ')';
+                    
+                    if (id != 'private') {
+                        var option = '<option value="' + last_name + ', ' + first_name + '">';
+                        option = option + 'L: ' + last_name + ', ' + first_name; 
+                        if (connections[i].threeCurrentPositions._total > 0) {
+                            var positions = connections[i].threeCurrentPositions.values;
+                            option = option + ' (' + positions[0].title + ' @ ' + positions[0].company.name + ')';
+                        }
+                        option = option + '</option>' + "\n";
                     }
-                    option = option + '</option>' + "\n";
 
                     html = html + option;
                 }
