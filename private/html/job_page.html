@@ -61,7 +61,7 @@
 
 <!-- popup window goes here -->
 <div id="refer_window" class="popup_window">
-    <div class="popup_window_title">Recommend %job_title%</div>
+    <div class="popup_window_title">Recommend a Friend - %job_title%</div>
     <div id="refer_progress">
         Please wait while your request is being processed... <br/><br/>
         <img src="%root%/common/images/progress/circle_big.gif" />
@@ -72,7 +72,7 @@
             <div id="refer_referrer_contacts" class="wizard_page">
                 <table class="referrer">
                     <tr>
-                        <td colspan="2" class="title">Your Contact Details</td>
+                        <td colspan="2" class="title">Please Verify Your Contact Details</td>
                     </tr>
                     
                     <!-- %refer_form% -->
@@ -83,7 +83,7 @@
             <div id="refer_candidates_social" class="wizard_page">
                 <table class="candidates">
                     <tr>
-                        <td colspan="3" class="title">Your Potential Candidates</td>
+                        <td colspan="3" class="title">Select &amp; Add Your Friends</td>
                     </tr>
                     <tr>
                         <td class="candidates_listing">
@@ -92,8 +92,8 @@
                             </div>
                             <div class="list_functions">
                                 L: LinkedIn;&nbsp;&nbsp;&nbsp;F: FaceBook&nbsp;&nbsp;&nbsp;
-                                <input type="button" value="Add a Friend" onClick="add_candidates_to_list(true);" />&nbsp;
-                                <input type="button" value="Add" onClick="add_candidates_to_list();" />
+                                <input type="button" value="Add New Friend" onClick="add_candidates_to_list(true);" />&nbsp;
+                                <input type="button" value="Add From List" onClick="add_candidates_to_list();" />
                             </div>
                         </td>
                         <td class="border"></td>
@@ -103,8 +103,8 @@
                                     To add a candidate, you can either:
                                     <br/><br/>
                                     <ol>
-                                        <li>Select your connections on the left and click the "Add" button; or</li>
-                                        <li>Click the "Add a Friend" button add someone who cannot be found in your list of connections.</li>
+                                        <li>Select your connections on the left and click the "Add From List" button; or</li>
+                                        <li>Click the "Add New Friend" button add someone who cannot be found in your list of connections.</li>
                                     </ol>
                                 </div>
                             </div>
