@@ -44,7 +44,7 @@ class JobPage extends Page {
     }
     
     public function insert_job_scripts() {
-        $this->insert_scripts(array('job.js', 'job_search_result.js', 'refer_candidate.js'));
+        $this->insert_scripts(array('list_box.js', 'job.js', 'job_search_result.js', 'refer_candidate.js'));
     }
     
     public function insert_inline_scripts($_show_popup = '', $_buffer_id = '') {

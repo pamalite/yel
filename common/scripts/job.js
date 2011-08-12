@@ -3,6 +3,8 @@ var is_linkedin = false;
 var is_facebook = false;
 var refer_num_candidates = 0;
 
+var connections_list = new ListBox('list_placeholder', 'connections_list', true);
+
 function close_refer_popup(_proceed_refer) {
     refer_wizard_page = 'referrer';    
     close_window('refer_window');
@@ -35,7 +37,7 @@ function show_refer_popup() {
                 }
 
                 is_linkedin = true;
-                var html = '<select class="connections_list" id="connections_list" multiple="1">';
+                connections_list.clear();
                 var i = 0;
                 for (i=0; i < connections.length; i++) {
                     var first_name = connections[i].firstName;
@@ -43,20 +45,18 @@ function show_refer_popup() {
                     var id = connections[i].id;
                     
                     if (id != 'private') {
-                        var option = '<option value="' + last_name + ', ' + first_name + '">';
-                        option = option + 'L: ' + last_name + ', ' + first_name; 
+                        var item = 'L: <span class="connection_name">' + last_name + ', ' + first_name + '</span>';
+                        var value = last_name + ', ' + first_name;
                         if (connections[i].threeCurrentPositions._total > 0) {
                             var positions = connections[i].threeCurrentPositions.values;
-                            option = option + ' (' + positions[0].title + ' @ ' + positions[0].company.name + ')';
+                            item = item + '<br/><span class="connection_position">' + positions[0].title + ' @ ' + positions[0].company.name + '</span>';
                         }
-                        option = option + '</option>' + "\n";
                     }
-
-                    html = html + option;
+                    
+                    connections_list.add_item(item, value);
                 }
-                html = html + "</select>";
 
-                $('list_placeholder').set('html', html);
+                connections_list.show();
                 $('refer_next_btn').disabled = false;
                 $('lbl_loading_status').set('html', 'Done! Press Next to continue.');
             })
@@ -273,7 +273,16 @@ function add_candidates_to_list(_is_not_from_list) {
         html = html + '</div>';
         refer_num_candidates++;
     } else {
-        var selected_candidates = $('connections_list').getSelected();
+        var selected_candidates_raw = connections_list.get_selected_values();
+        var selected_candidates = new Array();
+        for (var i=0; i < selected_candidates_raw.length; i++) {
+            var item_value = selected_candidates_raw[i].split('|');
+            selected_candidates[i] = new Hash({
+                text: item_value[0],
+                value: item_value[1]
+            });
+        }
+        
         var new_candidates = new Array();
         
         if (selected_candidates.length <= 0) {
@@ -291,7 +300,7 @@ function add_candidates_to_list(_is_not_from_list) {
                     candidate_social = 'Facebook';
                 }
                 
-                for (var j=0; j < refer_new_candidates; j++) {
+                for (var j=0; j < refer_num_candidates; j++) {
                     if (candidate_name == $('refer_candidate_name_' + j).value) {
                         is_exists = true;
                         break;
