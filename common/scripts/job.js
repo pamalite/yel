@@ -318,7 +318,7 @@ function add_candidates_to_list(_is_not_from_list) {
             for (var i=0; i < selected_candidates.length; i++) {
                 var candidate_name = selected_candidates[i].value;
                 var candidate_social = 'LinkedIn';
-                if (selected_candidates[i].text.charAt(0) == 'F') {
+                if (selected_candidates[i].value.charAt(0) == 'F') {
                     candidate_social = 'Facebook';
                 }
                 
