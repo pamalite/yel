@@ -184,7 +184,7 @@ function show_next_refer_wizard_page() {
             }
             
             // ask whether to reveal referrer name
-            var is_reveal_name = confirm('Perhaps do you want to let the candidates know who are you by revealing your name?');
+            var is_reveal_name = confirm('Perhaps would you like to reveal your name (as the recommender) to your friends?' + "\n\nClick 'OK' for Yes, and 'Cancel' for No.");
             
             // confirm submission
             if (!confirm('Confirm to submit your recommendations?')) {
@@ -234,8 +234,8 @@ function show_next_refer_wizard_page() {
                 url: uri,
                 method: 'post',
                 onSuccess: function(txt, xml) {
-                    set_status('<pre>' + txt + '</pre>');
-                    return;
+                    // set_status('<pre>' + txt + '</pre>');
+                    // return;
                     if (txt != 'ok') {
                         var msg = 'An error occured while submitting the following candidates. Please try again later.' + "\n";
                         var error_candidates = txt.split(',');
