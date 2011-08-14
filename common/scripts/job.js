@@ -45,8 +45,9 @@ function show_refer_popup() {
                     var id = connections[i].id;
                     
                     if (id != 'private') {
-                        var item = 'L: <span class="connection_name">' + last_name + ', ' + first_name + '</span>';
-                        var value = last_name + ', ' + first_name;
+                        var item = '<img src="../../common/images/icons/linkedin_icon_small.gif" /> <span class="connection_name">' + last_name + ', ' + first_name + '</span>';
+                        var value = 'L:' + last_name + ', ' + first_name;
+                        
                         if (connections[i].threeCurrentPositions._total > 0) {
                             var positions = connections[i].threeCurrentPositions.values;
                             item = item + '<br/><span class="connection_position">' + positions[0].title + ' @ ' + positions[0].company.name + '</span>';
@@ -296,9 +297,11 @@ function add_candidates_to_list(_is_not_from_list) {
                 var is_exists = false;
                 var candidate_name = selected_candidates[i].value;
                 var candidate_social = 'LinkedIn';
-                if (selected_candidates[i].text.charAt(0) == 'F') {
+                if (selected_candidates[i].value.charAt(0) == 'F') {
                     candidate_social = 'Facebook';
                 }
+                
+                candidate_name = candidate_name.substr(2);
                 
                 for (var j=0; j < refer_num_candidates; j++) {
                     if (candidate_name == $('refer_candidate_name_' + j).value) {
