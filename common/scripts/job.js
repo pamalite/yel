@@ -45,7 +45,7 @@ function show_refer_popup() {
                     var id = connections[i].id;
                     
                     if (id != 'private') {
-                        var item = '<img src="../../common/images/icons/linkedin_icon_small.gif" /> <span class="connection_name">' + last_name + ', ' + first_name + '</span>';
+                        var item = '<img src="../common/images/icons/linkedin_icon_small.gif" /> <span class="connection_name">' + last_name + ', ' + first_name + '</span>';
                         var value = 'L:' + last_name + ', ' + first_name;
                         
                         if (connections[i].threeCurrentPositions._total > 0) {
