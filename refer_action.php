@@ -85,20 +85,29 @@ foreach ($candidates as $i=>$candidate) {
         $message .= $line;
     }
     
+    $criteria = array(
+        'columns' => "employers.name", 
+        'joins' => "employers ON employers.id = jobs.employer", 
+        'match' => "jobs.id = ". $job->getId(), 
+        'limit' => "1"
+    );
+    $job_result = $job->find($criteria);
+    
     $message = str_replace('%requested_on%', date('M j, Y'), $message);
     $message = str_replace('%job_title%', $job->getTitle(), $message);
     $message = str_replace('%job_id%', $job->getId(), $message);
-    $message = str_replace('%employer%', $candidate['current_employer'], $message);
+    $message = str_replace('%employer%', $job_result[0]['name'], $message);
     $message = str_replace('%buffer_id%', $buffer_id, $message);
     $message = str_replace('%candidate_name%', htmlspecialchars_decode(stripslashes($candidate['name'])), $message);
     $referrer_name = 'A friend of yours';
     if ($referrer['is_reveal_name'] == '1') {
         $referrer_name = htmlspecialchars_decode(stripslashes($referrer['name']));
+        $referrer_name .= ' ('. $referrer['email_addr']. ')';
     }
-    $message = str_replace('%referrer_name%', $referrer_name. ' ('. $referrer['email_addr']. ')', $message);
+    $message = str_replace('%referrer_name%', $referrer_name, $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
-    $subject = $referrer_name. " referred you to ". $job->getTitle(). " position";
+    $subject = $referrer_name. " recommended you for the ". $job->getTitle(). " position";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     $headers .= 'Reply-To: '. $referrer['email_addr']. "\n";
     $headers .= 'MIME-Version: 1.0'. "\n";
