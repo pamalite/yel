@@ -322,6 +322,8 @@ function add_candidates_to_list(_is_not_from_list) {
                     candidate_social = 'Facebook';
                 }
                 
+                candidate_name = candidate_name.substr(2);
+                
                 new_candidates[new_candidates.length] = candidate_social + '|' + candidate_name;
             }
         }
