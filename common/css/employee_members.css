@@ -216,10 +216,14 @@ div.other_jobs {
 div.search, 
 div.main_filter {
     width: 100%;
-    height: 180px;
+    height: 200px;
     padding-top: 5px;
     background-color: #DDDDDD;
     border-collapse: collapse;
+}
+
+div.main_filter input.filter_search {
+    width: 98%;
 }
 
 div.search {
