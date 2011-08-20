@@ -32,7 +32,7 @@ function show_refer_popup() {
                 if (connections.length <= 0) {
                     is_linkedin = false;
                     $('refer_next_btn').disabled = false;
-                    $('lbl_loading_status').set('html', 'Done! Press Next to continue.');
+                    $('lbl_loading_status').set('html', 'Tip: Recommend your friends via LinkedIn and Facebook by logging in through either account.');
                     return;
                 }
 
