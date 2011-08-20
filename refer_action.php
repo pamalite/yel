@@ -86,8 +86,13 @@ foreach ($candidates as $i=>$candidate) {
     }
     
     $criteria = array(
-        'columns' => "employers.name", 
-        'joins' => "employers ON employers.id = jobs.employer", 
+        'columns' => 'jobs.*, industries.industry AS full_industry, 
+                      employers.name AS employer_name, branches.currency',
+        'joins' => 'industries ON industries.id = jobs.industry, 
+                    countries ON countries.country_code = jobs.country, 
+                    employers ON employers.id = jobs.employer, 
+                    employees ON employees.id = employers.registered_by, 
+                    branches ON branches.id = employees.branch', 
         'match' => "jobs.id = ". $job->getId(), 
         'limit' => "1"
     );
@@ -96,9 +101,28 @@ foreach ($candidates as $i=>$candidate) {
     $message = str_replace('%requested_on%', date('M j, Y'), $message);
     $message = str_replace('%job_title%', $job->getTitle(), $message);
     $message = str_replace('%job_id%', $job->getId(), $message);
-    $message = str_replace('%employer%', $job_result[0]['name'], $message);
+    $message = str_replace('%employer%', $job_result[0]['employer_name'], $message);
     $message = str_replace('%buffer_id%', $buffer_id, $message);
     $message = str_replace('%candidate_name%', htmlspecialchars_decode(stripslashes($candidate['name'])), $message);
+    $message = str_replace('%industry%', $job_result[0]['full_industry'], $message);
+    
+    $currency = $job_result[0]['currency'];
+    $salary_range = $currency. ' $'. number_format($job_result[0]['salary']);
+    if (!is_null($job_result[0]['salary_end']) && $job_result[0]['salary_end'] > 0) {
+        $salary_range .= ' - '. number_format($job_result[0]['salary_end']);
+    }
+    $message = str_replace('%salary_range%', $salary_range, $message);
+    
+    $message = str_replace('%reward%', $currency. ' $'. number_format($job_result[0]['potential_reward']), $message);
+    
+    $total_potential_reward = $job_result[0]['potential_reward'];
+    $potential_token_reward = $total_potential_reward * 0.05;
+    $potential_reward = $total_potential_reward - $potential_token_reward;
+    $message = str_replace('%bonus%', $currency. ' $'. number_format($potential_token_reward), $message);
+    
+    $job_desc = str_replace(array("\n", "\r", "\r\n"), '<br/>', $job_result[0]['description']);
+    $message = str_replace('%job_desc%', htmlspecialchars_decode(stripslashes($job_desc)), $message);
+    
     $referrer_name = 'A friend of yours';
     if ($referrer['is_reveal_name'] == '1') {
         $referrer_name = htmlspecialchars_decode(stripslashes($referrer['name']));

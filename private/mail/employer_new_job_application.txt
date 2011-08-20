@@ -1,19 +1,14 @@
-Hi %company%,
+Hi,
 
-You have received potential applicant for the following job positions:
+Attached is a resume for the following position(s) for your consideration: 
 
 %jobs%
 
-A message from our consultant:
-
 %message%
 
-Please sign in to your account to view the candidate's resume, or 
-download the attached resume.
-
-To sign in, go to the following web address:
-
-%protocol%://%root%/employers
 
 Yellow Elevator
 The Fast Way Up
+
+P/S: A copy of the attached resume can also be retrieved from your 
+Employer Account at %protocol%://%root%/employers

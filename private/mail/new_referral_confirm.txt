@@ -6,8 +6,15 @@
         <br/>
         Please acknowledge this recommendation by selecting one of the following actions to indicate your interest:<br/>
         <br/>
+        <bold>Industry:</bold>&nbsp;%industry%<br/>
+        <bold>Monthly Salary Range:</bold>&nbsp;%salary_range%<br/>
+        <bold>Recommender's Reward:</bold>&nbsp;%reward%<br/>
+        <bold>Candidate's Bonus:</bold>&nbsp;%bonus%<br/>
+        <bold>Job Description:</bold><br/><br/>
+        %job_desc%<br/>
+        <br/>
         <a href="%protocol%://%root%/job/%job_id%?buffer_id=%buffer_id%">
-            Yes, I would like to view the job details, then make a decision.
+            Yes, I would like to try out for this position.
         </a>
         &nbsp;&nbsp;&nbsp;
         <a href="%protocol%://%root%/reject_referral.php?id=%buffer_id%">
