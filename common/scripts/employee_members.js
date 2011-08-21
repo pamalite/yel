@@ -260,8 +260,8 @@ function populate_jobs_list() {
                     $('jobs').options[$('jobs').options.length] = option;
                     
                     var a_job = new Hash({
-                        'id': ids[i].childNodes[0].nodeValue,
-                        'title': title
+                        id: ids[i].childNodes[0].nodeValue,
+                        title: title
                     });
                     all_jobs[i] = a_job;
                 }
@@ -2279,8 +2279,8 @@ function onDomReady() {
    
    for (var i=0; i < $('employers').length; i++) {
        var a_emp = new Hash({
-           'id': $('employers').options[i].value,
-           'title': $('employers').options[i].text
+           id: $('employers').options[i].value,
+           title: $('employers').options[i].text
        });
        
        all_employers[i] = a_emp;

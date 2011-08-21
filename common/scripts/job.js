@@ -3,6 +3,7 @@ var is_linkedin = false;
 var is_facebook = false;
 var refer_num_candidates = 0;
 
+var my_connections = new Array();
 var connections_list = new ListBox('list_placeholder', 'connections_list', true);
 
 function close_refer_popup(_proceed_refer) {
@@ -12,6 +13,7 @@ function close_refer_popup(_proceed_refer) {
 
 function show_refer_popup() {
     // reset the wizard page
+    myConnections = new Array();
     refer_wizard_page = 'referrer';
     $('refer_next_btn').value = 'Next >';
     $('refer_next_btn').disabled = true;
@@ -44,17 +46,30 @@ function show_refer_popup() {
                     var last_name = connections[i].lastName;
                     var id = connections[i].id;
                     
+                    var a_connection = new Hash({
+                        socialId: id,
+                        social: 'LinkedIn',
+                        firstName: first_name,
+                        lastName: last_name,
+                        currentPosition: '',
+                        currentEmployer: ''
+                    });
+                    
                     if (id != 'private') {
                         var item = '<img src="../common/images/icons/linkedin_icon_small.gif" /> <span class="connection_name">' + last_name + ', ' + first_name + '</span>';
-                        var value = 'L:' + last_name + ', ' + first_name;
+                        var value = id;
                         
                         if (connections[i].threeCurrentPositions._total > 0) {
                             var positions = connections[i].threeCurrentPositions.values;
                             item = item + '<br/><span class="connection_position">' + positions[0].title + ' @ ' + positions[0].company.name + '</span>';
+                            
+                            a_connection.currentPosition = positions[0].title;
+                            a_connection.currentEmployer = positions[0].company.name;
                         }
                     }
                     
                     connections_list.add_item(item, value);
+                    my_connections[i] = a_connection;
                 }
 
                 connections_list.show();
@@ -295,50 +310,51 @@ function add_candidates_to_list(_is_not_from_list) {
         if (refer_num_candidates > 0) {
             for (var i=0; i < selected_candidates.length; i++) {
                 var is_exists = false;
-                var candidate_name = selected_candidates[i].value;
-                var candidate_social = 'LinkedIn';
-                if (selected_candidates[i].value.charAt(0) == 'F') {
-                    candidate_social = 'Facebook';
+                var candidate = null;
+                
+                // get from connections
+                for (var j=0; j < my_connections.length; j++) {
+                    if (my_connections[j].socialId == selected_candidates[i].value) {
+                        candidate = my_connections[j];
+                        break;
+                    }
                 }
                 
-                candidate_name = candidate_name.substr(2);
-                
                 for (var j=0; j < refer_num_candidates; j++) {
-                    if (candidate_name == $('refer_candidate_name_' + j).value) {
+                    if (candidate.socialId == $('refer_candidate_social_id_' + j).value) {
                         is_exists = true;
                         break;
                     }
                 }
                 
                 if (!is_exists) {
-                    new_candidates[new_candidates.length] = candidate_social + '|' + candidate_name;
+                    new_candidates[new_candidates.length] = candidate;
                 }
             }
         } else {
-            for (var i=0; i < selected_candidates.length; i++) {
-                var candidate_name = selected_candidates[i].value;
-                var candidate_social = 'LinkedIn';
-                if (selected_candidates[i].value.charAt(0) == 'F') {
-                    candidate_social = 'Facebook';
+            for (var i=0; i < selected_candidates.length; i++) {                
+                // get from connections
+                for (var j=0; j < my_connections.length; j++) {
+                    if (my_connections[j].socialId == selected_candidates[i].value) {
+                        new_candidates[new_candidates.length] = my_connections[j];
+                        break;
+                    }
                 }
-                
-                candidate_name = candidate_name.substr(2);
-                
-                new_candidates[new_candidates.length] = candidate_social + '|' + candidate_name;
             }
         }
         
         // add to list
         for (var i=0; i < new_candidates.length; i++) {
-            var items = new_candidates[i].split('|');
+            var candidate = new_candidates[i];
             
             html = html + '<div class="refer_candidates" id="refer_candidate_' + refer_num_candidates + '">' + "\n";
-            html = html + '<input type="hidden" id="refer_candidate_social_' + refer_num_candidates + '" value="' + items[0] + '" />' + "\n";
-            html = html + 'Name: <input type="text" id="refer_candidate_name_' + refer_num_candidates + '" value="' + items[1] + '" /><br/>' + "\n";
+            html = html + '<input type="hidden" id="refer_candidate_social_' + refer_num_candidates + '" value="' + candidate.social + '" />' + "\n";
+            html = html + '<input type="hidden" id="refer_candidate_social_id_' + refer_num_candidates + '" value="' + candidate.socialId + '" />' + "\n";
+            html = html + 'Name: <input type="text" id="refer_candidate_name_' + refer_num_candidates + '" value="' + candidate.lastName + ', ' + candidate.firstName + '" /><br/>' + "\n";
             html = html + 'Email: <input type="text" id="refer_candidate_email_' + refer_num_candidates + '" /><br/>' + "\n";
             html = html + 'Phone: <input type="text" id="refer_candidate_phone_' + refer_num_candidates + '" /><br/>' + "\n";
-            html = html + 'Current Position: <input type="text" id="refer_candidate_pos_' + refer_num_candidates + '" /><br/>' + "\n";
-            html = html + 'Current Employer: <input type="text" id="refer_candidate_emp_' + refer_num_candidates + '" /><br/>' + "\n";
+            html = html + 'Current Position: <input type="text" id="refer_candidate_pos_' + refer_num_candidates + '" value="' + candidate.currentPosition + '" /><br/>' + "\n";
+            html = html + 'Current Employer: <input type="text" id="refer_candidate_emp_' + refer_num_candidates + '" value="' + candidate.currentEmployer + '" /><br/>' + "\n";
             html = html + '<input type="button" value="Remove" onClick="remove_candidate_from_list(' + refer_num_candidates + ');" />' + "\n";
             html = html + '</div>' + "\n";
             
@@ -363,6 +379,7 @@ function remove_candidate_from_list(_idx) {
         if (i != _idx) {
             html = html + '<div class="refer_candidates" id="refer_candidate_' + new_idx + '">' + "\n";
             html = html + '<input type="hidden" id="refer_candidate_social_' + new_idx + '" value="' + $('refer_candidate_social_' + i).value + '" />' + "\n";
+            html = html + '<input type="hidden" id="refer_candidate_social_id_' + new_idx + '" value="' + $('refer_candidate_social_id_' + i).value + '" />' + "\n";
             html = html + 'Name: <input type="text" id="refer_candidate_name_' + new_idx + '" value="' + $('refer_candidate_name_' + i).value + '" /><br/>' + "\n";
             html = html + 'Email: <input type="text" id="refer_candidate_email_' + new_idx + '" value="' + $('refer_candidate_email_' + i).value + '" /><br/>' + "\n";
             html = html + 'Phone: <input type="text" id="refer_candidate_phone_' + new_idx + '" value="' + $('refer_candidate_phone_' + i).value + '" /><br/>' + "\n";
