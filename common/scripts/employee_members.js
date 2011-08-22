@@ -19,6 +19,8 @@ var sliding_search_fx = '';
 var return_page = '';
 var jobs_list = new ListBox('jobs_selector', 'jobs_list', true);
 var resume_id = '';
+var all_employers = new Array();
+var all_jobs = new Array();
 
 function new_applicants_ascending_or_descending() {
     if (new_applicants_order == 'desc') {
@@ -61,6 +63,50 @@ function sort_by(_table, _column) {
             members_ascending_or_descending();
             update_members();
             break;
+    }
+}
+
+function get_jobs() {
+    // 1. reset the list
+    $('jobs').options.length = 0;
+    
+    // 2. put everything if empty
+    if (isEmpty($('jobs_search').value)) {
+        for (var i=0; i < all_jobs.length; i++) {
+            var option = new Option(all_jobs[i].title, all_jobs[i].id);
+            $('jobs').add(option);
+        }
+        return;
+    }
+    
+    // 3. find in title by using regex in all_jobs, and rebuild
+    for (var i=0; i < all_jobs.length; i++) {
+        if (all_jobs[i].title.toLowerCase().search($('jobs_search').value.toLowerCase()) > -1) {
+            var option = new Option(all_jobs[i].title, all_jobs[i].id);
+            $('jobs').add(option);
+        }
+    }
+}
+
+function get_employers() {
+    // 1. reset the list
+    $('employers').options.length = 0;
+    
+    // 2. put everything if empty
+    if (isEmpty($('employers_search').value)) {
+        for (var i=0; i < all_employers.length; i++) {
+            var option = new Option(all_employers[i].title, all_employers[i].id);
+            $('employers').add(option);
+        }
+        return;
+    }
+    
+    // 3. find in title by using regex in all_employers, and rebuild
+    for (var i=0; i < all_employers.length; i++) {
+        if (all_employers[i].title.toLowerCase().search($('employers_search').value.toLowerCase()) > -1) {
+            var option = new Option(all_employers[i].title, all_employers[i].id);
+            $('employers').add(option);
+        }
     }
 }
 
@@ -197,6 +243,7 @@ function populate_jobs_list() {
             }
             
             if (txt == '0') {
+                all_jobs = new Array();
                 $('jobs_list_message_box').set('html', 'Please select another employer. There are no jobs published.');
                 $('jobs_list').setStyle('border', '1px dashed #888888');
                 $('jobs_list_message_box').setStyle('display', 'block');
@@ -211,6 +258,12 @@ function populate_jobs_list() {
                     var title = '[' + employer_ids[i].childNodes[0].nodeValue + '][' + ids[i].childNodes[0].nodeValue + '] ' + titles[i].childNodes[0].nodeValue;
                     var option = new Option(title, ids[i].childNodes[0].nodeValue );
                     $('jobs').options[$('jobs').options.length] = option;
+                    
+                    var a_job = new Hash({
+                        id: ids[i].childNodes[0].nodeValue,
+                        title: title
+                    });
+                    all_jobs[i] = a_job;
                 }
                 
                 $('jobs_list').setStyle('border', 'none');
@@ -812,6 +865,10 @@ function update_new_applicants() {
                 var current_emps = xml.getElementsByTagName('current_employer');
                 var remind_ons = xml.getElementsByTagName('formatted_remind_on');
                 var remind_days_left = xml.getElementsByTagName('days_left');
+                var is_reveal_names = xml.getElementsByTagName('is_reveal_name');
+                var via_socials = xml.getElementsByTagName('via_social_connection');
+                var candidate_responses = xml.getElementsByTagName('candidate_response');
+                var candidate_responded_ons = xml.getElementsByTagName('formatted_candidate_responded_on');
                 
                 var new_applicants_table = new FlexTable('new_applicants_table', 'new_applicants');
 
@@ -841,6 +898,9 @@ function update_new_applicants() {
                     } else {
                         var referrer_phone_num = '';
                         var referrer_email = '';
+                        var via_social = '';
+                        var revealed_name = 'Revealed Name: No';
+                        
                         if (referrer_phones[i].childNodes.length > 0) {
                             referrer_phone_num = referrer_phones[i].childNodes[0].nodeValue;
                         }
@@ -848,12 +908,24 @@ function update_new_applicants() {
                         if (referrer_emails[i].childNodes.length > 0) {
                             referrer_email = referrer_emails[i].childNodes[0].nodeValue;
                         }
-
+                        
+                        if (is_reveal_names[i].childNodes[0].nodeValue == '1') {
+                            revealed_name = 'Revealed Name: Yes';
+                        }
+                        
+                        if (via_socials[i].childNodes.length > 0) {
+                            if (via_socials[i].childNodes[0].nodeValue == 'linkedin') {
+                                via_social = 'Via: LinkedIn';
+                            } else {
+                                via_social = 'Via: FaceBook';
+                            }
+                        }
+                        
                         if (isEmpty(referrer_phone_num) || isEmpty(referrer_email)) {
                             is_cannot_signup = true;
-                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + ' (Incomplete!)</a></div>' + "\n";
+                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + ' (Incomplete!)</a><br/>' + via_social + '<br/>' + revealed_name + '</div>' + "\n";
                         } else {
-                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + '</a></div>' + "\n";
+                            referrer_short_details = '<div class="tiny_contact">Ref: <a class="no_link" onClick="show_referrer_popup(' + ids[i].childNodes[0].nodeValue + ');">' + referrer_names[i].childNodes[0].nodeValue + '</a><br/>' + via_social + '<br/>' + revealed_name + '</div>' + "\n";
                         }
                     }
                     
@@ -898,7 +970,19 @@ function update_new_applicants() {
                     }
                     short_desc = short_desc + mini_career_profile;
                     
+                    var candidate_response = '';
+                    if (via_socials[i].childNodes.length > 0) {
+                        candidate_response = '<div class="small_contact"><span style="font-weight: bold;">Response:</span> Not Yet</div>';
+                    }
+                    
+                    if (candidate_responses[i].childNodes.length > 0) {
+                        candidate_response = '<div class="small_contact"><span style="font-weight: bold;">Response:</span> ' + candidate_responses[i].childNodes[0].nodeValue + ' on ' + candidate_responded_ons[i].childNodes[0].nodeValue + '</div>';
+                    }
+                    
                     var candidate_details = short_desc + '<br />' + referrer_short_details;
+                    if (!isEmpty(candidate_response)) {
+                        candidate_details = candidate_details + '<br />' + candidate_response;
+                    }
                     row.set(1, new Cell(candidate_details, '', 'cell'));
                     
                     // job applied
@@ -2182,6 +2266,8 @@ function onDomReady() {
    }
    
    $('jobs_selector').addEvent('click', get_job_description);
+   $('employers_search').addEvent('keyup', get_employers);
+   $('jobs_search').addEvent('keyup', get_jobs);
    
    sliding_filter_fx = new Fx.Slide('div_main_filter', {
        mode: 'vertical'
@@ -2190,6 +2276,15 @@ function onDomReady() {
    sliding_search_fx = new Fx.Slide('div_search', {
        mode: 'vertical'
    });
+   
+   for (var i=0; i < $('employers').length; i++) {
+       var a_emp = new Hash({
+           id: $('employers').options[i].value,
+           title: $('employers').options[i].text
+       });
+       
+       all_employers[i] = a_emp;
+   }
 }
 
 window.addEvent('domready', onDomReady);

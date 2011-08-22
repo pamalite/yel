@@ -8,7 +8,6 @@ Referrer: %referrer% (%referrer_email%)
 Candidate: %candidate% (%candidate_email%)
 Candidate Phone: %candidate_phone%
 Candidate Current Position: %candidate_current_position%
-Has resume: %has_resume%
 
 Yellow Elevator
 The Fast Way Up

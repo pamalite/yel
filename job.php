@@ -68,11 +68,15 @@ if (!is_null($result[0]['alternate_employer'])) {
 }
 
 $show_popup = '';
+$buffer_id = '';
 $action_response = -1;
 $url_elements = explode('/', $_SERVER['REQUEST_URI']);
 $popup_params = explode('?', $url_elements[count($url_elements)-1]);
 if (count($popup_params) > 1) {
-    switch ($popup_params[1]) {
+    $params = explode('&', $popup_params[1]);
+    
+    // 1. error and popup?
+    switch ($params[0]) {
         case 'refer=1':
             $show_popup = 'refer';
             break;
@@ -85,9 +89,15 @@ if (count($popup_params) > 1) {
         case 'error=1':
         case 'error=2':
         case 'error=3':
-            $response = explode('=', $popup_params[1]);
+            $response = explode('=', $params[0]);
             $job_page->set_request_status($response[1]);
             break;
+    }
+    
+    // 2. buffer ID
+    if (count($params) > 1) {
+        $buffer_kv = explode('=', $params[1]);
+        $buffer_id = $buffer_kv[1];
     }
 }
 
@@ -97,7 +107,7 @@ $job_page->header(array(
 ));
 $job_page->insert_job_css();
 $job_page->insert_job_scripts();
-$job_page->insert_inline_scripts($show_popup);
+$job_page->insert_inline_scripts($show_popup, $buffer_id);
 $job_page->show($from_search);
 $job_page->footer();
 ?>

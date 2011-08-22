@@ -47,10 +47,6 @@ if (isset($_SESSION['yel']['member']['id']) &&
 $branch_email = 'team.my@yellowelevator.com';
 
 $data = array();
-$data['requested_on'] = $today; 
-$data['referrer_email'] = $branch_email;
-$data['referrer_phone'] = 'NULL';
-$data['referrer_name'] = 'NULL';
 $data['candidate_email'] = $candidate['email_addr'];
 $data['candidate_phone'] = $candidate['phone_num'];
 $data['candidate_name'] = $candidate['name'];
@@ -59,10 +55,25 @@ $data['current_employer'] = $candidate['current_employer'];
 $data['job'] = $job->getId();
 
 $referral_buffer = new ReferralBuffer();
-$buffer_id = $referral_buffer->create($data);
-if ($buffer_id === false) {
-    redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
-    exit();
+$buffer_id = $_POST['buffer_id'];
+if (empty($buffer_id)) {
+    $data['requested_on'] = $today; 
+    $data['referrer_email'] = $branch_email;
+    $data['referrer_phone'] = 'NULL';
+    $data['referrer_name'] = 'NULL';
+    $buffer_id = $referral_buffer->create($data);
+    if ($buffer_id === false) {
+        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
+        exit();
+    }
+} else {
+    $referral_buffer = new ReferralBuffer($buffer_id);
+    $data['candidate_response'] = 'yes';
+    $data['candidate_responded_on'] = $today;
+    if (($referral_buffer->update($data)) === false) {
+        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $job->getId(). '?error=1');
+        exit();
+    }
 }
 
 // 2. check any files to upload

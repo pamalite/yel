@@ -1,0 +1,29 @@
+<html>
+    <body>
+        Hi %candidate_name%, <br/>
+        <br/>
+        %referrer_name% recommended you for the %job_title% (%employer%) position through YellowElevator.com on %requested_on%.<br/>
+        <br/>
+        Please review the job details and acknowledge this recommendation by selecting one of the actions below to indicate your interest:<br/>
+        <br/>
+        <bold>Industry:</bold>&nbsp;%industry%<br/>
+        <bold>Monthly Salary Range:</bold>&nbsp;%salary_range%<br/>
+        <bold>Recommender's Reward:</bold>&nbsp;%reward%<br/>
+        <bold>Candidate's Bonus:</bold>&nbsp;%bonus%<br/>
+        <bold>Job Description:</bold><br/><br/>
+        %job_desc%<br/>
+        <br/>
+        <a href="%protocol%://%root%/job/%job_id%?apply=1&buffer_id=%buffer_id%">
+            Yes, I would like to try out for this position.
+        </a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="%protocol%://%root%/reject_referral.php?id=%buffer_id%">
+            No, thank you. I am happy with my current job.
+        </a><br/>
+        <br/>
+        At the job details page, click "Apply Job" if you are interested to apply for the job or click "Recommend a Friend" if you decide to recommend someone else for the job. Thank you.<br/>
+        <br/>
+        Yellow Elevator<br/>
+        The Fast Way Up
+    </body>
+</html>

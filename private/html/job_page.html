@@ -61,68 +61,91 @@
 
 <!-- popup window goes here -->
 <div id="refer_window" class="popup_window">
-    <div class="popup_window_title">Recommend %job_title%</div>
+    <div class="popup_window_title">Recommend a Friend - %job_title%</div>
     <div id="refer_progress">
         Please wait while your request is being processed... <br/><br/>
         <img src="%root%/common/images/progress/circle_big.gif" />
     </div>
     <form id="refer_form" action="%root%/refer_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_refer_popup(true);">
-        <input type="hidden" name="job_id" value="%job_id%" />
-        <table class="refer_form">
-            <tr>
-                <td class="referrer">
-                    <table class="referrer">
-                        <tr>
-                            <td colspan="2" class="title">Your Contact Details</td>
-                        </tr>
-                        
-                        <!-- %refer_form% -->
-                        
-                        <tr>
-                            <td colspan="2" class="title">Candidate's Contact Details &amp; Resume</td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_email">E-mail Address:</label></td>
-                            <td><input type="text" class="field" name="candidate_email" id="candidate_email" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_phone">Telephone:</label></td>
-                            <td><input type="text" class="field" name="candidate_phone" id="candidate_phone" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_name">Name:</label></td>
-                            <td><input type="text" class="field" name="candidate_name" id="candidate_name" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_resume">Resume:</label></td>
-                            <td><input type="file" class="field" name="candidate_resume" id="candidate_resume" value="" /></td>
-                        </tr>
-                    </table>
-                </td>
-                <td class="candidate">
-                    <table class="candidate">
-                        <tr>
-                            <td colspan="2" class="title">Candidate's Extra Info (Optional)</td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_current_pos">Current Position:</label></td>
-                            <td><input type="text" class="field" name="candidate_current_pos" id="candidate_current_pos" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_current_emp">Current Employer:</label></td>
-                            <td><input type="text" class="field" name="candidate_current_emp" id="candidate_current_emp" value="" /></td>
-                        </tr>
-                        <tr>
-                            <td class="label"><label for="candidate_remarks">Other Remarks:</label></td>
-                            <td><textarea class="field" name="candidate_remarks" id="candidate_remarks"></textarea></td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
+        <input type="hidden" id="job_id" name="job_id" value="%job_id%" />
+        <div class="refer_form">
+            <div id="refer_referrer_contacts" class="wizard_page">
+                <table class="referrer">
+                    <tr>
+                        <td colspan="2" class="title">Please Verify Your Contact Details</td>
+                    </tr>
+                    
+                    <!-- %refer_form% -->
+                    
+                </table>
+            </div>
+            
+            <div id="refer_candidates_social" class="wizard_page">
+                <table class="candidates">
+                    <tr>
+                        <td colspan="3" class="title">Select &amp; Add Your Friends</td>
+                    </tr>
+                    <tr>
+                        <td class="candidates_listing">
+                            <div id="list_placeholder" class="list_placeholder">
+                                Cannot retrieve your connections.
+                            </div>
+                            <div class="list_functions">
+                                <input type="button" value="Add New Friend" onClick="add_candidates_to_list(true);" />&nbsp;
+                                <input type="button" value="Add From List" onClick="add_candidates_to_list();" />
+                            </div>
+                        </td>
+                        <td class="border"></td>
+                        <td class="candidates_info_list">
+                            <div id="info_list_placeholder" class="info_list_placeholder">
+                                <div id="info_list_tip">
+                                    To recommend your friend(s) to this job opportunity, you can either:
+                                    <br/><br/>
+                                    <ol>
+                                        <li>Select your friend(s) in the list on the left and click the "Add From List" button; or</li>
+                                        <li>Click the "Add New Friend" button if you would like to recommend a friend who is not in the list.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div id="refer_candidates_default" class="wizard_page">
+                <table class="candidate">
+                    <tr>
+                        <td colspan="2" class="title">Your Potential Candidate</td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_email">E-mail Address:</label></td>
+                        <td><input type="text" class="field" name="candidate_email" id="candidate_email" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_phone">Telephone:</label></td>
+                        <td><input type="text" class="field" name="candidate_phone" id="candidate_phone" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_name">Name:</label></td>
+                        <td><input type="text" class="field" name="candidate_name" id="candidate_name" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_current_pos">Current Position:</label></td>
+                        <td><input type="text" class="field" name="candidate_current_pos" id="candidate_current_pos" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_current_emp">Current Employer:</label></td>
+                        <td><input type="text" class="field" name="candidate_current_emp" id="candidate_current_emp" value="" /></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
         <div class="popup_window_buttons_bar">
-             <input type="submit" value="Recommend Now" />
-             <input type="button" value="Cancel" onClick="close_refer_popup(false);" />
+            <span class="lbl_loading_status" id="lbl_loading_status">Preparing next page...</span>
+            &nbsp;&nbsp;&nbsp;
+            <input type="button" value="Cancel" onClick="close_refer_popup(false);" />
+            <input type="button" id="refer_next_btn" value="Next &gt;" onClick="show_next_refer_wizard_page();" />
         </div>
     </form>
 </div>
@@ -135,6 +158,7 @@
     </div>
     <form id="apply_form" action="%root%/apply_action.php" method="post" enctype="multipart/form-data" onSubmit="return close_apply_popup(true);">
         <input type="hidden" name="job_id" value="%job_id%" />
+        <input type="hidden" id="buffer_id" name="buffer_id" value="" />
         
         <!-- %apply_form% -->
         

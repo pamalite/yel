@@ -212,7 +212,10 @@ if ($_POST['action'] == 'get_new_applicants') {
                       (SELECT COUNT(buf.id) 
                        FROM referral_buffers AS buf 
                        WHERE buf.candidate_email = referral_buffers.candidate_email) AS num_jobs_attached, 
-                      referral_buffers.current_employer, referral_buffers.current_position", 
+                      referral_buffers.current_employer, referral_buffers.current_position, 
+                      referral_buffers.via_social_connection, referral_buffers.is_reveal_name, 
+                      referral_buffers.candidate_response, 
+                      DATE_FORMAT(referral_buffers.candidate_responded_on, '%e %b, %Y') AS formatted_candidate_responded_on", 
         'joins' => "members ON members.email_addr = referral_buffers.candidate_email, 
                     jobs ON jobs.id = referral_buffers.job, 
                     employers ON employers.id = jobs.employer",

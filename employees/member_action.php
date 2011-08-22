@@ -582,9 +582,7 @@ if ($_POST['action'] == 'apply_job') {
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     
     if (!empty($_POST['message'])) {
-        $message = str_replace('%message%', $_POST['message'], $message);
-    } else {
-        $message = str_replace('%message%', '[No message]', $message);
+        $message = str_replace('%message%', "A message from our consultant:\n\n". $_POST['message'], $message);
     }
     
     // 2. get the selected resume file

@@ -189,6 +189,7 @@ class EmployeeMembersPage extends Page {
                     <?php
                         } else {
                     ?>
+                        <input type="text" class="filter_search" id="employers_search" /><br/>
                         <select id="employers" class="employers" multiple>
                     <?php
                             foreach ($employers as $an_employer) {
@@ -210,6 +211,7 @@ class EmployeeMembersPage extends Page {
                     <td id="jobs_list" class="jobs_list">
                         <div id="jobs_list_message_box">&lt;--- Select the employers to list jobs.</div>
                         <div id="jobs_list_placeholder">
+                            <input type="text" class="filter_search" id="jobs_search" /><br/>
                             <select id="jobs" class="jobs" onClick="toggle_add_button();" multiple>
                             </select>
                         </div>
