@@ -126,14 +126,16 @@ foreach ($candidates as $i=>$candidate) {
     $message = str_replace('%job_desc%', htmlspecialchars_decode(stripslashes($job_desc)), $message);
     
     $referrer_name = 'A friend of yours';
+    $referrer_name_subject = $referrer_name;
     if ($referrer['is_reveal_name'] == '1') {
         $referrer_name = htmlspecialchars_decode(stripslashes($referrer['name']));
+        $referrer_name_subject = $referrer_name;
         $referrer_name .= ' ('. $referrer['email_addr']. ')';
     }
     $message = str_replace('%referrer_name%', $referrer_name, $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
-    $subject = $referrer_name. " recommended you for the ". $job->getTitle(). " position";
+    $subject = $referrer_name_subject. " recommended you for the ". $job->getTitle(). " position";
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     $headers .= 'Reply-To: '. $referrer['email_addr']. "\n";
     $headers .= 'MIME-Version: 1.0'. "\n";

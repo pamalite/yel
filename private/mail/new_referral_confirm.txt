@@ -4,7 +4,7 @@
         <br/>
         %referrer_name% recommended you for the %job_title% (%employer%) position through YellowElevator.com on %requested_on%.<br/>
         <br/>
-        Please acknowledge this recommendation by selecting one of the following actions to indicate your interest:<br/>
+        Please review the job details and acknowledge this recommendation by selecting one of the actions below to indicate your interest:<br/>
         <br/>
         <bold>Industry:</bold>&nbsp;%industry%<br/>
         <bold>Monthly Salary Range:</bold>&nbsp;%salary_range%<br/>

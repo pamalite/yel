@@ -200,7 +200,7 @@ function show_next_refer_wizard_page() {
             }
             
             // ask whether to reveal referrer name
-            var is_reveal_name = confirm('Perhaps would you like to reveal your name (as the recommender) to your friends?' + "\n\nClick 'OK' for Yes, and 'Cancel' for No.");
+            var is_reveal_name = confirm('Would you like to reveal your name (as the recommender) to your friends?' + "\n\nClick 'OK' for Yes, and 'Cancel' for No.");
             
             // confirm submission
             if (!confirm('Confirm to submit your recommendations?')) {
