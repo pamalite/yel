@@ -14,7 +14,7 @@
         %job_desc%<br/>
         <br/>
         <a href="%protocol%://%root%/job/%job_id%?apply=1&buffer_id=%buffer_id%">
-            Yes, I would like to try out for this position.
+            Yes, I am interested to apply for this position.
         </a>
         &nbsp;&nbsp;&nbsp;
         <a href="%protocol%://%root%/reject_referral.php?id=%buffer_id%">

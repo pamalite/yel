@@ -73,8 +73,8 @@ class WelcomePage extends Page {
                 }
                 $a_result = str_replace('%salary_range%', $salary_range, $a_result);
                 
-                $a_result = str_replace('%potential_reward%', number_format($potential_reward, 2, '.', ','), $a_result);
-                $a_result = str_replace('%potential_token_reward%', number_format($potential_token_reward, 2, '.', ','), $a_result);
+                $a_result = str_replace('%potential_reward%', number_format($potential_reward, 0, '.', ','), $a_result);
+                $a_result = str_replace('%potential_token_reward%', number_format($potential_token_reward, 0, '.', ','), $a_result);
                 $a_result = str_replace('%expire_on%', $job['formatted_expire_on'], $a_result);
                 
                 $top_jobs_html .= $a_result;
