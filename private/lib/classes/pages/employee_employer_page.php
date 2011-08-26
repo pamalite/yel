@@ -130,6 +130,28 @@ class EmployeeEmployerPage extends Page {
         echo '</select>'. "\n";
     }
     
+    private function generate_employees() {
+        $criteria = array(
+            'columns' => "id, CONCAT(lastname, ' ', firstname) AS employee, country"
+        );
+        
+        $result = $this->employee->find($criteria);
+        $my_id = $this->employee->getId();
+        
+        echo '<select class="field" id="job.owner" name="job.owner">'. "\n";
+        foreach ($result as $row) {
+            if ($row['id'] == $my_id) {
+                echo '<option value="'. $row['id']. '" selected>';
+            } else {
+                echo '<option value="'. $row['id']. '">';
+            }
+            
+            echo $row['employee']. ' ('. $row['country']. ')';
+            echo '</option>'. "\n";
+        }
+        echo '</select>'. "\n";
+    }
+    
     public function show() {
         $this->begin();
         $branch = $this->employee->getBranch();
@@ -477,6 +499,14 @@ class EmployeeEmployerPage extends Page {
             <form method="post"onSubmit="return false;">
                 <input type="hidden" id="job_id" value="0" />
                 <table id="job_form" class="job_form">
+                    <tr>
+                        <td class="label"><label for="job.owner">Consultant:</label></td>
+                        <td class="field">
+                        <?php
+                            $this->generate_employees();
+                        ?>
+                        </td>
+                    </tr>
                     <tr>
                         <td class="label"><label for="job.title">Title:</label></td>
                         <td class="field"><input class="field" type="text" id="job.title" name="title" /></td>
