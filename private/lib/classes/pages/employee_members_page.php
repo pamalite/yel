@@ -606,17 +606,7 @@ class EmployeeMembersPage extends Page {
                 <input type="hidden" id="reminder_id" value="" />
                 <input type="hidden" id="reminder_is_buffer" value="1" />
                 <div class="reminder_form">
-                    Follow up in 
-                    <select id="reminder_days">
-                        <option value="1" selected>1 day</option>
-                    <?php
-                    for ($i=2; $i <= 14; $i++) {
-                    ?>
-                        <option value="<?php echo $i; ?>"><?php echo $i; ?> days</option>
-                    <?php
-                    }
-                    ?>
-                    </select>
+                    Follow up on <input type="text" id="reminder_day" class="reminder_field" value="" />
                 </div>
             </form>
             <div class="popup_window_buttons_bar">

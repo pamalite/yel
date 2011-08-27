@@ -781,7 +781,7 @@ if ($_POST['action'] == 'sign_up') {
         
         // 3.5 save the notes by appending them
         $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
-         $member->saveNotes($existing_notes. "\n\n[(". $buffer_result[0]['job']. ") ". $job_result[0]['job_title']. "] ". $buffer_result[0]['referrer_remarks']);
+        $member->saveNotes($existing_notes. "\n\n[(". $buffer_result[0]['job']. ") ". $job_result[0]['job_title']. "] ". $buffer_result[0]['referrer_remarks']);
 
         // 4. create connection
         $connection_is_success = true;
@@ -1646,7 +1646,8 @@ if ($_POST['action'] == 'get_remind_on') {
     
     if ($_POST['is_buffer'] == '1') {
         $criteria = array(
-            'columns' => "DATEDIFF(remind_on, NOW()) AS days_left",
+            'columns' => "referral_buffers.remind_on, 
+                          DATEDIFF(remind_on, NOW()) AS days_left",
             'match' => "id = ". $_POST['id'],
             'limit' => "1"
         );
@@ -1654,7 +1655,8 @@ if ($_POST['action'] == 'get_remind_on') {
         $result = $buffer->find($criteria);
     } else {
         $criteria = array(
-            'columns' => "DATEDIFF(member_jobs.remind_on, NOW()) AS days_left",
+            'columns' => "member_jobs.remind_on, 
+                          DATEDIFF(member_jobs.remind_on, NOW()) AS days_left",
             'joins' => "member_jobs ON members.email_addr = member_jobs.member", 
             'match' => "member_jobs.id = ". $_POST['id'],
             'limit' => "1"
@@ -1663,14 +1665,16 @@ if ($_POST['action'] == 'get_remind_on') {
         $result = $member->find($criteria);
     }
     
-    echo $result[0]['days_left'];
+    //echo $result[0]['days_left'];
+    echo substr($result[0]['remind_on'], 0, strlen($result[0]['remind_on'])-3);
     exit();
 }
 
 if ($_POST['action'] == 'set_reminder') {
     if ($_POST['is_buffer'] == '1') {
         $data = array();
-        $data['remind_on'] = sql_date_add(now(), $_POST['days'], 'day');
+        $data['remind_on'] = $_POST['remind_on'];
+        
         $buffer = new ReferralBuffer($_POST['id']);
         if ($buffer->update($data) === false) {
             echo 'ko';
@@ -1678,7 +1682,7 @@ if ($_POST['action'] == 'set_reminder') {
         }
     } else {
         $member = new Member();
-        if ($member->setReminder($_POST['id'], sql_date_add(now(), $_POST['days'], 'day')) === false) {
+        if ($member->setReminder($_POST['id'], $_POST['remind_on']) === false) {
             echo 'ko';
             exit();
         }

@@ -2159,6 +2159,12 @@ function show_reminder_popup(_id, _is_buffer, _idx) {
     $('reminder_id').value = _id;
     $('reminder_is_buffer').value = _is_buffer;
     
+    new DatePicker('.reminder_field', {
+        timePicker: true,
+        format: 'Y-m-d @ H:i',
+        inputOutputFormat: 'Y-m-d H:i:00'
+    });
+    
     var params = 'id=' + _id;
     params = params + '&action=get_remind_on';
     params = params + '&is_buffer=' + _is_buffer;
@@ -2168,19 +2174,6 @@ function show_reminder_popup(_id, _is_buffer, _idx) {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            var found = false;
-            for (var i=0; i < $('reminder_days').options.length; i++) {
-                if ($('reminder_days').options[i].value == txt) {
-                    $('reminder_days').selectedIndex = i;
-                    found = true;
-                    break;
-                }
-            }
-            
-            if (!found) {
-                $('reminder_days').selectedIndex = 0;
-            }
-            
             set_status('');
             show_window('reminder_window');
         },
@@ -2194,11 +2187,15 @@ function show_reminder_popup(_id, _is_buffer, _idx) {
 
 function close_reminder_popup(_is_save) {
     if (_is_save) {
+        if (isEmpty($('reminder_day').value)) {
+            alert('You need to select a date and time.');
+            return false;
+        }
+        
         params = 'id=' + $('reminder_id').value;
         params = params + '&action=set_reminder';
         params = params + '&is_buffer=' + $('reminder_is_buffer').value;
-        var days = $('reminder_days').getSelected();
-        params = params + '&days=' + days[0].value;
+        params = params + '&remind_on=' + $('reminder_day').value;
         
         var uri = root + "/employees/members_action.php";
         var request = new Request({
