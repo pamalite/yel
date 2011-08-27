@@ -676,12 +676,15 @@ class EmployeeMemberPage extends Page {
 
                     foreach ($profile['resumes'] as $i=>$resume) {
                         $resumes_table->set($i+1, 0, $resume['formatted_modified_on'], '', 'cell');
-                        $resumes_table->set($i+1, 1, '<a href="resume_download.php?id='. $resume['id']. '">'. $resume['file_name']. '</a>', '', 'cell');
+                        
+                        $resume_link = '<a href="resume_download.php?id='. $resume['id']. '">'. $resume['file_name']. '</a>';
+                        if ($resume['is_yel_uploaded'] == '1') {
+                            $resume_link = '&raquo;&nbsp;'. $resume_link;
+                        }
+                        $resumes_table->set($i+1, 1, $resume_link, '', 'cell');
                         
                         $resume_action = '<a class="no_link" onClick="update_resume('. $resume['id']. ');">Update</a>';
-                        if ($resume['is_yel_uploaded'] == '1') {
-                            $resume_action .= '&nbsp;|&nbsp;<a class="no_link" onClick="show_apply_job_popup('. $resume['id']. ', \''. addslashes($resume['file_name']). '\');">Submit</a>';
-                        }
+                        $resume_action .= '&nbsp;|&nbsp;<a class="no_link" onClick="show_apply_job_popup('. $resume['id']. ', \''. addslashes($resume['file_name']). '\');">Submit</a>';
                         $resumes_table->set($i+1, 2, $resume_action, '', 'cell actions');
                     }
 
@@ -1078,7 +1081,7 @@ class EmployeeMemberPage extends Page {
                 </div>
             </div>
             <form id="apply_job_form" onSubmit="return false;">
-                <input type="hidden" id="resume_id" name="resume_id" value="0" />
+                <input type="hidden" id="apply_resume_id" name="resume_id" value="0" />
                 <input type="hidden" id="selected_jobs" value="<?php echo implode(',', $this->selected_jobs); ?>" />
                 <span style="font-weight: bold;">Additional Jobs:</span>
                 <div id="div_apply_job_form" class="apply_job_form">

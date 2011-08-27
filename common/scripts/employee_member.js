@@ -944,7 +944,7 @@ function close_employer_remarks() {
 
 function show_apply_job_popup(_resume_id, _resume_file_name) {
     $('message').value = '';
-    $('resume_id').value = _resume_id;
+    $('apply_resume_id').value = _resume_id;
     $('resume_file_name').set('html', _resume_file_name);
     
     var jobs = $('selected_jobs').value.split(',');
@@ -999,7 +999,7 @@ function close_apply_job_popup(_is_apply_job) {
         params = params + '&action=apply_job';
         params = params + '&employee=' + user_id;
         params = params + '&hr_contacts=' + hr_contacts;
-        params = params + '&resume=' + $('resume_id').value;
+        params = params + '&resume=' + $('apply_resume_id').value;
         
         var selected_job_str = $('selected_jobs').value;
         if (selected_jobs.length > 0) {
