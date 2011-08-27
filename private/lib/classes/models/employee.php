@@ -234,7 +234,7 @@ class Employee implements Model {
         $this->seed_id = 0;
         
         if (!empty($_id)) {
-            if (strlen($_id) < 8) {
+            if (strlen($_id) < 9) {
                 $this->id = $_id;
             } else {
                 $this->id = sanitize($this->getIdOnlyFromUserId($_id));
