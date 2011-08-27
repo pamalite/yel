@@ -672,6 +672,7 @@ if ($_POST['action'] == 'save_job') {
     }
     
     $data = array();
+    $data['employee'] = $_POST['employee'];
     $data['employer'] = $_POST['employer'];
     $data['industry'] = $_POST['industry'];
     $data['country'] = $_POST['country'];

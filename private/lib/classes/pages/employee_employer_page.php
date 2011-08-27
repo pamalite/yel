@@ -132,7 +132,8 @@ class EmployeeEmployerPage extends Page {
     
     private function generate_employees() {
         $criteria = array(
-            'columns' => "id, CONCAT(lastname, ' ', firstname) AS employee, country"
+            'columns' => "id, CONCAT(lastname, ', ', firstname) AS employee, country",
+            'order' => "employee ASC"
         );
         
         $result = $this->employee->find($criteria);
@@ -520,7 +521,7 @@ class EmployeeEmployerPage extends Page {
                         <td class="field"><input class="field" type="text" id="job.contact_carbon_copy" name="contact_carbon_copy" /></td>
                     </tr>
                     <tr>
-                        <td class="label"><label for="job.industry">Specialization:</label></td>
+                        <td class="label"><label for="job.industry">Industry:</label></td>
                         <td class="field"><?php $this->generate_industries('', 'job.industry'); ?></td>
                     </tr>
                     <tr>

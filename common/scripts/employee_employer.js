@@ -774,6 +774,7 @@ function show_job_form_with() {
                 }
                 
                 var title = xml.getElementsByTagName('title');
+                var owner = xml.getElementsByTagName('employee');
                 var alternate_employer = xml.getElementsByTagName('alternate_employer');
                 var industry = xml.getElementsByTagName('industry');
                 var contact_carbon_copy = xml.getElementsByTagName('contact_carbon_copy');
@@ -785,6 +786,13 @@ function show_job_form_with() {
                 var description = xml.getElementsByTagName('description');
                 
                 $('job.title').value = title[0].childNodes[0].nodeValue;
+                
+                for (var i=0; i < $('job.owner').options.length; i++) {
+                    if ($('job.owner').options[i].value == owner[0].childNodes[0].nodeValue) {
+                        $('job.owner').selectedIndex = i;
+                        break;
+                    }
+                }
                 
                 $('job.alternate_employer').value = '';
                 if (alternate_employer[0].childNodes.length > 0) {
@@ -905,7 +913,12 @@ function save_job() {
         salary_negotiable = 'Y';
     }
     
+    if (!confirm('Are you sure the consultant to manage this job is correct?' + "\n\n" + $('job.owner').options[$('job.owner').selectedIndex].text)) {
+        return false;
+    }
+    
     var params = 'id=' + $('job_id').value + '&action=save_job';
+    params = params + '&employee=' + $('job.owner').options[$('job.owner').selectedIndex].value;
     params = params + '&employer=' + employer_id;
     params = params + '&title=' + encodeURIComponent($('job.title').value);
     params = params + '&industry=' + $('job.industry').options[$('job.industry').selectedIndex].value;

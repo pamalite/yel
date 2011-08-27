@@ -226,7 +226,7 @@ class Employee implements Model {
         $query = "SELECT ". $columns. " FROM employees ". $joins. 
                   " ". $match. " ". $group. " ". $order. " ". $limit;
         
-        return $mysqli->query($query);
+        return $this->mysqli->query($query);
     }
     
     public function initializeWith($_id = "", $_seed_id = "") {
