@@ -780,8 +780,8 @@ if ($_POST['action'] == 'sign_up') {
         }
         
         // 3.5 save the notes by appending them
-        // $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
-        // $member->saveNotes($existing_notes. "\n\n[(". $buffer_result[0]['job']. ") ". $job_result[0]['job_title']. "] ". $buffer_result[0]['notes']);
+        $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
+         $member->saveNotes($existing_notes. "\n\n[(". $buffer_result[0]['job']. ") ". $job_result[0]['job_title']. "] ". $buffer_result[0]['referrer_remarks']);
 
         // 4. create connection
         $connection_is_success = true;
@@ -1620,9 +1620,26 @@ if ($_POST['action'] == 'confirm_employed') {
 if ($_POST['action'] == 'get_referrer_remarks') {
     $referral_buffer = new ReferralBuffer($_POST['id']);
     $record = $referral_buffer->get();
-    echo trim(htmlspecialchars_decode(stripslashes($record[0]['referrer_remarks'])));
+    $remark = trim(htmlspecialchars_decode(stripslashes($record[0]['referrer_remarks'])));
+    $remark = str_replace('<br/>', "\n", $remark);
+    echo strip_tags($remark);
     exit();
 }
+
+if ($_POST['action'] == 'save_referrer_remarks') {
+    $data = array();
+    $data['referrer_remarks'] = $_POST['remarks'];
+    
+    $referral_buffer = new ReferralBuffer($_POST['id']);
+    if ($referral_buffer->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
 
 if ($_POST['action'] == 'get_remind_on') {
     $result = array();

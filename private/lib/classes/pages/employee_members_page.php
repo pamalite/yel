@@ -590,8 +590,12 @@ class EmployeeMembersPage extends Page {
         
         <div id="referrer_remarks_window" class="popup_window">
             <div class="popup_window_title">Referrer Remarks</div>
-            <div id="remarks" class="remarks"></div>
+            <div id="remarks" class="remarks">
+                <input type="hidden" id="app_id" value="0" />
+                <textarea id="remarks_field" class="remarks"></textarea>
+            </div>
             <div class="popup_window_buttons_bar">
+                <input type="button" value="Save" onClick="close_referrer_remarks_popup(true);" />
                 <input type="button" value="Close" onClick="close_referrer_remarks_popup();" />
             </div>
         </div>

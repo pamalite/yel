@@ -958,13 +958,13 @@ function update_new_applicants() {
                     
                     var mini_career_profile = '';
                     if (current_pos[i].childNodes.length > 0) {
-                        mini_career_profile = '<div class="small_contact"><span style="font-weight: bold;">Current Position:</span>' + current_pos[i].childNodes[0].nodeValue + '</div>';
+                        mini_career_profile = '<div class="small_contact"><span style="font-weight: bold;">Current Position:</span>&nbsp;' + current_pos[i].childNodes[0].nodeValue + '</div>';
                     } else {
                         mini_career_profile = '<div class="small_contact"><span style="font-weight: bold;">Current Position:</span> N/A</div>';
                     }
                     
                     if (current_emps[i].childNodes.length > 0) {
-                        mini_career_profile = mini_career_profile + '<div class="small_contact"><span style="font-weight: bold;">Current Employer:</span>' + current_emps[i].childNodes[0].nodeValue + '</div>';
+                        mini_career_profile = mini_career_profile + '<div class="small_contact"><span style="font-weight: bold;">Current Employer:</span>&nbsp;' + current_emps[i].childNodes[0].nodeValue + '</div>';
                     } else {
                         mini_career_profile = mini_career_profile + '<div class="small_contact"><span style="font-weight: bold;">Current Employer:</span> N/A</div>';
                     }
@@ -1039,12 +1039,7 @@ function update_new_applicants() {
                     // actions
                     var actions = '';
                     actions = '<input type="button" value="Delete" onClick="delete_application(\'' + ids[i].childNodes[0].nodeValue + '\', true);" />';
-                    
-                    if (referrer_remarks[i].childNodes.length > 0) {
-                        if (referrer_remarks[i].childNodes[0].nodeValue != 'Current Position:<br/><br/><br/>Current Employer:<br/><br/><br/>Other Remarks:<br/>') {
-                            actions = actions + '<input type="button" value="Remarks" onClick="show_referrer_remarks_popup(\'' + ids[i].childNodes[0].nodeValue + '\'); " />';
-                        }
-                    }
+                    actions = actions + '<input type="button" value="Remarks" onClick="show_referrer_remarks_popup(\'' + ids[i].childNodes[0].nodeValue + '\'); " />';
                     
                     if (is_cannot_signup) {
                         actions = actions + '<input type="button" value="Sign Up" disabled />';
@@ -1373,7 +1368,7 @@ function transfer_to_member(_app_id) {
     }
     
     // this function is similar with sign up, but functions a little differently.
-    // separting them is to manage them more easily
+    // separating them is to manage them more easily
     var params = 'id=' + _app_id;
     params = params + '&action=sign_up';
     params = params + '&employee_id=' + user_id;
@@ -2121,7 +2116,9 @@ function show_referrer_remarks_popup(_app_id) {
         url: uri,
         method: 'post',
         onSuccess: function(txt, xml) {
-            $('remarks').set('html', txt);
+            // $('remarks').set('html', txt);
+            $('app_id').value = _app_id;
+            $('remarks_field').value = txt;
             set_status('');
             show_window('referrer_remarks_window');
         },
@@ -2133,8 +2130,29 @@ function show_referrer_remarks_popup(_app_id) {
     request.send(params);
 }
 
-function close_referrer_remarks_popup() {
-    close_window('referrer_remarks_window');
+function close_referrer_remarks_popup(_is_save) {
+    if (_is_save) {
+        var params = 'id=' + $('app_id').value + '&action=save_referrer_remarks';
+        params = params + '&remarks=' + encodeURIComponent($('remarks_field').value);
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('An error occured while saving remarks.');
+                    return;
+                }
+                
+                close_window('referrer_remarks_window');
+            }
+        });
+
+        request.send(params);
+    } else {
+        close_window('referrer_remarks_window');
+    }
 }
 
 function show_reminder_popup(_id, _is_buffer, _idx) {
