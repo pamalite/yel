@@ -261,6 +261,16 @@ class Job implements Model {
         return $this->id;
     }
     
+    public function getExpiryDate() {
+        $query = "SELECT expire_on FROM jobs WHERE id = ". $this->id. " LIMIT 1";
+        $result = $this->mysqli->query($query);
+        if ($result === false || is_null($result) || empty($result)) {
+            return false;
+        }
+        
+        return $result[0]['expire_on'];
+    }
+    
     public function incrementViewCount() {
         $query = "UPDATE jobs SET views_count = (views_count + 1) 
                   WHERE id = ". $this->id;

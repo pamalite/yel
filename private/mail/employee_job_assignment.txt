@@ -1,0 +1,8 @@
+The following job has been assigned to you.
+
+Job ID: %job_id%
+Job: %job%
+Employer: %employer%
+Country: %country%
+Is Executive?: %is_exec%
+Expiry: %expiry%

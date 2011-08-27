@@ -726,6 +726,31 @@ if ($_POST['action'] == 'save_job') {
         }
     }
     
+    // send an email to consultant about the job is being assigned
+    $employee = new Employee($_POST['employee']);
+    $employer = new Employer($_POST['employer']);
+    
+    $lines = file(dirname(__FILE__). '/../private/mail/employee_job_assignment.txt');
+    $message = '';
+    foreach($lines as $line) {
+        $message .= $line;
+    }
+
+    $message = str_replace('%job_id%', $job->getId(), $message);
+    $message = str_replace('%job%', $_POST['title'], $message);
+    $message = str_replace('%employer%', $employer->getName(), $message);
+    $message = str_replace('%country%', Country::getCountryFrom($_POST['country']), $message);
+    $message = str_replace('%is_exec%', (($_POST['is_executive'] == '1') ? 'Yes' : 'No'), $message);
+    $message = str_replace('%expiry%', $job->getExpiryDate(), $message);
+    $subject = $_POST['title']. ' position has been assigned to you';
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
+    mail($employee->getEmailAddress(), $subject, $body, $headers);
+
+    // $handle = fopen('/tmp/email_to_'. $employee->getEmailAddress(). '.txt', 'w');
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $body);
+    // fclose($handle);
+    
     // Tweet about this job, if it is new
     if ($new_id > 0 && !$is_test_site) {
         $employer = htmlspecialchars_decode(stripslashes($employer->getName()));
