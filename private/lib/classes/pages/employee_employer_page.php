@@ -509,6 +509,10 @@ class EmployeeEmployerPage extends Page {
                         </td>
                     </tr>
                     <tr>
+                        <td class="label"><label for="job.is_exec">Executive Search Only:</label></td>
+                        <td class="field"><input type="checkbox" id="job.is_exec" name="is_exec" /></td>
+                    </tr>
+                    <tr>
                         <td class="label"><label for="job.title">Title:</label></td>
                         <td class="field"><input class="field" type="text" id="job.title" name="title" /></td>
                     </tr>

@@ -1047,7 +1047,7 @@ function update_new_applicants() {
                         if (is_members[i].childNodes[0].nodeValue == '0') {
                             actions = actions + '<input type="button" value="Sign Up" onClick="make_member_from(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
                         } else {
-                            actions = actions + '<input type="button" value="Transfer" onClick="transfer_to_member(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
+                            actions = actions + '<input type="button" value="Shortlist" onClick="transfer_to_member(\'' + ids[i].childNodes[0].nodeValue + '\');" />';
                         }
                     }
                     row.set(5, new Cell(actions, '', 'cell action'));
@@ -1324,8 +1324,14 @@ function make_member_from(_app_id) {
         return;
     }
     
+    var is_sign_up_only = 0;
+    if (confirm('Perhaps do you want to shortlist this candidate as well?' + "\n\n'OK' for Yes; 'Cancel' for No")) {
+        is_sign_up_only = 1;
+    }
+    
     var params = 'id=' + _app_id;
     params = params + '&action=sign_up';
+    params = params + '&sign_up_only=' + is_sign_up_only;
     params = params + '&employee_id=' + user_id;
     
     var uri = root + "/employees/members_action.php";
@@ -1363,7 +1369,7 @@ function make_member_from(_app_id) {
 }
 
 function transfer_to_member(_app_id) {
-    if (!confirm('Confirm to transfer the selected applicant?' + "\n\n" + 'All other application made to/for this candidate will be moved to Members section as well.' +"\n")) {
+    if (!confirm('Confirm to shortlist the selected applicant?' + "\n\n" + 'All other application made to/for this candidate will be moved to Members section as well.' +"\n")) {
         return;
     }
     
@@ -1381,7 +1387,7 @@ function transfer_to_member(_app_id) {
             set_status('');
             
             if (!isEmail(txt)) {
-                var err_msg = 'Cannot transfer the selected applicant.' + "\n\n";
+                var err_msg = 'Cannot shortlist the selected applicant.' + "\n\n";
                 switch(txt) {
                     case 'ko:member':
                         alert(err_msg + 'The candidate is not a member, and the system failed to create an account too.');
@@ -1400,7 +1406,7 @@ function transfer_to_member(_app_id) {
             show_applicants();
         },
         onRequest: function(instance) {
-            set_status('Transferring applicant...');
+            set_status('Shortlisting applicant...');
         }
     });
     
@@ -1813,7 +1819,7 @@ function close_referrer_popup(_is_save) {
         }
         
         if (isEmpty($('ref_referrer_phone').value) || !isEmail($('ref_referrer_email').value)) {
-            if (!confirm('You will NOT be able to proceed to Sign Up or Transfer without a valid phone number and email address.' + "\n\n" + 'Are you sure to proceed?')) {
+            if (!confirm('You will NOT be able to proceed to Sign Up or Shortlist without a valid phone number and email address.' + "\n\n" + 'Are you sure to proceed?')) {
                 return;
             }
         }

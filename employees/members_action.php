@@ -714,6 +714,13 @@ if ($_POST['action'] == 'delete_application') {
 }
 
 if ($_POST['action'] == 'sign_up') {
+    $is_sign_up_only = false;
+    if (isset($_POST['sign_up_only'])) {
+        if ($_POST['sign_up_only'] == '1') {
+            $is_sign_up_only = true;
+        }
+    }
+    
     // 0. get all related buffer records
     $referral_buffer = new ReferralBuffer($_POST['id']);
     $result = $referral_buffer->get();
@@ -847,7 +854,11 @@ if ($_POST['action'] == 'sign_up') {
         }
         
         // 7. delete referralbuffer
-        $buffer->delete();
+        // check whether is this sign-up only
+        // if yes, ignore all the transferring
+        if (!$is_sign_up_only) {
+            $buffer->delete();
+        }
     }
     
     echo $candidate_email;
