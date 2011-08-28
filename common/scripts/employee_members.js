@@ -541,7 +541,7 @@ function update_applicants() {
                             applied_or_submitted = applied_or_submitted + '<br/><br/>';
                         }
                         
-                        applied_or_submitted = applied_or_submitted + '<span style="color: #666666;">Submitted by YE: </span><a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">#' + resume_ids[i].childNodes[0].nodeValue + '</a>';
+                        applied_or_submitted = applied_or_submitted + '<span style="color: #666666;">Submitted by YE: </span><a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">#' + resume_ids[i].childNodes[0].nodeValue + ' ' + resumes[i].childNodes[0].nodeValue + '</a>';
                     }
                     resume_details = resume_details + applied_or_submitted + "\n";
                     
