@@ -853,7 +853,7 @@ function update_new_applicants() {
                 var candidate_names = xml.getElementsByTagName('candidate_name');
                 var candidate_phones = xml.getElementsByTagName('candidate_phone');
                 var resume_ids = xml.getElementsByTagName('existing_resume_id');
-                var resumes = xml.getElementsByTagName('existing_resume_name');
+                var resumes = xml.getElementsByTagName('existing_resume');
                 var resume_file_hashes = xml.getElementsByTagName('resume_file_hash');
                 var resume_file_names = xml.getElementsByTagName('resume_file_name');
                 var requested_ons = xml.getElementsByTagName('formatted_requested_on');
