@@ -853,7 +853,9 @@ function update_new_applicants() {
                 var candidate_names = xml.getElementsByTagName('candidate_name');
                 var candidate_phones = xml.getElementsByTagName('candidate_phone');
                 var resume_ids = xml.getElementsByTagName('existing_resume_id');
+                var resumes = xml.getElementsByTagName('existing_resume_name');
                 var resume_file_hashes = xml.getElementsByTagName('resume_file_hash');
+                var resume_file_names = xml.getElementsByTagName('resume_file_name');
                 var requested_ons = xml.getElementsByTagName('formatted_requested_on');
                 var progress_notes = xml.getElementsByTagName('progress_notes');
                 var referrer_remarks = xml.getElementsByTagName('referrer_remarks');
@@ -1002,9 +1004,9 @@ function update_new_applicants() {
                     
                     // resume
                     if (resume_ids[i].childNodes.length > 0) {
-                        row.set(3, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
+                        row.set(3, new Cell('<a href="resume.php?id=' + resume_ids[i].childNodes[0].nodeValue + '">' + resumes[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
                     } else if (resume_file_hashes[i].childNodes.length > 0) {
-                        row.set(3, new Cell('<a href="resume.php?id=' + ids[i].childNodes[0].nodeValue + '&hash=' + resume_file_hashes[i].childNodes[0].nodeValue + '">View Resume</a>', '', 'cell'));
+                        row.set(3, new Cell('<a href="resume.php?id=' + ids[i].childNodes[0].nodeValue + '&hash=' + resume_file_hashes[i].childNodes[0].nodeValue + '">' + resume_file_names[i].childNodes[0].nodeValue + '</a>', '', 'cell'));
                     } else {
                         row.set(3, new Cell('N/A', '', 'cell'));
                     }

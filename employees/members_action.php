@@ -203,6 +203,7 @@ if ($_POST['action'] == 'get_new_applicants') {
                       referral_buffers.referrer_email, referral_buffers.referrer_name, 
                       referral_buffers.referrer_phone, 
                       referral_buffers.existing_resume_id, referral_buffers.resume_file_hash, 
+                      resumes.name AS existing_resume, referral_buffers.resume_file_name, 
                       referral_buffers.progress_notes, referral_buffers.referrer_remarks, 
                       IF(members.email_addr IS NULL, 0, 1) AS is_member,
                       jobs.title AS job, jobs.employer,  
@@ -218,7 +219,8 @@ if ($_POST['action'] == 'get_new_applicants') {
                       DATE_FORMAT(referral_buffers.candidate_responded_on, '%e %b, %Y') AS formatted_candidate_responded_on", 
         'joins' => "members ON members.email_addr = referral_buffers.candidate_email, 
                     jobs ON jobs.id = referral_buffers.job, 
-                    employers ON employers.id = jobs.employer",
+                    employers ON employers.id = jobs.employer, 
+                    resumes ON resumes.id = referral_buffers.existing_resume_id",
         'match' => $match, 
         'order' => $order_by
     );
