@@ -531,7 +531,7 @@ function update_applicants() {
                     
                     var applied_or_submitted = '';
                     if (applied_resume_ids[i].childNodes.length > 0) {
-                        applied_or_submitted = '<br/><br/><span style="color: #666666;">From Candidate: </span><a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">View</a>';
+                        applied_or_submitted = '<br/><br/><span style="color: #666666;">From Candidate: </span><a href="resume.php?id=' + applied_resume_ids[i].childNodes[0].nodeValue + '">' + applied_resumes[i].childNodes[0].nodeValue + '</a>';
                     }
                     
                     if (resume_ids[i].childNodes.length > 0) {
