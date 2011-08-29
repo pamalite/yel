@@ -788,7 +788,14 @@ if ($_POST['action'] == 'sign_up') {
             }
         }
         
-        // 3.5 save the notes by appending them
+        // 3.1 save the job profile
+        $job_profile_data = array(
+            'position_title' => $buffer_result[0]['current_position'],
+            'employer' => $buffer_result[0]['current_employer']
+        );
+        $member->addJobProfile($job_profile_data);
+        
+        // 3.2 save the notes by appending them
         $existing_notes = htmlspecialchars_decode(stripslashes($member->getNotes()));
         $member->saveNotes($existing_notes. "\n\n[(". $buffer_result[0]['job']. ") ". $job_result[0]['job_title']. "] ". $buffer_result[0]['referrer_remarks']);
 
@@ -1642,6 +1649,7 @@ if ($_POST['action'] == 'get_referrer_remarks') {
 if ($_POST['action'] == 'save_referrer_remarks') {
     $data = array();
     $data['referrer_remarks'] = $_POST['remarks'];
+    $data['referrer_remarks'] .= "\n\n--- ". date('Y-m-d H:i'). " ---\n\n";
     
     $referral_buffer = new ReferralBuffer($_POST['id']);
     if ($referral_buffer->update($data) === false) {

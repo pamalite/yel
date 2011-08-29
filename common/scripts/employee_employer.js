@@ -794,10 +794,12 @@ function show_job_form_with() {
                     $('job.is_exec').checked = false;
                 }
                 
-                for (var i=0; i < $('job.owner').options.length; i++) {
-                    if ($('job.owner').options[i].value == owner[0].childNodes[0].nodeValue) {
-                        $('job.owner').selectedIndex = i;
-                        break;
+                if (owner[0].childNodes.length > 0) {
+                    for (var i=0; i < $('job.owner').options.length; i++) {
+                        if ($('job.owner').options[i].value == owner[0].childNodes[0].nodeValue) {
+                            $('job.owner').selectedIndex = i;
+                            break;
+                        }
                     }
                 }
                 

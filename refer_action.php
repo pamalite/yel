@@ -67,7 +67,7 @@ foreach ($candidates as $i=>$candidate) {
     $data['via_social_connection'] = $candidate['social'];
     $data['current_position'] = $candidate['current_position'];
     $data['current_employer'] = $candidate['current_employer'];
-    $data['referrer_remarks'] = '<b>Current Position:</b><br/>'. $candidate['current_position']. '<br/><br/><b>Current Employer:</b><br/>'. $candidate['current_employer'];
+    $data['referrer_remarks'] = 'NULL';
     
     $referral_buffer = new ReferralBuffer();
     $buffer_id = $referral_buffer->create($data);

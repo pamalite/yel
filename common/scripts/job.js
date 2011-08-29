@@ -492,7 +492,7 @@ function onDomReady() {
     }
     
     if (alert_success) {
-        alert('Your request was successfully submitted.' + "\n\nWe will contact the candidate shortly.");
+        alert('Your application/referral was successfully submitted.' + "\n\nIt will be reviewed by our recruitment consultants and (if suitable) will then be submitted to the employer. Thank you!");
     }
 }
 
