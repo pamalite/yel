@@ -486,7 +486,8 @@ class MemberSearch {
         }
         
         if (array_key_exists('position', $_criterias)) {
-            $this->position = $this->insert_wildcards($_criterias['position']);
+            //$this->position = $this->insert_wildcards($_criterias['position']);
+            $this->position = $_criterias['position'];
         }
         
         if (array_key_exists('employer', $_criterias)) {

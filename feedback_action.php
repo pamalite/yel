@@ -1,6 +1,6 @@
 <?php
 require_once dirname(__FILE__). "/private/lib/utilities.php";
-require_once dirname(__FILE__). "/../private/lib/recaptchalib.php";
+require_once dirname(__FILE__). "/private/lib/recaptchalib.php";
 
 session_start();
 

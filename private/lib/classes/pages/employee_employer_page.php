@@ -133,6 +133,7 @@ class EmployeeEmployerPage extends Page {
     private function generate_employees() {
         $criteria = array(
             'columns' => "id, CONCAT(lastname, ', ', firstname) AS employee, country",
+            'match' => "id <> 1",
             'order' => "employee ASC"
         );
         
