@@ -292,17 +292,24 @@ function show_job_profile_popup(_id) {
                     }
                 }
                 
-                var work_from_items = work_from[0].childNodes[0].nodeValue.split('-');
-                var work_from_month = work_from_items[1];
-                var work_from_year = work_from_items[0];
+                var work_from_items = null;
+                if (work_from[0].childNodes.length > 0) {
+                    work_from_items = work_from[0].childNodes[0].nodeValue.split('-');
+                }
                 
-                $('work_from_year').value = work_from_year;
-                for (var i=0; i < $('work_from_month').options.length; i++) {
-                    if ($('work_from_month').options[i].value == work_from_month) {
-                        $('work_from_month').selectedIndex = i;
-                        break;
+                if (work_from_items == null) {
+                    $('work_from_month').selectedIndex = 0;
+                    $('work_from_year').value = '';
+                } else {
+                    $('work_from_year').value = work_from_items[0];
+                    for (var i=0; i < $('work_from_month').options.length; i++) {
+                        if ($('work_from_month').options[i].value == work_from_items[1]) {
+                            $('work_from_month').selectedIndex = i;
+                            break;
+                        }
                     }
                 }
+                
                 
                 var work_to_items = null;
                 if (work_to[0].childNodes.length > 0) {

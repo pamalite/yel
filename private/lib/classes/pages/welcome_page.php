@@ -67,9 +67,9 @@ class WelcomePage extends Page {
                 $a_result = str_replace('%industry%', $job['industry'], $a_result);
                 $a_result = str_replace('%currency%', $job['currency'], $a_result);
                 
-                $salary_range = number_format($job['salary_start'], 2, '.', ',');
+                $salary_range = number_format($job['salary_start'], 0, '.', ',');
                 if (!empty($job['salary_end']) && !is_null($job['salary_end'])) {
-                    $salary_range .= ' - '. number_format($job['salary_end'], 2, '.', ',');
+                    $salary_range .= ' - '. number_format($job['salary_end'], 0, '.', ',');
                 }
                 $a_result = str_replace('%salary_range%', $salary_range, $a_result);
                 

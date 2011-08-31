@@ -199,14 +199,14 @@ class SearchPage extends Page {
                 $a_result = str_replace('%industry%', $row['industry'], $a_result);
                 $a_result = str_replace('%currency%', $row['currency'], $a_result);
                 
-                $salary_range = number_format($row['salary'], 2, '.', ',');
+                $salary_range = number_format($row['salary'], 0, '.', ',');
                 if (!empty($row['salary_end']) && !is_null($row['salary_end'])) {
-                    $salary_range .= ' - '. number_format($row['salary_end'], 2, '.', ',');
+                    $salary_range .= ' - '. number_format($row['salary_end'], 0, '.', ',');
                 }
                 $a_result = str_replace('%salary_range%', $salary_range, $a_result);
                 
-                $a_result = str_replace('%potential_reward%', number_format($potential_reward, 2, '.', ','), $a_result);
-                $a_result = str_replace('%potential_token_reward%', number_format($potential_token_reward, 2, '.', ','), $a_result);
+                $a_result = str_replace('%potential_reward%', number_format($potential_reward, 0, '.', ','), $a_result);
+                $a_result = str_replace('%potential_token_reward%', number_format($potential_token_reward, 0, '.', ','), $a_result);
                 $a_result = str_replace('%expire_on%', $row['formatted_expire_on'], $a_result);
                 
                 $html .= $a_result;

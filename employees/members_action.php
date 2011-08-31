@@ -50,12 +50,14 @@ function create_member_from($_email_addr, $_fullname, $_phone, $_employee_id) {
         $message .= $line;
     }
     
+    $candidate_name = $data['lastname']. ', '. $data['firstname'];
+    $message = str_replace('%candidate%', $candidate_name, $message);
     $message = str_replace('%password%', $password, $message);
     $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
     $message = str_replace('%root%', $GLOBALS['root'], $message);
     
     //$subject = '['. $_email_addr. '] New Membership from Yellow Elevator';
-    $subject = 'New Membership from Yellow Elevator';
+    $subject = 'Recent correspondence with YellowElevator.com\'s recruitment consultant - '. $candidate_name;
     $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\n";
     if (!is_null($employee)) {
         $emp_email = $employee->getEmailAddress();

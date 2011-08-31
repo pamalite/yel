@@ -263,6 +263,7 @@ function show_next_refer_wizard_page() {
                         return false;
                     }
                     close_window('refer_window');
+                    alert('Your recommendation was successfully submitted.' + "\n\nIt will be reviewed by our recruitment consultants and (if suitable) will then be submitted to the employer. Thank you!");
                 }
             });
             request.send(params);
@@ -492,7 +493,7 @@ function onDomReady() {
     }
     
     if (alert_success) {
-        alert('Your application/referral was successfully submitted.' + "\n\nIt will be reviewed by our recruitment consultants and (if suitable) will then be submitted to the employer. Thank you!");
+        alert('Your application/recommendation was successfully submitted.' + "\n\nIt will be reviewed by our recruitment consultants and (if suitable) will then be submitted to the employer. Thank you!");
     }
 }
 
