@@ -76,7 +76,7 @@ if (isset($_POST['headhunter_id'])) {
     $job_name = $result[0]['title'];
     $employer['email_addr'] = $result[0]['email_addr'];
     $employer['name'] = $result[0]['employer'];
-    $employer['id'] = $result[0]['employer_id']
+    $employer['id'] = $result[0]['employer_id'];
     
     $mail_lines = file('private/mail/employer_headhunter_referral.txt');
     $message = '';
