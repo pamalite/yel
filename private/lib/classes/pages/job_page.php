@@ -9,6 +9,7 @@ class JobPage extends Page {
     private $action_has_error = false;
     private $action_responded = false;
     private $job = NULL;
+    private $is_headhunter = false;
     
     function __construct($_session = NULL, $_job_id, $_criterias = NULL) {
         parent::__construct();
@@ -16,6 +17,9 @@ class JobPage extends Page {
         if (!is_null($_session)) {
             if (!empty($_session['id']) && !empty($_session['sid'])) {
                 $this->member = new Member($_session['id'], $_session['sid']);
+                if ($this->member->isHeadhunter()) {
+                    $this->is_headhunter = true;
+                }
             }
         }
         
@@ -49,6 +53,12 @@ class JobPage extends Page {
     
     public function insert_inline_scripts($_show_popup = '', $_buffer_id = '') {
         $script = 'var job_id = "'. $this->job_id. '";'. "\n";
+        
+        if ($this->is_headhunter) {
+            $script .= 'var is_headhunter = true;'. "\n";
+        } else {
+            $script .= 'var is_headhunter = false;'. "\n";
+        }
         
         if (count($this->job) <= 0 || is_null($this->job) || $this->job === false) {
             $script .= 'var show_popup = "";'. "\n";
@@ -228,7 +238,11 @@ class JobPage extends Page {
         $this->begin();
         $this->top_search("Job Details");
         if (!is_null($this->member)) {
-            $this->menu('member');
+            if ($this->is_headhunter) {
+                $this->menu('headhunter');
+            } else {
+                $this->menu('member');
+            }
         }
         $this->howitworks();
         
@@ -250,6 +264,19 @@ class JobPage extends Page {
         $page = file_get_contents(dirname(__FILE__). '/../../../html/job_page.html');
         $page = str_replace('%root%', $this->url_root, $page);
         $page = str_replace('%job_id%', $this->job_id, $page);
+        
+        if ($this->is_headhunter) {
+            $page = str_replace('%friend_or_candidate%', 'Candidate', $page);
+            $page = str_replace('%apply_visible%', 'display: none;', $page);
+            
+            $hidden_input = '<input type="hidden" id="headhunter_id" name="headhunter_id" value="'. $this->member->getId(). '" />';
+            
+            $page = str_replace('%headhunter_hidden_input%', $hidden_input, $page);
+        } else {
+            $page = str_replace('%friend_or_candidate%', 'Friend', $page);
+            $page = str_replace('%apply_visible%', 'display: block;', $page);
+            $page = str_replace('%headhunter_hidden_input%', '', $page);
+        }
         
         $toggle = '';
         if (is_null($this->member)) {
@@ -315,7 +342,7 @@ class JobPage extends Page {
             $refer_form = file_get_contents(dirname(__FILE__). '/../../../html/job_page_refer_common_form.html');
             if (!is_null($this->member)) {
                 $refer_form = file_get_contents(dirname(__FILE__). '/../../../html/job_page_refer_logged_in_form.html');
-                
+
                 $refer_form = str_replace('%refer_member_id%', $this->member->getId(), $refer_form);
                 $refer_form = str_replace('%refer_member_fullname%', $this->member->getFullname(), $refer_form);
                 $refer_form = str_replace('%refer_member_phone%', $this->member->getPhone(), $refer_form);

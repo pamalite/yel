@@ -219,3 +219,7 @@ span.connection_position {
     font-size: 9pt;
     color: #666666;
 }
+
+#refer_candidates_headhunter {
+    display: none;
+}

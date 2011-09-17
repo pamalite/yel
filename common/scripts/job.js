@@ -23,7 +23,14 @@ function show_refer_popup() {
     if (typeof IN.API == 'undefined') {
         is_linkedin = false;
         $('refer_next_btn').disabled = false;
-        $('lbl_loading_status').set('html', 'Tip: Recommend your friends via LinkedIn and Facebook by logging in through either account.');
+        
+        if (is_headhunter) {
+            refer_wizard_page = 'headhunter';
+            $('refer_next_btn').value = 'Recommend Now';
+            $('lbl_loading_status').set('html', '');
+        } else {
+            $('lbl_loading_status').set('html', 'Tip: Recommend your friends via LinkedIn and Facebook by logging in through either account.');
+        }
     } else {
         IN.API.Connections("me")
             .fields("id", "firstName", "lastName", "threeCurrentPositions")
@@ -86,6 +93,13 @@ function show_refer_popup() {
     $('refer_referrer_contacts').setStyle('display', 'block');
     $('refer_candidates_social').setStyle('display', 'none');
     $('refer_candidates_default').setStyle('display', 'none');
+    
+    if (is_headhunter) {
+        $('refer_referrer_contacts').setStyle('display', 'none');
+        $('refer_candidates_social').setStyle('display', 'none');
+        $('refer_candidates_default').setStyle('display', 'none');
+        $('refer_candidates_headhunter').setStyle('display', 'block');
+    }
     
     show_window('refer_window');
     // window.scrollTo(0, 0);
@@ -268,6 +282,20 @@ function show_next_refer_wizard_page() {
             });
             request.send(params);
             
+            return true;
+        case 'headhunter':
+            if (isEmpty($('candidate_resume').value)) {
+                alert('You need to upload a furnished resume.');
+                return false;
+            }
+            
+            if (isEmpty($('candidate_cover_note').value)) {
+                if (!confirm('No cover note needed?')) {
+                    return false;
+                }
+            }
+            
+            $('refer_form').submit();
             return true;
     }
     

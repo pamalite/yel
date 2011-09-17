@@ -80,6 +80,8 @@ function login() {
             
             if (status[0].childNodes[0].nodeValue == 'ok') {
                 location.replace(root + '/members/home.php' + job_to_redirect);
+            } else if (status[0].childNodes[0].nodeValue == 'hh') {
+                location.replace(root + '/members/headhunter_recommendations.php');
             }
         },
         onRequest: function(instance) {

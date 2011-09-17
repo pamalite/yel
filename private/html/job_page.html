@@ -44,10 +44,10 @@
                     </div>
                     <div class="actions">
                         <div class="action_item">
-                            <a class="no_link" onClick="show_refer_popup();">Recommend a Friend</a>
+                            <a class="no_link" onClick="show_refer_popup();">Recommend a %friend_or_candidate%</a>
                         </div>
                         <div class="action_item">
-                            <a class="no_link" onClick="show_apply_popup();">Apply Job</a>
+                            <a class="no_link" onClick="show_apply_popup();" style="%apply_visible%">Apply Job</a>
                         </div>
                         <div class="action_item" style="display: %from_search%;">
                             <a href="../search.php">Back to Searched Jobs</a>
@@ -61,7 +61,7 @@
 
 <!-- popup window goes here -->
 <div id="refer_window" class="popup_window">
-    <div class="popup_window_title">Recommend a Friend - %job_title%</div>
+    <div class="popup_window_title">Recommend a %friend_or_candidate% - %job_title%</div>
     <div id="refer_progress">
         Please wait while your request is being processed... <br/><br/>
         <img src="%root%/common/images/progress/circle_big.gif" />
@@ -108,6 +108,23 @@
                                 </div>
                             </div>
                         </td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div id="refer_candidates_headhunter" class="wizard_page">
+                %headhunter_hidden_input%
+                <table class="candidate">
+                    <tr>
+                        <td colspan="2" class="title">Your Potential Candidate</td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_resume">Candidate's Resume:</label></td>
+                        <td><input type="file" name="candidate_resume" id="candidate_resume" value="" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label"><label for="candidate_cover_note">Cover Note:</label></td>
+                        <td><textarea class="field" name="candidate_cover_note" id="candidate_cover_note"></textarea></td>
                     </tr>
                 </table>
             </div>

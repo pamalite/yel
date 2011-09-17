@@ -96,6 +96,9 @@ if ($_POST['action'] == 'login') {
     }
     
     $response['login'] = array('status' => 'ok');
+    if ($member->isHeadhunter()) {
+        $response['login'] = array('status' => 'hh');
+    }
     echo $xml_dom->get_xml_from_array($response);
     exit();
 }

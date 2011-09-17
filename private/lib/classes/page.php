@@ -302,6 +302,21 @@ class Page {
             } else {
                 $menu = str_replace('%member_profile%', 'none', $menu);
             }
+        } else if ($type == 'headhunter') {
+            $menu = file_get_contents(dirname(__FILE__). '/../../html/menu_headhunters.html');
+            $menu = str_replace('%root%', $this->url_root, $menu);
+            
+            if ($page == 'recommendations') {
+                $menu = str_replace('%member_recommendations%', $selected, $menu);
+            } else {
+                $menu = str_replace('%member_recommendations%', 'none', $menu);
+            }
+            
+            if ($page == 'profile') {
+                $menu = str_replace('%member_profile%', $selected, $menu);
+            } else {
+                $menu = str_replace('%member_profile%', 'none', $menu);
+            }
         }
         
         echo $menu;

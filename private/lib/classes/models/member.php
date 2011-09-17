@@ -1143,5 +1143,17 @@ class Member implements Model {
         $this->id = $result[0]['email_addr'];
         return $this->id;
     }
+    
+    public function isHeadhunter() {
+        $query = "SELECT individual_headhunter FROM members WHERE email_addr = '". $this->id. "' LIMIT 1";
+        $result = $this->mysqli->query($query);
+        
+        if ($result[0]['individual_headhunter'] == 'Y') {
+            return true;
+        }
+        
+        return false;
+    }
+    
 }
 ?>
