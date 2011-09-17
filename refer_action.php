@@ -35,6 +35,108 @@ if (!isset($_POST['job_id'])) {
     redirect_to('welcome.php');
 }
 
+if (isset($_POST['headhunter_id'])) {
+    // headhunter referral
+    // create
+    $data = array();
+    $data['member'] = $_POST['headhunter_id'];
+    $data['job'] = $_POST['job_id'];
+    $data['referred_on'] = date('Y-m-d H:i:s');
+    $data['employer_message'] = $_POST['candidate_cover_note'];
+    
+    $referral = new HeadhunterReferral();
+    if ($referral->create($data) === false) {
+        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $_POST['job_id']. '?error=1');
+        exit();
+    }
+    
+    // upload file
+    $data = array();
+    $data['FILE'] = array();
+    $data['FILE']['type'] = $_FILES['candidate_resume']['type'];
+    $data['FILE']['size'] = $_FILES['candidate_resume']['size'];
+    $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['candidate_resume']['name']));
+    $data['FILE']['tmp_name'] = $_FILES['candidate_resume']['tmp_name'];
+    
+    if ($rreferral->uploadFile($data) === false) {
+        redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $_POST['job_id']. '?error=1');
+        exit();
+    }
+    
+    // send email to employer
+    $criteria = array(
+        'columns' => "jobs.title, jobs.employer AS employer_id, 
+                      employers.email_addr, employers.name AS employer",
+        'joins' => "employers ON employers.id = jobs.employer",
+        'match' => "jobs.id = ". $_POST['id'],
+        'limit' => "1"
+    );
+    $job = new Job();
+    $result = $job->find($criteria);
+    $job_name = $result[0]['title'];
+    $employer['email_addr'] = $result[0]['email_addr'];
+    $employer['name'] = $result[0]['employer'];
+    $employer['id'] = $result[0]['employer_id']
+    
+    $mail_lines = file('private/mail/employer_headhunter_referral.txt');
+    $message = '';
+    foreach ($mail_lines as $line) {
+        $message .= $line;
+    }
+    
+    $message = str_replace('%job%', htmlspecialchars_decode(stripslashes($job_name)), $message);
+    $message = str_replace('%referred_on%', date('M j, Y'), $message);
+    
+    if (!empty($_POST['candidate_cover_note'])) {
+        $cover_note = '<br/>Also, the consultant has provided the following cover note for this candidate:<br/>';
+        $cover_note .= '<br/>'. str_replace(array("\r\n", "\r", "\n"), '<br/>', $_POST['candidate_cover_note']). '<br/>';
+        $message = str_replace('%message%', $cover_note, $message);
+    }
+    
+    $message = str_replace('%protocol%', $GLOBALS['protocol'], $message);
+    $message = str_replace('%root%', $GLOBALS['root'], $message);
+    $message = str_replace('%referral_id%', $referral->getId(), $message);
+    
+    $file_info = $referral->getFileInfo();
+    $file = $GLOBALS['headhunter_resume_dir']. '/'. $referral->getId(). '.'. $file_info['file_hash'];
+    $attached_filename = $file_info['file_name'];
+    $attachment = chunk_split(base64_encode(file_get_contents($file)));
+    $subject = 'Potential Candidate for the '. $job_name. ' position';
+    
+    $headers = 'From: admin@yellowelevator.com'. "\n";
+    // $headers .= 'Cc: '. $yel_email. "\n";
+    $headers .= 'MIME-Version: 1.0'. "\n";
+    $headers .= 'Content-Type: multipart/mixed; boundary="yel_mail_sep_'. $attached_filename. '";'. "\n\n";
+    
+    $body = '--yel_mail_sep_'. $attached_filename. "\n";
+    $body .= 'Content-Type: multipart/alternative; boundary="yel_mail_sep_alt_'. $attached_filename. '"'. "\n";
+    $body .= '--yel_mail_sep_alt_'. $attached_filename. "\n";
+    $body .= 'Content-Type: text/html; charset="iso-8859-1"'. "\n";
+    $body .= 'Content-Transfer-Encoding: 7bit"'. "\n";
+    
+    $body .= $message. "\n";
+    $body .= '--yel_mail_sep_alt_'. $attached_filename. "--\n\n";
+    $body .= '--yel_mail_sep_'. $attached_filename. "\n";
+    $body .= 'Content-Type: '. $file_info['file_type']. '; name="'. $attached_filename. '"'. "\n";
+    $body .= 'Content-Transfer-Encoding: base64'. "\n";
+    $body .= 'Content-Disposition: attachment'. "\n";
+    $body .= $attachment. "\n";
+    $body .= '--yel_mail_sep_'. $attached_filename. "--\n\n";
+    
+    mail($employer['email_addr'], $subject, $body, $headers);
+    
+    // $handle = fopen('/tmp/email_to_'. $employer['email_addr']. '.txt', 'w');
+    // fwrite($handle, 'To: '. $employer['email_addr']. "\n\n");
+    // fwrite($handle, 'Header: '. $headers. "\n\n");
+    // fwrite($handle, 'Subject: '. $subject. "\n\n");
+    // fwrite($handle, $body);
+    // fclose($handle);
+    
+    redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $_POST['job_id']);
+    exit();
+}
+
+// normal referral
 // 1. initialize the parameters
 $referrer = array();
 $referrer['email_addr'] = sanitize($_POST['referrer_email']);

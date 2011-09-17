@@ -24,6 +24,7 @@ $default_results_per_page = 10;
 // Resume upload settings
 $resume_dir = $data_path. "/resumes";
 $buffered_resume_dir = $data_path. "/buffered_resumes";
+$headhunter_resume_dir = $data_path. "/headhunter_resumes";
 $resume_size_limit = "1048576 "; // ~1MB
 $allowable_resume_types = array("text/plain",
                                 "text/html",

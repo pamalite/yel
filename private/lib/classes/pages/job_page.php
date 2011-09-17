@@ -17,7 +17,7 @@ class JobPage extends Page {
         if (!is_null($_session)) {
             if (!empty($_session['id']) && !empty($_session['sid'])) {
                 $this->member = new Member($_session['id'], $_session['sid']);
-                if ($this->member->isHeadhunter()) {
+                if (!$this->member->isHeadhunter()) {
                     $this->is_headhunter = true;
                 }
             }

@@ -1,0 +1,27 @@
+<html>
+    <body>
+        Hi, <br/>
+        <br/>
+        One of our externally invited recruitment consultants has attached a resume for the %job% position for your consideration on %referred_on%.<br/>
+        <br/>
+        Please review the attached CV and proceed with this recommendation by selecting one of the actions below to indicate your interest.<br/>
+        %message%
+        <br/>
+        <a href="%protocol%://%root%/employer/headhunter_referral.php?approve=1&id=%referral_id%">
+            Approve the resume, and connect me to the consultant.
+        </a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="%protocol%://%root%/employer/headhunter_referral.php?approve=0&id=%referral_id%">
+            Thanks, but no thanks.
+        </a>
+        &nbsp;&nbsp;&nbsp;
+        <a href="%protocol%://%root%/employer/headhunter_referral.php?report=1&id=%referral_id%">
+            Report bad quality CVs.
+        </a><br/>
+        <br/>
+        A copy of the attached resume can also be retrieved from your Employer Account at %protocol%://%root%/employers<br/>
+        <br/>
+        Yellow Elevator<br/>
+        The Fast Way Up
+    </body>
+</html>

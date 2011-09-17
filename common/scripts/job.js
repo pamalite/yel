@@ -7,6 +7,7 @@ var my_connections = new Array();
 var connections_list = new ListBox('list_placeholder', 'connections_list', true);
 
 function close_refer_popup(_proceed_refer) {
+    close_safari_connection();
     refer_wizard_page = 'referrer';    
     close_window('refer_window');
 }
