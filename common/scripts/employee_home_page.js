@@ -405,7 +405,7 @@ function update_applicants() {
             
             if (txt == '0') {
                 set_status('');
-                $('div_applicants').set('html', '<div class="empty_results">No applicants to show.</div>');
+                $('div_applicants').set('html', '<div class="empty_results">No applicants notifications to show.</div>');
             } else {
                 var total_pages = xml.getElementsByTagName('total_pages');
                 
