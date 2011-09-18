@@ -100,7 +100,8 @@
 #testimony_window, 
 #remarks_window,
 #notify_window, 
-#employment_window {
+#employment_window,
+#interview_schedule_window {
     display: none;
     width: 800px;
 }
@@ -109,7 +110,8 @@
     width: 550px;
 }
 
-#employment_window {
+#employment_window,
+#interview_schedule_window {
     width: 395px;
 }
 
@@ -128,7 +130,8 @@
     margin: auto;
 }
 
-.employment_form_table {
+.employment_form_table, 
+.schedule_form_table {
     width: 100%;
     margin: auto;
 }
@@ -174,4 +177,17 @@ div.remarks_cell {
     width: 98%;
     height: 75px;
     overflow: auto;
+}
+
+table.schedule_form_table td {
+    vertical-align: top;
+}
+
+table.schedule_form_table td.label {
+    width: 25%;
+}
+
+textarea {
+    width: 100%;
+    height: 150px;
 }

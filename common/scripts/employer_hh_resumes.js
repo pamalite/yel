@@ -340,14 +340,44 @@ function show_employment_popup(_referral_id) {
 
 function close_schedule_interview_popup(_is_schedule) {
     if (_is_schedule) {
+        if (isEmpty($('schedule_datetime').value)) {
+            alert('Date & Time cannot be empty.');
+            return false;
+        }
         
+        var params = 'id=' + $('schedule_employment_referral_id').value + '&action=schedule_interview';
+        params = params + '&datetime=' + $('schedule_datetime').value;
+        params = params + '&message=' + encodeURIComponent($('schedule_message').value);
+        
+        var uri = root + "/employers/hh_resumes_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                if (txt == 'ko') {
+                    alert('An error occured while scheduling interview.');
+                    return false;
+                }
+                
+                show_resumes_of(current_job_id, current_job_title);
+            }
+        });
+
+        request.send(params);
     }
     
     close_window('interview_schedule_window');
 }
 
 function show_schedule_interview_popup(_referral_id) {
-    $('employment_referral_id').value = _referral_id;
+    $('schedule_employment_referral_id').value = _referral_id;
+    
+    new DatePicker('.schedule_datetime', {
+        timePicker: true,
+        format: 'Y-m-d @ H:i',
+        inputOutputFormat: 'Y-m-d H:i:00'
+    });
+    
     show_window('interview_schedule_window');
 }
 

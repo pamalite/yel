@@ -188,10 +188,10 @@ class EmployerHeadhunterResumesPage extends Page {
         <div id="interview_schedule_window" class="popup_window">
             <div id="window_employment_title" class="popup_window_title">Schedule Interview</div>
             <div class="employment_form">
-                <table class="employment_form_table">
+                <table class="schedule_form_table">
                     <tr>
                         <td class="label">Date &amp; Time:</td>
-                        <td class="field"><input type="text" id="schedule_datetime" class="schedule_datetime" value="<?php echo date('Y-m-d H:i'); ?>" /></td>
+                        <td class="field"><input type="text" id="schedule_datetime" class="schedule_datetime" value="<?php echo date('Y-m-d H:i:s'); ?>" /></td>
                     </tr>
                     <tr>
                         <td class="label">Message:</td>
@@ -200,7 +200,7 @@ class EmployerHeadhunterResumesPage extends Page {
                 </table>
             </div>
             <div class="popup_window_buttons_bar">
-                <input type="hidden" id="employment_referral_id" value="0" />
+                <input type="hidden" id="schedule_employment_referral_id" value="0" />
                 <input type="button" value="Send" onClick="close_schedule_interview_popup(true);" />
                 <input type="button" value="Close" onClick="close_schedule_interview_popup(false);" />
             </div>
