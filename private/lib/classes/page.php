@@ -89,13 +89,22 @@ class Page {
             $top = str_replace('%not_logged_in%', 'none', $top);
             $top = str_replace('%employer_logged_in%', 'inline', $top);
             $top = str_replace('%member_logged_in%', 'none', $top);
+            $top = str_replace('%headhunter_logged_in%', 'none', $top);
             $top = str_replace('%employee_logged_in%', 'none', $top);
         } elseif (isset($_SESSION['yel']['member']) && 
                   !empty($_SESSION['yel']['member']['id']) && 
                   !is_null($_SESSION['yel']['member']['id'])) {
             $top = str_replace('%not_logged_in%', 'none', $top);
             $top = str_replace('%employer_logged_in%', 'none', $top);
-            $top = str_replace('%member_logged_in%', 'inline', $top);
+            
+            $member = new Member($_SESSION['yel']['member']['id']);
+            if ($member->isHeadhunter()) {
+                $top = str_replace('%member_logged_in%', 'none', $top);
+                $top = str_replace('%headhunter_logged_in%', 'inline', $top);
+            } else {
+                $top = str_replace('%member_logged_in%', 'inline', $top);
+                $top = str_replace('%headhunter_logged_in%', 'none', $top);
+            }
             $top = str_replace('%employee_logged_in%', 'none', $top);
         } elseif (isset($_SESSION['yel']['employee']) && 
                   !empty($_SESSION['yel']['employee']['id']) && 
@@ -103,11 +112,13 @@ class Page {
             $top = str_replace('%not_logged_in%', 'none', $top);
             $top = str_replace('%employer_logged_in%', 'none', $top);
             $top = str_replace('%member_logged_in%', 'none', $top);
+            $top = str_replace('%headhunter_logged_in%', 'none', $top);
             $top = str_replace('%employee_logged_in%', 'inline', $top);
         } else {
             $top = str_replace('%not_logged_in%', 'default', $top);
             $top = str_replace('%employer_logged_in%', 'none', $top);
             $top = str_replace('%member_logged_in%', 'none', $top);
+            $top = str_replace('%headhunter_logged_in%', 'none', $top);
             $top = str_replace('%employee_logged_in%', 'none', $top);
         }
         

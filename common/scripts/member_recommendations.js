@@ -12,7 +12,14 @@ function ascending_or_descending() {
 function sort_by(_table, _column) {
     order_by = _column;
     ascending_or_descending();
-    show_recommendations();
+    
+    switch (_table) {
+        case 'headhunter_referrals':
+            show_headhunter_recommendations();
+            break;
+        default:
+            show_recommendations();    
+    }
 }
 
 function delete_buffered(_referral_id) {
@@ -107,6 +114,93 @@ function show_recommendations() {
                         action = '<a class="no_link" onClick="delete_buffered(\'' + ids[i].childNodes[0].nodeValue + '\');">delete</a>';
                     }
                     row.set(3, new Cell(action, '', 'cell actions'));
+                    
+                    recommendations_table.set((parseInt(i)+1), row);
+                }
+                
+                $('div_recommendations').set('html', recommendations_table.get_html());
+            }
+        },
+        onRequest: function(instance) {
+            set_status('Loading recommendations...');
+        }
+    });
+    
+    request.send(params);
+}
+
+function show_headhunter_recommendations() {
+    var params = 'id=' + id + '&action=get_hh_recommendations';
+    params = params + '&order_by=' + order_by + ' ' + order;
+    
+    var uri = root + "/members/recommendations_action.php";
+    var request = new Request({
+        url: uri,
+        method: 'post',
+        onSuccess: function(txt, xml) {
+            set_status('');
+            
+            if (txt == 'ko') {
+                alert('An error occured while loading recommendations.');
+                return false;
+            }
+            
+            if (txt == '0') {
+               $('div_recommendations').set('html', '<div class="empty_results">No recommendations made.</div>');
+            } else {
+                // set_status('<pre>' + txt + '</pre>');
+                // return;
+                var tabs = xml.getElementsByTagName('tab');
+                var ids = xml.getElementsByTagName('id');
+                var job_ids = xml.getElementsByTagName('job_id');
+                var jobs = xml.getElementsByTagName('job');
+                var employers = xml.getElementsByTagName('employer');
+                var referred_ons = xml.getElementsByTagName('formatted_referred_on');
+                var rejected_ons = xml.getElementsByTagName('formatted_rejected_on');
+                var agreed_ons = xml.getElementsByTagName('formatted_agreed_on');
+                var scheduled_ons = xml.getElementsByTagName('formatted_scheduled_on');
+                var resume_hashes = xml.getElementsByTagName('resume_file_hash');
+                var resume_files = xml.getElementsByTagName('resume_file_name');
+                
+                var recommendations_table = new FlexTable('recommendations_table', 'recommendations');
+                
+                var header = new Row('');
+                header.set(0, new Cell("<a class=\"sortable\" onClick=\"sort_by('headhunter_referrals', 'referred_on');\">Recommended On</a>", '', 'header'));
+                header.set(1, new Cell("<a class=\"sortable\" onClick=\"sort_by('headhunter_referrals', 'jobs.title');\">Position</a>", '', 'header'));
+                header.set(2, new Cell("Resume File Submitted", '', 'header'));
+                header.set(3, new Cell("&nbsp;", '', 'header actions'));
+                recommendations_table.set(0, header);
+                
+                recommendations = new Array();
+                for (var i=0; i < ids.length; i++) {
+                    var row = new Row('');
+                    
+                    // referred on
+                    row.set(0, new Cell(referred_ons[i].childNodes[0].nodeValue, '', 'cell'));
+                    
+                    // position
+                    var position = '<div class="candidate_name"><a href="../job/' + job_ids[i].childNodes[0].nodeValue + '">' + jobs[i].childNodes[0].nodeValue + '</a></div><br/>';
+                    position = position + '<div class="small_contact"><span style="font-weight: bold;">Employer: </span>' + employers[i].childNodes[0].nodeValue + '</div>';
+                    row.set(1, new Cell(position, '', 'cell'));
+                    
+                    // resume file
+                    var resume_file = '<a href="recommendations_action.php?id=' + ids[i].childNodes[0].nodeValue + '&hash=' + resume_hashes[i].childNodes[0].nodeValue + '">' + resume_files[i].childNodes[0].nodeValue + '</a>';
+                    row.set(2, new Cell(resume_file, '', 'cell'));
+                    
+                    // status
+                    var status = 'New';
+                    if (agreed_ons[i].childNodes.length > 0) {
+                        status = '<span style="font-weight: bold;">Employer Accepted On: </span>' + agreed_ons[i].childNodes[0].nodeValue;
+                        
+                        if (scheduled_ons[i].childNodes.length > 0) {
+                            status = status + '<br/><span style="font-weight: bold;">Interview Scheduled On: </span>' + scheduled_ons[i].childNodes[0].nodeValue;
+                        }
+                    }
+                    
+                    if (rejected_ons[i].childNodes.length > 0) {
+                        status = '<span style="font-weight: bold;">Employer Rejected On: </span>' + rejected_ons[i].childNodes[0].nodeValue;
+                    }
+                    row.set(3, new Cell(status, '', 'cell actions'));
                     
                     recommendations_table.set((parseInt(i)+1), row);
                 }

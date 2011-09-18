@@ -144,7 +144,7 @@ if (isset($_POST['headhunter_id'])) {
     // fwrite($handle, $body);
     // fclose($handle);
     
-    redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $_POST['job_id']);
+    redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $_POST['job_id']. '?success=2');
     exit();
 }
 

@@ -3,12 +3,14 @@ require_once dirname(__FILE__). "/../../utilities.php";
 
 class MemberProfilePage extends Page {
     private $member = NULL;
+    private $is_headhunter = false;
     private $error_message = '';
     
     function __construct($_session) {
         parent::__construct();
         
         $this->member = new Member($_session['id'], $_session['sid']);
+        $this->is_headhunter = $this->member->isHeadhunter();
     }
     
     public function set_error($_error) {
@@ -101,7 +103,11 @@ class MemberProfilePage extends Page {
     public function show() {
         $this->begin();
         $this->top_search("Profile");
-        $this->menu('member', 'profile');
+        if ($this->is_headhunter) {
+            $this->menu('headhunter', 'profile');
+        } else {
+            $this->menu('member', 'profile');
+        }
         $this->howitworks();
         
         $profile = desanitize($this->member->get());
@@ -157,6 +163,20 @@ class MemberProfilePage extends Page {
                         <td class="label">Last Name / Surname:</td>
                         <td class="field"><?php echo $profile[0]['lastname']; ?></td>
                     </tr>
+                    <?php
+                    if ($this->is_headhunter) {
+                    ?>
+                    <tr>
+                        <td class="label">Agency Ref. No.:</td>
+                        <td class="field"><?php echo $profile[0]['headhunter_number']; ?></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Agreed Reward Percentage:</td>
+                        <td class="field"><?php echo $profile[0]['headhunter_reward_percentage']; ?></td>
+                    </tr>
+                    <?php
+                    }
+                    ?>
                     <tr>
                         <td class="label">Nationality:</td>
                         <td class="field">
