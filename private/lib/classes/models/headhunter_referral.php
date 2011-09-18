@@ -202,6 +202,12 @@ class HeadhunterReferral implements Model {
         return $result[0]['employer_message'];
     }
     
+    public function getCoverNote() {
+        $query = "SELECT cover_note FROM headhunter_referrals WHERE id = ". $this->id. " LIMIT 1";
+        $result = $this->mysqli->query($query);
+        return $result[0]['employer_message'];
+    }
+    
     public function uploadFile($_file_data) {
         if (!is_array($_file_data)) {
             return false;

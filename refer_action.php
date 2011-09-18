@@ -42,7 +42,7 @@ if (isset($_POST['headhunter_id'])) {
     $data['member'] = $_POST['headhunter_id'];
     $data['job'] = $_POST['job_id'];
     $data['referred_on'] = date('Y-m-d H:i:s');
-    $data['employer_message'] = $_POST['candidate_cover_note'];
+    $data['cover_note'] = $_POST['candidate_cover_note'];
     
     $referral = new HeadhunterReferral();
     if ($referral->create($data) === false) {

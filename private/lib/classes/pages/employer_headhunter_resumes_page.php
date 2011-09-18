@@ -20,7 +20,7 @@ class EmployerHeadhunterResumesPage extends Page {
     }
     
     public function insert_employer_resumes_scripts() {
-        $this->insert_scripts(array('flextable.js', 'employer_resumes.js'));
+        $this->insert_scripts(array('flextable.js', 'employer_hh_resumes.js'));
     }
     
     public function insert_inline_scripts() {
@@ -158,55 +158,13 @@ class EmployerHeadhunterResumesPage extends Page {
         
         <div id="testimony_window" class="popup_window">
             <input type="hidden" id="referral_id" value="0" />
-            <div id="window_testimony_candidate" class="popup_window_title"></div>
+            <div id="window_testimony_candidate" class="popup_window_title">Cover Note</div>
             <div id="window_testimony"></div>
             <div class="popup_window_buttons_bar">
                 <div class="instructions_label">
                     (Tip: Drag and select all to copy by pressing Ctrl + C or Command + C.)
                 </div>
-                <input type="button" value="Download PDF" onClick="download_testimony_pdf();" />
-                <input type="button" value="Close" onClick="close_testimony_popup();" />
-            </div>
-        </div>
-        
-        <div id="remarks_window" class="popup_window">
-            <div id="window_remarks_candidate" class="popup_window_title"></div>
-            <textarea id="txt_remarks" class="txt_remarks"></textarea>
-            <div class="popup_window_buttons_bar">
-                <input type="hidden" id="remarks_referral_id" value="0" />
-                <input type="hidden" id="remarks_candidate_idx" value="-1" />
-                <input type="button" value="Save &amp; Close" onClick="close_remarks_popup(true);" />
-                <input type="button" value="Close" onClick="close_remarks_popup(false);" />
-            </div>
-        </div>
-        
-        <div id="notify_window" class="popup_window">
-            <div id="window_notify_consultant" class="popup_window_title"></div>
-            <div class="message_options">
-                Choose a request to send, and enter any further communications below.<br/><br/>
-                <input type="radio" name="message" id="full_resume" checked /><label for="full_resume">Need full resume.&nbsp;
-                <input type="radio" name="message" id="others" /><label for="others">Others.
-                <br/><br/>
-            </div>
-            <textarea id="txt_message" class="txt_message"></textarea>
-            <table class="reply_to_area">
-                <tr>
-                    <td style="width: 25%;">Send To Consultant:</td>
-                    <td><span id="employee_name"></span>&nbsp;(<span id="employee_email"></span>)</td>
-                </tr>
-                <tr>
-                    <td style="width: 25%;">Reply To Email:</td>
-                    <td>
-                        <input type="text" class="field" id="reply_to" value="" /><br/>
-                        <span style="font-size: 7pt; color: #666666;">Tip: If this is left empty, the default email will be used for your consultant to reply to.</span>
-                    </td>
-                </tr>
-            </table>
-            <div class="popup_window_buttons_bar">
-                <input type="hidden" id="notify_referral_id" value="0" />
-                <input type="hidden" id="notify_candidate_idx" value="-1" />
-                <input type="button" value="Send E-mail &amp; Close" onClick="close_notify_popup(true);" />
-                <input type="button" value="Close" onClick="close_notify_popup(false);" />
+                <input type="button" value="Close" onClick="close_cover_note_popup();" />
             </div>
         </div>
         
@@ -215,22 +173,6 @@ class EmployerHeadhunterResumesPage extends Page {
             <div class="employment_form">
                 <table class="employment_form_table">
                     <tr>
-                        <td class="label">Work Commencement:</td>
-                        <td class="field">
-                        <?php
-                            $today = date('Y-m-d');
-                            $date_components = explode('-', $today);
-                            $year = $date_components[0];
-                            $month = $date_components[1];
-                            $day = $date_components[2];
-                            
-                            echo generate_dropdown('day', '', 1, 31, $day, 2, 'Day');
-                            echo generate_month_dropdown('month', '', $month);
-                            echo '<span id="year_label">'. $year. '</span>'. "\n";
-                        ?>
-                        </td>
-                    </tr>
-                    <tr>
                         <td class="label">Annual Salary:</td>
                         <td class="field"><span id="currency"><?php echo $currency; ?></span>$&nbsp;<input type="text" class="salary_field" id="salary" name="salary" value="1.00" /></td>
                     </tr>
@@ -238,9 +180,29 @@ class EmployerHeadhunterResumesPage extends Page {
             </div>
             <div class="popup_window_buttons_bar">
                 <input type="hidden" id="employment_referral_id" value="0" />
-                <input type="hidden" id="employment_candidate_idx" value="-1" />
                 <input type="button" value="Confirm &amp; Close" onClick="close_employment_popup(true);" />
                 <input type="button" value="Close" onClick="close_employment_popup(false);" />
+            </div>
+        </div>
+        
+        <div id="interview_schedule_window" class="popup_window">
+            <div id="window_employment_title" class="popup_window_title">Schedule Interview</div>
+            <div class="employment_form">
+                <table class="employment_form_table">
+                    <tr>
+                        <td class="label">Date &amp; Time:</td>
+                        <td class="field"><input type="text" id="schedule_datetime" class="schedule_datetime" value="<?php echo date('Y-m-d H:i'); ?>" /></td>
+                    </tr>
+                    <tr>
+                        <td class="label">Message:</td>
+                        <td class="field"><textarea id="schedule_message"></textarea></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="popup_window_buttons_bar">
+                <input type="hidden" id="employment_referral_id" value="0" />
+                <input type="button" value="Send" onClick="close_schedule_interview_popup(true);" />
+                <input type="button" value="Close" onClick="close_schedule_interview_popup(false);" />
             </div>
         </div>
         <?php
