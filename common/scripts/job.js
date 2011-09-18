@@ -7,7 +7,6 @@ var my_connections = new Array();
 var connections_list = new ListBox('list_placeholder', 'connections_list', true);
 
 function close_refer_popup(_proceed_refer) {
-    close_safari_connection();
     refer_wizard_page = 'referrer';    
     close_window('refer_window');
 }
@@ -523,6 +522,10 @@ function onDomReady() {
     
     if (alert_success) {
         alert('Your application was successfully submitted.' + "\n\nIt will be reviewed by our recruitment consultants and (if suitable) will then be submitted to the employer. Thank you!");
+    }
+    
+    if (alert_headhunter_request_success) {
+        alert('Your recommendation was successfully submitted.' + "\n\nIt will be reviewed by directly by the employer. If they find your candidate is suitable, they will contact you through YellowElevator. Thank you!\n\nNOTE: There is NO contact information shared at this point by YellowElevator. And, YellowElevator DOES NOT track, and use, the resume and cover note submitted.");
     }
 }
 

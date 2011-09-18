@@ -86,6 +86,9 @@ if (count($popup_params) > 1) {
         case 'success=1':
             $job_page->set_request_status(0);
             break;
+        case 'success=2':
+            $job_page->set_request_status(-1);
+            break;
         case 'error=1':
         case 'error=2':
         case 'error=3':

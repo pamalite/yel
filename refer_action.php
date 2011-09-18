@@ -58,25 +58,28 @@ if (isset($_POST['headhunter_id'])) {
     $data['FILE']['name'] = str_replace(array('\'', '"', '\\'), '', basename($_FILES['candidate_resume']['name']));
     $data['FILE']['tmp_name'] = $_FILES['candidate_resume']['tmp_name'];
     
-    if ($rreferral->uploadFile($data) === false) {
+    if ($referral->uploadFile($data) === false) {
         redirect_to($GLOBALS['protocol']. '://'. $GLOBALS['root']. '/job/'. $_POST['job_id']. '?error=1');
         exit();
     }
     
     // send email to employer
     $criteria = array(
-        'columns' => "jobs.title, jobs.employer AS employer_id, 
+        'columns' => "jobs.title, jobs.contact_carbon_copy, jobs.employer AS employer_id, 
                       employers.email_addr, employers.name AS employer",
         'joins' => "employers ON employers.id = jobs.employer",
-        'match' => "jobs.id = ". $_POST['id'],
+        'match' => "jobs.id = ". $_POST['job_id'],
         'limit' => "1"
     );
     $job = new Job();
     $result = $job->find($criteria);
     $job_name = $result[0]['title'];
-    $employer['email_addr'] = $result[0]['email_addr'];
-    $employer['name'] = $result[0]['employer'];
-    $employer['id'] = $result[0]['employer_id'];
+    $employer = array(
+       'email_addr' => $result[0]['email_addr'],
+       'name' => $result[0]['employer'],
+       'id' => $result[0]['employer_id'],
+       'cc' => $result[0]['contact_carbon_copy']
+    );
     
     $mail_lines = file('private/mail/employer_headhunter_referral.txt');
     $message = '';
@@ -123,10 +126,19 @@ if (isset($_POST['headhunter_id'])) {
     $body .= $attachment. "\n";
     $body .= '--yel_mail_sep_'. $attached_filename. "--\n\n";
     
-    mail($employer['email_addr'], $subject, $body, $headers);
+    $employer_emails = $employer['email_addr'];
+    if (!empty($employer['cc']) && !is_null($employer['cc'])) {
+        $hr_contacts = explode(',', $employer['cc']);
+        foreach ($hr_contacts as $i => $hr_contact) {
+            $hr_contacts[$i] = trim($hr_contact);
+        }
+        
+        $employer_emails = implode(',', $hr_contacts);
+    }
+    mail($employer_emails, $subject, $body, $headers);
     
-    // $handle = fopen('/tmp/email_to_'. $employer['email_addr']. '.txt', 'w');
-    // fwrite($handle, 'To: '. $employer['email_addr']. "\n\n");
+    // $handle = fopen('/tmp/email_to_'. $employer_emails. '.txt', 'w');
+    // fwrite($handle, 'To: '. $employer_emails. "\n\n");
     // fwrite($handle, 'Header: '. $headers. "\n\n");
     // fwrite($handle, 'Subject: '. $subject. "\n\n");
     // fwrite($handle, $body);

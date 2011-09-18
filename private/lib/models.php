@@ -17,4 +17,5 @@ require_once "classes/models/referral_requests.php";
 require_once "classes/models/referral_token_reward.php";
 require_once "classes/models/recommender.php";
 require_once "classes/models/referral_buffer.php";
+require_once "classes/models/headhunter_referral.php";
 ?>

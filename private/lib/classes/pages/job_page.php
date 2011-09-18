@@ -8,6 +8,7 @@ class JobPage extends Page {
     private $is_employee_viewing = false;
     private $action_has_error = false;
     private $action_responded = false;
+    private $headhunter_request_completed = false;
     private $job = NULL;
     private $is_headhunter = false;
     
@@ -17,7 +18,7 @@ class JobPage extends Page {
         if (!is_null($_session)) {
             if (!empty($_session['id']) && !empty($_session['sid'])) {
                 $this->member = new Member($_session['id'], $_session['sid']);
-                if (!$this->member->isHeadhunter()) {
+                if ($this->member->isHeadhunter()) {
                     $this->is_headhunter = true;
                 }
             }
@@ -36,6 +37,10 @@ class JobPage extends Page {
         $this->action_responded = true;
         if ($_error_number > 0) {
             $this->action_has_error = true;
+        }
+        
+        if ($_error_number < 0) {
+            $this->headhunter_request_completed = true;
         }
     }
     
@@ -115,6 +120,12 @@ class JobPage extends Page {
             } else {
                 $script .= 'var alert_success = false;'; 
             }
+        }
+        
+        if ($this->headhunter_request_completed) {
+            $script .= 'var alert_headhunter_request_success = true;';
+        } else {
+            $script .= 'var alert_headhunter_request_success = false;';
         }
         
         $this->header = str_replace('<!-- %inline_javascript% -->', $script, $this->header);
