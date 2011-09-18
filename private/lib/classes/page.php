@@ -263,10 +263,10 @@ class Page {
                 $menu = str_replace('%employee_resumes%', 'none', $menu);
             }
             
-            if ($page == 'resumes') {
-                $menu = str_replace('%employer_resumes%', $selected, $menu);
+            if ($page == 'hh_resumes') {
+                $menu = str_replace('%employer_hh_resumes%', $selected, $menu);
             } else {
-                $menu = str_replace('%employee_resumes%', 'none', $menu);
+                $menu = str_replace('%employee_hh_resumes%', 'none', $menu);
             }
             
             if ($page == 'jobs') {
