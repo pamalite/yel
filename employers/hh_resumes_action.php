@@ -406,6 +406,55 @@ if ($_POST['action'] == 'reject_resume') {
 }
 
 if ($_POST['action'] == 'schedule_interview') {
+    $data = array();
+    $data['employer_agreed_on'] = date('Y-m-d H:i:s');
+    $data['interview_scheduled_on'] = $_POST['datetime'];
+    $data['employer_message'] = $_POST['message'];
     
+    $referral = new HeadhunterReferrals($_POST['id']);
+    if ($referral->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    $criteria = array(
+        'columns' => "members.email_addr, CONCAT(members.lastname, ', ', members.firstname) AS member_name, 
+                      jobs.title, employers.name AS employer, employers.email_addr AS employer_email, 
+                      jobs.contact_carbon_copy, headhunter_referrals.resume_file_name", 
+        'joins' => "jobs ON jobs.id = headhunter_referrals.job, 
+                    employers ON employers.id = jobs.employer, 
+                    members ON members.email_addr = headhunter_referrals.member",
+        'match' => "headhunter_referrals.id = ". $_POST['id'], 
+        'limit' => "1"
+    );
+    
+    $result = $referral->find($criteria);
+    
+    $mail_lines = file('../private/mail/headhunter_interview.txt');
+    $message = '';
+    foreach ($mail_lines as $line) {
+        $message .= $line;
+    }
+    
+    $message = str_replace('%member%', htmlspecialchars_decode(stripslashes($result[0]['member_name'])), $message);
+    $message = str_replace('%resumee%', $resul[0]['resume_file_name'], $message);
+    $message = str_replace('%employer%', htmlspecialchars_decode(stripslashes($result[0]['employer'])), $message);
+    $message = str_replace('%job%', htmlspecialchars_decode(stripslashes($result[0]['title'])), $message);
+    
+    $employer_message = '';
+    if (!empty($_POST['employer_message'])) {
+        $employer_message = 'The employer has the following message for you: '. "\n\n===";
+        $employer_message .= $_POST['employer_message'];
+        $employer_message .= "===\n\n";
+    }
+    $message = str_replace('%employer_message%', $employer_message, $message);
+    
+    $subject = "Interview Scheduled for Candidates of ". $result[0]['resume_file_name'];
+    $headers = 'From: YellowElevator.com <admin@yellowelevator.com>' . "\r\n";
+    $headers .= 'Reply-To: '. $result[0]['employer_email']. ', '. $result[0]['contact_carbon_copy']. "\r\n";
+    mail($result[0]['email_addr'], $subject, $message, $headers);
+    
+    echo 'ok';
+    exit();
 }
 ?>

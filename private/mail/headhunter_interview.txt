@@ -1,0 +1,17 @@
+Hi %member%,
+
+The resume %resume% posted for the position %job% from %employer% 
+was accepted the employer. 
+
+The employer would like to schedule an interview with the candidate, 
+and perhaps request more details about the candidate. 
+
+%employer_message%
+
+Please respond to %employer% promptly to avoid any delays. 
+
+For convenience, you can reply directly from this email, and it will 
+reply directly to all the involved HR parties in %employer%.
+
+Yellow Elevator
+The Fast Way Up
