@@ -979,6 +979,20 @@ if ($_POST['action'] == 'add_new_application') {
     exit();
 }
 
+if ($_POST['action'] == 'edit_candidate_name') {
+    $data = array();
+    $data['candidate_name'] = $_POST['name'];
+    
+    $buffer = new ReferralBuffer($_POST['id']);
+    if ($buffer->update($data) === false) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
 if ($_POST['action'] == 'edit_candidate_phone') {
     $data = array();
     $data['candidate_phone'] = $_POST['phone'];
