@@ -942,7 +942,7 @@ function update_new_applicants() {
                         candidate_email = candidate_emails[i].childNodes[0].nodeValue;
                     }
                     
-                    var short_desc = '<span style="font-weight: bold;">' + candidate_names[i].childNodes[0].nodeValue + '</span>' + "\n";
+                    var short_desc = '<span style="font-weight: bold;">' + candidate_names[i].childNodes[0].nodeValue + '</span> <a class="no_link small_contact_edit" onClick="edit_candidate_name(' + ids[i].childNodes[0].nodeValue + ');">edit</a>' + "\n";
                     
                     if (isEmpty(candidate_phone_num)) {
                         is_cannot_signup = true;
@@ -1489,6 +1489,35 @@ function close_notes_popup(_is_save) {
         close_window('notes_window');
     }
 }
+
+function edit_candidate_name(_id) {
+    var name = prompt('Enter the candidate\'s name.');
+    if (!isEmpty(name)) {
+        var params = 'id=' + _id + '&action=edit_candidate_name&name=' + name;
+        
+        var uri = root + "/employees/members_action.php";
+        var request = new Request({
+            url: uri,
+            method: 'post',
+            onSuccess: function(txt, xml) {
+                set_status('');
+                
+                if (txt == 'ko') {
+                    alert('An error while saving candidate\'s name.');
+                    return;
+                }
+                
+                update_new_applicants();
+            },
+            onRequest: function(instance) {
+                set_status('Saving name...');
+            }
+        });
+
+        request.send(params);
+    } 
+}
+
 
 function edit_candidate_phone(_id) {
     var phone = prompt('Enter the candidate\'s phone number.');

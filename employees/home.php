@@ -38,6 +38,18 @@ if (isset($_SESSION['yel']['employee']['dev'])) {
     }
 }
 
+$section = 'applications';
+if (isset($_POST['page'])) {
+    $section = $_POST['page'];
+} else if (isset($_GET['page'])) {
+    $section = $_GET['page'];
+}
+
+$error_code = '';
+if (isset($_GET['error'])) {
+    $error_code = $_GET['error'];
+}
+
 $home = new EmployeeHomePage($_SESSION['yel']['employee']);
 $home->header(array('root_dir' => '../', 
                      'title' => 'Employee Home'));

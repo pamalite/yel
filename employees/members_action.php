@@ -195,6 +195,21 @@ if ($_POST['action'] == 'get_new_applicants') {
         }
     }
     
+    if (isset($_POST['notification'])) {
+        if ($_POST['notification'] == '1') {
+            if ($_POST['employee'] > 0) {
+                $match .= " AND jobs.employee = ". $_POST['employee'];
+            }
+        }
+    }
+    
+    if (isset($_POST['expiring'])) {
+        if (!empty($_POST['expiring'])) {
+            $match .= " AND referral_buffers.remind_on IS NOT NULL";
+            $match .= " AND DATE(referral_buffers.remind_on) <= '". $_POST['expiring']. "'";
+        }
+    }
+    
     if (isset($_POST['page'])) {
         $page = $_POST['page'];
     }
@@ -302,6 +317,21 @@ if ($_POST['action'] == 'get_applicants') {
     
     if (isset($_POST['resume_id'])) {
         $match .= " AND (member_jobs.`resume` = ". $_POST['resume_id']. " OR referrals.`resume` = ". $_POST['resume_id']. ")";
+    }
+    
+    if (isset($_POST['notification'])) {
+        if ($_POST['notification'] == '1') {
+            if ($_POST['employee'] > 0) {
+                $match .= " AND jobs.employee = ". $_POST['employee'];
+            }
+        }
+    }
+    
+    if (isset($_POST['expiring'])) {
+        if (!empty($_POST['expiring'])) {
+            $match .= " AND member_jobs.remind_on IS NOT NULL";
+            $match .= " AND DATE(member_jobs.remind_on) <= '". $_POST['expiring']. "'";
+        }
     }
     
     if (isset($_POST['page'])) {
@@ -941,6 +971,20 @@ if ($_POST['action'] == 'add_new_application') {
     }
     
     if (!$is_success) {
+        echo 'ko';
+        exit();
+    }
+    
+    echo 'ok';
+    exit();
+}
+
+if ($_POST['action'] == 'edit_candidate_name') {
+    $data = array();
+    $data['candidate_name'] = $_POST['name'];
+    
+    $buffer = new ReferralBuffer($_POST['id']);
+    if ($buffer->update($data) === false) {
         echo 'ko';
         exit();
     }

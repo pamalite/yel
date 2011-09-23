@@ -1,6 +1,3 @@
-div.deco {
-    background-image: url('../images/employee_home_bg.jpg');
-    background-repeat: no-repeat;
-    background-position: center center;
-    height: 300px;
+input.expire_on_field {
+    width: 90px;
 }
