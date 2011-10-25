@@ -1143,5 +1143,40 @@ class Member implements Model {
         $this->id = $result[0]['email_addr'];
         return $this->id;
     }
+    
+	public function getFacebookId() {
+        $query = "SELECT facebook_id FROM members WHERE email_addr = '". $this->id. "'";
+        $result = $this->mysqli->query($query);
+        
+        if ($result === false) {
+            return false;
+        }
+
+        if (is_null($result) || empty($result)) {
+            return NULL;
+        } 
+        
+        return $result[0]['facebook_id'];
+    }
+    
+    public function getEmailFromFacebook($_facebook_id) {
+        if (is_null($_facebook_id) || empty($_facebook_id)) {
+            return false;
+        }
+        
+        $query = "SELECT email_addr FROM members WHERE facebook_id = '". $_facebook_id. "'";
+        $result = $this->mysqli->query($query);
+        
+        if ($result === false) {
+            return false;
+        }
+
+        if (is_null($result) || empty($result)) {
+            return NULL;
+        } 
+        
+        $this->id = $result[0]['email_addr'];
+        return $this->id;
+    }
 }
 ?>

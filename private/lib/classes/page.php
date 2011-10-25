@@ -45,6 +45,15 @@ class Page {
         $this->header = str_replace('%linkedin_api_key%', $GLOBALS['linkedin_api_key'], $this->header);
     }
     
+	public function insert_facebook_jsscript() {
+		$is_facebook = "false";
+		if (isset($_SESSION['yel']['member']['facebook_id'])) {
+		    $is_facebook = "true";
+		}
+        $this->header = str_replace('%is_facebook%', $is_facebook, $this->header);
+        $this->header = str_replace('%fb_app_id%', $GLOBALS['fb_app_id'], $this->header);
+    }
+    
     public function header($hashes = "") {
         $override_title = (!isset($hashes['override_title'])) ? false : true;
         $title = (!isset($hashes['title'])) ? '' : $hashes['title'];
@@ -59,6 +68,7 @@ class Page {
         }
         
         $this->insert_linkedin_jsscript();
+        $this->insert_facebook_jsscript();
     }
     
     public function begin() {
@@ -82,6 +92,7 @@ class Page {
     protected function top_welcome() {
         $top = file_get_contents(dirname(__FILE__). '/../../html/top_welcome.html');
         $top = str_replace('%root%', $this->url_root, $top);
+        $top = str_replace('%fb_app_id%', $GLOBALS['fb_app_id'], $top);
         
         if (isset($_SESSION['yel']['employer']) && 
             !empty($_SESSION['yel']['employer']['id']) && 

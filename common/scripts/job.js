@@ -1,14 +1,60 @@
 var refer_wizard_page = 'referrer';
 var is_linkedin = false;
-var is_facebook = false;
 var refer_num_candidates = 0;
 
 var my_connections = new Array();
 var connections_list = new ListBox('list_placeholder', 'connections_list', true);
 
+if ((is_facebook == true) && (window.location.hash.length == 0)) {
+    var path = 'https://www.facebook.com/dialog/oauth?';
+    var queryParams = ['client_id=' + fb_app_id,
+      'redirect_uri=' + window.location,
+      'response_type=token'];
+    var query = queryParams.join('&');
+    var url = path + query;
+    window.open(url, '_self');
+} 
+
 function close_refer_popup(_proceed_refer) {
     refer_wizard_page = 'referrer';    
     close_window('refer_window');
+}
+
+function display_facebook_friends(result) {
+    var markup = '';
+    var numFriends = result ? result["data"].length : 0;
+    if (numFriends > 0) {
+    	connections_list.clear();
+		for (var i=0; i<numFriends; i++) {
+			var item = '<img src="https://graph.facebook.com/' + result["data"][i]["id"] + '/picture" />&nbsp;';
+			item += '<span class="connection_name">' + result["data"][i]["name"] + '</span><br>';
+		
+			var a_connection = new Hash({
+			    socialId: result["data"][i]["id"],
+				social: 'Facebook',
+				firstName: result["data"][i]["name"],
+				lastName: '',
+				currentPosition: '',
+				currentEmployer: ''
+			});
+			connections_list.add_item(item, result["data"][i]["id"]);
+			my_connections[i] = a_connection;
+        }
+		connections_list.show();
+
+		//var profilePicsDiv = document.getElementById('profile_pics');
+		//profilePicsDiv.innerHTML = markup;
+		//FB.XFBML.parse(profilePicsDiv);
+      
+		$('refer_next_btn').disabled = false;
+		$('lbl_loading_status').set('html', 'Done! Press Next to continue.');
+    }
+    else	{
+        is_facebook = false;
+        $('refer_next_btn').disabled = false;
+        $('lbl_loading_status').set('html', 'Tip: Recommend your friends via LinkedIn and Facebook by logging in through either account.');
+        return;
+    }
 }
 
 function show_refer_popup() {
@@ -20,11 +66,12 @@ function show_refer_popup() {
     $('lbl_loading_status').set('html', 'Preparing next page...');
     
     // get connection names from LinkedIn and update the list
-    if (typeof IN.API == 'undefined') {
+    if ((typeof IN.API == 'undefined') && (is_facebook == false)) {
         is_linkedin = false;
         $('refer_next_btn').disabled = false;
         $('lbl_loading_status').set('html', 'Tip: Recommend your friends via LinkedIn and Facebook by logging in through either account.');
-    } else {
+    } 
+    else if (typeof IN.API != 'undefined') {		//linked in login
         IN.API.Connections("me")
             .fields("id", "firstName", "lastName", "threeCurrentPositions")
             .result(function(_connections, _metadata) {
@@ -39,6 +86,7 @@ function show_refer_popup() {
                 }
 
                 is_linkedin = true;
+                is_facebook = false;
                 connections_list.clear();
                 var i = 0;
                 for (i=0; i < connections.length; i++) {
@@ -81,6 +129,20 @@ function show_refer_popup() {
                 $('refer_next_btn').disabled = false;
                 $('lbl_loading_status').set('html', 'Tip: Recommend your friends via LinkedIn and Facebook by logging in through either account.');
             });
+    }
+    
+    if (is_facebook == true) {		//facebook login
+	   //display friends
+	   var accessToken = window.location.hash.substring(1);
+	          var path = "https://graph.facebook.com/me/friends?";
+	      var queryParams = [accessToken, 'callback=display_facebook_friends'];
+	      var query = queryParams.join('&');
+	      var url = path + query;
+	
+	      // use jsonp to call the graph
+          var script = document.createElement('script');
+          script.src = url;
+          document.body.appendChild(script);    
     }
     
     $('refer_referrer_contacts').setStyle('display', 'block');
@@ -263,6 +325,7 @@ function show_next_refer_wizard_page() {
                         return false;
                     }
                     close_window('refer_window');
+                    alert('Your recommendation was successfully submitted.' + "\n\nIt will be reviewed by our recruitment consultants and (if suitable) will then be submitted to the employer. Thank you!");
                 }
             });
             request.send(params);
@@ -350,7 +413,10 @@ function add_candidates_to_list(_is_not_from_list) {
             html = html + '<div class="refer_candidates" id="refer_candidate_' + refer_num_candidates + '">' + "\n";
             html = html + '<input type="hidden" id="refer_candidate_social_' + refer_num_candidates + '" value="' + candidate.social + '" />' + "\n";
             html = html + '<input type="hidden" id="refer_candidate_social_id_' + refer_num_candidates + '" value="' + candidate.socialId + '" />' + "\n";
-            html = html + 'Name: <input type="text" id="refer_candidate_name_' + refer_num_candidates + '" value="' + candidate.lastName + ', ' + candidate.firstName + '" /><br/>' + "\n";
+            if (candidate.lastName.length > 0)
+            	html = html + 'Name: <input type="text" id="refer_candidate_name_' + refer_num_candidates + '" value="' + candidate.lastName + ', ' + candidate.firstName + '" /><br/>' + "\n";
+            else
+            	html = html + 'Name: <input type="text" id="refer_candidate_name_' + refer_num_candidates + '" value="' + candidate.firstName + '" /><br/>' + "\n";
             html = html + 'Email: <input type="text" id="refer_candidate_email_' + refer_num_candidates + '" /><br/>' + "\n";
             html = html + 'Phone: <input type="text" id="refer_candidate_phone_' + refer_num_candidates + '" /><br/>' + "\n";
             html = html + 'Current Position: <input type="text" id="refer_candidate_pos_' + refer_num_candidates + '" value="' + candidate.currentPosition + '" /><br/>' + "\n";
@@ -492,7 +558,7 @@ function onDomReady() {
     }
     
     if (alert_success) {
-        alert('Your request was successfully submitted.' + "\n\nWe will contact the candidate shortly.");
+        alert('Your application was successfully submitted.' + "\n\nIt will be reviewed by our recruitment consultants and (if suitable) will then be submitted to the employer. Thank you!");
     }
 }
 

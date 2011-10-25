@@ -16,6 +16,34 @@
                     <script type="IN/Login" data-onAuth="on_linkedin_auth"></script>
                     <br/><br/>
                     <span style="font-size: 18pt; color: #CCCCCC;">OR</span><br/><br/>
+                    click the Facebook button
+                    <br/><br/>
+                    <div id="fb-root"></div>
+      	            <script>
+				      	window.fbAsyncInit = function() {
+					        FB.init({
+					          appId: '%fb_app_id%',
+					          cookie: true,
+					          xfbml: true, 
+					          oauth: true
+					        });
+							FB.Event.subscribe('auth.login', function(response) {
+							          on_facebook_auth();
+							        });
+				      	};
+					    (function() {
+					        var e = document.createElement('script'); e.async = true;
+					        e.src = document.location.protocol +
+					          '//connect.facebook.net/en_US/all.js';
+					        document.getElementById('fb-root').appendChild(e);
+					    }());
+				    </script>
+      	            <a id="fb_login_button" href="#"
+      	            	onclick="FB.login(function(){},{scope: 'email,friends_about_me,user_work_history,friends_work_history'});return false;"> 
+    				<img src="../common/images/facebook_login.png" alt="Sign In with Facebook"></a>
+                    
+                    <br/><br/>
+                    <span style="font-size: 18pt; color: #CCCCCC;">OR</span><br/><br/>
                     Please fill up <span style="font-weight: bold; text-decoration: underline;">ALL</span> the fields below.
                 </td>
             </tr>

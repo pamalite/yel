@@ -1,13 +1,14 @@
 <!DOCTYPE HTML>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
 <head>
 <LINK REL="SHORTCUT ICON" href="%root%/common/images/favicon.ico">
 <title>%page_title%</title>
 <link rel="stylesheet" type="text/css" href="%root%/common/css/common.css">
 <link rel="stylesheet" type="text/css" href="%root%/common/css/howitworks.css">
 <link rel="stylesheet" type="text/css" href="%root%/common/css/Autocompleter.css" type="text/css" media="screen" />
+<link rel="stylesheet" type="text/css" href="%root%/common/css/datepicker.css">
 
 <!-- LinkedIn JS APIs -->
 <script type="text/javascript" src="https://platform.linkedin.com/in.js">
@@ -15,7 +16,11 @@ api_key: %linkedin_api_key%
 authorize: true
 </script>
 
-<!-- LinkedIn JS APIs -->
+<!-- Facebook script -->
+<script>
+var is_facebook = %is_facebook%;
+var fb_app_id = %fb_app_id%;
+</script>
 
 <!-- additional CSS for individual pages -->
 %page_css%
@@ -33,7 +38,9 @@ authorize: true
 <script type="text/javascript" src="%root%/common/scripts/howitworks.js"></script>
 <script type="text/javascript" src="%root%/common/scripts/Observer.js"></script>
 <script type="text/javascript" src="%root%/common/scripts/Autocompleter.js"></script>
+<script type="text/javascript" src="%root%/common/scripts/datepicker.js"></script>
 <script type="text/javascript" src="%root%/common/scripts/linkedin.js"></script>
+<script type="text/javascript" src="%root%/common/scripts/facebook.js"></script>
 
 <!-- additional JS for individual pages -->
 %page_javascript%

@@ -8,15 +8,46 @@
 </div>
 <div class="loginbar">
     <span id="not_logged_in_bar" style="display: %not_logged_in%;">
+	<table align="center"><tr>
+	<td>
         <input type="text" id="login_email_addr" alt="Email" />
         <input type="password" id="login_password" alt="Password" />
         <input type="button" id="login" value="Sign In" />
         <span style="font-size: 8pt;">
             <a class="welcome_members" href="#" onClick="show_password_reset_window();">Forgot Password?</a>
         </span>
-        &nbsp;OR&nbsp;
-        <script type="IN/Login" data-onAuth="on_linkedin_auth"></script>
+	</td>
+	<td>&nbsp;OR&nbsp;</td>
+	<td><script type="IN/Login" data-onAuth="on_linkedin_auth"></script></td>
+	<td>&nbsp;OR&nbsp;</td>
+	<td>
+		<div id="fb-root"></div>
+	 	<script>
+	     	window.fbAsyncInit = function() {
+		        FB.init({
+		          appId: '%fb_app_id%',
+		          cookie: true,
+		          xfbml: true, 
+		          oauth: true
+		        });
+		        FB.Event.subscribe('auth.login', function(response) {
+		        	on_facebook_auth_welcome();
+			        });
+	     	};
+	    (function() {
+	        var e = document.createElement('script'); e.async = true;
+	        e.src = document.location.protocol +
+	          '//connect.facebook.net/en_US/all.js';
+	        document.getElementById('fb-root').appendChild(e);
+	    }());
+	   </script>
+       <a id="fb_login_button" href="#"
+            	onclick="FB.login(function(){},{scope: 'email,friends_about_me,user_work_history,friends_work_history'});return false;"> 
+		<img src="common/images/facebook_login.png" alt="Sign In with Facebook"></a>
+	</td>
+	</tr></table>
     </span>
+    
     <span style="display: %member_logged_in%;">
         Go back to <span style="font-weight: bold;"><a href="%root%/members">Career Profile</a></span> or <span style="font-weight: bold;"><a onClick="return logout_from_linkedin();" href="%root%/members/logout.php">Logout</a></span>
     </span>

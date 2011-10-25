@@ -12,6 +12,10 @@ $openinviter_path = '/../../openinviter';
 $linkedin_api_key = 'R2lTi8uK9ROT8_1AfK_h5KWRBuMpycGGxGw0Dqn6_aXbHlRYwA-vqTe1eozKzAUo';
 $linkedin_secret_key = 'LsgYZUxq5lAcmrXaKJMgPckN3R9pnfqI29kHybevAKCCDdz3_YjzITkGtKbTkZiY';
 
+// Facebook settings
+$fb_app_id = '231262470267031';
+$fb_app_secret = 'db6f3bd9e8a75f21ef4e14a3c81fbb82';
+
 // Geographical settings
 $default_country_code = "MY";
 $default_country = "Malaysia";

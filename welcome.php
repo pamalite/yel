@@ -2,6 +2,7 @@
 session_start();
 
 require_once "private/lib/utilities.php";
+require_once "private/lib/facebook_connect.php";
 require_once "private/lib/classes/pages/welcome_page.php";
 
 // 1. Check whether session has been initialized
@@ -45,5 +46,12 @@ $welcome->insert_welcome_css();
 $welcome->insert_welcome_scripts();
 $welcome->insert_inline_scripts();
 $welcome->show();
+
+//auto login if current facebook user has registered with yellow elevator
+if (get_current_facebook_user() != "")
+{
+	echo "<script>on_facebook_auth_welcome();</script>";
+}
+        
 $welcome->footer();
 ?>
